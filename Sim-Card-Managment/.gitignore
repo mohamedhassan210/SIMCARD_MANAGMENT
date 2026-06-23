@@ -1,0 +1,31 @@
+## Visual Studio files
+.vs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+b囊/
+Build/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## .NET Core / ASP.NET Core build outputs
+bin/
+obj/
+
+## Publish output folder (if you use folder publish)
+bin/Release/net*/publish/
+
+## Tailwind CSS compiled output (Optional)
+# If you want to build the CSS every time on the server, you can ignore it:
+# wwwroot/css/site.css
+
+## Operating System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+node_modules/
