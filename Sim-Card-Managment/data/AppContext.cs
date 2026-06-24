@@ -6,13 +6,19 @@ namespace Sim_Card_Managment.data
     public class AppContext :DbContext
     {
         public AppContext(DbContextOptions options) : base(options) { }
-        public virtual DbSet<Employee> Employees { get; set; }
-        public virtual DbSet<NonEmployee> NonEmployees { get; set; }
         public virtual DbSet<Sim_Card_Managment.Models.Action> Actions { get; set; }
-        public virtual DbSet<Status> Statuss { get; set; }
-        public virtual DbSet<Subscription> Subscriptions { get; set; }
+        public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<Group> Groups { get; set; }
+        public virtual DbSet<NonEmployee> NonEmployees { get; set; }
+        public virtual DbSet<Quote> Quotes { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<RoleGroup> RoleGroups { get; set; }
         public virtual DbSet<SIM> SIMs { get; set; }
+        public virtual DbSet<Subscription> Subscriptions { get; set; }
         public virtual DbSet<USB> USBs { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+     
+      
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

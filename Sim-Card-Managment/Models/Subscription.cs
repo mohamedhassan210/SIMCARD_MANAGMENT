@@ -11,7 +11,14 @@ namespace Sim_Card_Managment.Models
         public Guid? NotEmployeeId { get; set; }
         public Guid? SIMId { get; set; }
         public Guid? USBId { get; set; }
-        // فاضل ال UserId وال object بتاعه اللي هيتعمل بيه ال foreign key
+        public Guid? UserId { get; set; }
+        public Guid? ActionId {  get; set; }
+
+        [ForeignKey(nameof(ActionId))]
+        public virtual Action? Action { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public virtual User? User { get; set; }
         [ForeignKey(nameof(EmpId))]
         public virtual Employee? Employee { get; set; }
         [ForeignKey(nameof(NotEmployeeId))]
