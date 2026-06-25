@@ -1,6 +1,6 @@
 ﻿using Sim_Card_Managment.Models;
 
-namespace Sim_Card_Managment.Repos.USBRepo.USBRepo
+namespace Sim_Card_Managment.Repos
 {
     public interface IUSBRepo
     {

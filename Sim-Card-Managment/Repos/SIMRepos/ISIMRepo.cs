@@ -1,6 +1,7 @@
 ﻿using Sim_Card_Managment.Models;
 
-namespace Sim_Card_Managment.Repos.SIMRepo.SIMRepo
+
+namespace Sim_Card_Managment.Repos
 {
     public interface ISIMRepo
     {

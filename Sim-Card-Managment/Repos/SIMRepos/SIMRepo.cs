@@ -1,7 +1,7 @@
 ﻿using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 
-namespace Sim_Card_Managment.Repos.SIMRepo
+namespace Sim_Card_Managment.Repos
 {
     public class SIMRepo : ISIMRepo
     {
