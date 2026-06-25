@@ -1,0 +1,34 @@
+/* Font */
+@font-face {
+    font-family: 'Roboto';
+    src: url("../css/Roboto-VariableFont_wdth\,wght.ttf") format("truetype");
+}
+body
+{
+    font-family: "Roboto" , sans-serif;
+}
+/* NavBar */
+/* ul bg */
+.bg-blur
+{
+    background:linear-gradient(135deg,rgba(255,255,255,0.2),rgba(255,255,255,0.2)) !important;
+backdrop-filter: blur(100px) !important;
+    -webkit-backdrop-filter: blur(100px) !important;
+}
+/* active Link */
+.navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
+   color: #000 !important;
+   background-color: #fff;
+   border-radius: 20px;
+   
+}
+/* End Of NavBar */
+/* Hero Scetion (Home Page) */
+.hero_bg
+{
+    background-color: #E24D17;
+}
+.max-width
+{
+    max-width: 800px;
+}
