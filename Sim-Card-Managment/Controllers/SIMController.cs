@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
+using Sim_Card_Managment.Models;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -26,11 +26,11 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(SIM sim)
+        public IActionResult Create(Sim sim)
         {
             if (ModelState.IsValid)
             {
-                sim.SimId = Guid.NewGuid();
+                sim.Id = Guid.NewGuid();
                 _simRepo.Add(sim);
 
                 return RedirectToAction(nameof(Index));
@@ -40,7 +40,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(int id)
         {
             var sim = _simRepo.GetById(id);
 
@@ -51,7 +51,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(SIM sim)
+        public IActionResult Edit(Sim sim)
         {
             if (ModelState.IsValid)
             {

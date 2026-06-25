@@ -7,6 +7,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IUSBRepo, USBRepo>();
 builder.Services.AddScoped<ISIMRepo, SIMRepo>();
+builder.Services.AddScoped<IQuotaRepo, QuotaRepo>();
+builder.Services.AddScoped<ISubscriptionRepo, SubscriptionRepo>();
 
 var app = builder.Build();
 
