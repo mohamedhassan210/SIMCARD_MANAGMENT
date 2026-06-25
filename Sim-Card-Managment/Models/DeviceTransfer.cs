@@ -6,17 +6,17 @@ namespace Sim_Card_Managment.Models
     public class DeviceTransfer
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
-        public int FromSubscriptionId { get; set; }
+        public Guid FromSubscriptionId { get; set; }
 
         [Required]
-        public int ToEmpId { get; set; }
+        public Guid ToEmpId { get; set; }
 
-        public int? SimId { get; set; }
+        public Guid? SimId { get; set; }
 
-        public int? UsbId { get; set; }
+        public Guid? UsbId { get; set; }
 
         [Required]
         public DateTime TransferDate { get; set; }
@@ -25,9 +25,9 @@ namespace Sim_Card_Managment.Models
         public string? Reason { get; set; }  // Lost / Replaced / Reassigned
 
         [Required]
-        public int CreatedBy { get; set; }
+        public Guid CreatedBy { get; set; }
 
-        public int? NewSubscriptionId { get; set; }  // subscription created after transfer
+        public Guid? NewSubscriptionId { get; set; }  // subscription created after transfer
 
         // Navigation properties
         [ForeignKey(nameof(FromSubscriptionId))]

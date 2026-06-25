@@ -6,7 +6,7 @@ namespace Sim_Card_Managment.Models
     public class Quota
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Column(TypeName = "decimal(10,2)")]
         public decimal BaseAmount { get; set; }  // GB per month

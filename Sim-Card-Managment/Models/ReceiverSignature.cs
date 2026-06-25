@@ -6,13 +6,13 @@ namespace Sim_Card_Managment.Models
     public class ReceiverSignature
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
-        public int SubscriptionId { get; set; }
+        public Guid SubscriptionId { get; set; }
 
         [Required]
-        public int SignedBy { get; set; }
+        public Guid SignedBy { get; set; }
 
         [Required]
         public DateTime SignedDate { get; set; }

@@ -6,7 +6,7 @@ namespace Sim_Card_Managment.Models
     public class User
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -21,7 +21,7 @@ namespace Sim_Card_Managment.Models
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        public int GroupId { get; set; }
+        public Guid GroupId { get; set; }
 
         public DateTime? LastLogin { get; set; }
 

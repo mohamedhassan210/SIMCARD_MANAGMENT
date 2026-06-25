@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\Sim-Card-Managment.props" />
-</Project>
