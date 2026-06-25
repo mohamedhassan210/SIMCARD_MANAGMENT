@@ -159,3 +159,6 @@ C:\Users\DELL\Source\Repos\SIMCARD_MANAGMENT\Sim-Card-Managment\obj\Debug\net8.0
 C:\Users\DELL\Source\Repos\SIMCARD_MANAGMENT\Sim-Card-Managment\obj\Debug\net8.0\Sim-Card-Managment.pdb
 C:\Users\DELL\Source\Repos\SIMCARD_MANAGMENT\Sim-Card-Managment\obj\Debug\net8.0\Sim-Card-Managment.genruntimeconfig.cache
 C:\Users\DELL\Source\Repos\SIMCARD_MANAGMENT\Sim-Card-Managment\obj\Debug\net8.0\ref\Sim-Card-Managment.dll
+D:\New folder (3)\Sim-Card-Managment\obj\Debug\net8.0\Sim-Card-Managment.dll
+D:\New folder (3)\Sim-Card-Managment\obj\Debug\net8.0\refint\Sim-Card-Managment.dll
+D:\New folder (3)\Sim-Card-Managment\obj\Debug\net8.0\Sim-Card-Managment.pdb

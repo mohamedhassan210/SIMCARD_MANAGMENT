@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {}
+    "D:\\New folder (3)\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {}
   },
   "projects": {
-    "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
+    "D:\\New folder (3)\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
+        "projectUniqueName": "D:\\New folder (3)\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
         "projectName": "Sim-Card-Managment",
-        "projectPath": "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
-        "packagesPath": "C:\\Users\\m.eldokany\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\Sim-Card-Managment\\obj\\",
+        "projectPath": "D:\\New folder (3)\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
+        "packagesPath": "C:\\Users\\sd\\.nuget\\packages\\",
+        "outputPath": "D:\\New folder (3)\\Sim-Card-Managment\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\m.eldokany\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\sd\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -44,7 +44,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.100"
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -78,7 +78,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
