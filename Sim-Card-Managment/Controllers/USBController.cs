@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Models;
-using Sim_Card_Managment.Repos;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -37,7 +36,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public IActionResult Edit(Guid id)
         {
             var usb = _usbRepo.GetById(id);
 
@@ -59,7 +58,7 @@ namespace Sim_Card_Managment.Controllers
             return View(usb);
         }
 
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
             _usbRepo.Delete(id);
             return RedirectToAction(nameof(Index));

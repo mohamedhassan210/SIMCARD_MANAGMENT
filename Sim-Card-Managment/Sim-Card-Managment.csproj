@@ -12,12 +12,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
-	<Target Name="TailwindBeforeBuild" BeforeTargets="Build" Condition="'$(Configuration)' == 'Debug'">
-		<Exec Command="npx tailwindcss -i ./Styles/tailwind.css -o ./wwwroot/css/site.css" />
-	</Target>
 
-	<Target Name="TailwindBeforePublish" BeforeTargets="Publish" Condition="'$(Configuration)' == 'Release'">
-		<Exec Command="npx tailwindcss -i ./Styles/tailwind.css -o ./wwwroot/css/site.css --minify" />
-	</Target>
 	
 </Project>

@@ -1,4 +1,5 @@
-using Sim_Card_Managment.Repos;
+using Sim_Card_Managment.Repos.SIMRepo;
+using Sim_Card_Managment.Repos.USBRepo;
 
 var builder = WebApplication.CreateBuilder(args);
 

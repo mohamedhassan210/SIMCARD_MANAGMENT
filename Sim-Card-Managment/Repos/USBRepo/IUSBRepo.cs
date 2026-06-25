@@ -1,13 +1,13 @@
 ﻿using Sim_Card_Managment.Models;
 
-namespace Sim_Card_Managment.Repos
+namespace Sim_Card_Managment.Repos.USBRepo.USBRepo
 {
     public interface IUSBRepo
     {
         IEnumerable<Usb> GetAll();
-        Usb? GetById(int id);
+        Usb? GetById(Guid id);
         void Add(Usb usb);
         void Update(Usb usb);
-        void Delete(int id);
+        void Delete(Guid id);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Models;
 
 namespace Sim_Card_Managment.Controllers
@@ -40,7 +39,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public IActionResult Edit(Guid id)
         {
             var sim = _simRepo.GetById(id);
 
