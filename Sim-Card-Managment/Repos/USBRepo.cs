@@ -17,7 +17,7 @@ namespace Sim_Card_Managment.Repos
             return _context.Usbs.ToList();
         }
 
-        public Usb? GetById(int id)
+        public Usb? GetById(Guid id)
         {
             return _context.Usbs.Find(id);
         }
@@ -34,7 +34,7 @@ namespace Sim_Card_Managment.Repos
             _context.SaveChanges();
         }
 
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
             var usb = GetById(id);
 

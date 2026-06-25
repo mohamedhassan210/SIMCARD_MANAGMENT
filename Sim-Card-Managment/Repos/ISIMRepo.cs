@@ -5,9 +5,9 @@ namespace Sim_Card_Managment.Repos
     public interface ISIMRepo
     {
         IEnumerable<Sim> GetAll();
-        Sim? GetById(int id);
+        Sim? GetById(Guid id);
         void Add(Sim sim);
         void Update(Sim sim);
-        void Delete(int id);
+        void Delete(Guid id);
     }
 }
