@@ -2755,23 +2755,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\sd\\.nuget\\packages\\": {},
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
+      "projectUniqueName": "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
       "projectName": "Sim-Card-Managment",
-      "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
-      "packagesPath": "C:\\Users\\sd\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\obj\\",
+      "projectPath": "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
+      "packagesPath": "C:\\Users\\m.eldokany\\.nuget\\packages\\",
+      "outputPath": "D:\\Repos\\Sim-Card-Managment\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\sd\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\m.eldokany\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2798,7 +2798,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -2832,7 +2832,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
