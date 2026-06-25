@@ -1,7 +1,12 @@
+using Sim_Card_Managment.Repos;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<IUSBRepo, USBRepo>();
+builder.Services.AddScoped<ISIMRepo, SIMRepo>();
 
 var app = builder.Build();
 
