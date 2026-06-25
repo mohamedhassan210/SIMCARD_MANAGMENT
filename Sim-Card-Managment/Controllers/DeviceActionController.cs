@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Models;
-using Sim_Card_Managment.Repos;
+using Sim_Card_Managment.Repos.DeviceActionRepo;
 
 namespace Sim_Card_Managment.Controllers
 {
