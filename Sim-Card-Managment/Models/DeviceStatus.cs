@@ -6,11 +6,11 @@ namespace Sim_Card_Managment.Models
     public class DeviceStatus
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
-        public int? SimId { get; set; }
+        public Guid? SimId { get; set; }
 
-        public int? UsbId { get; set; }
+        public Guid? UsbId { get; set; }
 
         [Required]
         [StringLength(30)]
@@ -23,11 +23,11 @@ namespace Sim_Card_Managment.Models
         public string? Notes { get; set; }
 
         [Required]
-        public int ReportedBy { get; set; }
+        public Guid ReportedBy { get; set; }
 
-        public int? ReplacedBySimId { get; set; }  // new SIM if replaced
+        public Guid? ReplacedBySimId { get; set; }  // new SIM if replaced
 
-        public int? ReplacedByUsbId { get; set; }  // new USB if replaced
+        public Guid? ReplacedByUsbId { get; set; }  // new USB if replaced
 
         // Navigation properties
         [ForeignKey(nameof(SimId))]
