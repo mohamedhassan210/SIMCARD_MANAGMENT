@@ -2,22 +2,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Sim_Card_Managment.Models
 {
-    public class NonEmployee
+    public class DeviceAction
     {
         [Key]
         public Guid Id { get; set; }
 
         [Required]
-        [StringLength(200)]
-        public string Name { get; set; } = string.Empty;
-
-        [StringLength(200)]
-        public string? ContactInfo { get; set; }
-
         [StringLength(100)]
-        public string? Type { get; set; }  // e.g. Contractor, Visitor
+        public string Name { get; set; } = string.Empty;  // e.g. Assign, Replace, Return
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        [StringLength(20)]
+        public string ActionStatus { get; set; } = "Active";  // Active / Inactive
+
+        [StringLength(500)]
+        public string? Description { get; set; }
 
         // Navigation properties
         public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
