@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
+using Sim_Card_Managment.Repos.QuoteRepo;
 
 namespace Sim_Card_Managment.Controllers
 {

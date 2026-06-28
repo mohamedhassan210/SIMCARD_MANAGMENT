@@ -1,6 +1,6 @@
 ﻿using Sim_Card_Managment.Models;
 
-namespace Sim_Card_Managment.Repos
+namespace Sim_Card_Managment.Repos.QuoteRepo
 {
     public interface IQuotaRepo
     {
