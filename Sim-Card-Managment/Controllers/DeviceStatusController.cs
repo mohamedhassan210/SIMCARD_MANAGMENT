@@ -29,7 +29,7 @@ namespace Sim_Card_Managment.Controllers
 
         public IActionResult Create()
         {
-            return View(new DeviceStatus());
+            return View(new DeviceStatus { StatusDate = DateTime.Now });
         }
 
         [HttpPost]

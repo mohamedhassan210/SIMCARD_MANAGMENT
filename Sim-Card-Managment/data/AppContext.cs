@@ -156,12 +156,5 @@ namespace Sim_Card_Managment.data
                 .HasForeignKey(ds => ds.ReportedBy)
                 .OnDelete(DeleteBehavior.Restrict);
         }
-     ________       
-    /\--__--/\
-      ------
-        /|\  
-         |
-         |
-        / \
     }
 }

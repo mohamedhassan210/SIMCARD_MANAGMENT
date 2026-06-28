@@ -7,7 +7,8 @@ namespace Sim_Card_Managment.Repos
         IEnumerable<DeviceTransfer> GetAllDeviceTransfers();
         DeviceTransfer? GetDeviceTransferbyId(Guid id);
         void AddDeviceTransfer(DeviceTransfer deviceTransfer);
-        void Update(DeviceTransfer deviceTransfer);
-        void DeleteTransfer(Guid id);
+        Subscription? GetSubscriptionById(Guid id);
+        void AddSubscription(Subscription subscription);
+        void CompleteTransaction();
     }
 }

@@ -25,22 +25,20 @@ namespace Sim_Card_Managment.Repos
         public void AddDeviceTransfer(DeviceTransfer deviceTransfer)
         {
             _context.DeviceTransfers.Add(deviceTransfer);
-            _context.SaveChanges();
         }
 
-        public void DeleteTransfer(Guid id)
+        public Subscription? GetSubscriptionById(Guid id)
         {
-            var transfer = GetDeviceTransferbyId(id);
-            if (transfer != null)
-            {
-                _context.DeviceTransfers.Remove(transfer);
-                _context.SaveChanges();
-            }
+            return _context.Subscriptions.Find(id);
         }
 
-        public void Update(DeviceTransfer deviceTransfer)
+        public void AddSubscription(Subscription subscription)
         {
-            _context.DeviceTransfers.Update(deviceTransfer);
+            _context.Subscriptions.Add(subscription);
+        }
+
+        public void CompleteTransaction()
+        {
             _context.SaveChanges();
         }
     }
