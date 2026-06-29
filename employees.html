@@ -1,11 +1,114 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="css/main.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
 </head>
-<body>
-    Employees
+
+<body class="bg-black text-white min-vh-100 font-sans">
+
+    <div class="container-fluid py-5 px-md-5">
+
+        <div class="d-flex justify-content-center my-5">
+            <div class="overlap-title-wrapper">
+                <div class="overlap-number">120</div>
+                <div class="overlap-text">Employee</div>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <div
+                class="search-wrapper flex-grow-1 d-flex align-items-center px-3 py-2 rounded-pill border border-secondary">
+                <i class="bi bi-search text-white me-2"></i>
+                <input type="text" class="form-control bg-transparent border-0 text-white shadow-none "
+                    placeholder="Search by id or name">
+            </div>
+
+            <button class="btn custom-filter-btn"
+                style="box-shadow: 0px 0px 10px 5px rgba(255, 255, 255, 0.2) !important; border: none !important;">
+                <i class="bi bi-filter-right text-white fs-4"></i>
+            </button>
+        </div>
+
+
+
+        <div class="bg-white text-dark table-board px-4 pt-4 pb-0 position-relative ">
+
+            <div class="table-responsive custom-scrollbar pe-3 mb-4 rounded-5">
+                <table class="table custom-table align-middle text-start mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="border-0"></th>
+                            <th scope="col" class="border-0 text-muted fw-normal">Name</th>
+                            <th scope="col" class="border-0 text-muted fw-normal">Id</th>
+                            <th scope="col" class="border-0 text-muted fw-normal">Phone</th>
+                            <th scope="col" class="border-0 text-muted fw-normal">Used</th>
+                            <th scope="col" class="border-0"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-muted border-end">0</td>
+                            <td class="border-end">Adham Amr Mohamed</td>
+                            <td class="border-end">012</td>
+                            <td class="border-end">01556176733</td>
+                            <td class="border-end py-3">
+                                <span class="badge bg-brand-orange rounded-pill me-1 px-3 py-2">1 SIM</span>
+                                <span class="badge bg-brand-orange rounded-pill px-3 py-2">2 USB</span>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-brand-orange text-white rounded-2"><i
+                                        class="bi bi-box-arrow-up-right"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted border-end">1</td>
+                            <td class="border-end">Adham Amr Mohamed</td>
+                            <td class="border-end">012</td>
+                            <td class="border-end">01556176733</td>
+                            <td class="border-end py-3">
+                                <span class="badge bg-brand-orange rounded-pill px-3 py-2">2 USB</span>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-brand-orange text-white rounded-2"><i
+                                        class="bi bi-box-arrow-up-right"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted border-end">2</td>
+                            <td class="border-end">Adham Amr Mohamed</td>
+                            <td class="border-end">012</td>
+                            <td class="border-end">01556176733</td>
+                            <td class="border-end py-3">
+                                <span class="badge bg-brand-orange rounded-pill px-3 py-2">1 SIM</span>
+                            </td>
+                            <td class="text-center"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted border-end">3</td>
+                            <td class="border-end">Adham Amr Mohamed</td>
+                            <td class="border-end">012</td>
+                            <td class="border-end">01556176733</td>
+                            <td class="border-end py-3"></td>
+                            <td class="text-center"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

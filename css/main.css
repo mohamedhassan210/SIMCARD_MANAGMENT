@@ -1,3 +1,5 @@
+
+
 /* Font */
 @font-face {
     font-family: 'Roboto';
@@ -86,3 +88,185 @@ body
     color: #d1d1d1;
 }
 
+
+
+
+
+
+/* --- empoly css --- */
+:root {
+    --brand-orange: #E24D17;
+}
+
+body {
+    background-color: #000;
+}
+
+/* --- Utilities --- */
+.bg-brand-orange {
+    background-color: var(--brand-orange) !important;
+}
+.btn-brand-orange {
+    background-color: var(--brand-orange) !important;
+    color: white !important;
+    border: none;
+}
+.btn-brand-orange:hover {
+    background-color: #c44111 !important;
+    color: white;
+}
+
+/* --- Search & Filter --- */
+.search-wrapper {
+    background-color: #0a0a0a; /* Slightly lighter than pure black */
+}
+
+.search-wrapper input::placeholder {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Fix input outline on focus */
+.search-wrapper input:focus {
+    box-shadow: none;
+    outline: none;
+    color: white;
+}
+.custom-filter-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background-color: #E24D17;
+    border: none !important; /* Ensure no Bootstrap border is hiding it */
+    
+    /* Using RGBA for a glowing drop-shadow effect on a black background */
+    box-shadow: 0px 8px 20px rgba(226, 77, 23, 0.6) !important; 
+}
+/* --- Table Container --- */
+.table-board {
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    min-height: 500px;
+
+}
+/* --- The Bulletproof Table Border-Radius --- */
+.custom-table {
+    border-collapse: separate !important;
+    border-spacing: 0;
+    border: 1px solid #e0e0e0; /* The main outer border */
+    border-radius: 16px;       /* The rounded corners */
+}
+
+/* Prevent double-borders on the inside */
+.custom-table thead th {
+    border-top: none !important;
+    border-bottom: 1px solid #e0e0e0;
+}
+.custom-table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* Force the exact corner cells to curve with the border */
+.custom-table thead tr:first-child th:first-child {
+    border-top-left-radius: 16px;
+}
+.custom-table thead tr:first-child th:last-child {
+    border-top-right-radius: 16px;
+}
+.custom-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 16px;
+}
+.custom-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 16px;
+}
+
+/* Keep your vertical cell borders */
+.custom-table td, 
+.custom-table th {
+    vertical-align: middle;
+}
+.custom-table td.border-end {
+    border-right: 1px solid #e0e0e0 !important;
+}
+
+/* Optional: Make the wrapper border match your design's light gray color */
+.table-responsive.border {
+    border-color: #e0e0e0 !important;
+}
+
+
+/* --- Custom Orange Scrollbar --- */
+.custom-scrollbar {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--brand-orange); 
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #c44111; 
+}
+
+
+
+
+/* --- Overlapping Title Style --- */
+.overlap-title-wrapper {
+    position: relative;
+    display: inline-block; /* Shrink-wraps the container tightly around the text */
+    text-align: center;
+    line-height: 1;        /* Removes extra invisible spacing above/below text */
+    font-family: sans-serif; 
+}
+
+/* The large orange background number */
+.overlap-number {
+    font-size: 298px;      /* Very large font */
+    font-weight: 700;      /* Bold */
+    color: var(--brand-orange); /* Uses your existing orange variable (#E24D17) */
+    margin: 0;
+    z-index: 1;
+}
+
+/* The white foreground text */
+.overlap-text {
+    font-size: 128px;       
+    color: #ffffff;
+    
+    /* Absolute positioning magic to make it overlap */
+    position: absolute;
+    bottom: 5px;           /* Pushes it up slightly from the bottom of the numbers */
+    left: 50%;             /* Starts the text exactly in the middle... */
+    transform: translateX(-50%); /* ...then pulls it back by 50% to perfectly center it */
+    z-index: 2;            /* Forces it to sit on top of the orange numbers */
+    
+    margin: 0;
+    letter-spacing: 2px;   /* Slight spacing between letters */
+}
+
+
+@media (max-width: 768px) {
+    .overlap-number {
+        font-size: 100px;
+    }
+    .overlap-text {
+        font-size: 45px;
+        bottom: 2px;
+    }
+}
+
+.cursor{
+    cursor: pointer;
+}
