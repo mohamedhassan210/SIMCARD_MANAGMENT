@@ -2,7 +2,7 @@
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 
-namespace Sim_Card_Managment.Repos.SubscriptionRepo
+namespace Sim_Card_Managment.Repos
 {
     public class SubscriptionRepo : ISubscriptionRepo
     {

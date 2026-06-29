@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Repos.QuoteRepo;
-using Sim_Card_Managment.Repos.SubscriptionRepo;
 
 var builder = WebApplication.CreateBuilder(args);
 
