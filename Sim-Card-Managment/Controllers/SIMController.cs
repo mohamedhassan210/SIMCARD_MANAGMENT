@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
+using Sim_Card_Managment.Authorization;
+using System;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class SIMController : Controller
     {
         private readonly ISIMRepo _simRepo;

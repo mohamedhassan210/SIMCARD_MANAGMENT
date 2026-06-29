@@ -1,16 +1,18 @@
 ﻿@model Sim_Card_Managment.Models.Quota
 
 @{
-    ViewData["Title"] = "Create Quota";
+    ViewData["Title"] = "Edit Quota";
 }
 
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <h2 class="mb-4">Create Quota Plan</h2>
+            <h2 class="mb-4">Edit Quota Plan</h2>
 
-            <form asp-action="Create" method="post">
+            <form asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <input type="hidden" asp-for="Id" />
 
                 <div class="form-group mb-3">
                     <label asp-for="BaseAmount" class="form-label">Base Amount (GB)</label>
@@ -26,7 +28,7 @@
 
                 <div class="form-group mb-3">
                     <label asp-for="Period" class="form-label">Period</label>
-                    <input asp-for="Period" class="form-control" required placeholder="e.g., Monthly, Yearly" />
+                    <input asp-for="Period" class="form-control" required />
                     <span asp-validation-for="Period" class="text-danger"></span>
                 </div>
 
@@ -43,7 +45,7 @@
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-success w-100">Save</button>
+                    <button type="submit" class="btn btn-warning w-100">Update</button>
                     <a asp-action="Index" class="btn btn-secondary w-100">Cancel</a>
                 </div>
             </form>
@@ -53,7 +55,10 @@
 
 @section Scripts {
     @{
-        @Html.AntiForgeryToken();
+
+
+        @Html.AntiForgeryToken()
+        ;
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

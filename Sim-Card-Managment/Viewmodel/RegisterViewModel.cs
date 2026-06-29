@@ -18,7 +18,7 @@ namespace Sim_Card_Managment.Viewmodel
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        public int GroupId { get; set; }
+        public Guid GroupId { get; set; }
 
         public DateTime? LastLogin { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using Sim_Card_Managment.data;
+﻿using Microsoft.EntityFrameworkCore;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 
 namespace Sim_Card_Managment.Repos
@@ -14,12 +15,22 @@ namespace Sim_Card_Managment.Repos
 
         public IEnumerable<DeviceStatus> GetAllDeviceStatuses()
         {
-            return _context.DeviceStatuses.ToList();
+            return _context.DeviceStatuses
+                .Include(d => d.Sim)
+                .Include(d => d.Usb)
+                .Include(d => d.ReportedByUser)
+                .ToList();
         }
 
         public DeviceStatus? GetDeviceStatusbyId(Guid id)
         {
-            return _context.DeviceStatuses.Find(id);
+            return _context.DeviceStatuses
+                .Include(d => d.Sim)
+                .Include(d => d.Usb)
+                .Include(d => d.ReportedByUser)
+                .Include(d => d.ReplacedBySim)
+                .Include(d => d.ReplacedByUsb)
+                .FirstOrDefault(d => d.Id == id);
         }
 
         public void AddDeviceStatus(DeviceStatus deviceStatus)
