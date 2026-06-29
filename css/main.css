@@ -266,3 +266,7 @@ body {
         bottom: 2px;
     }
 }
+
+.cursor{
+    cursor: pointer;
+}
