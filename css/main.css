@@ -29,10 +29,9 @@ body
 /* ul bg */
 .bg-blur
 {
-    background:linear-gradient(135deg,rgba(255,255,255,0.2),rgba(255,255,255,0.2)) !important;
-backdrop-filter: blur(100px) !important;
-    -webkit-backdrop-filter: blur(100px) !important;
-}
+    background:linear-gradient(135deg,rgba(255,255,255,0),rgba(255,255,255,0.1)) !important;
+    backdrop-filter: blur(90%) !important;
+    -webkit-backdrop-filter: blur(90%) !important;}
 /* active Link */
 .navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
    color: #000 !important;
@@ -86,3 +85,4 @@ backdrop-filter: blur(100px) !important;
     font-size: 0.95rem;
     color: #d1d1d1;
 }
+
