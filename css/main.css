@@ -1,0 +1,88 @@
+/* Font */
+@font-face {
+    font-family: 'Roboto';
+    src: url("../css/Roboto-VariableFont_wdth\,wght.ttf") format("truetype");
+}
+body
+{
+    font-family: "Roboto" , sans-serif;
+}
+/* sideBar SVG */
+.svg
+{
+    animation: spin 3s linear 2s infinite alternate;
+
+}
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+.offcanvas-backdrop
+{
+    background-color: transparent !important;
+}
+/* NavBar */
+/* ul bg */
+.bg-blur
+{
+    background:linear-gradient(135deg,rgba(255,255,255,0),rgba(255,255,255,0.1)) !important;
+    backdrop-filter: blur(90%) !important;
+    -webkit-backdrop-filter: blur(90%) !important;}
+/* active Link */
+.navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
+   color: #000 !important;
+   background-color: #fff;
+   border-radius: 20px;
+   
+}
+/* End Of NavBar */
+/* Hero Scetion (Home Page) */
+.hero_bg
+{
+    background-color: #E24D17;
+}
+.max-width
+{
+    max-width: 800px;
+}
+/* Custom Sidebar Dropdown Styles */
+.sidebar-accordion .accordion-item {
+    background: transparent;
+    border: none;
+}
+
+/* Rotate the triangle when collapsed */
+.sidebar-toggle-btn .toggle-triangle {
+    transition: transform 0.3s ease;
+}
+.sidebar-toggle-btn.collapsed .toggle-triangle {
+    transform: rotate(180deg);
+}
+
+/* Icon Box Colors */
+.icon-box-main {
+    background: linear-gradient(135deg, #e75323, #cc3b0d);
+    width: 38px;
+    height: 38px;
+}
+.icon-box-sub {
+    background-color: #262626;
+    width: 36px;
+    height: 36px;
+}
+.triangle-box {
+    width: 38px;
+    height: 38px;
+    border: 1px solid #4a4a4a;
+}
+
+/* Text Styles */
+.sub-item-text {
+    font-size: 0.95rem;
+    color: #d1d1d1;
+}
+
