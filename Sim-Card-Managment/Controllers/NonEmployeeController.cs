@@ -43,7 +43,7 @@ namespace Sim_Card_Managment.Controllers
         public IActionResult Create(NonEmployee nonEmployee)
         {
             if (!ModelState.IsValid) return View(nonEmployee);
-            nonEmployee.NotEmployeeId = Guid.NewGuid();
+            nonEmployee.Id = Guid.NewGuid();
             _repo.Add(nonEmployee);
             return RedirectToAction(nameof(Index));
         }
@@ -61,7 +61,7 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Guid id, NonEmployee nonEmployee)
         {
-            if (id != nonEmployee.NotEmployeeId) return BadRequest();
+            if (id != nonEmployee.Id) return BadRequest();
             if (!ModelState.IsValid) return View(nonEmployee);
             _repo.Update(nonEmployee);
             return RedirectToAction(nameof(Index));
