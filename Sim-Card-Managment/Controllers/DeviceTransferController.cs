@@ -29,7 +29,7 @@ namespace Sim_Card_Managment.Controllers
 
         public IActionResult Create()
         {
-            return View(new DeviceTransfer());
+            return View(new DeviceTransfer { TransferDate = DateTime.Now });
         }
 
         [HttpPost]
@@ -38,49 +38,41 @@ namespace Sim_Card_Managment.Controllers
         {
             if (ModelState.IsValid)
             {
-                deviceTransfer.Id = Guid.NewGuid();
-                _repo.AddDeviceTransfer(deviceTransfer);
-                return RedirectToAction(nameof(Index));
+                var oldSubscription = _repo.GetSubscriptionById(deviceTransfer.FromSubscriptionId);
+
+                if (oldSubscription != null)
+                {
+                    // 1. Close the old subscription by setting EndDate to Now
+                    oldSubscription.EndDate = deviceTransfer.TransferDate;
+
+                    // 2. Create the new subscription (leave EndDate as null so it is Active)
+                    var newSubscription = new Subscription
+                    {
+                        Id = Guid.NewGuid(),
+                        EmpId = deviceTransfer.ToEmpId,
+                        SimId = deviceTransfer.SimId ?? oldSubscription.SimId,
+                        UsbId = deviceTransfer.UsbId ?? oldSubscription.UsbId,
+                        CreatedBy = deviceTransfer.CreatedBy,
+                        CreatedDate = DateTime.Now,
+                        StartDate = deviceTransfer.TransferDate,
+                        EndDate = null, // Open-ended/Active
+                        QuotaId = oldSubscription.QuotaId,
+                        ActionId = oldSubscription.ActionId
+                    };
+
+                    deviceTransfer.Id = Guid.NewGuid();
+                    deviceTransfer.NewSubscriptionId = newSubscription.Id;
+
+                    _repo.AddSubscription(newSubscription);
+                    _repo.AddDeviceTransfer(deviceTransfer);
+                    _repo.CompleteTransaction();
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ModelState.AddModelError("", "Old subscription not found.");
             }
             return View(deviceTransfer);
-        }
-
-        public IActionResult Edit(Guid id)
-        {
-            var deviceTransfer = _repo.GetDeviceTransferbyId(id);
-            if (deviceTransfer == null) return NotFound();
-
-            return View(deviceTransfer);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(Guid id, DeviceTransfer deviceTransfer)
-        {
-            if (id != deviceTransfer.Id) return NotFound();
-
-            if (ModelState.IsValid)
-            {
-                _repo.Update(deviceTransfer);
-                return RedirectToAction(nameof(Index));
-            }
-            return View(deviceTransfer);
-        }
-
-        public IActionResult Delete(Guid id)
-        {
-            var deviceTransfer = _repo.GetDeviceTransferbyId(id);
-            if (deviceTransfer == null) return NotFound();
-
-            return View(deviceTransfer);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(Guid id)
-        {
-            _repo.DeleteTransfer(id);
-            return RedirectToAction(nameof(Index));
         }
     }
 }

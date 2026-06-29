@@ -1,0 +1,38 @@
+﻿@model Sim_Card_Managment.Models.Quota
+
+@{
+    ViewData["Title"] = "Quota Details";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm col-md-8 mx-auto">
+        <div class="card-header bg-info text-white">
+            <h3 class="mb-0">Quota Plan Details</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Plan ID</dt>
+                <dd class="col-sm-8 text-muted">@Model.Id</dd>
+
+                <dt class="col-sm-4">Base Amount</dt>
+                <dd class="col-sm-8">@Model.BaseAmount GB</dd>
+
+                <dt class="col-sm-4">Extra Amount</dt>
+                <dd class="col-sm-8">@Model.ExtraAmount GB</dd>
+
+                <dt class="col-sm-4">Period</dt>
+                <dd class="col-sm-8">@Model.Period</dd>
+
+                <dt class="col-sm-4">Valid From</dt>
+                <dd class="col-sm-8">@Model.ValidFrom?.ToString("yyyy-MM-dd")</dd>
+
+                <dt class="col-sm-4">Valid To</dt>
+                <dd class="col-sm-8">@Model.ValidTo?.ToString("yyyy-MM-dd")</dd>
+            </dl>
+        </div>
+        <div class="card-footer d-flex gap-2 bg-light">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning w-100">Edit Plan</a>
+            <a asp-action="Index" class="btn btn-secondary w-100">Back to List</a>
+        </div>
+    </div>
+</div>
