@@ -29,6 +29,7 @@ namespace Sim_Card_Managment.data
         public DbSet<Group> Groups { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<GroupPermission> GroupPermissions { get; set; }
+        public DbSet<UserOtp> UserOtps { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
