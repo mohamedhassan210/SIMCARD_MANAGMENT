@@ -19,7 +19,7 @@ namespace Sim_Card_Managment.Models
 
         [Required]
         public Guid QuotaId { get; set; }
-
+            
         [Required]
         public Guid ActionId { get; set; }
 
