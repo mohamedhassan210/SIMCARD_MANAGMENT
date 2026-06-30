@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Sim_Card_Managment.Repos
+namespace Sim_Card_Managment.Repos.EmployeeRepos
 {
     public class EmployeeRepo : IEmployeeRepo
     {
