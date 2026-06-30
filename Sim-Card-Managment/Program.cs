@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Repos.QuoteRepo;
@@ -19,12 +21,15 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 // ----------------------------------------
-
+builder.Services.AddDbContext<AppDbContext>(
+    x => x.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
 builder.Services.AddScoped<IUSBRepo, USBRepo>();
 builder.Services.AddScoped<ISIMRepo, SIMRepo>();
 builder.Services.AddScoped<IQuotaRepo, QuotaRepo>();
 builder.Services.AddScoped<ISubscriptionRepo, SubscriptionRepo>();
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
+builder.Services.AddScoped<IDashboardRepo,DashboardRepo>();
+
 
 var app = builder.Build();
 
@@ -48,6 +53,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=home}/{id?}");
 
 app.Run();

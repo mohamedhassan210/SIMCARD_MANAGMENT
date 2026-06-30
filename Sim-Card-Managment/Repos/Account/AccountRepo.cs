@@ -23,6 +23,16 @@ namespace Sim_Card_Managment.Repos.Account
             _context = context;
             _httpContextAccessor = httpContextAccessor;
         }
+        public UserOtp? GetValidOtpByEmail(string email)
+        {
+            return _context.UserOtps
+                .FirstOrDefault(o => o.Email == email && o.ExpireDate > DateTime.Now);
+        }
+
+        public User? GetUserByEmail(string email)
+        {
+            return _context.Users.FirstOrDefault(u => u.Email == email);
+        }
 
         public bool Register(RegisterViewModel model)
         {
