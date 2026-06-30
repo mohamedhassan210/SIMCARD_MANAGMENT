@@ -13,8 +13,8 @@
     </style>
 </head>
 <body>
-    <div class="position-fixed top-50 start-0 bg-white z-3 d-flex justify-content-center align-items-center shadow "
-         style="height: 40px; width: 40px; cursor: pointer; border-radius: 0 8px 8px 0;"
+    <div class="position-fixed top-50 start-0 bg-white z-3 d-flex justify-content-center align-items-center shadow " 
+         style="height: 40px; width: 40px; cursor: pointer; border-radius: 0 8px 8px 0; z-index:1000"
          data-bs-toggle="offcanvas" data-bs-target="#leftSidebar" aria-controls="leftSidebar">
 
         <!-- Spinning Gear Icon -->
@@ -209,7 +209,7 @@
 
         </div>
     </aside>
-    <nav class="position-fixed top-0 navbar navbar-expand-lg w-100">
+    <nav class=" position-absolute top-0 navbar navbar-expand-lg w-100">
         <div class="container">
             <a class="navbar-brand text-white fw-bold" asp-controller="Home" asp-action="Index">FATHALL SIM</a>
 
@@ -244,6 +244,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/highcharts.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
