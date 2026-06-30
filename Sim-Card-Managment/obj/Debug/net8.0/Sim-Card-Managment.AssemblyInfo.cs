@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Sim-Card-Managment")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b6a753f8c78404e70663565e40133ebcaa5affcb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+89435738cc5ab89613e687ff5b60de76d8540186")]
 [assembly: System.Reflection.AssemblyProductAttribute("Sim-Card-Managment")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Sim-Card-Managment")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

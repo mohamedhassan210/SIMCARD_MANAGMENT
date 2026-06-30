@@ -1,4 +1,6 @@
+wwwroot\css\main.css
 wwwroot\favicon.ico
+wwwroot\img\fathallalogo.png
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map

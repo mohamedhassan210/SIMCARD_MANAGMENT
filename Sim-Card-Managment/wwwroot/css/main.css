@@ -1,0 +1,76 @@
+﻿@font-face {
+    font-family: 'Roboto';
+    src: url("../css/Roboto-Italic-VariableFont_wdth\,wght.ttf") format("truetype");
+}
+
+
+:root {
+    --brand-orange: #E24D17;
+}
+
+body {
+    background-color: black;
+    color: white;
+}
+
+.glass-box {
+    width: 619px;
+    height: 684px;
+    border-radius: 32px;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.custom-input {
+    width: 411px;
+    height: 56px;
+    border-radius: 30px;
+    background-color: #ffffff;
+    border: none;
+}
+
+/* THIS IS THE BUTTON CSS */
+.custom-btn {
+    width: 411px;
+    height: 56px;
+    background-color: #E24D17 !important;
+    /* Added !important just in case */
+    color: white !important;
+    font-size: 24px;
+    font-weight: 500;
+    border-radius: 30px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+    .custom-btn:hover {
+        background-color: #c44111 !important;
+    }
+
+.bg-shape {
+    position: absolute;
+    width: 50vw;
+    height: 70vh;
+    border-radius: 189px;
+    border-bottom-left-radius: 20%;
+}
+
+.shape-solid {
+    bottom: -25vh;
+    right: -5vw;
+    background-color: var(--brand-orange);
+    transform: rotate(-55deg);
+}
+
+.shape-outline {
+    bottom: -60vh;
+    left: -25vw;
+    border: 4px solid var(--brand-orange);
+    transform: rotate(-20deg);
+}
