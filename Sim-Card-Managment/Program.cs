@@ -1,7 +1,35 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using Sim_Card_Managment.data;
+using Sim_Card_Managment.Repos;
+using Sim_Card_Managment.Repos.Account;
+using Sim_Card_Managment.Repos.QuoteRepo;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddHttpContextAccessor();
+
+// 3. ÅÚÏÇÏ äÙÇã ÇáÜ Cookie Authentication æÇáãÓÇÑÇÊ ÇáãØáæÈÉ (Login & AccessDenied)
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";        
+        options.AccessDeniedPath = "/Account/AccessDenied";
+    });
+
+// ----------------------------------------
+builder.Services.AddDbContext<AppDbContext>(
+    x => x.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
+builder.Services.AddScoped<IUSBRepo, USBRepo>();
+builder.Services.AddScoped<ISIMRepo, SIMRepo>();
+builder.Services.AddScoped<IQuotaRepo, QuotaRepo>();
+builder.Services.AddScoped<ISubscriptionRepo, SubscriptionRepo>();
+builder.Services.AddScoped<IAccountRepo, AccountRepo>();
+builder.Services.AddScoped<IDashboardRepo,DashboardRepo>();
+
 
 var app = builder.Build();
 
@@ -9,7 +37,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -18,10 +45,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+
+app.UseAuthentication(); 
+// ----------------------------------------
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=home}/{id?}");
 
 app.Run();

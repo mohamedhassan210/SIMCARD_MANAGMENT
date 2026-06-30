@@ -1,0 +1,59 @@
+﻿@model Sim_Card_Managment.Models.Quota
+
+@{
+    ViewData["Title"] = "Create Quota";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="mb-4">Create Quota Plan</h2>
+
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="BaseAmount" class="form-label">Base Amount (GB)</label>
+                    <input asp-for="BaseAmount" class="form-control" type="number" step="0.01" required />
+                    <span asp-validation-for="BaseAmount" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ExtraAmount" class="form-label">Extra Amount (GB)</label>
+                    <input asp-for="ExtraAmount" class="form-control" type="number" step="0.01" />
+                    <span asp-validation-for="ExtraAmount" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Period" class="form-label">Period</label>
+                    <input asp-for="Period" class="form-control" required placeholder="e.g., Monthly, Yearly" />
+                    <span asp-validation-for="Period" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ValidFrom" class="form-label">Valid From</label>
+                    <input asp-for="ValidFrom" class="form-control" type="date" required />
+                    <span asp-validation-for="ValidFrom" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ValidTo" class="form-label">Valid To</label>
+                    <input asp-for="ValidTo" class="form-control" type="date" required />
+                    <span asp-validation-for="ValidTo" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success w-100">Save</button>
+                    <a asp-action="Index" class="btn btn-secondary w-100">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        @Html.AntiForgeryToken();
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

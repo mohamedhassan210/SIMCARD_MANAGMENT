@@ -1,32 +1,35 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Sim_Card_Managment.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Sim_Card_Managment.Repos;
 
 namespace Sim_Card_Managment.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IDashboardRepo _repo;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IDashboardRepo repo)
         {
-            _logger = logger;
+            _repo = repo;
         }
 
-        public IActionResult Index()
+        public IActionResult home()
         {
+            ViewBag.ActiveSims = _repo.GetActiveSimsCount();
+            ViewBag.LostSims = _repo.GetDeviceStatusCount("Lost", true);
+            ViewBag.ReplacedSims = _repo.GetDeviceStatusCount("Replaced", true);
+            ViewBag.ReturnedSims = _repo.GetDeviceStatusCount("Returned", true);
+
+            
+            ViewBag.ActiveUsbs = _repo.GetActiveUsbsCount();
+            ViewBag.LostUsbs = _repo.GetDeviceStatusCount("Lost", false);
+            ViewBag.ReplacedUsbs = _repo.GetDeviceStatusCount("Replaced", false);
+            ViewBag.ReturnedUsbs = _repo.GetDeviceStatusCount("Returned", false);
+
+            
+            ViewBag.RecentEmployees = _repo.GetTopEmployees(4);
+            ViewBag.RecentSims = _repo.GetTopSims(4);
+
             return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
