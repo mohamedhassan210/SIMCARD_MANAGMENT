@@ -1,0 +1,188 @@
+
+<h2 class="sr-only">System pages sitemap — SIM and USB management system</h2>
+<style>
+.sitemap { padding: 1rem 0; font-size: 13px; }
+.module { margin-bottom: 1.5rem; }
+.mod-header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+.mod-header i { font-size: 18px; }
+.mod-title { font-weight: 500; font-size: 14px; }
+.mod-count { margin-left: auto; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.pages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; padding: 0 4px; }
+.page-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; transition: border-color .15s; }
+.page-card:hover { border-color: var(--border-strong); }
+.page-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.page-badge { font-size: 10px; font-weight: 500; padding: 2px 6px; border-radius: 4px; }
+.page-name { font-weight: 500; font-size: 13px; color: var(--text-primary); margin-bottom: 2px; }
+.page-route { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 6px; }
+.page-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+.badge-get  { background: var(--bg-success);  color: var(--text-success); }
+.badge-post { background: var(--bg-accent);   color: var(--text-accent);  }
+.badge-put  { background: var(--bg-warning);  color: var(--text-warning); }
+.badge-del  { background: var(--bg-danger);   color: var(--text-danger);  }
+.badge-auth { background: var(--bg-pro);      color: var(--text-pro);     }
+.m-blue   { background: var(--bg-accent);  border-color: var(--border-accent); }
+.m-teal   { background: var(--bg-success); border-color: var(--border-success); }
+.m-coral  { background: var(--bg-danger);  border-color: var(--border-danger); }
+.m-purple { background: var(--bg-pro);     border-color: var(--border-pro); }
+.m-warn   { background: var(--bg-warning); border-color: var(--border-warning); }
+.m-gray   { background: var(--surface-1);  border-color: var(--border-strong); }
+.mc-blue   { color: var(--text-accent);  }
+.mc-teal   { color: var(--text-success); }
+.mc-coral  { color: var(--text-danger);  }
+.mc-purple { color: var(--text-pro);     }
+.mc-warn   { color: var(--text-warning); }
+.mc-gray   { color: var(--text-secondary); }
+.cnt-blue   { background: var(--bg-accent);  color: var(--text-accent); }
+.cnt-teal   { background: var(--bg-success); color: var(--text-success); }
+.cnt-coral  { background: var(--bg-danger);  color: var(--text-danger); }
+.cnt-purple { background: var(--bg-pro);     color: var(--text-pro); }
+.cnt-warn   { background: var(--bg-warning); color: var(--text-warning); }
+.cnt-gray   { background: var(--surface-0);  color: var(--text-secondary); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; padding: 10px 14px; background: var(--surface-1); border-radius: 8px; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+</style>
+
+<div class="sitemap">
+  <div class="legend">
+    <div class="leg"><div class="leg-dot badge-get"></div>List / View</div>
+    <div class="leg"><div class="leg-dot badge-post"></div>Create</div>
+    <div class="leg"><div class="leg-dot badge-put"></div>Edit</div>
+    <div class="leg"><div class="leg-dot badge-del"></div>Delete / Deactivate</div>
+    <div class="leg"><div class="leg-dot badge-auth"></div>Auth-only</div>
+  </div>
+  <div id="sitemap"></div>
+</div>
+
+<script>
+const modules = [
+  {
+    id: "auth", icon: "ti-lock", label: "Authentication", cls: "m-purple", mc: "mc-purple", cnt: "cnt-purple",
+    pages: [
+      { name: "Login", route: "/Account/Login", badge: "post", desc: "Form تسجيل الدخول — Username + Password + Remember Me" },
+      { name: "Logout", route: "/Account/Logout", badge: "post", desc: "إنهاء الجلسة وحذف الـ session/cookie" },
+      { name: "Access Denied", route: "/Account/AccessDenied", badge: "get", desc: "صفحة 403 — لما المستخدم مالوش صلاحية" },
+    ]
+  },
+  {
+    id: "dashboard", icon: "ti-layout-dashboard", label: "Dashboard", cls: "m-blue", mc: "mc-blue", cnt: "cnt-blue",
+    pages: [
+      { name: "Home / Dashboard", route: "/", badge: "get", desc: "إحصائيات سريعة — عدد الـ SIMs، USB، اشتراكات نشطة، آخر عمليات" },
+    ]
+  },
+  {
+    id: "employees", icon: "ti-users", label: "Employees & Non-Employees", cls: "m-blue", mc: "mc-blue", cnt: "cnt-blue",
+    pages: [
+      { name: "Employee list", route: "/Employee/Index", badge: "get", desc: "جدول بحث وفلترة لكل الموظفين مع حالة الـ Active/Inactive" },
+      { name: "Employee details", route: "/Employee/Details/{id}", badge: "get", desc: "بيانات الموظف + كل الأجهزة المسجلة عليه (SIM, USB) + تاريخ كامل" },
+      { name: "Create employee", route: "/Employee/Create", badge: "post", desc: "فورم إضافة موظف جديد — Name, NationalID, Position, User link" },
+      { name: "Edit employee", route: "/Employee/Edit/{id}", badge: "put", desc: "تعديل بيانات الموظف + ربطه بـ User account" },
+      { name: "Deactivate employee", route: "/Employee/Deactivate/{id}", badge: "del", desc: "تعطيل حساب الموظف دون حذف التاريخ — تأكيد بـ modal" },
+      { name: "Non-employee list", route: "/NonEmployee/Index", badge: "get", desc: "قائمة Contractors والزوار مع النوع والـ Contact Info" },
+      { name: "Create non-employee", route: "/NonEmployee/Create", badge: "post", desc: "إضافة شخص خارجي — Name, Type, ContactInfo" },
+      { name: "Edit non-employee", route: "/NonEmployee/Edit/{id}", badge: "put", desc: "تعديل بيانات الشخص الخارجي" },
+    ]
+  },
+  {
+    id: "devices", icon: "ti-device-sim-card", label: "SIM & USB Devices", cls: "m-teal", mc: "mc-teal", cnt: "cnt-teal",
+    pages: [
+      { name: "SIM list", route: "/Sim/Index", badge: "get", desc: "كل الـ SIMs مع الفلترة بالـ Status، NetworkType، الموظف" },
+      { name: "SIM details", route: "/Sim/Details/{id}", badge: "get", desc: "كل بيانات الـ SIM + تاريخ الحالات + من استخدمه" },
+      { name: "Create SIM", route: "/Sim/Create", badge: "post", desc: "تسجيل SIM جديد — ICCID, PhoneNumber, NetworkType, Fees" },
+      { name: "Edit SIM", route: "/Sim/Edit/{id}", badge: "put", desc: "تعديل بيانات الـ SIM وتغيير حالته" },
+      { name: "Mark SIM lost/replaced", route: "/Sim/ChangeStatus/{id}", badge: "put", desc: "تغيير الحالة: Lost / Replaced / Returned + ربط الجهاز البديل" },
+      { name: "USB list", route: "/Usb/Index", badge: "get", desc: "كل الـ USB modems مع الفلترة بالـ Status والموظف" },
+      { name: "USB details", route: "/Usb/Details/{id}", badge: "get", desc: "بيانات الـ USB + تاريخ الحالات والنقل" },
+      { name: "Create USB", route: "/Usb/Create", badge: "post", desc: "تسجيل USB جديد — SerialNumber, Model" },
+      { name: "Edit USB", route: "/Usb/Edit/{id}", badge: "put", desc: "تعديل بيانات الـ USB وتغيير حالته" },
+      { name: "Mark USB lost/replaced", route: "/Usb/ChangeStatus/{id}", badge: "put", desc: "تغيير الحالة: Lost / Replaced / Returned + الجهاز البديل" },
+    ]
+  },
+  {
+    id: "subscriptions", icon: "ti-clipboard-list", label: "Subscriptions", cls: "m-blue", mc: "mc-blue", cnt: "cnt-blue",
+    pages: [
+      { name: "Subscription list", route: "/Subscription/Index", badge: "get", desc: "كل الاشتراكات مع الفلترة بالموظف أو الحالة أو التاريخ" },
+      { name: "Subscription details", route: "/Subscription/Details/{id}", badge: "get", desc: "تفاصيل الاشتراك — الموظف، الـ SIM، USB، Quota، Action، التواريخ، التوقيع" },
+      { name: "Create subscription", route: "/Subscription/Create", badge: "post", desc: "تعيين SIM (±USB) لموظف مع تحديد الـ Quota والـ Action وتاريخ البداية" },
+      { name: "End subscription", route: "/Subscription/End/{id}", badge: "put", desc: "إنهاء اشتراك بتحديد EndDate وتحديث حالة الجهاز تلقائياً" },
+      { name: "Capture signature", route: "/Subscription/Sign/{id}", badge: "post", desc: "صفحة التوقيع الرقمي (canvas) أو رفع صورة توقيع ورقي" },
+    ]
+  },
+  {
+    id: "transfer", icon: "ti-arrows-exchange", label: "Device Transfer", cls: "m-warn", mc: "mc-warn", cnt: "cnt-warn",
+    pages: [
+      { name: "Transfer list", route: "/DeviceTransfer/Index", badge: "get", desc: "كل عمليات النقل — من مين، لمين، إمتى، ليه" },
+      { name: "Transfer details", route: "/DeviceTransfer/Details/{id}", badge: "get", desc: "تفاصيل عملية النقل والاشتراكات المرتبطة بها" },
+      { name: "Create transfer", route: "/DeviceTransfer/Create", badge: "post", desc: "نقل SIM/USB من موظف لآخر — يغلق الاشتراك القديم ويفتح جديد تلقائياً" },
+    ]
+  },
+  {
+    id: "quota", icon: "ti-chart-pie", label: "Quota", cls: "m-teal", mc: "mc-teal", cnt: "cnt-teal",
+    pages: [
+      { name: "Quota list", route: "/Quota/Index", badge: "get", desc: "كل خطط الـ Quota — BaseAmount, ExtraAmount, Period" },
+      { name: "Create quota", route: "/Quota/Create", badge: "post", desc: "تعريف خطة Quota جديدة — GB، الفترة، تواريخ الصلاحية" },
+      { name: "Edit quota", route: "/Quota/Edit/{id}", badge: "put", desc: "تعديل خطة الـ Quota" },
+    ]
+  },
+  {
+    id: "audit", icon: "ti-history", label: "Audit Log", cls: "m-gray", mc: "mc-gray", cnt: "cnt-gray",
+    pages: [
+      { name: "Audit log", route: "/AuditLog/Index", badge: "get", desc: "جدول لكل العمليات — بحث بالجدول، نوع العملية، المستخدم، التاريخ" },
+      { name: "Audit details", route: "/AuditLog/Details/{id}", badge: "get", desc: "عرض JSON diff كامل — القيم القديمة vs الجديدة لكل حقل" },
+    ]
+  },
+  {
+    id: "reports", icon: "ti-report", label: "Reports", cls: "m-blue", mc: "mc-blue", cnt: "cnt-blue",
+    pages: [
+      { name: "Device status report", route: "/Reports/DeviceStatus", badge: "get", desc: "كل الأجهزة مع حالتها الحالية والموظف المسؤول عنها — Export Excel" },
+      { name: "Employee devices report", route: "/Reports/EmployeeDevices", badge: "get", desc: "كل الأجهزة اللي اتعينت لموظف معين من أول وجديد — Export Excel" },
+      { name: "Quota usage report", route: "/Reports/Quota", badge: "get", desc: "استخدام الـ Quota على كل الاشتراكات النشطة — Export Excel" },
+    ]
+  },
+  {
+    id: "admin", icon: "ti-settings", label: "Administration", cls: "m-purple", mc: "mc-purple", cnt: "cnt-purple",
+    pages: [
+      { name: "User list", route: "/User/Index", badge: "get", desc: "كل المستخدمين مع الـ Group وآخر login وحالة الـ Active" },
+      { name: "Create user", route: "/User/Create", badge: "post", desc: "إضافة مستخدم — Username, Email, Password, Group" },
+      { name: "Edit user", route: "/User/Edit/{id}", badge: "put", desc: "تعديل بيانات المستخدم أو تغيير الـ Group" },
+      { name: "Deactivate user", route: "/User/Deactivate/{id}", badge: "del", desc: "تعطيل حساب المستخدم دون حذف الـ AuditLog الخاص بيه" },
+      { name: "Group list", route: "/Group/Index", badge: "get", desc: "كل الـ Groups والصلاحيات المرتبطة بكل group" },
+      { name: "Create group", route: "/Group/Create", badge: "post", desc: "إضافة Group جديدة — Name, Description + تحديد الـ Permissions" },
+      { name: "Edit group", route: "/Group/Edit/{id}", badge: "put", desc: "تعديل الـ Group وإضافة/حذف Permissions منها" },
+      { name: "Permission list", route: "/Permission/Index", badge: "get", desc: "كل الـ Permissions المتاحة — ControllerName + ActionName" },
+      { name: "Create permission", route: "/Permission/Create", badge: "post", desc: "تعريف Permission جديدة — Controller، Action، Description" },
+      { name: "Action list", route: "/DeviceAction/Index", badge: "get", desc: "قائمة الـ Actions المتاحة (Assign, Replace, Return…) مع حالتها" },
+      { name: "Create action", route: "/DeviceAction/Create", badge: "post", desc: "إضافة Action type جديد للاستخدام في الاشتراكات" },
+    ]
+  },
+];
+
+const badgeLabels = { get:"VIEW", post:"CREATE", put:"EDIT", del:"DELETE", auth:"AUTH" };
+
+const container = document.getElementById('sitemap');
+modules.forEach(mod => {
+  const total = mod.pages.length;
+  const div = document.createElement('div');
+  div.className = 'module';
+  div.innerHTML = `
+    <div class="mod-header ${mod.cls}" onclick="sendPrompt('اشرح لي صفحات module ${mod.label} بالتفصيل')">
+      <i class="ti ${mod.icon} ${mod.mc}" aria-hidden="true" style="font-size:18px"></i>
+      <span class="mod-title ${mod.mc}">${mod.label}</span>
+      <span class="mod-count ${mod.cnt}">${total} pages</span>
+    </div>
+    <div class="pages-grid">
+      ${mod.pages.map(p => `
+        <div class="page-card" onclick="sendPrompt('اشرح لي صفحة ${p.name} وإيه اللي بتعمله')">
+          <div class="page-card-top">
+            <span class="page-badge badge-${p.badge}">${badgeLabels[p.badge]}</span>
+          </div>
+          <div class="page-name">${p.name}</div>
+          <div class="page-route">${p.route}</div>
+          <div class="page-desc">${p.desc}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  container.appendChild(div);
+});
+</script>
