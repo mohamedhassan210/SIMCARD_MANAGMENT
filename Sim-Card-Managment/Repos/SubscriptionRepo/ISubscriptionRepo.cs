@@ -6,7 +6,7 @@ namespace Sim_Card_Managment.Repos
     {
         IEnumerable<Subscription> GetAll();
         Subscription? GetById(Guid id);
-        void Add(Subscription subscription);
+        void Add(Subscription subscription);   
         void Update(Subscription subscription);
         void Delete(Guid id);
     }
