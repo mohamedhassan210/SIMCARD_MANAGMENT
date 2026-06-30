@@ -28,7 +28,7 @@ builder.Services.AddScoped<ISIMRepo, SIMRepo>();
 builder.Services.AddScoped<IQuotaRepo, QuotaRepo>();
 builder.Services.AddScoped<ISubscriptionRepo, SubscriptionRepo>();
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
-
+builder.Services.AddScoped<IDashboardRepo,DashboardRepo>();
 
 
 var app = builder.Build();
@@ -53,6 +53,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Subscription}/{action=Create}/{id?}");
+    pattern: "{controller=Home}/{action=home}/{id?}");
 
 app.Run();

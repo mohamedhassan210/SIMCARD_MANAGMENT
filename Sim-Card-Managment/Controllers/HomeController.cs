@@ -12,7 +12,7 @@ namespace Sim_Card_Managment.Controllers
             _repo = repo;
         }
 
-        public IActionResult Index()
+        public IActionResult home()
         {
             ViewBag.ActiveSims = _repo.GetActiveSimsCount();
             ViewBag.LostSims = _repo.GetDeviceStatusCount("Lost", true);
