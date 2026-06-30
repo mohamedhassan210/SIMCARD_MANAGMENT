@@ -12,14 +12,26 @@ namespace Sim_Card_Managment.Repos
             _context = context;
         }
 
-        public int GetTotalSimsCount()
+        public int GetActiveSimsCount()
         {
-            return _context.Sims.Count();
+            return _context.Subscriptions.Count(s => s.EndDate == null);
         }
 
-        public int GetTotalUsbsCount()
+        public int GetActiveUsbsCount()
         {
-            return _context.Usbs.Count();
+            return _context.Subscriptions.Count(s => s.EndDate == null && s.UsbId != null);
+        }
+
+        public int GetDeviceStatusCount(string statusType, bool isSim)
+        {
+            if (isSim)
+            {
+                return _context.DeviceStatuses.Count(d => d.StatusType == statusType && d.SimId != null);
+            }
+            else
+            {
+                return _context.DeviceStatuses.Count(d => d.StatusType == statusType && d.UsbId != null);
+            }
         }
 
         public IEnumerable<Employee> GetTopEmployees(int count)

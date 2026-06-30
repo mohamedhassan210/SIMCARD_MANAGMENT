@@ -4,8 +4,9 @@ namespace Sim_Card_Managment.Repos
 {
     public interface IDashboardRepo
     {
-        int GetTotalSimsCount();
-        int GetTotalUsbsCount();
+        int GetActiveSimsCount();
+        int GetActiveUsbsCount();
+        int GetDeviceStatusCount(string statusType, bool isSim);
         IEnumerable<Employee> GetTopEmployees(int count);
         IEnumerable<Sim> GetTopSims(int count);
     }

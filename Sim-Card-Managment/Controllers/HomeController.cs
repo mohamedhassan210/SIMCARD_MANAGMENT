@@ -14,9 +14,18 @@ namespace Sim_Card_Managment.Controllers
 
         public IActionResult Index()
         {
-            ViewBag.TotalSims = _repo.GetTotalSimsCount();
-            ViewBag.TotalUsbs = _repo.GetTotalUsbsCount();
+            ViewBag.ActiveSims = _repo.GetActiveSimsCount();
+            ViewBag.LostSims = _repo.GetDeviceStatusCount("Lost", true);
+            ViewBag.ReplacedSims = _repo.GetDeviceStatusCount("Replaced", true);
+            ViewBag.ReturnedSims = _repo.GetDeviceStatusCount("Returned", true);
 
+            
+            ViewBag.ActiveUsbs = _repo.GetActiveUsbsCount();
+            ViewBag.LostUsbs = _repo.GetDeviceStatusCount("Lost", false);
+            ViewBag.ReplacedUsbs = _repo.GetDeviceStatusCount("Replaced", false);
+            ViewBag.ReturnedUsbs = _repo.GetDeviceStatusCount("Returned", false);
+
+            
             ViewBag.RecentEmployees = _repo.GetTopEmployees(4);
             ViewBag.RecentSims = _repo.GetTopSims(4);
 
