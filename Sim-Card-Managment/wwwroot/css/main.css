@@ -2,6 +2,18 @@
     font-family: 'Roboto';
     src: url(../Fonts/Roboto-VariableFont_wdth,wght.ttf) format("truetype");
 }
+/* Hide scrollbar for IE, Edge, and Firefox */
+html, body {
+    -ms-overflow-style: none; /* IE and Legacy Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+    /* Hide scrollbar for Chrome, Safari, and newer Edge */
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+        display: none;
+    }
+
 .p-74 {
     padding-top: 74px !important;
 }
