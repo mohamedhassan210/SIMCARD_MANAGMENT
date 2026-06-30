@@ -8,6 +8,11 @@
 *@
 @{
 }
+@using Sim_Card_Managment.Models
+@{
+    var recentEmployees = ViewBag.RecentEmployees as IEnumerable<Employee>;
+    int index = 0;
+}
 
 
 
@@ -34,10 +39,10 @@
         <div class="container-fluid">
             <div class="row g-4">
 
-                <div class="col-12 col-lg-2 d-flex flex-column gap-4 " >
+                <div class="col-12 col-lg-4 d-flex flex-column gap-4">
 
-                    <div class="position-relative overflow-hidden p-4  shadow-sm text-white"
-                         style="background-color: #E24D17; min-width: 280px; border-radius: 31px">
+                    <div class="position-relative overflow-hidden p-4 rounded-4 shadow-sm text-white"
+                         style="background-color: #E24D17; min-width: 280px;">
 
                         <svg class="position-absolute pe-none" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"
                              style="right: -40px; bottom: -10px; width: 250px; height: 220px; fill: #ffffff; opacity: 0.15;">
@@ -55,19 +60,19 @@
 
                         <div class="d-flex flex-wrap gap-2 position-relative z-1">
                             <div class="rounded-pill px-3 py-1 fw-bold text-white shadow-sm" style="background-color: #C12A23; font-size: 0.85rem;">
-                                12 Lost
+                                @ViewBag.LostSims Lost
                             </div>
                             <div class="rounded-pill px-3 py-1 fw-bold text-white shadow-sm" style="background-color: #19692C; font-size: 0.85rem;">
-                                250 Free
+                                @ViewBag.ReplacedSims Replaced
                             </div>
                             <div class="rounded-pill px-3 py-1 fw-bold text-white shadow-sm" style="background-color: #111111; font-size: 0.85rem;">
-                                250 used
+                                @ViewBag.ReturnedSims Returned
                             </div>
                         </div>
                     </div>
 
                     <div class="position-relative overflow-hidden p-4 rounded-4 shadow-sm text-white"
-                         style="background-color: #E24D17; min-width: 280px; border-radius: 31px">
+                         style="background-color: #E24D17; min-width: 280px;">
 
                         <svg class="position-absolute pe-none" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"
                              style="right: -20px; bottom: -10px; width: 250px; height: 220px; fill: #ffffff; opacity: 0.15;">
@@ -80,26 +85,26 @@
                             <img src="images/boxicons_usb.svg" alt="USB" style="width: 20px;">
                         </div>
 
-                        <div class="display-4 fw-bolder lh-1 position-relative z-1" style="letter-spacing: -1px;">320</div>
+                        <div class="display-4 fw-bolder lh-1 position-relative z-1" style="letter-spacing: -1px;">@ViewBag.ActiveUsbs</div>
                         <div class="display-5 fw-bold lh-1 mb-4 position-relative z-1" style="letter-spacing: -1px;">USB</div>
 
                         <div class="d-flex flex-wrap gap-2 position-relative z-1">
                             <div class="rounded-pill px-3 py-1 fw-bold text-white shadow-sm" style="background-color: #19692C; font-size: 0.85rem;">
-                                250 Free
+                                @ViewBag.ReplacedUsbs Replaced
                             </div>
                             <div class="rounded-pill px-3 py-1 fw-bold text-white shadow-sm" style="background-color: #C12A23; font-size: 0.85rem;">
-                                12 Lost
+                                @ViewBag.LostUsbs Lost
                             </div>
                             <div class="rounded-pill px-3 py-1 fw-bold text-white shadow-sm" style="background-color: #111111; font-size: 0.85rem;">
-                                250 used
+                                @ViewBag.ReturnedUsbs Returned
                             </div>
                         </div>
                     </div>
 
                 </div>
 
-                <div class="col-12 col-lg-9 offset-1">
-                    <div class="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column" style="border-radius: 31px">
+                <div class="col-12 col-lg-8">
+                    <div class="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
 
                         <div id="sim-usage-chart" style="width: 100%; height: 100%; min-height: 400px;"></div>
 
@@ -112,121 +117,120 @@
 
 
 
-        <section class="bg-white text-white py-5">
-            <div class="px-5">
+    <section class="bg-white text-white py-5">
+        <div class="px-5">
 
-                <h2 class="fw-light mb-4 text-black fw-bold" style="font-size: 2rem; ">Employees</h2>
+            <h2 class="fw-light mb-4" style="font-size: 2rem; color: #212529;">Employees</h2>
 
-                <div class="position-relative">
+            <div class="position-relative">
 
-                    <div class="position-absolute"
-                         style="background-color: #E24D17; bottom: -15px; left: 15px; width: 60%; height: 60px; border-radius: 0 0 100px 100px; z-index: 0; transform: rotate(3deg);">
+                <div class="position-absolute"
+                     style="background-color: #E24D17; bottom: -15px; left: 15px; width: 60%; height: 60px; border-radius: 0 0 100px 100px; z-index: 0; transform: rotate(3deg);">
+                </div>
+
+                <div class="bg-white rounded-4 overflow-hidden position-relative z-1"
+                     style="box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0 align-middle position-relative"
+                               style="color: #6c757d;">
+
+                            <thead style="border-bottom: 1px solid #eaeaea;">
+                                <tr>
+                                    <th scope="col" class="py-3 px-3 text-center fw-normal"
+                                        style="border-right: 1px solid #eaeaea; width: 60px;"></th>
+                                    <th scope="col" class="py-3 px-4 fw-normal"
+                                        style="border-right: 1px solid #eaeaea;">Name</th>
+                                    <th scope="col" class="py-3 px-4 fw-normal"
+                                        style="border-right: 1px solid #eaeaea;">Id</th>
+                                    <th scope="col" class="py-3 px-4 fw-normal"
+                                        style="border-right: 1px solid #eaeaea;">National ID</th>
+                                    <th scope="col" class="py-3 px-4 fw-normal">Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @if (recentEmployees != null && recentEmployees.Any())
+                                {
+                                    foreach (var emp in recentEmployees)
+                                    {
+                                        bool isLastRow = (index == recentEmployees.Count() - 1);
+                                        string rowStyle = isLastRow ? "" : "border-bottom: 1px solid #f4f4f4;";
+
+                                        <tr style="@rowStyle">
+                                            <td class="py-3 px-3 text-center">@(index++)</td>
+                                            <td class="py-3 px-4" style="color: #212529; font-weight: 500;">@emp.Name</td>
+                                            <td class="py-3 px-4">@emp.Id</td>
+                                            <td class="py-3 px-4">@emp.NationalID</td>
+                                            <td class="py-3 px-4">
+                                                @if (emp.IsActive)
+                                                {
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill">Inactive</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">No data available.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <div style="opacity: 0.8; height: 70px;"
+                             class="position-absolute bg-white start-0 end-0 bottom-0 pointer-events-none"></div>
                     </div>
 
-                    <div class="bg-white rounded-4 overflow-hidden position-relative z-1"
-                     style="box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 31px">
+                    <a asp-controller="Employee" asp-action="Index" class="btn position-absolute text-white fw-bold d-flex align-items-center gap-2"
+                       style="background-color: #E24D17; bottom: 20px; right: 20px; border-radius: 25px; padding: 10px 24px; box-shadow: 0 4px 15px rgba(226, 77, 23, 0.4); text-decoration: none; z-index: 2;">
+                        View All
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14"></path>
+                            <path d="M12 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
 
-                        <div class="table-responsive" >
-                            <table class="table table-borderless mb-0 align-middle position-relative"
-                                   style="color: #6c757d; ">
-
-                                <thead style="border-bottom: 1px solid #eaeaea;">
-                                    <tr>
-                                        <th scope="col" class="py-3 px-3 text-center fw-normal"
-                                            style="border-right: 1px solid #eaeaea; width: 60px;"></th>
-                                        <th scope="col" class="py-3 px-4 fw-normal"
-                                            style="border-right: 1px solid #eaeaea;">Name</th>
-                                        <th scope="col" class="py-3 px-4 fw-normal"
-                                            style="border-right: 1px solid #eaeaea;">Id</th>
-                                        <th scope="col" class="py-3 px-4 fw-normal" 
-                                            style="border-right: 1px solid #eaeaea;">Phone</th>
-                                        <th scope="col" class="py-3 px-4 fw-normal">Department</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    <tr style="border-bottom: 1px solid #f4f4f4;">
-                                        <td class="py-3 px-3 text-center">0</td>
-                                        <td class="py-3 px-4">Adham Amr Mohamed</td>
-                                        <td class="py-3 px-4">012</td>
-                                        <td class="py-3 px-4">01556176733</td>
-                                        <td class="py-3 px-4"></td>
-                                    </tr>
-
-                                    <tr style="border-bottom: 1px solid #f4f4f4;">
-                                        <td class="py-3 px-3 text-center">1</td>
-                                        <td class="py-3 px-4 ">Adham Amr Mohamed</td>
-                                        <td class="py-3 px-4 ">012</td>
-                                        <td class="py-3 px-4 ">01556176733</td>
-                                        <td class="py-3 px-4"></td>
-                                    </tr>
-
-                                    <tr style="border-bottom: 1px solid #f4f4f4;">
-                                        <td class="py-3 px-3 text-center">2</td>
-                                        <td class="py-3 px-4">Adham Amr Mohamed</td>
-                                        <td class="py-3 px-4">012</td>
-                                        <td class="py-3 px-4">01556176733</td>
-                                        <td class="py-3 px-4"></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td class="py-3 px-3 text-center">3</td>
-                                        <td class="py-3 px-4">Adham Amr Mohamed</td>
-                                        <td class="py-3 px-4">012</td>
-                                        <td class="py-3 px-4">01556176733</td>
-                                        <td class="py-3 px-4"></td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
-                            <div style="opacity: 0.8; height: 70px;"
-                                 class="position-absolute bg-white start-0 end-0 bottom-0"></div>
-                        </div>
-
-                        <button class="btn position-absolute text-white fw-bold d-flex align-items-center gap-2"
-                                style="background-color: #E24D17; bottom: 20px; right: 20px; border-radius: 25px; padding: 10px 24px; box-shadow: 0 4px 15px rgba(226, 77, 23, 0.4);">
-                            View All
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 12h14"></path>
-                                <path d="M12 5l7 7-7 7"></path>
-                            </svg>
-                        </button>
-
-                    </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
         <section class="bg-white text-white py-5">
             <div class="px-5">
 
-                <h2 class="fw-light mb-3 text-black fw-bold" style="font-size: 2.2rem; ">Explore SIM Cards</h2>
+                <h2 class="fw-light mb-3" style="font-size: 2.2rem;">Explore SIM Cards</h2>
 
                 <div class="d-flex gap-2 mb-4">
                     <div class="bg-white rounded-3 d-flex justify-content-center align-items-center"
-                         style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); ">
+                         style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
                         <a class="rounded-circle d-flex justify-content-center align-items-center cursor">
-                            <img src="~/img/we.png" alt="Alternate Text" />
+                            <!-- we -->
 
                         </a>
                     </div>
                     <div class="bg-white rounded-3 d-flex justify-content-center align-items-center"
                          style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
                         <a class="d-flex justify-content-center align-items-center cursor">
-                           <img src="~/img/fodafone.png" alt="Alternate Text" />
+                            <!-- vodafone -->
 
                         </a>
                     </div>
                     <div class="bg-white rounded-3 d-flex justify-content-center align-items-center"
                          style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
                         <a class="rounded-circle d-flex justify-content-center align-items-center cursor">
-                        <img src="~/img/orange.png" alt="Alternate Text" />
-
+                            <!-- orange -->
                         </a>
                     </div>
                     <a class="bg-white rounded-3 d-flex justify-content-center align-items-center cursor"
                        style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                    <img src="~/img/etisalat.png" alt="Alternate Text" />
+                        <!-- etaisalt -->
 
                     </a>
                 </div>
@@ -238,7 +242,7 @@
                     </div>
 
                     <div class="bg-white rounded-4 overflow-hidden position-relative z-1"
-                     style="box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 31px">
+                         style="box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
 
                         <div class="table-responsive">
                             <table class="table table-borderless mb-0 align-middle position-relative"
@@ -263,8 +267,8 @@
                                         <td class="py-3 px-3 text-center">0</td>
                                         <td class="py-3 px-4">
                                             <div class="rounded-circle d-flex ">
-                                            <img src="~/img/we.png" alt="Alternate Text" />
-                                        </div>
+                                                <!-- we table -->
+                                            </div>
                                         </td>
                                         <td class="py-3 px-4">012</td>
                                         <td class="py-3 px-4">01556176733</td>
@@ -275,8 +279,8 @@
                                         <td class="py-3 px-3 text-center">1</td>
                                         <td class="py-3 px-4">
                                             <div class="d-flex ">
-                                            <img src="~/img/orange.png" alt="Alternate Text" />
-                                        </div>
+                                                <!-- orange table -->
+                                            </div>
                                         </td>
                                         <td class="py-3 px-4 text-opacity-75">012</td>
                                         <td class="py-3 px-4 text-opacity-75">01556176733</td>
