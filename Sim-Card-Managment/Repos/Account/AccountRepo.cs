@@ -25,17 +25,13 @@ using Sim_Card_Managment.Viewmodel;
 
 
 namespace Sim_Card_Managment.Repos.Account
-
 {
-
     public class AccountRepo : IAccountRepo
-
     {
 
         private readonly AppDbContext _context;
 
         private readonly IHttpContextAccessor _httpContextAccessor;
-
 
 
         public AccountRepo(AppDbContext context, IHttpContextAccessor httpContextAccessor)
@@ -48,7 +44,17 @@ namespace Sim_Card_Managment.Repos.Account
 
         }
 
+        public async Task<UserOtp?> GetValidOtpByEmailAsync(string email)
+        {
+            return await _context.UserOtps
+                .FirstOrDefaultAsync(o => o.Email == email && o.ExpireDate > DateTime.Now && !o.IsUsed);
+        }
 
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
 
         public bool Register(RegisterViewModel model)
 

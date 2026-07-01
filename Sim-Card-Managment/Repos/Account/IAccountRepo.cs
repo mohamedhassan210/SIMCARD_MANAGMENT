@@ -1,21 +1,17 @@
-﻿using System;
-
-using System.Collections.Generic;
-
-using System.Threading.Tasks;
-
+﻿using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Viewmodel;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 
 namespace Sim_Card_Managment.Repos.Account
-
 {
-
     public interface IAccountRepo
-
     {
-
+        Task<UserOtp?> GetValidOtpByEmailAsync(string email);
+        Task<User?> GetUserByEmailAsync(string email);
         bool Register(RegisterViewModel model);
 
         Task<LoginResult> Login(LoginViewmodel model);
