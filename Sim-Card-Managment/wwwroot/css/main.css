@@ -93,13 +93,9 @@ border-radius: 20px !important;
 
 
 .glass-box {
-    width: 619px;
-    height: 684px;
-    border-radius: 32px;
     background-color: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .custom-input {
