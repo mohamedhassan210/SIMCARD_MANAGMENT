@@ -5,13 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace Sim_Card_Managment.Models
-
 {
-
     public class User
-
     {
-
         [Key]
 
         public Guid Id { get; set; }

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Viewmodel;
-using System;
+using Sim_Card_Managment.Models;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -56,7 +56,7 @@ namespace Sim_Card_Managment.Controllers
 
         #endregion
 
-        #region 2. Password Management (Reset)
+        #region 2. Password Management (Reset & Forgot Password)
 
         [HttpGet]
         public IActionResult ResetPassword(string username)
@@ -84,9 +84,52 @@ namespace Sim_Card_Managment.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View(new ForgotPasswordViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var validOtpRecord = await _accountRepo.GetValidOtpByEmailAsync(model.Email);
+
+            if (validOtpRecord != null)
+            {
+                var user = await _accountRepo.GetUserByEmailAsync(model.Email);
+
+                if (user != null)
+                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    };
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity)
+                    );
+
+                    TempData["Message"] = $"Your active OTP code is: {validOtpRecord.OtpCode}";
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+
+            ModelState.AddModelError("", "No active or valid OTP found for this email address.");
+            return View(model);
+        }
+
         #endregion
 
-        #region 3. User Registration (Manager-Only)
+        #region 3. User Registration & Profile Management
 
         [HttpGet]
         [Authorize(Roles = "Manager")]
@@ -261,4 +304,3 @@ namespace Sim_Card_Managment.Controllers
         #endregion
     }
 }
-// Account
