@@ -1,11 +1,18 @@
-﻿<!doctype html>
+﻿@model LoginViewmodel
+
+@{
+    Layout = null; 
+}
+
+<!doctype html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
     <link href="~/css/main.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
 </head>
 
 <body class="bg-black text-white">
@@ -16,15 +23,33 @@
             <div class="glass-box d-flex flex-column align-items-center p-5 shadow-lg">
                 <h2 class="text-center fw-bold text-white mb-5" style="font-size: 48px;">Login</h2>
 
-                <div class="d-flex flex-column align-items-center w-100">
-                    <input type="text" placeholder="Username" class=" custom-input mb-4 ps-3 text-dark"
-                           style="margin-top: 50px;">
-                    <input type="password" placeholder="Password" class=" custom-input mb-4 ps-3 text-dark">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 text-center"></div>
 
-                    <a href="#" class="text-white text-decoration-none mb-4">Forgot your password ? <span style="color: #E24D17;">  reset it</span></a>
+                <form asp-controller="Account" asp-action="Login" method="post" class="d-flex flex-column align-items-center w-100">
 
-                    <button class="btn custom-btn">Login</button>
-                </div>
+                    @Html.AntiForgeryToken()
+
+                    <div class="w-100 mb-4" style="margin-top: 50px;">
+                        <input asp-for="Username" type="text" placeholder="Username" class="custom-input w-100 ps-3 text-dark">
+                        <span asp-validation-for="Username" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    <div class="w-100 mb-4">
+                        <input asp-for="Password" type="password" placeholder="Password" class="custom-input w-100 ps-3 text-dark">
+                        <span asp-validation-for="Password" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    <div class="form-check mb-4 align-self-start ms-2">
+                        <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                        <label asp-for="RememberMe" class="form-check-label text-white small">Remember Me</label>
+                    </div>
+
+                    <a asp-action="ResetPassword" class="text-white text-decoration-none mb-4 small">
+                        Forgot your password? <span style="color: #E24D17;">reset it</span>
+                    </a>
+
+                    <button type="submit" class="btn custom-btn">Login</button>
+                </form>
             </div>
 
         </div>
@@ -32,7 +57,8 @@
         <div class="bg-shape shape-solid z-1"></div>
         <div class="bg-shape shape-outline z-1"></div>
     </section>
-    <script src="js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
