@@ -1,0 +1,19 @@
+﻿@model Sim_Card_Managment.Viewmodel.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+<div class="container mt-5">
+    <div class="card mx-auto" style="max-width: 500px;">
+        <div class="card-header bg-primary text-white">
+            <h4>My Profile Information</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>User ID:</strong> @Model.Id</p>
+            <p><strong>Username / Full Name:</strong> @Model.FullName</p>
+            <p><strong>Email Address:</strong> @Model.Email</p>
+            <p><strong>System Role:</strong> <span class="badge bg-info">@Model.Role</span></p>
+        </div>
+    </div>
+</div>

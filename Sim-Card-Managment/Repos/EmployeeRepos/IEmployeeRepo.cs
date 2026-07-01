@@ -2,7 +2,7 @@ using Sim_Card_Managment.Models;
 using System;
 using System.Collections.Generic;
 
-namespace Sim_Card_Managment.Repos
+namespace Sim_Card_Managment.Repos.EmployeeRepos
 {
     public interface IEmployeeRepo
     {
