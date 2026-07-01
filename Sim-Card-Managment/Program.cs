@@ -4,6 +4,7 @@ using Sim_Card_Managment.data;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Repos.QuoteRepo;
+using Sim_Card_Managment.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,10 +30,17 @@ builder.Services.AddScoped<IQuotaRepo, QuotaRepo>();
 builder.Services.AddScoped<ISubscriptionRepo, SubscriptionRepo>();
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IDashboardRepo,DashboardRepo>();
-builder.Services.AddScoped<IEmployeeRepo, EmployeeRepo>();
+builder.Services.AddSingleton<PermissionDiscoveryService>();
 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var discovery = app.Services.GetRequiredService<PermissionDiscoveryService>();
+    await discovery.SeedPermissionsAsync(db);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -190,5 +190,26 @@ border-radius: 20px !important;
         box-shadow: 0 0 10px rgba(226, 77, 23, 0.4);
     }
 
+.offcanvas-header{
+    justify-content:flex-end !important;
+
+
+}
+
+
+
+    .offcanvas-header .btn-close {
+        background: none !important;
+        color: red !important;
+        opacity:1;
+        background-color: white !important;
+        padding-right: 15px !important;
+        border-radius: 10px !important;
+
+    }
+
+
+
+
 
      

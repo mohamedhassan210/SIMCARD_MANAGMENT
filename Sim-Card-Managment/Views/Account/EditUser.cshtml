@@ -1,0 +1,55 @@
+﻿@model Sim_Card_Managment.Viewmodel.EditUserViewModel
+
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square"></i> Edit Employee Account</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="EditUser" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-semibold text-secondary">Username (Cannot be changed)</label>
+                            <input asp-for="Username" class="form-control bg-light" readonly />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Email" class="form-label fw-semibold"></label>
+                            <input asp-for="Email" class="form-control" placeholder="example@domain.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Role" class="form-label fw-semibold">System Role</label>
+                            <select asp-for="Role" class="form-select">
+                                <option value="Employee">Employee</option>
+                                <option value="Manager">Manager</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="GroupId" class="form-label fw-semibold">Assign Group (GUID)</label>
+                            <input asp-for="GroupId" class="form-control" placeholder="00000000-0000-0000-0000-000000000000" />
+                            <span asp-validation-for="GroupId" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                            <a asp-action="ManageUsers" class="btn btn-outline-secondary w-100">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

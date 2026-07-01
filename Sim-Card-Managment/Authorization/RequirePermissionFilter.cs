@@ -23,14 +23,12 @@ namespace Sim_Card_Managment.Authorization
         {
             var http = context.HttpContext;
 
-            // Ensure authenticated
             if (!http.User?.Identity?.IsAuthenticated ?? true)
             {
                 context.Result = new ChallengeResult();
                 return;
             }
 
-            // Determine controller/action names
             var controllerName = _controller ?? context.RouteData.Values["controller"]?.ToString();
             var actionName = _action ?? context.RouteData.Values["action"]?.ToString();
 
@@ -40,10 +38,9 @@ namespace Sim_Card_Managment.Authorization
                 return;
             }
 
-            // Get user id from claims
-            string? userIdStr = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                                ?? http.User.FindFirst("sub")?.Value
-                                ?? http.User.Identity?.Name;
+            var userIdStr = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                         ?? http.User.FindFirst("sub")?.Value
+                         ?? http.User.Identity?.Name;
 
             if (string.IsNullOrEmpty(userIdStr))
             {
@@ -51,92 +48,44 @@ namespace Sim_Card_Managment.Authorization
                 return;
             }
 
-            // Load users into memory and attempt to resolve the current user and its GroupId
-            var users = await _db.Users.ToListAsync();
-            object? matchedUser = null;
+            Guid? groupId = null;
 
-            // Try parse guid
-            Guid parsedGuid;
-            bool isGuid = Guid.TryParse(userIdStr, out parsedGuid);
-
-            foreach (var u in users)
+            if (Guid.TryParse(userIdStr, out var parsedGuid))
             {
-                var type = u.GetType();
-
-                if (isGuid)
-                {
-                    // check common id property names
-                    var idProp = type.GetProperty("Id") ?? type.GetProperty("UserId") ?? type.GetProperty("ID");
-                    if (idProp != null)
-                    {
-                        var val = idProp.GetValue(u);
-                        if (val is Guid g && g == parsedGuid)
-                        {
-                            matchedUser = u;
-                            break;
-                        }
-                    }
-                }
-
-                // fallback: check username/name matching
-                var nameProp = type.GetProperty("Username") ?? type.GetProperty("UserName") ?? type.GetProperty("Name");
-                if (nameProp != null)
-                {
-                    var nv = nameProp.GetValue(u)?.ToString();
-                    if (!string.IsNullOrEmpty(nv) && nv == userIdStr)
-                    {
-                        matchedUser = u;
-                        break;
-                    }
-                }
+                groupId = await _db.Users
+                    .Where(u => u.Id == parsedGuid && u.IsActive && !u.IsDeleted)
+                    .Select(u => (Guid?)u.GroupId)
+                    .FirstOrDefaultAsync();
             }
 
-            if (matchedUser == null)
+            if (groupId == null)
+            {
+                groupId = await _db.Users
+                    .Where(u => u.Username == userIdStr && u.IsActive && !u.IsDeleted)
+                    .Select(u => (Guid?)u.GroupId)
+                    .FirstOrDefaultAsync();
+            }
+
+            if (groupId == null)
             {
                 context.Result = new ForbidResult();
                 return;
             }
 
-            // get GroupId from matched user via common property names
-            var matchedType = matchedUser.GetType();
-            var groupProp = matchedType.GetProperty("GroupId") ?? matchedType.GetProperty("Group") ?? matchedType.GetProperty("RoleId");
-            Guid groupId;
-            if (groupProp == null)
+            var permissionId = await _db.Permissions
+                .Where(p => p.ControllerName == controllerName && p.ActionName == actionName)
+                .Select(p => (Guid?)p.Id)
+                .FirstOrDefaultAsync();
+
+            if (permissionId == null)
             {
                 context.Result = new ForbidResult();
                 return;
             }
 
-            var groupVal = groupProp.GetValue(matchedUser);
-            if (groupVal == null)
-            {
-                context.Result = new ForbidResult();
-                return;
-            }
+            var allowed = await _db.GroupPermissions
+                .AnyAsync(gp => gp.GroupId == groupId.Value && gp.PermissionId == permissionId.Value);
 
-            if (groupVal is Guid gId)
-            {
-                groupId = gId;
-            }
-            else if (Guid.TryParse(groupVal.ToString(), out var tmp))
-            {
-                groupId = tmp;
-            }
-            else
-            {
-                context.Result = new ForbidResult();
-                return;
-            }
-
-            // find permission
-            var permission = _db.Permissions.FirstOrDefault(p => p.ControllerName == controllerName && p.ActionName == actionName);
-            if (permission == null)
-            {
-                context.Result = new ForbidResult();
-                return;
-            }
-
-            var allowed = _db.GroupPermissions.Any(gp => gp.GroupId == groupId && gp.PermissionId == permission.Id);
             if (!allowed)
             {
                 context.Result = new ForbidResult();

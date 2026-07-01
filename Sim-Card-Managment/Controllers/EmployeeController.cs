@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Models;
-using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Authorization;
 using System;
+using Sim_Card_Managment.Repos.EmployeeRepos;
 
 namespace Sim_Card_Managment.Controllers
 {

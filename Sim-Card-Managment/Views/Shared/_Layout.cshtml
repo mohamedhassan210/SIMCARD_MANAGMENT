@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/Sim_Card_Managment.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/main.css"/>
+    <link rel="stylesheet" href="~/css/all.min.css" />
     <style>
    
      
@@ -24,17 +25,19 @@
     </div>
     <!-- Offcanvas Sidebar Component -->
     <!-- Added data-bs-theme="dark" so the close button and accordion arrows automatically turn white -->
-    <aside class="offcanvas offcanvas-start bg-black bg-opacity-25  border-end border-secondary" tabindex="-1" id="leftSidebar" aria-labelledby="leftSidebarLabel" data-bs-theme="dark">
+    <aside class="offcanvas offcanvas-start bg-black bg-opacity-25  border-end border-secondary" tabindex="-1" id="leftSidebar" aria-labelledby="leftSidebarLabel" data-bs-theme="dark" style="border-radius: 0px 30px 30px 0px">
 
         <!-- Sidebar Header -->
         <div class="offcanvas-header ">
 
-            <button type="button" class="btn-close  text-danger" data-bs-dismiss="offcanvas" aria-label="Close" style="color: red;"></button>
+            <button type="button" class="btn-close bg-white " data-bs-dismiss="offcanvas" aria-label="Close"   >
+                <i class="fa-solid fa-x " style="font-size: 20px"></i>
+            </button>
         </div>
 
         <!-- Sidebar Menu Container -->
-        <div class="accordion sidebar-accordion mx-auto g-5+
- " id="sidebarMenu" style="max-width: 300px ;">
+        <div class="accordion sidebar-accordion mx-auto g-5
+ " id="sidebarMenu" style="max-width: 400px ;">
 
             <!-- ==================== USER SECTION ==================== -->
             <div class="accordion-item mb-2">
@@ -61,7 +64,7 @@
                         <!-- Sub 1 -->
                         <div class="d-flex align-items-center gap-3 mb-3">
                             <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14" /></svg>
+                                <i class="fa-solid fa-plus"></i>
                             </div>
                             <span class="sub-item-text">Create new user</span>
                         </div>
@@ -79,7 +82,7 @@
                         <!-- Sub 3 -->
                         <div class="d-flex align-items-center gap-3">
                             <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14m-7-7h14" /></svg>
+                                <i class="fa-solid fa-plus"></i>
                             </div>
                             <span class="sub-item-text">Create new user</span>
                         </div>
