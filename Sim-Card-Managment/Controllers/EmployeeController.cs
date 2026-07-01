@@ -6,7 +6,7 @@ using System;
 
 namespace Sim_Card_Managment.Controllers
 {
-    [RequirePermission]
+    //[RequirePermission]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepo _repo;
@@ -19,7 +19,7 @@ namespace Sim_Card_Managment.Controllers
         // GET: /Employee
         public IActionResult Index()
         {
-            var employees = _repo.GetAll();
+            var employees = _repo.GetAll();// ?? new List<Employee>();
             return View(employees);
         }
 

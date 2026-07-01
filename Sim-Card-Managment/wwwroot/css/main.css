@@ -29,10 +29,9 @@ body {
     -webkit-backdrop-filter: blur(90%) !important;
 }
 /* active Link */
-.navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
-    color: #000 !important;
-    background-color: #fff;
-    border-radius: 20px;
+.navbar-nav .nav-link.active, .navbar-nav .nav-link.show{ color: #fff !important;
+background-color: #E24D17 !important;
+border-radius: 20px !important;
 }
 /* End Of NavBar */
 /* Custom Sidebar Dropdown Styles */
@@ -84,20 +83,14 @@ body {
 }
 
 
-@font-face {
-    font-family: 'Roboto';
-    src: url("../css/Roboto-Italic-VariableFont_wdth\,wght.ttf") format("truetype");
-}
+
 
 
 :root {
     --brand-orange: #E24D17;
 }
 
-body {
-    background-color: black;
-    color: white;
-}
+
 
 .glass-box {
     width: 619px;

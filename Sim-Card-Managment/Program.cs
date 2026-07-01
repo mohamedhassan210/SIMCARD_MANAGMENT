@@ -29,6 +29,7 @@ builder.Services.AddScoped<IQuotaRepo, QuotaRepo>();
 builder.Services.AddScoped<ISubscriptionRepo, SubscriptionRepo>();
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IDashboardRepo,DashboardRepo>();
+builder.Services.AddScoped<IEmployeeRepo, EmployeeRepo>();
 
 
 var app = builder.Build();
