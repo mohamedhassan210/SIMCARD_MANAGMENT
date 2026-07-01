@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Viewmodel;
 using Sim_Card_Managment.Models;
@@ -197,6 +198,97 @@ namespace Sim_Card_Managment.Controllers
             TempData["Success"] = "You have been logged out securely.";
             return RedirectToAction("Login", "Account");
         }
+
+        #endregion
+
+        #region 🔥 6. User Management (Advanced Features - Manager Only) 🔥
+
+        // 1. شاشة عرض وإدارة المستخدمين مع البحث والفلترة
+        [HttpGet]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> ManageUsers(string? search, Guid? groupId, bool? isActive)
+        {
+            var users = await _accountRepo.GetAllUsersAsync(search, groupId, isActive);
+
+            ViewBag.CurrentSearch = search;
+            ViewBag.CurrentGroupId = groupId;
+            ViewBag.CurrentIsActive = isActive;
+
+            return View(users);
+        }
+
+        // 2. شاشة تعديل بيانات مستخدم (HttpGet)
+        [HttpGet]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> EditUser(Guid id)
+        {
+            var model = await _accountRepo.GetUserForEditAsync(id);
+            if (model == null)
+            {
+                TempData["Warning"] = "The user does not exist or has been deleted.";
+                return RedirectToAction("ManageUsers");
+            }
+            return View(model);
+        }
+
+        // 3. استقبال بيانات التعديل وحفظها (HttpPost)
+        [HttpPost]
+        [Authorize(Roles = "Manager")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var result = await _accountRepo.UpdateUserAsync(model);
+            if (result)
+            {
+                TempData["Success"] = "User data updated successfully.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            TempData["Warning"] = "An error occurred while updating user data.";
+            return View(model);
+        }
+
+        // 4. تجميد أو تفعيل الحساب بزرار واحد سريع (Toggle Active)
+        [HttpPost]
+        [Authorize(Roles = "Manager")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleActive(Guid id)
+        {
+            var result = await _accountRepo.ToggleUserActiveAsync(id);
+            if (!result)
+            {
+                TempData["Warning"] = "Unable to change account status.";
+            }
+            else
+            {
+                TempData["Success"] = "Account status updated successfully.";
+            }
+            return RedirectToAction("ManageUsers");
+        }
+
+        // 5. الحذف الذكي بدون مسح نهائي (Soft Delete)
+        [HttpPost]
+        [Authorize(Roles = "Manager")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SoftDelete(Guid id)
+        {
+            var result = await _accountRepo.SoftDeleteUserAsync(id);
+            if (!result)
+            {
+                TempData["Warning"] = "Unable to delete user.";
+            }
+            else
+            {
+                TempData["Success"] = "User moved to soft-deleted items successfully.";
+            }
+            return RedirectToAction("ManageUsers");
+        }
+
+        #endregion
+
+        #region 7. Helpers
 
         #endregion
 

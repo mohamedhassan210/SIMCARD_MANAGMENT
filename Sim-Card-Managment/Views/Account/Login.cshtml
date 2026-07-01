@@ -1,27 +1,87 @@
-﻿@model LoginViewmodel
+﻿
+<style>
+    /* =========================================
+       Login Page Styles
+       ========================================= */
 
-@{
-    Layout = null; 
-}
+    /* Main background section */
+    .login-section {
+        background-color: #E24D17;
+    }
 
-<!doctype html>
-<html lang="en">
+    /* Centered white login card */
+    .login-card {
+        border-radius: 24px;
+        width: 100%;
+        max-width: 600px;
+        min-height: 500px;
+        justify-content: center; /* Aligns inner flex items */
+    }
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="~/css/main.css" rel="stylesheet">
-    <link rel="stylesheet" href="~/css/bootstrap.min.css">
-</head>
+    /* Heading styling */
+    .login-title {
+        font-size: 32px;
+    }
 
-<body class="bg-black text-white">
+    /* Input fields (Overrides default bootstrap focus shadows) */
+    .login-input {
+        font-size: 0.9rem;
+        box-shadow: none;
+    }
 
-    <section class="position-relative vh-100 vw-100 overflow-hidden">
-        <div class="d-flex h-100 w-100 align-items-center justify-content-center position-relative " style="z-index: 1000">
+    /* Custom button styling */
+    .login-btn {
+        background-color: #E24D17;
+        font-size: 1rem;
+        border: 2px solid #E24D17;
+    }
 
-            <div class="glass-box d-flex flex-column align-items-center p-5 shadow-lg">
-                <h2 class="text-center fw-bold text-white mb-5" style="font-size: 48px;">Login</h2>
+        /* Optional: Added a hover effect for better UX */
+        .login-btn:hover {
+            background-color: #c74213;
+            border-color: #c74213;
+            color: #ffffff;
+        }
+
+    /* Bottom text links */
+    .forgot-password-link {
+        font-size: 0.8rem;
+        color: #333333;
+    }
+
+    /* Highlighted 'reset it' text */
+    .reset-text {
+        color: #E24D17;
+    }
+
+    .form-control
+    {
+        border:2px solid transparent !important;
+    }
+    .form-control:focus
+    {
+        box-shadow:none !important;
+        border: 2px solid #E24D17 !important;
+    }
+</style>
+
+
+<section class="login-section position-relative vh-100 vw-100 overflow-hidden">
+    <div class="d-flex h-100 w-100 align-items-center justify-content-center position-relative">
+
+        <div class="login-card bg-white d-flex flex-column align-items-center px-4 py-5 shadow-lg">
+
+            <h2 class="login-title text-center fw-bolder text-dark mb-5">Login</h2>
+
+            <div class="d-flex flex-column align-items-center w-100 px-2">
+
+                <input type="text"
+                       placeholder="user name"
+                       class="login-input form-control bg-light border-0 rounded-pill mb-3 px-4 py-3 text-dark w-100  ">
+
+                <input type="password"
+                       placeholder="Password"
+                       class="login-input form-control bg-light border-0 rounded-pill mb-4 px-4 py-3 text-dark w-100">
 
                 <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 text-center"></div>
 
