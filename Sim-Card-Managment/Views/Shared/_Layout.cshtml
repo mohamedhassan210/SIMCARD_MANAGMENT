@@ -25,17 +25,19 @@
     </div>
     <!-- Offcanvas Sidebar Component -->
     <!-- Added data-bs-theme="dark" so the close button and accordion arrows automatically turn white -->
-    <aside class="offcanvas offcanvas-start bg-black bg-opacity-25  border-end border-secondary" tabindex="-1" id="leftSidebar" aria-labelledby="leftSidebarLabel" data-bs-theme="dark">
+    <aside class="offcanvas offcanvas-start bg-black bg-opacity-25  border-end border-secondary" tabindex="-1" id="leftSidebar" aria-labelledby="leftSidebarLabel" data-bs-theme="dark" style="border-radius: 0px 30px 30px 0px">
 
         <!-- Sidebar Header -->
         <div class="offcanvas-header ">
 
-            <button type="button" class="btn-close  text-danger" data-bs-dismiss="offcanvas" aria-label="Close" style="color: red;"></button>
+            <button type="button" class="btn-close bg-white " data-bs-dismiss="offcanvas" aria-label="Close"   >
+                <i class="fa-solid fa-x " style="font-size: 20px"></i>
+            </button>
         </div>
 
         <!-- Sidebar Menu Container -->
-        <div class="accordion sidebar-accordion mx-auto g-5+
- " id="sidebarMenu" style="max-width: 300px ;">
+        <div class="accordion sidebar-accordion mx-auto g-5
+ " id="sidebarMenu" style="max-width: 400px ;">
 
             <!-- ==================== USER SECTION ==================== -->
             <div class="accordion-item mb-2">
