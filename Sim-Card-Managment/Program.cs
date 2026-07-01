@@ -33,7 +33,10 @@ builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IDashboardRepo,DashboardRepo>();
 builder.Services.AddSingleton<PermissionDiscoveryService>();
 builder.Services.AddScoped<IEmployeeRepo, EmployeeRepo>();
-
+builder.Services.AddScoped<IDeviceActionRepo, DeviceActionRepo>();
+builder.Services.AddScoped<IDeviceStatusRepo, DeviceStatusRepo>();
+builder.Services.AddScoped<IDeviceTransferRepo, DeviceTransferRepo>();
+builder.Services.AddSession();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -54,7 +57,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 
 app.UseAuthentication(); 
 // ----------------------------------------

@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Viewmodel;
-using Sim_Card_Managment.Models;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -96,35 +99,188 @@ namespace Sim_Card_Managment.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var validOtpRecord = await _accountRepo.GetValidOtpByEmailAsync(model.Email);
-
-            if (validOtpRecord != null)
+            var user = await _accountRepo.GetUserByEmailAsync(model.Email);
+            if (user == null)
             {
-                var user = await _accountRepo.GetUserByEmailAsync(model.Email);
-
-                if (user != null)
-                {
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, user.Username),
-                        new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-                    };
-
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity)
-                    );
-
-                    TempData["Message"] = $"Your active OTP code is: {validOtpRecord.OtpCode}";
-                    return RedirectToAction("Index", "Home");
-                }
+                // Security best practice: don't reveal if an email doesn't exist, 
+                // or show a generic error to prevent email harvesting.
+                ModelState.AddModelError("", "This email address is not registered in the system.");
+                return View(model);
             }
 
-            ModelState.AddModelError("", "No active or valid OTP found for this email address.");
+            // Try to find an existing valid OTP first
+            var validOtpRecord = await _accountRepo.GetValidOtpByEmailAsync(model.Email);
+
+            // If no valid OTP exists, generate a brand new one on the fly!
+            if (validOtpRecord == null)
+            {
+                // Example: Generate a random 6-digit number
+                string newOtpCode = new Random().Next(100000, 999999).ToString();
+
+                // Save it via your repository layer
+                validOtpRecord = await _accountRepo.CreateAndSaveNewOtpAsync(model.Email, newOtpCode);
+            }
+
+            try
+            {
+                using (var smtpClient = new SmtpClient("smtp.gmail.com"))
+                {
+                    smtpClient.Port = 587;
+                    smtpClient.Credentials = new NetworkCredential("YoussefElsayedAhmedJ5@gmail.com", "iifymjwqhvuziecx");
+                    smtpClient.EnableSsl = true;
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress("YoussefElsayedAhmedJ5@gmail.com", "SIM & USB Management System"),
+                        Subject = "Your Secure Login OTP Code",
+                        Body = $@"
+                    <h3>Hello {user.Username},</h3>
+                    <p>You requested a secure login access link via your email address.</p>
+                    <p>Your active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></p>
+                    <p>This code is temporary. Please use it before it expires.</p>",
+                        IsBodyHtml = true
+                    };
+
+                    mailMessage.To.Add(model.Email);
+                    await smtpClient.SendMailAsync(mailMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Failed to send the email. Please contact your system administrator.");
+                return View(model);
+            }
+
+            TempData["TargetEmail"] = model.Email;
+            return RedirectToAction("VerifyOtp");
+        }
+        [HttpGet]
+        public IActionResult VerifyOtp()
+        {
+            // Retrieve the target email passed from the forgot password panel step
+            var email = TempData["TargetEmail"] as string;
+            if (string.IsNullOrEmpty(email)) return RedirectToAction("ForgotPassword");
+
+            var model = new VerifyOtpViewModel { Email = email };
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            // Fetch the latest OTP record for this email
+            var validOtpRecord = await _accountRepo.GetValidOtpByEmailAsync(model.Email);
+
+            if (validOtpRecord == null)
+            {
+                ModelState.AddModelError("", "No verification code was requested for this email address.");
+                return View(model);
+            }
+
+            // 1. Check Expiration first
+            if (validOtpRecord.ExpireDate < DateTime.Now)
+            {
+                ModelState.AddModelError("", "This OTP has expired. Please request a new code.");
+                return View(model);
+            }
+
+            // 2. Check if already used (if your DB tracks this)
+            if (validOtpRecord.IsUsed)
+            {
+                ModelState.AddModelError("", "This OTP has already been used. Please request a new code.");
+                return View(model);
+            }
+
+            // 3. Check if the code matches
+            if (validOtpRecord.OtpCode != model.OtpCode.Trim())
+            {
+                ModelState.AddModelError("", "Incorrect OTP. Please check the code and try again.");
+                return View(model);
+            }
+
+            // --- Success Flow ---
+            var user = await _accountRepo.GetUserByEmailAsync(model.Email);
+            if (user != null)
+            {
+                // Clear session limit tracking on successful login
+                HttpContext.Session.Remove("ResendCount_" + model.Email);
+
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+        };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+                TempData["Success"] = "Logged in successfully.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ModelState.AddModelError("", "An error occurred. Please try again.");
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendOtp(string email)
+        {
+            if (string.IsNullOrEmpty(email)) return RedirectToAction("ForgotPassword");
+
+            string sessionKey = $"ResendCount_{email}";
+            int currentResends = HttpContext.Session.GetInt32(sessionKey) ?? 0;
+
+            // 🛑 Rule Check: If they hit 10 resends, cut them off
+            if (currentResends >= 10)
+            {
+                TempData["ErrorMessage"] = "You have reached the maximum layout of 10 resends. Please contact support at support@company.com.";
+                TempData["TargetEmail"] = email;
+                return RedirectToAction("VerifyOtp");
+            }
+
+            // Increment resend count tracker
+            currentResends++;
+            HttpContext.Session.SetInt32(sessionKey, currentResends);
+
+            // Generate a new OTP code
+            string newOtpCode = new Random().Next(100000, 999999).ToString();
+            var validOtpRecord = await _accountRepo.CreateAndSaveNewOtpAsync(email, newOtpCode);
+
+            try
+            {
+                using (var smtpClient = new SmtpClient("smtp.gmail.com"))
+                {
+                    smtpClient.Port = 587;
+                    smtpClient.UseDefaultCredentials = false;
+                    smtpClient.Credentials = new NetworkCredential("YoussefElsayedAhmedJ5@gmail.com", "iifymjwqhvuziecx");
+                    smtpClient.EnableSsl = true;
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress("YoussefElsayedAhmedJ5@gmail.com", "SIM & USB Management System"),
+                        Subject = "Your New Secure Login OTP Code",
+                        Body = $"<h3>Your new active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></h3>",
+                        IsBodyHtml = true
+                    };
+
+                    mailMessage.To.Add(email);
+                    await smtpClient.SendMailAsync(mailMessage);
+                }
+
+                TempData["SuccessMessage"] = $"A new code has been sent! (Resend request {currentResends}/10)";
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = "Failed to dispatch email server routing. Please try again.";
+            }
+
+            TempData["TargetEmail"] = email;
+            return RedirectToAction("VerifyOtp");
         }
 
         #endregion
