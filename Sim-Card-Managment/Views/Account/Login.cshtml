@@ -1,38 +1,98 @@
-﻿<!doctype html>
-<html lang="en">
+﻿
+<style>
+    /* =========================================
+       Login Page Styles
+       ========================================= */
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="~/css/main.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-</head>
+    /* Main background section */
+    .login-section {
+        background-color: #E24D17;
+    }
 
-<body class="bg-black text-white">
+    /* Centered white login card */
+    .login-card {
+        border-radius: 24px;
+        width: 100%;
+        max-width: 600px;
+        min-height: 500px;
+        justify-content: center; /* Aligns inner flex items */
+    }
 
-    <section class="position-relative vh-100 vw-100 overflow-hidden">
-        <div class="d-flex h-100 w-100 align-items-center justify-content-center position-relative " style="z-index: 1000">
+    /* Heading styling */
+    .login-title {
+        font-size: 32px;
+    }
 
-            <div class="glass-box d-flex flex-column align-items-center p-5 shadow-lg">
-                <h2 class="text-center fw-bold text-white mb-5" style="font-size: 48px;">Login</h2>
+    /* Input fields (Overrides default bootstrap focus shadows) */
+    .login-input {
+        font-size: 0.9rem;
+        box-shadow: none;
+    }
 
-                <div class="d-flex flex-column align-items-center w-100">
-                    <input type="text" placeholder="Username" class=" custom-input mb-4 ps-3 text-dark"
-                           style="margin-top: 50px;">
-                    <input type="password" placeholder="Password" class=" custom-input mb-4 ps-3 text-dark">
+    /* Custom button styling */
+    .login-btn {
+        background-color: #E24D17;
+        font-size: 1rem;
+        border: 2px solid #E24D17;
+    }
 
-                    <a href="#" class="text-white text-decoration-none mb-4">Forgot your password ? <span style="color: #E24D17;">  reset it</span></a>
+        /* Optional: Added a hover effect for better UX */
+        .login-btn:hover {
+            background-color: #c74213;
+            border-color: #c74213;
+            color: #ffffff;
+        }
 
-                    <button class="btn custom-btn">Login</button>
-                </div>
+    /* Bottom text links */
+    .forgot-password-link {
+        font-size: 0.8rem;
+        color: #333333;
+    }
+
+    /* Highlighted 'reset it' text */
+    .reset-text {
+        color: #E24D17;
+    }
+
+    .form-control
+    {
+        border:2px solid transparent !important;
+    }
+    .form-control:focus
+    {
+        box-shadow:none !important;
+        border: 2px solid #E24D17 !important;
+    }
+</style>
+
+
+<section class="login-section position-relative vh-100 vw-100 overflow-hidden">
+    <div class="d-flex h-100 w-100 align-items-center justify-content-center position-relative">
+
+        <div class="login-card bg-white d-flex flex-column align-items-center px-4 py-5 shadow-lg">
+
+            <h2 class="login-title text-center fw-bolder text-dark mb-5">Login</h2>
+
+            <div class="d-flex flex-column align-items-center w-100 px-2">
+
+                <input type="text"
+                       placeholder="user name"
+                       class="login-input form-control bg-light border-0 rounded-pill mb-3 px-4 py-3 text-dark w-100  ">
+
+                <input type="password"
+                       placeholder="Password"
+                       class="login-input form-control bg-light border-0 rounded-pill mb-4 px-4 py-3 text-dark w-100">
+
+                <button class="login-btn btn rounded-pill w-100 text-white fw-bold py-2 mb-3 transition">
+                    Login
+                </button>
+
+                <span >
+                    Forgot your password ? <a asp-action="ForgotPassword" class="reset-text fw-bold forgot-password-link text-decoration-none" >reset it</a>
+                </span>
+
             </div>
-
         </div>
 
-        <div class="bg-shape shape-solid z-1"></div>
-        <div class="bg-shape shape-outline z-1"></div>
-    </section>
-    <script src="js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+    </div>
+</section>

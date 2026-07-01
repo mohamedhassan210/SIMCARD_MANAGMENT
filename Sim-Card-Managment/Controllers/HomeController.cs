@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
 
 namespace Sim_Card_Managment.Controllers
@@ -25,7 +26,6 @@ namespace Sim_Card_Managment.Controllers
             ViewBag.ReplacedUsbs = _repo.GetDeviceStatusCount("Replaced", false);
             ViewBag.ReturnedUsbs = _repo.GetDeviceStatusCount("Returned", false);
 
-            
             ViewBag.RecentEmployees = _repo.GetTopEmployees(4);
             ViewBag.RecentSims = _repo.GetTopSims(4);
 

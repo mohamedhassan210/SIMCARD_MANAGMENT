@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repos.Account;
+using Sim_Card_Managment.Repos.EmployeeRepos;
 using Sim_Card_Managment.Repos.QuoteRepo;
 using Sim_Card_Managment.Services;
 
@@ -31,7 +32,7 @@ builder.Services.AddScoped<ISubscriptionRepo, SubscriptionRepo>();
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IDashboardRepo,DashboardRepo>();
 builder.Services.AddSingleton<PermissionDiscoveryService>();
-
+builder.Services.AddScoped<IEmployeeRepo, EmployeeRepo>();
 
 var app = builder.Build();
 

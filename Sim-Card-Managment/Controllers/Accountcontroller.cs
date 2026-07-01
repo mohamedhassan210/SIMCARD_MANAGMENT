@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Viewmodel;
 using Sim_Card_Managment.Models;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Net;
-using System.Net.Mail;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -39,7 +38,6 @@ namespace Sim_Card_Managment.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            // 🔥 تم الإصلاح: الـ Repo والـ Controller بقوا متوافقين على الـ LoginResult
             var loginResult = await _accountRepo.Login(model);
 
             if (loginResult.IsSuccess)
@@ -47,14 +45,12 @@ namespace Sim_Card_Managment.Controllers
                 if (loginResult.IsFirstLogin)
                 {
                     TempData["Warning"] = "Security Notice: You must reset your temporary password.";
-                    // 🛑 تم الإصلاح: غيرنا model.Email وخليناها model.Username عشان يطابق الموديل بتاعك بالظبط ويشيل الخط الأحمر
                     return RedirectToAction("ResetPassword", new { username = model.Username });
                 }
 
                 return RedirectToAction("Index", "Home");
             }
 
-            // 🔥 تم الإصلاح: قراءة الـ ErrorMessage صح من غير أحمر
             ModelState.AddModelError("", loginResult.ErrorMessage ?? "Invalid login attempt.");
             return View(model);
         }
@@ -101,97 +97,20 @@ namespace Sim_Card_Managment.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var user = await _accountRepo.GetUserByEmailAsync(model.Email);
-            if (user == null)
-            {
-                // Security best practice: don't reveal if an email doesn't exist, 
-                // or show a generic error to prevent email harvesting.
-                ModelState.AddModelError("", "This email address is not registered in the system.");
-                return View(model);
-            }
-
-            // Try to find an existing valid OTP first
             var validOtpRecord = await _accountRepo.GetValidOtpByEmailAsync(model.Email);
 
-            // If no valid OTP exists, generate a brand new one on the fly!
-            if (validOtpRecord == null)
-            {
-                // Example: Generate a random 6-digit number
-                string newOtpCode = new Random().Next(100000, 999999).ToString();
-
-                // Save it via your repository layer
-                validOtpRecord = await _accountRepo.CreateAndSaveNewOtpAsync(model.Email, newOtpCode);
-            }
-
-            try
-            {
-                using (var smtpClient = new SmtpClient("smtp.gmail.com"))
-                {
-                    smtpClient.Port = 587;
-                    smtpClient.Credentials = new NetworkCredential("YoussefElsayedAhmedJ5@gmail.com", "iifymjwqhvuziecx");
-                    smtpClient.EnableSsl = true;
-
-                    var mailMessage = new MailMessage
-                    {
-                        From = new MailAddress("YoussefElsayedAhmedJ5@gmail.com", "SIM & USB Management System"),
-                        Subject = "Your Secure Login OTP Code",
-                        Body = $@"
-                    <h3>Hello {user.Username},</h3>
-                    <p>You requested a secure login access link via your email address.</p>
-                    <p>Your active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></p>
-                    <p>This code is temporary. Please use it before it expires.</p>",
-                        IsBodyHtml = true
-                    };
-
-                    mailMessage.To.Add(model.Email);
-                    await smtpClient.SendMailAsync(mailMessage);
-                }
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Failed to send the email. Please contact your system administrator.");
-                return View(model);
-            }
-
-            TempData["TargetEmail"] = model.Email;
-            return RedirectToAction("VerifyOtp");
-        }
-        [HttpGet]
-        public IActionResult VerifyOtp()
-        {
-            // Retrieve the target email passed from the forgot password panel step
-            var email = TempData["TargetEmail"] as string;
-            if (string.IsNullOrEmpty(email)) return RedirectToAction("ForgotPassword");
-
-            var model = new VerifyOtpViewModel { Email = email };
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
-        {
-            if (!ModelState.IsValid) return View(model);
-
-            var validOtpRecord = await _accountRepo.GetValidOtpByEmailAsync(model.Email);
-
-            // Validate if an active DB token matches what the user submitted directly
-            if (validOtpRecord != null && validOtpRecord.OtpCode == model.OtpCode.Trim())
+            if (validOtpRecord != null)
             {
                 var user = await _accountRepo.GetUserByEmailAsync(model.Email);
 
                 if (user != null)
                 {
-                    // Optional: Mark OTP as used if your architecture includes an IsUsed field
-                    // validOtpRecord.IsUsed = true;
-                    // await _accountRepo.UpdateOtpStatusAsync(validOtpRecord);
-
                     var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-            };
+                    {
+                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -200,14 +119,15 @@ namespace Sim_Card_Managment.Controllers
                         new ClaimsPrincipal(claimsIdentity)
                     );
 
-                    TempData["Success"] = "Logged in successfully via secure verification code.";
+                    TempData["Message"] = $"Your active OTP code is: {validOtpRecord.OtpCode}";
                     return RedirectToAction("Index", "Home");
                 }
             }
 
-            ModelState.AddModelError("", "The code entered is incorrect or has expired.");
+            ModelState.AddModelError("", "No active or valid OTP found for this email address.");
             return View(model);
         }
+
         #endregion
 
         #region 3. User Registration & Profile Management
@@ -230,22 +150,42 @@ namespace Sim_Card_Managment.Controllers
             if (isCreated)
             {
                 TempData["Success"] = "Account created successfully.";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("ManageUsers");
             }
 
             ModelState.AddModelError("", "Registration failed.");
             return View(model);
         }
 
+        #endregion
+
+        #region 4. User Profile Details (Advanced Security)
+
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Profile(Guid id)
+        public async Task<IActionResult> ProfileDetails(Guid id)
         {
+            var currentUserIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(currentUserIdClaim) || !Guid.TryParse(currentUserIdClaim, out Guid loggedInUserId))
+            {
+                return ForceLogoutAndRedirect();
+            }
+
+            if (loggedInUserId != id && !User.IsInRole("Manager"))
+            {
+                return RedirectToAction("AccessDenied");
+            }
+
             var userProfile = await _accountRepo.GetProfileByIdAsync(id);
             if (userProfile == null) return NotFound();
 
             return View(userProfile);
         }
+
+        #endregion
+
+        #region 5. Secure Logout
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -258,6 +198,97 @@ namespace Sim_Card_Managment.Controllers
             TempData["Success"] = "You have been logged out securely.";
             return RedirectToAction("Login", "Account");
         }
+
+        #endregion
+
+        #region 🔥 6. User Management (Advanced Features - Manager Only) 🔥
+
+        // 1. شاشة عرض وإدارة المستخدمين مع البحث والفلترة
+        [HttpGet]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> ManageUsers(string? search, Guid? groupId, bool? isActive)
+        {
+            var users = await _accountRepo.GetAllUsersAsync(search, groupId, isActive);
+
+            ViewBag.CurrentSearch = search;
+            ViewBag.CurrentGroupId = groupId;
+            ViewBag.CurrentIsActive = isActive;
+
+            return View(users);
+        }
+
+        // 2. شاشة تعديل بيانات مستخدم (HttpGet)
+        [HttpGet]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> EditUser(Guid id)
+        {
+            var model = await _accountRepo.GetUserForEditAsync(id);
+            if (model == null)
+            {
+                TempData["Warning"] = "The user does not exist or has been deleted.";
+                return RedirectToAction("ManageUsers");
+            }
+            return View(model);
+        }
+
+        // 3. استقبال بيانات التعديل وحفظها (HttpPost)
+        [HttpPost]
+        [Authorize(Roles = "Manager")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var result = await _accountRepo.UpdateUserAsync(model);
+            if (result)
+            {
+                TempData["Success"] = "User data updated successfully.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            TempData["Warning"] = "An error occurred while updating user data.";
+            return View(model);
+        }
+
+        // 4. تجميد أو تفعيل الحساب بزرار واحد سريع (Toggle Active)
+        [HttpPost]
+        [Authorize(Roles = "Manager")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleActive(Guid id)
+        {
+            var result = await _accountRepo.ToggleUserActiveAsync(id);
+            if (!result)
+            {
+                TempData["Warning"] = "Unable to change account status.";
+            }
+            else
+            {
+                TempData["Success"] = "Account status updated successfully.";
+            }
+            return RedirectToAction("ManageUsers");
+        }
+
+        // 5. الحذف الذكي بدون مسح نهائي (Soft Delete)
+        [HttpPost]
+        [Authorize(Roles = "Manager")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SoftDelete(Guid id)
+        {
+            var result = await _accountRepo.SoftDeleteUserAsync(id);
+            if (!result)
+            {
+                TempData["Warning"] = "Unable to delete user.";
+            }
+            else
+            {
+                TempData["Success"] = "User moved to soft-deleted items successfully.";
+            }
+            return RedirectToAction("ManageUsers");
+        }
+
+        #endregion
+
+        #region 7. Helpers
 
         [HttpGet]
         public IActionResult AccessDenied()
