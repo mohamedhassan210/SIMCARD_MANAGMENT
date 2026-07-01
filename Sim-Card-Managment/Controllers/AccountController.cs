@@ -7,6 +7,8 @@ using Sim_Card_Managment.Viewmodel;
 using Sim_Card_Managment.Models;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Mail;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -99,20 +101,97 @@ namespace Sim_Card_Managment.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
+            var user = await _accountRepo.GetUserByEmailAsync(model.Email);
+            if (user == null)
+            {
+                // Security best practice: don't reveal if an email doesn't exist, 
+                // or show a generic error to prevent email harvesting.
+                ModelState.AddModelError("", "This email address is not registered in the system.");
+                return View(model);
+            }
+
+            // Try to find an existing valid OTP first
             var validOtpRecord = await _accountRepo.GetValidOtpByEmailAsync(model.Email);
 
-            if (validOtpRecord != null)
+            // If no valid OTP exists, generate a brand new one on the fly!
+            if (validOtpRecord == null)
+            {
+                // Example: Generate a random 6-digit number
+                string newOtpCode = new Random().Next(100000, 999999).ToString();
+
+                // Save it via your repository layer
+                validOtpRecord = await _accountRepo.CreateAndSaveNewOtpAsync(model.Email, newOtpCode);
+            }
+
+            try
+            {
+                using (var smtpClient = new SmtpClient("smtp.gmail.com"))
+                {
+                    smtpClient.Port = 587;
+                    smtpClient.Credentials = new NetworkCredential("YoussefElsayedAhmedJ5@gmail.com", "iifymjwqhvuziecx");
+                    smtpClient.EnableSsl = true;
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress("YoussefElsayedAhmedJ5@gmail.com", "SIM & USB Management System"),
+                        Subject = "Your Secure Login OTP Code",
+                        Body = $@"
+                    <h3>Hello {user.Username},</h3>
+                    <p>You requested a secure login access link via your email address.</p>
+                    <p>Your active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></p>
+                    <p>This code is temporary. Please use it before it expires.</p>",
+                        IsBodyHtml = true
+                    };
+
+                    mailMessage.To.Add(model.Email);
+                    await smtpClient.SendMailAsync(mailMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Failed to send the email. Please contact your system administrator.");
+                return View(model);
+            }
+
+            TempData["TargetEmail"] = model.Email;
+            return RedirectToAction("VerifyOtp");
+        }
+        [HttpGet]
+        public IActionResult VerifyOtp()
+        {
+            // Retrieve the target email passed from the forgot password panel step
+            var email = TempData["TargetEmail"] as string;
+            if (string.IsNullOrEmpty(email)) return RedirectToAction("ForgotPassword");
+
+            var model = new VerifyOtpViewModel { Email = email };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var validOtpRecord = await _accountRepo.GetValidOtpByEmailAsync(model.Email);
+
+            // Validate if an active DB token matches what the user submitted directly
+            if (validOtpRecord != null && validOtpRecord.OtpCode == model.OtpCode.Trim())
             {
                 var user = await _accountRepo.GetUserByEmailAsync(model.Email);
 
                 if (user != null)
                 {
+                    // Optional: Mark OTP as used if your architecture includes an IsUsed field
+                    // validOtpRecord.IsUsed = true;
+                    // await _accountRepo.UpdateOtpStatusAsync(validOtpRecord);
+
                     var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, user.Username),
-                        new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-                    };
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+            };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -121,15 +200,14 @@ namespace Sim_Card_Managment.Controllers
                         new ClaimsPrincipal(claimsIdentity)
                     );
 
-                    TempData["Message"] = $"Your active OTP code is: {validOtpRecord.OtpCode}";
+                    TempData["Success"] = "Logged in successfully via secure verification code.";
                     return RedirectToAction("Index", "Home");
                 }
             }
 
-            ModelState.AddModelError("", "No active or valid OTP found for this email address.");
+            ModelState.AddModelError("", "The code entered is incorrect or has expired.");
             return View(model);
         }
-
         #endregion
 
         #region 3. User Registration & Profile Management

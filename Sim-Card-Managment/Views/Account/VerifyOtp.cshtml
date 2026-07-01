@@ -1,0 +1,51 @@
+﻿@model Sim_Card_Managment.Viewmodel.VerifyOtpViewModel
+
+@{
+    ViewData["Title"] = "Verify Access Code";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-dark text-white text-center py-3">
+                    <h4 class="mb-0"><i class="ti ti-shield-check me-2"></i>Enter Security Code</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">
+                        We have sent a temporary verification token to <strong>@Model.Email</strong>. Please enter the secure code below to access your dashboard.
+                    </p>
+
+                    <form asp-action="VerifyOtp" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <input type="hidden" asp-for="Email" />
+
+                        <div class="mb-4">
+                            <label asp-for="OtpCode" class="form-label font-weight-medium">One-Time Password (OTP)</label>
+                            <input asp-for="OtpCode" class="form-control form-control-lg text-center font-monospace tracking-wide"
+                                   placeholder="000000" autocomplete="off" style="font-size: 1.5rem; letter-spacing: 4px;" />
+                            <span asp-validation-for="OtpCode" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-dark btn-lg">
+                                Confirm & Login
+                            </button>
+                            <a asp-action="ForgotPassword" class="btn btn-link text-secondary btn-sm mt-2">
+                                Request a new code
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
