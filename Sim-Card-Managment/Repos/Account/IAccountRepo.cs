@@ -10,6 +10,7 @@ namespace Sim_Card_Managment.Repos.Account
 {
     public interface IAccountRepo
     {
+        Task<UserOtp> CreateAndSaveNewOtpAsync(string email, string otpCode);
         Task<UserOtp?> GetValidOtpByEmailAsync(string email);
         Task<User?> GetUserByEmailAsync(string email);
         bool Register(RegisterViewModel model);

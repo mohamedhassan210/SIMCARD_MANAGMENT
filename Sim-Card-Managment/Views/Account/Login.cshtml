@@ -83,16 +83,42 @@
                        placeholder="Password"
                        class="login-input form-control bg-light border-0 rounded-pill mb-4 px-4 py-3 text-dark w-100">
 
-                <button class="login-btn btn rounded-pill w-100 text-white fw-bold py-2 mb-3 transition">
-                    Login
-                </button>
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 text-center"></div>
 
-                <span >
-                    Forgot your password ? <a asp-action="ForgotPassword" class="reset-text fw-bold forgot-password-link text-decoration-none" >reset it</a>
-                </span>
+                <form asp-controller="Account" asp-action="Login" method="post" class="d-flex flex-column align-items-center w-100">
 
+                    @Html.AntiForgeryToken()
+
+                    <div class="w-100 mb-4" style="margin-top: 50px;">
+                        <input asp-for="Username" type="text" placeholder="Username" class="custom-input w-100 ps-3 text-dark">
+                        <span asp-validation-for="Username" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    <div class="w-100 mb-4">
+                        <input asp-for="Password" type="password" placeholder="Password" class="custom-input w-100 ps-3 text-dark">
+                        <span asp-validation-for="Password" class="text-danger small d-block mt-1"></span>
+                    </div>
+
+                    <div class="form-check mb-4 align-self-start ms-2">
+                        <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                        <label asp-for="RememberMe" class="form-check-label text-white small">Remember Me</label>
+                    </div>
+
+                    <a asp-action="ResetPassword" class="text-white text-decoration-none mb-4 small">
+                        Forgot your password? <span style="color: #E24D17;">reset it</span>
+                    </a>
+
+                    <button type="submit" class="btn custom-btn">Login</button>
+                </form>
             </div>
+
         </div>
 
-    </div>
-</section>
+        <div class="bg-shape shape-solid z-1"></div>
+        <div class="bg-shape shape-outline z-1"></div>
+    </section>
+
+    <script src="~/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
