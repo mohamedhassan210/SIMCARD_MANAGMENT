@@ -1,8 +1,4 @@
-﻿
-<!-- emp details -->
-
-
-<style>
+﻿<style>
     /* --- Responsive Typography --- */
     .emp-title {
         font-size: clamp(2rem, 5vw, 4rem); /* Scales between 32px and 64px */
@@ -122,17 +118,16 @@
 <body style="background-color: #EEEDED; margin-top: 30px">
 
     <section class="p-5">
-        <!-- Applied responsive classes here -->
         <h2 class="emp-title">Adham amr mohamed <span class="emp-badge ms-2">2 sim</span></h2>
 
         <p class="emp-id fw-medium">309060702500484</p>
 
         <div class="d-flex flex-wrap gap-4 mt-4">
-            <button class="btn active text-white roundedbutton" style="background-color: #E24D17; font-size: 20px;">
+            <a class="btn active text-white roundedbutton" style="background-color: #E24D17; font-size: 20px;" asp-controller="Employee" asp-action="Edit">
                 <i class="fa-solid fa-pen-to-square me-2"></i>Edit Details
-            </button>
+            </a>
 
-            <button class="btn active text-white roundedbutton" style="background-color: #D41212; font-size: 20px;">
+            <button class="btn active text-white roundedbutton" style="background-color: #D41212; font-size: 20px;" onclick="confirmDelete()">
                 <i class="fa-solid fa-trash-can me-2"></i>Delete
             </button>
 
@@ -198,6 +193,31 @@
 
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
 
+    <script>
+        function confirmDelete() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#D41212', // Matches your red button
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Place your actual backend deletion logic here (e.g., redirect or AJAX call)
+
+                    Swal.fire(
+                        'Deleted!',
+                        'The employee has been deleted.',
+                        'success'
+                    )
+                }
+            })
+        }
+    </script>
 </body>
