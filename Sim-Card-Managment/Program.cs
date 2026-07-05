@@ -23,8 +23,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 // ----------------------------------------
-builder.Services.AddDbContext<AppDbContext>(
-    x => x.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
+// Retrieve the connection string
+var connectionString = builder.Configuration.GetConnectionString("conn");
+
+// Register your DbContext (Replace 'CinemaContext' with your actual context name)
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IUSBRepo, USBRepo>();
 builder.Services.AddScoped<ISIMRepo, SIMRepo>();
 builder.Services.AddScoped<IQuotaRepo, QuotaRepo>();
