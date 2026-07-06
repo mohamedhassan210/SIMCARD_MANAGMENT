@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Viewmodel;
-using System.Net;
-using System.Net.Mail;
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -280,7 +279,7 @@ namespace Sim_Card_Managment.Controllers
 
         #endregion
 
-        #region 3. User Registration & Profile Management
+        #region 3. User Registration (Manager-Only)
 
         [HttpGet]
         [Authorize(Roles = "Manager")]
