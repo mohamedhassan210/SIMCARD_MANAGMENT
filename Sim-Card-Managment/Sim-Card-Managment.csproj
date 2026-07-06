@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Sim_Card_Managment</RootNamespace>
+    <UserSecretsId>957230da-a7f8-4d59-89ac-160513a9f846</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

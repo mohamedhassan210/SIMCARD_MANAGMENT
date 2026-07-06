@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection.Metadata;
+using System.Xml.Linq;
+using Microsoft.EntityFrameworkCore;
 using Sim_Card_Managment.Models;
 
 namespace Sim_Card_Managment.data
@@ -30,6 +32,12 @@ namespace Sim_Card_Managment.data
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<GroupPermission> GroupPermissions { get; set; }
         public DbSet<UserOtp> UserOtps { get; set; }
+
+        // ── Document tables ──────────────────────────────────────────────
+
+        public DbSet<Models.Document> Documents { get; set; }
+        public DbSet<Serial> Serials { get; set; }
+        public DbSet<DocumentType> DocumentTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -155,6 +163,48 @@ namespace Sim_Card_Managment.data
                 .HasOne(ds => ds.ReportedByUser)
                 .WithMany(u => u.ReportedStatuses)
                 .HasForeignKey(ds => ds.ReportedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── Document: DocumentType ──────────────────────────────
+            modelBuilder.Entity<Models.Document>()
+                .HasOne(d => d.DocumentType)
+                .WithMany(dt => dt.Documents)
+                .HasForeignKey(d => d.DocumenttypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            // ── Document: User ──────────────────────────────
+            modelBuilder.Entity<Models.Document>()
+                .HasOne(d => d.CreatedBy)
+                .WithMany(u => u.Documents)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── Document: Serials ──────────────────────────────
+            modelBuilder.Entity<Serial>()
+                .HasOne(s => s.Document)
+                .WithMany(d => d.Serials)
+                .HasForeignKey(s => s.DocumentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── Usb: Serials ──────────────────────────────
+            modelBuilder.Entity<Serial>()
+                .HasOne(s => s.Usb)
+                .WithMany(u => u.Serials)
+                .HasForeignKey(s => s.UsbId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── sim: Serials ──────────────────────────────
+            modelBuilder.Entity<Serial>()
+                .HasOne(s => s.Sim)
+                .WithMany(s => s.Serials)
+                .HasForeignKey(s => s.SimId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── User: Serials ──────────────────────────────
+            modelBuilder.Entity<Serial>()
+                .HasOne(s => s.CreatedBy)
+                .WithMany(s => s.Serials)
+                .HasForeignKey(s => s.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
