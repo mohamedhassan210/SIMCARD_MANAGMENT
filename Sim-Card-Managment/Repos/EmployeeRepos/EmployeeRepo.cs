@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 using System;
@@ -17,7 +18,7 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
 
         public IEnumerable<Employee> GetAll()
         {
-            return _context.Employees.ToList();
+            return _context.Employees.Include(e=>e.User).Include(e=>e.Subscriptions).ToList();
         }
 
         public Employee? GetById(Guid id)

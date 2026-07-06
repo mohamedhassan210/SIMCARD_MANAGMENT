@@ -23,7 +23,7 @@ namespace Sim_Card_Managment.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; } = true; 
 
         // Navigation properties
         [ForeignKey(nameof(UserId))]

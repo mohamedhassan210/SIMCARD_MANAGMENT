@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repos.Account;
+using Sim_Card_Managment.Repos.EmployeeRepos;
+using Sim_Card_Managment.Repos.NonEmployeeRepos;
 using Sim_Card_Managment.Repos.QuoteRepo;
 using Sim_Card_Managment.Services;
 
@@ -22,8 +24,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 // ----------------------------------------
-builder.Services.AddDbContext<AppDbContext>(
-    x => x.UseSqlServer(builder.Configuration.GetConnectionString("conn")));
+// Ensure the path string matches "ConnectionStrings:conn"
+var connectionString = builder.Configuration.GetConnectionString("conn");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IUSBRepo, USBRepo>();
 builder.Services.AddScoped<ISIMRepo, SIMRepo>();
 builder.Services.AddScoped<IQuotaRepo, QuotaRepo>();
@@ -31,8 +36,12 @@ builder.Services.AddScoped<ISubscriptionRepo, SubscriptionRepo>();
 builder.Services.AddScoped<IAccountRepo, AccountRepo>();
 builder.Services.AddScoped<IDashboardRepo,DashboardRepo>();
 builder.Services.AddSingleton<PermissionDiscoveryService>();
-
-
+builder.Services.AddScoped<IEmployeeRepo, EmployeeRepo>();
+builder.Services.AddScoped<IDeviceActionRepo, DeviceActionRepo>();
+builder.Services.AddScoped<IDeviceStatusRepo, DeviceStatusRepo>();
+builder.Services.AddScoped<IDeviceTransferRepo, DeviceTransferRepo>();
+builder.Services.AddScoped<INonEmployeeRepo, NonEmployeeRepo>();
+builder.Services.AddSession();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -53,7 +62,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 
 app.UseAuthentication(); 
 // ----------------------------------------

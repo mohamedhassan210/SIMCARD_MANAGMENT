@@ -6,7 +6,7 @@ using Sim_Card_Managment.Repos.EmployeeRepos;
 
 namespace Sim_Card_Managment.Controllers
 {
-    [RequirePermission]
+    //[RequirePermission]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepo _repo;
@@ -19,16 +19,16 @@ namespace Sim_Card_Managment.Controllers
         // GET: /Employee
         public IActionResult Index()
         {
-            var employees = _repo.GetAll();
+            var employees = _repo.GetAll();// ?? new List<Employee>();
             return View(employees);
         }
 
         // GET: /Employee/Details/{id}
-        public IActionResult Details(Guid id)
+        public IActionResult Details(/*Guid id*/)
         {
-            var employee = _repo.GetById(id);
-            if (employee == null) return NotFound();
-            return View(employee);
+            //var employee = _repo.GetById(id);
+            //if (employee == null) return NotFound();
+            return View(/*employee*/);
         }
 
         // GET: /Employee/Create
@@ -49,11 +49,11 @@ namespace Sim_Card_Managment.Controllers
         }
 
         // GET: /Employee/Edit/{id}
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(/*Guid id*/)
         {
-            var employee = _repo.GetById(id);
-            if (employee == null) return NotFound();
-            return View(employee);
+            //var employee = _repo.GetById(id);
+            //if (employee == null) return NotFound();
+            return View(/*employee*/);
         }
 
         // POST: /Employee/Edit/{id}
