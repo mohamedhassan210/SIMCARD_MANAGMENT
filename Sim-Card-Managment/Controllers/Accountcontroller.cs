@@ -51,7 +51,7 @@ namespace Sim_Card_Managment.Controllers
                     return RedirectToAction("ResetPassword", new { username = model.Username });
                 }
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("home", "Home");
             }
 
             ModelState.AddModelError("", loginResult.ErrorMessage ?? "Invalid login attempt.");
@@ -206,21 +206,15 @@ namespace Sim_Card_Managment.Controllers
             var user = await _accountRepo.GetUserByEmailAsync(model.Email);
             if (user != null)
             {
-                // Clear session limit tracking on successful login
+                // Optional: Mark the OTP record as used in your DB if your system supports it
+                // validOtpRecord.IsUsed = true;
+                // await _accountRepo.UpdateOtpStatusAsync(validOtpRecord);
+
+                // Clear session limit tracking on successful verification
                 HttpContext.Session.Remove("ResendCount_" + model.Email);
 
-                var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-        };
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
-                TempData["Success"] = "Logged in successfully.";
-                return RedirectToAction("Index", "Home");
+                // Redirect directly to your existing ResetPassword action with the username route parameter
+                return RedirectToAction("ResetPassword", new { username = user.Username });
             }
 
             ModelState.AddModelError("", "An error occurred. Please try again.");
