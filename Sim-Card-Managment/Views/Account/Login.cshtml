@@ -1,7 +1,4 @@
 ﻿@model Sim_Card_Managment.Viewmodel.LoginViewmodel
-@{
-    Layout = null; // Ensuring standalone page styling
-}
 
 <style>
     /* =========================================
@@ -9,96 +6,104 @@
            ========================================= */
     .login-section {
         background-color: #E24D17;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
     .login-card {
-        border-radius: 24px;
-        width: 100%;
-        max-width: 500px;
-        min-height: 500px;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 480px;
+        min-height: auto;
     }
 
     .login-title {
-        font-size: 32px;
+        font-weight: 800;
+        font-size: 36px;
+        color: #000;
+        margin-bottom: 2.5rem !important;
     }
 
     .login-input {
-        font-size: 0.9rem;
+        background-color: #D9D9D9 !important;
+        border: none;
+        border-radius: 12px !important;
+        padding: 14px 20px !important;
+        color: #333;
+        width: 100%;
+        font-size: 14px;
         box-shadow: none;
+        transition: box-shadow 0.2s ease-in-out;
     }
+
+        .login-input::placeholder {
+            color: #777;
+        }
+
+        .login-input:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 2px #E24D17 !important;
+            background-color: #D9D9D9 !important;
+        }
 
     .login-btn {
         background-color: #E24D17;
         color: white;
-        font-size: 1rem;
-        border: 2px solid #E24D17;
-        transition: all 0.2s ease-in-out;
+        border-radius: 12px !important;
+        padding: 12px;
+        font-weight: 700;
+        font-size: 18px;
+        border: none;
+        transition: opacity 0.3s ease;
     }
 
         .login-btn:hover {
-            background-color: #c74213;
-            border-color: #c74213;
+            opacity: 0.9;
             color: #ffffff;
         }
 
     .forgot-password-link {
-        font-size: 0.85rem;
-        color: #555555;
+        font-size: 14px;
+        color: #000;
     }
 
     .reset-text {
         color: #E24D17;
         font-weight: bold;
     }
-
-    .form-control {
-        border: 2px solid transparent !important;
-    }
-
-        .form-control:focus {
-            box-shadow: none !important;
-            border: 2px solid #E24D17 !important;
-        }
 </style>
 
 <section class="login-section position-relative vh-100 vw-100 overflow-hidden d-flex align-items-center justify-content-center">
 
     <div class="login-card bg-white d-flex flex-column align-items-center px-4 py-5 shadow-lg position-relative z-2">
 
-        <h2 class="login-title text-center fw-bolder text-dark mb-4">Login</h2>
+        <h2 class="login-title text-center text-dark">Login</h2>
 
         <form asp-controller="Account" asp-action="Login" method="post" class="d-flex flex-column align-items-center w-100 px-2">
-            @Html.AntiForgeryToken()
 
             <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 text-center"></div>
 
-            <div class="w-100 mb-3">
-                <input asp-for="Username" type="text" placeholder="Username"
-                       class="login-input form-control bg-light rounded-pill px-4 py-3 text-dark w-100">
-                <span asp-validation-for="Username" class="text-danger small d-block mt-1 ms-3"></span>
+            <div class="w-100 mb-4">
+                <input asp-for="Username" type="text" placeholder="user name"
+                       class="login-input form-control">
+                <span asp-validation-for="Username" class="text-danger small d-block mt-1 ms-1"></span>
             </div>
 
-            <div class="w-100 mb-3">
+            <div class="w-100 mb-4">
                 <input asp-for="Password" type="password" placeholder="Password"
-                       class="login-input form-control bg-light rounded-pill px-4 py-3 text-dark w-100">
-                <span asp-validation-for="Password" class="text-danger small d-block mt-1 ms-3"></span>
+                       class="login-input form-control">
+                <span asp-validation-for="Password" class="text-danger small d-block mt-1 ms-1"></span>
             </div>
 
-            <div class="form-check mb-4 align-self-start ms-3">
-                <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="RememberMe" />
-                <label asp-for="RememberMe" class="form-check-label text-dark small" for="RememberMe">Remember Me</label>
-            </div>
+            <button type="submit" class="btn login-btn w-100 fw-bold mb-4">Login</button>
 
-            <a asp-action="ResetPassword" class="forgot-password-link text-decoration-none mb-4 text-center">
-                Forgot your password? <span class="reset-text">Reset it</span>
+            <a asp-action="ForgotPassword" class="forgot-password-link text-decoration-none text-center">
+                Forgot your password ? <span class="reset-text">reset it</span>
             </a>
 
-            <button type="submit" class="btn login-btn rounded-pill px-5 py-2 w-100fw-bold">Login</button>
         </form>
     </div>
 
-    <div class="bg-shape shape-solid z-1"></div>
-    <div class="bg-shape shape-outline z-1"></div>
+
 </section>
 
 <script src="~/js/bootstrap.bundle.min.js"></script>
