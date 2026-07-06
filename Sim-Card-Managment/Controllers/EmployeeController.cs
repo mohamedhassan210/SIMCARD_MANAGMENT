@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
-using Sim_Card_Managment.Models;
-using Sim_Card_Managment.Authorization;
-using System;
+using Sim_Card_Managment.ViewModels;
 using Sim_Card_Managment.Repos.EmployeeRepos;
+using Sim_Card_Managment.Models;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Sim_Card_Managment.Controllers
 {
-    //[RequirePermission]
+    [RequirePermission]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepo _repo;
@@ -19,12 +21,34 @@ namespace Sim_Card_Managment.Controllers
         // GET: /Employee
         public IActionResult Index()
         {
-            var employees = _repo.GetAll();// ?? new List<Employee>();
-            return View(employees);
+            var employeesFromDb = _repo.GetAll()?.ToList();
+            var currentDate = DateTime.Now;
+
+            if (employeesFromDb == null)
+            {
+                return View(new List<EmployeeIndexViewModel>());
+            }
+
+            var viewModelList = employeesFromDb.Select(emp => {
+                var activeSubs = emp.Subscriptions?
+                    .Where(s => s.StartDate <= currentDate && (s.EndDate == null || s.EndDate > currentDate))
+                    .ToList();
+
+                return new EmployeeIndexViewModel
+                {
+                    Id = emp.Id,
+                    Name = emp.Name,
+                    NationalID = emp.NationalID,
+                    ActiveSimOnlyCount = activeSubs?.Count(s => s.UsbId == null) ?? 0,
+                    ActiveUsbCount = activeSubs?.Count(s => s.UsbId != null) ?? 0
+                };
+            }).ToList();
+
+            return View(viewModelList);
         }
 
         // GET: /Employee/Details/{id}
-        public IActionResult Details(/*Guid id*/)
+        public IActionResult Details(Guid id)
         {
             //var employee = _repo.GetById(id);
             //if (employee == null) return NotFound();

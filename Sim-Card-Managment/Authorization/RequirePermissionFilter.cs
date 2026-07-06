@@ -29,8 +29,11 @@ namespace Sim_Card_Managment.Authorization
                 return;
             }
 
-            var controllerName = _controller ?? context.RouteData.Values["controller"]?.ToString();
-            var actionName = _action ?? context.RouteData.Values["action"]?.ToString();
+            var controllerName = (string.IsNullOrEmpty(_controller) ? null : _controller)
+                ?? context.RouteData.Values["controller"]?.ToString();
+
+            var actionName = (string.IsNullOrEmpty(_action) ? null : _action)
+                ?? context.RouteData.Values["action"]?.ToString();
 
             if (string.IsNullOrEmpty(controllerName) || string.IsNullOrEmpty(actionName))
             {
@@ -53,7 +56,7 @@ namespace Sim_Card_Managment.Authorization
             if (Guid.TryParse(userIdStr, out var parsedGuid))
             {
                 groupId = await _db.Users
-                    .Where(u => u.Id == parsedGuid && u.IsActive && !u.IsDeleted)
+                    .Where(u => u.Id == parsedGuid && u.IsActive && !u.IsActive)
                     .Select(u => (Guid?)u.GroupId)
                     .FirstOrDefaultAsync();
             }
@@ -61,7 +64,7 @@ namespace Sim_Card_Managment.Authorization
             if (groupId == null)
             {
                 groupId = await _db.Users
-                    .Where(u => u.Username == userIdStr && u.IsActive && !u.IsDeleted)
+                    .Where(u => u.Username == userIdStr && u.IsActive && !u.IsActive)
                     .Select(u => (Guid?)u.GroupId)
                     .FirstOrDefaultAsync();
             }
