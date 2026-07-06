@@ -29,8 +29,11 @@ namespace Sim_Card_Managment.Authorization
                 return;
             }
 
-            var controllerName = _controller ?? context.RouteData.Values["controller"]?.ToString();
-            var actionName = _action ?? context.RouteData.Values["action"]?.ToString();
+            var controllerName = (string.IsNullOrEmpty(_controller) ? null : _controller)
+                ?? context.RouteData.Values["controller"]?.ToString();
+
+            var actionName = (string.IsNullOrEmpty(_action) ? null : _action)
+                ?? context.RouteData.Values["action"]?.ToString();
 
             if (string.IsNullOrEmpty(controllerName) || string.IsNullOrEmpty(actionName))
             {
