@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Highcharts.chart('sim-usage-chart', {
         chart: {
             type: 'column',
-            backgroundColor: '#F8F9FA', // Matching the off-white background in the image
+            backgroundColor: '#fff', // Matching the off-white background in the image
             borderRadius: 16 // Rounds the outer container if desired
         },
 
@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 color: '#888888',
                 fontSize: '15px'
             }
+
         },
 
         // 2. Clean X-Axis (No bold lines or tick marks)
@@ -80,22 +81,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // 6. The Data (Two series for the two bars)
         series: [
             {
-                name: 'Assigned',
+                name: 'SIM',
                 // Data for [Sat, Sun, Mon, Tue, Wed]
                 data: [100, 0, 0, 0, 0],
                 color: '#E24D17' // The dark FATHALL brand orange
             },
             {
-                name: 'Pending',
+                name: 'USB',
                 // Data for [Sat, Sun, Mon, Tue, Wed]
                 data: [45, 0, 0, 0, 0],
                 color: '#E08563' // A lighter, softer peach/orange
             }
         ],
 
-        // Optional: Clean up the tooltip to match the minimal vibe
         credits: {
-            enabled: false // Removes the "Highcharts.com" watermark
+            enabled: false 
         }
     });
 

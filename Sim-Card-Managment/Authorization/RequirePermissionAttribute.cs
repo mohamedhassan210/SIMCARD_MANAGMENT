@@ -7,10 +7,10 @@ public class RequirePermissionAttribute : TypeFilterAttribute
     public string? Controller { get; }
 
     public RequirePermissionAttribute(string? action = null, string? controller = null)
-        : base(typeof(RequirePermissionFilter))
+    : base(typeof(RequirePermissionFilter))
     {
         Action = action;
         Controller = controller;
-        Arguments = new object[] { action, controller };
+        Arguments = new object[] { action ?? string.Empty, controller ?? string.Empty };
     }
 }

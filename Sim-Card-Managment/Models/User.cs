@@ -79,6 +79,8 @@ namespace Sim_Card_Managment.Models
         public virtual ICollection<DeviceTransfer> LoggedTransfers { get; set; } = new List<DeviceTransfer>();
 
         public virtual ICollection<ReceiverSignature> Signatures { get; set; } = new List<ReceiverSignature>();
+        public virtual ICollection<Serial> Serials { get; set; } = new List<Serial>();
+        public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
 
     }
 

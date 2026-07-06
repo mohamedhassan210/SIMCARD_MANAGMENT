@@ -28,8 +28,9 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
         public Employee? GetById(Guid id)
         {
             return _context.Employees
-                           .Include(e => e.Subscriptions)
-                           .FirstOrDefault(e => e.Id == id);
+                .Include(e => e.Subscriptions)
+                .Include(e => e.ReceivedTransfers)
+                .FirstOrDefault(e => e.Id == id);
         }
 
         public void Add(Employee employee)

@@ -119,11 +119,11 @@ namespace Sim_Card_Managment.Repos.Account
 
         {
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username && u.PasswordHash == model.Password);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
 
 
 
-            if (user == null || user.IsActive) // 🔐 تم إضافة شرط الحذف الذكي هنا لمنع دخول الممسوحين
+            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
 
             {
 

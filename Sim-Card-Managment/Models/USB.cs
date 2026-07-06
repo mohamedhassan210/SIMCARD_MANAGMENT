@@ -24,5 +24,6 @@ namespace Sim_Card_Managment.Models
         public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
         public virtual ICollection<DeviceTransfer> DeviceTransfers { get; set; } = new List<DeviceTransfer>();
         public virtual ICollection<DeviceStatus> DeviceStatuses { get; set; } = new List<DeviceStatus>();
+        public virtual ICollection<Serial> Serials { get; set; } = new List<Serial>();
     }
 }

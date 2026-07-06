@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepo _repo;
@@ -49,9 +50,9 @@ namespace Sim_Card_Managment.Controllers
         // GET: /Employee/Details/{id}
         public IActionResult Details(Guid id)
         {
-            var employee = _repo.GetById(id);
-            if (employee == null) return NotFound();
-            return View(employee);
+            //var employee = _repo.GetById(id);
+            //if (employee == null) return NotFound();
+            return View(/*employee*/);
         }
 
         // GET: /Employee/Create
@@ -66,17 +67,17 @@ namespace Sim_Card_Managment.Controllers
         public IActionResult Create(Employee employee)
         {
             if (!ModelState.IsValid) return View(employee);
-
+            employee.Id = Guid.NewGuid();
             _repo.Add(employee);
             return RedirectToAction(nameof(Index));
         }
 
         // GET: /Employee/Edit/{id}
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(/*Guid id*/)
         {
-            var employee = _repo.GetById(id);
-            if (employee == null) return NotFound();
-            return View(employee);
+            //var employee = _repo.GetById(id);
+            //if (employee == null) return NotFound();
+            return View(/*employee*/);
         }
 
         // POST: /Employee/Edit/{id}
@@ -86,7 +87,6 @@ namespace Sim_Card_Managment.Controllers
         {
             if (id != employee.Id) return BadRequest();
             if (!ModelState.IsValid) return View(employee);
-
             _repo.Update(employee);
             return RedirectToAction(nameof(Index));
         }
