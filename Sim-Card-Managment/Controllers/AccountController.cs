@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Models;
@@ -10,6 +9,7 @@ using Sim_Card_Managment.Viewmodel;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -59,7 +59,7 @@ namespace Sim_Card_Managment.Controllers
 
         #endregion
 
-        #region 2. Password Management (Reset)
+        #region 2. Password Management (Reset & Forgot Password)
 
         [HttpGet]
         public IActionResult ResetPassword(string username)
