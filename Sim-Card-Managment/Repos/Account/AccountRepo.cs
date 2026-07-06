@@ -43,8 +43,21 @@ namespace Sim_Card_Managment.Repos.Account
             _httpContextAccessor = httpContextAccessor;
 
         }
+        public async Task<UserOtp> CreateAndSaveNewOtpAsync(string email, string otpCode)
+        {
+            var newOtp = new UserOtp
+            {
+                Email = email,
+                OtpCode = otpCode,
+                ExpireDate = DateTime.Now.AddMinutes(15), // Code remains valid for 15 minutes
+                IsUsed = false
+            };
 
-        public async Task<UserOtp?> GetValidOtpByEmailAsync(string email)
+            _context.UserOtps.Add(newOtp);
+            await _context.SaveChangesAsync();
+            return newOtp;
+        }
+    public async Task<UserOtp?> GetValidOtpByEmailAsync(string email)
         {
             return await _context.UserOtps
                 .FirstOrDefaultAsync(o => o.Email == email && o.ExpireDate > DateTime.Now && !o.IsUsed);

@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@{
+    // Get the current controller and action from the route
+    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -192,7 +198,7 @@
             </div>
 
 
-            <div style="width: 320px; background-color: #2b2b2b; border-radius: 24px;" class="p-5 text-center mx-auto">
+            <div style="width: 320px; background-color: #2b2b2b; border-radius: 24px;" class="p-5 text-center mx-auto mt-3">
                 <h2 style="font-size: 32px;" class="text-white fw-bold mb-3">Let's start!</h2>
                 <p style="font-size: 20px; color: #a1a1a1; line-height: 1.4;" class="mb-0">
                     Creating or adding new tasks couldn't be easier
@@ -201,7 +207,7 @@
 
         </div>
     </aside>
-    <nav class=" position-absolute top-0 navbar navbar-expand-lg w-100">
+    <nav class="position-absolute top-0 navbar navbar-expand-lg w-100">
         <div class="container">
             <a class="navbar-brand text-white fw-bold" asp-controller="Home" asp-action="Index">FATHALL SIM</a>
 
@@ -211,23 +217,38 @@
 
             <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                 <ul class="navbar-nav border border-1 border-white rounded-pill p-2 text-white bg-blur">
-                    <li class="nav-item ">
-                        <a class="nav-link fw-bold px-4 text-black active" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
+
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black" asp-controller="Home" asp-action="Sim">Sim</a>
+                        <a class="nav-link fw-bold px-4 text-black @(currentController == "Home" && currentAction == "Index" ? "active" : "")"
+                           asp-controller="/" asp-action="home">Home</a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black" asp-controller="Home" asp-action="Usb">Usb</a>
+                        <a class="nav-link fw-bold px-4 text-black @(currentController == "Home" && currentAction == "Sim" ? "active" : "")"
+                           asp-controller="Home" asp-action="Sim">Sim</a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black" asp-controller="Employee" asp-action="Index">Employees</a>
+                        <a class="nav-link fw-bold px-4 text-black @(currentController == "Home" && currentAction == "Usb" ? "active" : "")"
+                           asp-controller="Home" asp-action="Usb">Usb</a>
                     </li>
+
+                    <li class="nav-item">
+                        <!-- Checks only the controller so it stays active on Details/Create pages inside Employee -->
+                        <a class="nav-link fw-bold px-4 text-black @(currentController == "Employee" ? "active" : "")"
+                           asp-controller="Employee" asp-action="Index">Employees</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <!-- Checks only the controller so it stays active on Details/Create pages inside NonEmployee -->
+                        <a class="nav-link fw-bold px-4 text-black @(currentController == "NonEmployee" ? "active" : "")"
+                           asp-controller="NonEmployee" asp-action="Index">NonEmployees</a>
+                    </li>
+
                 </ul>
             </div>
         </div>
-    </nav>
-
+    </nav>  
     <div class="">
         <main role="main" class="pb-3">
             @RenderBody()

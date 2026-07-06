@@ -24,11 +24,11 @@ namespace Sim_Card_Managment.Controllers
         }
 
         // GET: /Employee/Details/{id}
-        public IActionResult Details(Guid id)
+        public IActionResult Details(/*Guid id*/)
         {
-            var employee = _repo.GetById(id);
-            if (employee == null) return NotFound();
-            return View(employee);
+            //var employee = _repo.GetById(id);
+            //if (employee == null) return NotFound();
+            return View(/*employee*/);
         }
 
         // GET: /Employee/Create
@@ -49,11 +49,11 @@ namespace Sim_Card_Managment.Controllers
         }
 
         // GET: /Employee/Edit/{id}
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(/*Guid id*/)
         {
-            var employee = _repo.GetById(id);
-            if (employee == null) return NotFound();
-            return View(employee);
+            //var employee = _repo.GetById(id);
+            //if (employee == null) return NotFound();
+            return View(/*employee*/);
         }
 
         // POST: /Employee/Edit/{id}

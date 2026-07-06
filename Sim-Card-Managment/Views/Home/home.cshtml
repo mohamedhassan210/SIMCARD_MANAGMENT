@@ -1,63 +1,52 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-@using Sim_Card_Managment.Models
+﻿@using Sim_Card_Managment.Models
 @{
     var recentEmployees = ViewBag.RecentEmployees as IEnumerable<Employee>;
     int index = 0;
 }
+@{
+    var recentSims = ViewBag.RecentSims as IEnumerable<Sim> ?? new List<Sim>();
+    int indexCounter = 0;
 
+    // 1. Group recent sims by day of the week for the dynamic chart data
+    // Assumes your Sim model has a creation/assignment date property (e.g., CreatedAt or AssignmentDate)
+    var chartData = recentSims
+        .Where(s => s.RegisteredAt >= DateTime.Today.AddDays(-6)) // Last 7 days
+        .GroupBy(s => s.RegisteredAt.DayOfWeek)
+        .ToDictionary(g => g.Key, g => g.Count());
 
+    var daysOfWeek = new[] { DayOfWeek.Saturday, DayOfWeek.Sunday, DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday };
+    var chartCounts = daysOfWeek.Select(d => chartData.ContainsKey(d) ? chartData[d] : 0).ToArray();
+}
 
+<header class="hero_bg">
+    <section class="hero text-white pt-5 pb-5" id="hero_home">
+        <div class="max-width text-center mx-auto mt-4 mb-5">
+            <h2 class="fw-bolder display-1 mb-4">Streamline Your Staff SIM Cards</h2>
+            <p class="fs-3 fw-light">
+                Efficiently manage staff SIM cards, data plans, and assignments from a single dashboard
+            </p>
+        </div>
+    </section>
+</header>
 
-    <header class="hero_bg">
-
-        
-
-        <section class="hero text-white pt-5 pb-5" id="hero_home">
-            <div class="max-width text-center mx-auto mt-4 mb-5">
-                <h2 class="fw-bolder display-1 mb-4">Streamline Your Staff SIM Cards</h2>
-                <p class="fs-3 fw-light">
-                    Efficiently manage staff SIM cards, data plans, and assignments from a single
-                    dashboard
-                </p>
-            </div>
-        </section>
-
-    </header>
-
-    <main>
+<main>
     <section class="position-relative py-5 px-5" style="background-color: #EEEEEE;">
-
         <div class="container-fluid">
-            <div class="row g-4 " >
-
-                <div class="col-12 col-lg-2   d-flex flex-column gap-4">
-
+            <div class="row g-4 ">
+                <div class="col-12 col-lg-2 d-flex flex-column gap-4">
                     <div class="position-relative overflow-hidden p-4 rounded-4 shadow-sm text-white"
                          style="background-color: #E24D17; min-width: 280px; border-radius: 31px">
-
                         <svg class="position-absolute pe-none" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"
                              style="right: -40px; bottom: -10px; width: 250px; height: 220px; fill: #ffffff; opacity: 0.15;">
                             <path d="M176,120v72H80V120Z" opacity="0.2" />
                             <path d="M213.65723,82.34277l-56-56A8.00235,8.00235,0,0,0,152,24H55.99219a16.01833,16.01833,0,0,0-16,16V216a16.01833,16.01833,0,0,0,16,16H200a16.01833,16.01833,0,0,0,16-16V88A8.00235,8.00235,0,0,0,213.65723,82.34277ZM200,216H55.99219V40h92.69433L200,91.314l.00977,124.68555ZM176,112H80a8.00039,8.00039,0,0,0-8,8v72a8.00039,8.00039,0,0,0,8,8h96a8.00039,8.00039,0,0,0,8-8V120A8.00039,8.00039,0,0,0,176,112Zm-8,72H152V152a8,8,0,0,0-16,0v32H120V152a8,8,0,0,0-16,0v32H88V128h80Z" />
                         </svg>
-
                         <div class="d-flex align-items-center justify-content-center mb-4 position-relative z-1 bg-white rounded"
                              style="width: 32px; height: 32px;">
                             <img src="images/ph_sim_card.svg" alt="SIM" style="width: 20px;">
                         </div>
-
                         <div class="display-4 fw-bolder lh-1 position-relative z-1" style="letter-spacing: -1px;">@ViewBag.ActiveSims</div>
                         <div class="display-5 fw-bold lh-1 mb-4 position-relative z-1" style="letter-spacing: -1px;">SIM</div>
-
                         <div class="d-flex flex-wrap gap-2 position-relative z-1">
                             <div class="rounded-pill px-3 py-1 fw-bold text-white shadow-sm" style="background-color: #C12A23; font-size: 0.85rem;">
                                 @ViewBag.LostSims Lost
@@ -73,21 +62,17 @@
 
                     <div class="position-relative overflow-hidden p-4 rounded-4 shadow-sm text-white"
                          style="background-color: #E24D17; min-width: 280px; border-radius: 31px">
-
                         <svg class="position-absolute pe-none" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"
                              style="right: -20px; bottom: -10px; width: 250px; height: 220px; fill: #ffffff; opacity: 0.15;">
                             <path d="M13.5 9H16.5V16.5H13.5V9ZM19.5 9H22.5V16.5H19.5V9Z" />
                             <path d="M30 19.5H28.5V4.5C28.5 3.675 27.825 3 27 3H9C8.175 3 7.5 3.675 7.5 4.5V19.5H6C5.175 19.5 4.5 20.175 4.5 21V28.5C4.5 30.975 6.525 33 9 33H27C29.475 33 31.5 30.975 31.5 28.5V21C31.5 20.175 30.825 19.5 30 19.5ZM10.5 6H25.5V19.5H10.5V6ZM28.5 28.5C28.5 29.325 27.825 30 27 30H9C8.175 30 7.5 29.325 7.5 28.5V22.5H28.5V28.5Z" />
                         </svg>
-
                         <div class="d-flex align-items-center justify-content-center mb-4 position-relative z-1 bg-white rounded"
                              style="width: 32px; height: 32px;">
                             <img src="images/boxicons_usb.svg" alt="USB" style="width: 20px;">
                         </div>
-
                         <div class="display-4 fw-bolder lh-1 position-relative z-1" style="letter-spacing: -1px;">@ViewBag.ActiveUsbs</div>
                         <div class="display-5 fw-bold lh-1 mb-4 position-relative z-1" style="letter-spacing: -1px;">USB</div>
-
                         <div class="d-flex flex-wrap gap-2 position-relative z-1">
                             <div class="rounded-pill px-3 py-1 fw-bold text-white shadow-sm" style="background-color: #19692C; font-size: 0.85rem;">
                                 @ViewBag.ReplacedUsbs Replaced
@@ -100,55 +85,37 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="col-12 col-lg-9 offset-1">
                     <div class="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column" style="border-radius: 31px">
-
                         <div id="sim-usage-chart" style="width: 100%; height: 100%; min-height: 400px; "></div>
-
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
 
-
-
     <section class="bg-white text-white py-5">
         <div class="px-5">
-
             <h2 class="fw-bold mb-4" style="font-size: 2rem; color: black;">Employees</h2>
-
             <div class="position-relative">
-
                 <div class="position-absolute"
                      style="background-color: #E24D17; bottom: -15px; left: 15px; width: 60%; height: 60px; border-radius: 0 0 100px 100px; z-index: 0; transform: rotate(3deg);">
                 </div>
-
                 <div class="bg-white rounded-4 overflow-hidden position-relative z-1"
                      style="box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 31px">
-
                     <div class="table-responsive">
-                        <table class="table table-borderless mb-0 align-middle position-relative"
-                               style="color: #6c757d;">
-
+                        <table class="table table-borderless mb-0 align-middle position-relative" style="color: #6c757d;">
                             <thead style="border-bottom: 1px solid #eaeaea;">
                                 <tr>
-                                    <th scope="col" class="py-3 px-3 text-center fw-normal"
-                                        style="border-right: 1px solid #eaeaea; width: 60px;"></th>
-                                    <th scope="col" class="py-3 px-4 fw-normal"
-                                        style="border-right: 1px solid #eaeaea;">Name</th>
-                                    <th scope="col" class="py-3 px-4 fw-normal"
-                                        style="border-right: 1px solid #eaeaea;">Id</th>
-                                    <th scope="col" class="py-3 px-4 fw-normal"
-                                        style="border-right: 1px solid #eaeaea;">National ID</th>
+                                    <th scope="col" class="py-3 px-3 text-center fw-normal" style="border-right: 1px solid #eaeaea; width: 60px;"></th>
+                                    <th scope="col" class="py-3 px-4 fw-normal" style="border-right: 1px solid #eaeaea;">Name</th>
+                                    <th scope="col" class="py-3 px-4 fw-normal" style="border-right: 1px solid #eaeaea;">Id</th>
+                                    <th scope="col" class="py-3 px-4 fw-normal" style="border-right: 1px solid #eaeaea;">National ID</th>
                                     <th scope="col" class="py-3 px-4 fw-normal">Status</th>
                                 </tr>
                             </thead>
-
                             <tbody style="min-height: 200px">
                                 @if (recentEmployees != null && recentEmployees.Any())
                                 {
@@ -174,158 +141,168 @@
                                             </td>
                                         </tr>
                                     }
-                                    
                                 }
                                 else
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center  py-4 text-black">  No data available.</td>
+                                        <td colspan="5" class="text-center py-4 text-black">No data available.</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
-                        @if(recentEmployees != null && recentEmployees.Any())
+                        @if (recentEmployees != null && recentEmployees.Any())
                         {
-                             <div style="opacity: 0.5; height: 70px;"
-                             class="position-absolute bg-white start-0 end-0 bottom-0 pointer-events-none"></div>
-                    
+                            <div style="opacity: 0.5; height: 70px;" class="position-absolute bg-white start-0 end-0 bottom-0 pointer-events-none"></div>
                         }
                     </div>
-                       
-                    @if (recentEmployees != null && recentEmployees.Any()){
-                    <a asp-controller="Employee" asp-action="Index" class="btn position-absolute text-white fw-bold d-flex align-items-center gap-2"
-                       style="background-color: #E24D17; bottom: 20px; right: 20px; border-radius: 25px; padding: 10px 24px; box-shadow: 0 4px 15px rgba(226, 77, 23, 0.4); text-decoration: none; z-index: 2;">
-                        View All
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 12h14"></path>
-                            <path d="M12 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
-                    }
 
+                    @if (recentEmployees != null && recentEmployees.Any())
+                    {
+                        <a asp-controller="Employee" asp-action="Index" class="btn position-absolute text-white fw-bold d-flex align-items-center gap-2"
+                           style="background-color: #E24D17; bottom: 20px; right: 20px; border-radius: 25px; padding: 10px 24px; box-shadow: 0 4px 15px rgba(226, 77, 23, 0.4); text-decoration: none; z-index: 2;">
+                            View All
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14"></path>
+                                <path d="M12 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    }
                 </div>
             </div>
         </div>
-    </section>
-        <section class="bg-white text-white py-5">
-            <div class="px-5">
 
-                <h2 class="fw-bold mb-3 text-black" style="font-size: 2.2rem;">Explore SIM Cards</h2>
-
-                <div class="d-flex gap-2 mb-4">
-                    <div class="bg-white rounded-3 d-flex justify-content-center align-items-center"
-                         style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                        <a class="rounded-circle d-flex justify-content-center align-items-center cursor">
+        <div class="px-5 mt-5">
+            <h2 class="fw-bold mb-3 text-black" style="font-size: 2.2rem;">Explore SIM Cards</h2>
+            <div class="d-flex gap-2 mb-4">
+                <div class="bg-white rounded-3 d-flex justify-content-center align-items-center" style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <a class="rounded-circle d-flex justify-content-center align-items-center cursor">
                         <img src="~/img/we.png" alt="Alternate Text" />
-
-                        </a>
-                    </div>
-                    <div class="bg-white rounded-3 d-flex justify-content-center align-items-center"
-                         style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                        <a class="d-flex justify-content-center align-items-center cursor">
-                        <img src="~/img/fodafone.png" alt="Alternate Text" />
-
-                        </a>
-                    </div>
-                    <div class="bg-white rounded-3 d-flex justify-content-center align-items-center"
-                         style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                        <a class="rounded-circle d-flex justify-content-center align-items-center cursor">
-                        <img src="~/img/orange.png" alt="Alternate Text" />
-                    </a>
-                    </div>
-                    <a class="bg-white rounded-3 d-flex justify-content-center align-items-center cursor"
-                       style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                    <img src="~/img/etisalat.png" alt="Alternate Text" />
-
                     </a>
                 </div>
+                <div class="bg-white rounded-3 d-flex justify-content-center align-items-center" style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <a class="d-flex justify-content-center align-items-center cursor">
+                        <img src="~/img/fodafone.png" alt="Alternate Text" />
+                    </a>
+                </div>
+                <div class="bg-white rounded-3 d-flex justify-content-center align-items-center" style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <a class="rounded-circle d-flex justify-content-center align-items-center cursor">
+                        <img src="~/img/orange.png" alt="Alternate Text" />
+                    </a>
+                </div>
+                <a class="bg-white rounded-3 d-flex justify-content-center align-items-center cursor" style="width: 45px; height: 45px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <img src="~/img/etisalat.png" alt="Alternate Text" />
+                </a>
+            </div>
 
-                <div class="position-relative">
-
-                    <div class="position-absolute"
-                         style="background-color: #E24D17; bottom: -15px; left: 15px; width: 60%; height: 60px; border-radius: 0 0 100px 100px; z-index: 0; transform: rotate(3deg);">
-                    </div>
-
-                    <div class="bg-white rounded-4 overflow-hidden position-relative z-1"
-                     style="box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 31px">
-
-                        <div class="table-responsive">
-                            <table class="table table-borderless mb-0 align-middle position-relative"
-                                   style="color: #6c757d;">
-
-                                <thead style="border-bottom: 1px solid #eaeaea;">
+            <div class="position-relative">
+                <div class="position-absolute" style="background-color: #E24D17; bottom: -15px; left: 15px; width: 60%; height: 60px; border-radius: 0 0 100px 100px; z-index: 0; transform: rotate(3deg);">
+                </div>
+                <div class="bg-white rounded-4 overflow-hidden position-relative z-1" style="box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 31px">
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0 align-middle position-relative" style="color: #6c757d;">
+                            <thead style="border-bottom: 1px solid #eaeaea;">
+                                <tr>
+                                    <th scope="col" class="py-3 px-3 text-center fw-normal" style="border-right: 1px solid #eaeaea; width: 60px;"></th>
+                                    <th scope="col" class="py-3 px-4 fw-normal" style="border-right: 1px solid #eaeaea; width: 200px;">Provider</th>
+                                    <th scope="col" class="py-3 px-4 fw-normal" style="border-right: 1px solid #eaeaea;">Id / Serial</th>
+                                    <th scope="col" class="py-3 px-4 fw-normal" style="border-right: 1px solid #eaeaea;">Phone</th>
+                                    <th scope="col" class="py-3 px-4 fw-normal">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!recentSims.Any())
+                                {
                                     <tr>
-                                        <th scope="col" class="py-3 px-3 text-center fw-normal"
-                                            style="border-right: 1px solid #eaeaea; width: 60px;"></th>
-                                        <th scope="col" class="py-3 px-4 fw-normal"
-                                            style="border-right: 1px solid #eaeaea; width: 200px;">Provider</th>
-                                        <th scope="col" class="py-3 px-4 fw-normal"
-                                            style="border-right: 1px solid #eaeaea;">Id</th>
-                                        <th scope="col" class="py-3 px-4 fw-normal"
-                                            style="border-right: 1px solid #eaeaea;">Phone</th>
-                                        <th scope="col" class="py-3 px-4 fw-normal">Department</th>
+                                        <td colspan="5" class="text-center py-5 text-muted">No SIM cards available at the moment.</td>
                                     </tr>
-                                </thead>
-
-                                <tbody>
-                                    <tr style="border-bottom: 1px solid #f4f4f4;">
-                                        <td class="py-3 px-3 text-center">0</td>
-                                        <td class="py-3 px-4">
-                                            <div class="rounded-circle d-flex ">
-                                            <img src="~/img/we.png" alt="Alternate Text" />
-                                        </div>
-                                        </td>
-                                        <td class="py-3 px-4">012</td>
-                                        <td class="py-3 px-4">01556176733</td>
-                                        <td class="py-3 px-4"></td>
-                                    </tr>
-
-                                    <tr style="border-bottom: 1px solid #f4f4f4;">
-                                        <td class="py-3 px-3 text-center">1</td>
-                                        <td class="py-3 px-4">
-                                            <div class="d-flex ">
-                                            <img src="~/img/orange.png" alt="Alternate Text" />
-                                        </div>
-                                        </td>
-                                        <td class="py-3 px-4 ">012</td>
-                                        <td class="py-3 px-4 ">01556176733</td>
-                                        <td class="py-3 px-4"></td>
-                                    </tr>
-
-                                    <tr style="border-bottom: 1px solid #f4f4f4;">
-                                        <td class="py-3 px-3 text-center" >2</td>
-                                    <td class="py-3 px-4">
-                                        <div class="d-flex ">
-                                            <img src="~/img/etisalat.png" alt="Alternate Text" />
-                                        </div>
-                                    </td>
-                                        <td class="py-3 px-4" >012</td>
-                                        <td class="py-3 px-4" >01556176733</td>
-                                        <td class="py-3 px-4"></td>
-                                    </tr>
-
-
-                                </tbody>
-                            </table>
-                            <div style="opacity: 0.5; height: 70px;"
-                                 class="position-absolute bg-white start-0 end-0 bottom-0"></div>
-                        </div>
+                                }
+                                else
+                                {
+                                    foreach (var sim in recentSims)
+                                    {
+                                        <tr style="border-bottom: 1px solid #f4f4f4;">
+                                            <td class="py-3 px-3 text-center">@indexCounter</td>
+                                            <td class="py-3 px-4">
+                                                <div class="rounded-circle d-flex">
+                                                    @if (sim.PhoneNumber.StartsWith("010"))
+                                                    {
+                                                        <img src="~/img/fodafone.png" alt="Vodafone" />
+                                                    }
+                                                    else if (sim.PhoneNumber.StartsWith("012"))
+                                                    {
+                                                        <img src="~/img/orange.png" alt="Orange" />
+                                                    }
+                                                    else if (sim.PhoneNumber.StartsWith("011"))
+                                                    {
+                                                        <img src="~/img/etisalat.png" alt="Etisalat" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="~/img/we.png" alt="WE" />
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td class="py-3 px-4">@sim.SerialNumber</td>
+                                            <td class="py-3 px-4">@sim.PhoneNumber</td>
+                                            <td class="py-3 px-4">
+                                                <span class="badge @(sim.Status == "Active" ? "bg-success" : "bg-warning")">@sim.Status</span>
+                                            </td>
+                                        </tr>
+                                        indexCounter++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                        <div style="opacity: 0.5; height: 70px;" class="position-absolute bg-white start-0 end-0 bottom-0"></div>
                     </div>
+                </div>
 
+                @if (recentSims.Any())
+                {
                     <button class="btn position-absolute text-white fw-bold d-flex align-items-center gap-2 z-3"
                             style="background-color: #E24D17; bottom: 20px; right: 20px; border-radius: 25px; padding: 10px 24px; box-shadow: 0 4px 15px rgba(226, 77, 23, 0.4);">
                         View All
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M5 12h14"></path>
                             <path d="M12 5l7 7-7 7"></path>
                         </svg>
                     </button>
+                }
+            </div>
+        </div>
+    </section>
+</main>
 
-                </div>
-            </div>
-            </div>
-        </section>
-    </main>
- 
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Clear out any hardcoded arrays and print the live C# array directly into JavaScript
+        var serverData = [@string.Join(",", chartCounts)];
+
+        var options = {
+            chart: {
+                type: 'bar',
+                height: '100%',
+                toolbar: { show: false }
+            },
+            series: [{
+                name: 'Newly Assigned SIMs',
+                data: serverData
+            }],
+            xaxis: {
+                categories: ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+            },
+            colors: ['#E24D17'],
+            plotOptions: {
+                bar: {
+                    borderRadius: 6,
+                    columnWidth: '40%'
+                }
+            },
+            dataLabels: { enabled: false }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#sim-usage-chart"), options);
+        chart.render();
+    });
+</script>
