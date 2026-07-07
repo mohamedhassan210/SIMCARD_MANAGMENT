@@ -18,158 +18,11 @@
     var chartCounts = daysOfWeek.Select(d => chartData.ContainsKey(d) ? chartData[d] : 0).ToArray();
 }
 
-<style>
-    /* --- Global & Utility Layout --- */
-    .bg-light-gray {
-        background-color: #EEEEEE;
-    }
 
-    .rounded-31 {
-        border-radius: 31px;
-    }
-
-    .tight-spacing {
-        letter-spacing: -1px;
-    }
-
-    .section-title {
-        font-size: 2rem;
-        color: black;
-    }
-
-    .section-title-lg {
-        font-size: 2.2rem;
-        color: black;
-    }
-
-    /* --- Stat Cards --- */
-    .stat-card {
-        background-color: #E24D17;
-        min-width: 280px;
-    }
-
-    .stat-svg-bg-sim,
-    .stat-svg-bg-usb {
-        fill: #ffffff;
-        opacity: 0.15;
-        width: 250px;
-        height: 220px;
-        bottom: -10px;
-    }
-
-    .stat-svg-bg-sim {
-        right: -40px;
-    }
-
-    .stat-svg-bg-usb {
-        right: -20px;
-    }
-
-    .icon-box {
-        width: 32px;
-        height: 32px;
-    }
-
-    .icon-img {
-        width: 20px;
-    }
-
-    /* --- Badges --- */
-    .badge-custom {
-        font-size: 0.85rem;
-    }
-
-    .badge-lost {
-        background-color: #C12A23;
-    }
-
-    .badge-replaced {
-        background-color: #19692C;
-    }
-
-    .badge-returned {
-        background-color: #111111;
-    }
-
-    /* --- Charts --- */
-    .chart-container {
-        width: 100%;
-        height: 100%;
-        min-height: 400px;
-    }
-
-    /* --- Tables & Data Containers --- */
-    .table-decor-bg {
-        background-color: #E24D17;
-        bottom: -15px;
-        left: 15px;
-        width: 60%;
-        height: 60px;
-        border-radius: 0 0 100px 100px;
-        z-index: 0;
-        transform: rotate(3deg);
-    }
-
-    .table-card {
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    .custom-table {
-        color: #6c757d;
-    }
-
-    .table-header {
-        border-bottom: 1px solid #eaeaea;
-    }
-
-    .border-right-light {
-        border-right: 1px solid #eaeaea;
-    }
-
-    .w-60 {
-        width: 60px;
-    }
-
-    .w-200 {
-        width: 200px;
-    }
-
-    .custom-table tbody tr:not(:last-child) {
-        border-bottom: 1px solid #f4f4f4;
-    }
-
-    .table-text-dark {
-        color: #212529;
-        font-weight: 500;
-    }
-
-    .table-fade {
-        opacity: 0.5;
-        height: 70px;
-    }
-
-    /* --- Buttons & Interactives --- */
-    .btn-custom-primary {
-        background-color: #E24D17;
-        bottom: 20px;
-        right: 20px;
-        border-radius: 25px;
-        padding: 10px 24px;
-        box-shadow: 0 4px 15px rgba(226, 77, 23, 0.4);
-        text-decoration: none;
-        z-index: 2;
-    }
-
-    .provider-logo-box {
-        width: 45px;
-        height: 45px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-</style>
 
 <header class="hero_bg">
     <section class="hero text-white pt-5 pb-5" id="hero_home">
-        <div class="max-width text-center mx-auto mt-4 mb-5">
+        <div class="maxW_Hero text-center mx-auto mt-4 mb-5">
             <h2 class="fw-bolder display-1 mb-4">Streamline Your Staff SIM Cards</h2>
             <p class="fs-3 fw-light">
                 Efficiently manage staff SIM cards, data plans, and assignments from a single dashboard
@@ -387,8 +240,13 @@
                                     }
                                 }
                             </tbody>
+
                         </table>
-                        <div class="position-absolute bg-white start-0 end-0 bottom-0 table-fade"></div>
+                        @if (recentEmployees != null && recentEmployees.Any())
+                        {
+                            <div class="position-absolute bg-white start-0 end-0 bottom-0 table-fade"></div>
+
+                        }
                     </div>
                 </div>
 
