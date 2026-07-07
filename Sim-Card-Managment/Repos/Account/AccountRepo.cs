@@ -221,7 +221,7 @@ namespace Sim_Card_Managment.Repos.Account
 
             var user = await _context.Users.FindAsync(id);
 
-            if (user == null || user.IsDeleted) return null;
+            if (user == null || user.IsActive) return null;
 
 
 
@@ -263,7 +263,7 @@ namespace Sim_Card_Managment.Repos.Account
 
             // جلب المستخدمين الذين لم يتم حذفهم حذفاً ذكياً
 
-            var query = _context.Users.Where(u => u.IsDeleted == false).AsQueryable();
+            var query = _context.Users.Where(u => u.IsActive == false).AsQueryable();
 
 
 
@@ -331,7 +331,7 @@ namespace Sim_Card_Managment.Repos.Account
 
             var user = await _context.Users.FindAsync(id);
 
-            if (user == null || user.IsDeleted) return null;
+            if (user == null || user.IsActive) return null;
 
 
 
@@ -361,7 +361,7 @@ namespace Sim_Card_Managment.Repos.Account
 
             var user = await _context.Users.FindAsync(model.Id);
 
-            if (user == null || user.IsDeleted) return false;
+            if (user == null || user.IsActive) return false;
 
 
 
@@ -387,7 +387,7 @@ namespace Sim_Card_Managment.Repos.Account
 
             var user = await _context.Users.FindAsync(id);
 
-            if (user == null || user.IsDeleted) return false;
+            if (user == null || user.IsActive) return false;
 
 
 
@@ -419,7 +419,7 @@ namespace Sim_Card_Managment.Repos.Account
 
             // تحويل حالة الحذف الذكي إلى true ليختفي من العرض مع الحفاظ على سجلاته
 
-            user.IsDeleted = true;
+            user.IsActive = true;
 
 
 

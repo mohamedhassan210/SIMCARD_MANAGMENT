@@ -1,9 +1,10 @@
-﻿@*
+﻿@model Sim_Card_Managment.Models.Employee
+
+@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
 }
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -101,6 +102,8 @@
             font-weight: 700;
             font-size: 15px;
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
 
             .btn-cancel:hover {
@@ -117,6 +120,7 @@
             font-weight: 700;
             font-size: 15px;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
             .btn-create:hover {
@@ -124,12 +128,6 @@
                 border-color: #c84111;
                 color: #fff;
             }
-
-        /* Mobile responsiveness adjustments */
-     
-
-
-        
     </style>
 </head>
 
@@ -138,42 +136,51 @@
     <div class="create-card shadow">
         <h2 class="title-header">Create new employee</h2>
 
-        <div class="row g-4 mb-5">
-            <div class="col-md-6">
-                <label class="custom-label">Name</label>
-                <input type="text" class="custom-input" placeholder="Adham amr mohamed">
-            </div>
-            <div class="col-md-6">
-                <label class="custom-label">national id</label>
-                <input type="text" class="custom-input" placeholder="30906070********">
+        <form asp-controller="Employee" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <label class="custom-label">Name</label>
+                    <input type="text" class="custom-input" asp-for="Name" placeholder="Adham amr mohamed">
+                </div>
+                <div class="col-md-6">
+                    <label class="custom-label">national id</label>
+                    <input type="text" class="custom-input" asp-for="NationalID" placeholder="30906070********">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="custom-label">Phone</label>
+                    <input type="text" class="custom-input" name="Phone" placeholder="01556176733">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="custom-label">Group</label>
+                    <select class="custom-select" name="SelectedGroupId">
+                        <option value="" disabled selected>-- --</option>
+
+                        @if (ViewBag.GroupsList != null)
+                        {
+                            foreach (var group in ViewBag.GroupsList)
+                            {
+                                <option value="@group.Id">@group.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="custom-label">Position</label>
+                    <input type="text" class="custom-input" asp-for="Position" placeholder="It manager">
+                </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="custom-label">Phone</label>
-                <input type="text" class="custom-input" placeholder="01556176733">
+            <div class="d-flex justify-content-end gap-3 mt-4">
+                <a class="btn btn-cancel" asp-controller="Employee" asp-action="Index">Cancel</a>
+                <button type="submit" class="btn btn-create">Create</button>
             </div>
-            <div class="col-md-6">
-                <label class="custom-label">Department</label>
-                <select class="custom-select">
-                    <option selected>IT</option>
-                    <option>HR</option>
-                    <option>Marketing</option>
-                    <option>Sales</option>
-                </select>
-            </div>
-
-            <div class="col-md-6">
-                <label class="custom-label">Position</label>
-                <input type="text" class="custom-input" placeholder="It manager">
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-end gap-3 mt-4">
-            <a type="button" class="btn btn-cancel" asp-controller="Employee" asp-action="index">Cancel</a>
-            <button type="submit" class="btn btn-create">Create</button>
-        </div>
+        </form>
     </div>
-
 
 </body>
 

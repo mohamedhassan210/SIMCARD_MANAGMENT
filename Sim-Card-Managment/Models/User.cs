@@ -50,7 +50,7 @@ namespace Sim_Card_Managment.Models
 
         public bool IsActive { get; set; } = true;
 
-        public bool IsDeleted { get; set; } = false;
+        
 
 
 
