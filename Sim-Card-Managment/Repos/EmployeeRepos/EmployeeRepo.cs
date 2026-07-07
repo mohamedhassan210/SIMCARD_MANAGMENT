@@ -35,6 +35,14 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
 
         public void Add(Employee employee)
         {
+            string nid = employee.NationalID;
+            var x = _context.Employees.FirstOrDefault(e => e.NationalID == nid);
+
+            if (x != null)
+            {
+                return;
+            }
+
             _context.Employees.Add(employee);
             _context.SaveChanges();
         }
