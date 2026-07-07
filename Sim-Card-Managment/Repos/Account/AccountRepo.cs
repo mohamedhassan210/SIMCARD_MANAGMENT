@@ -194,23 +194,15 @@ namespace Sim_Card_Managment.Repos.Account
 
 
         public async Task<bool> ResetPasswordAsync(ResetPasswordViewModel model)
-
         {
-
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
-
             if (user == null) return false;
 
-
-
-            user.PasswordHash = model.NewPassword;
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
 
             _context.Users.Update(user);
-
             await _context.SaveChangesAsync();
-
             return true;
-
         }
 
 
