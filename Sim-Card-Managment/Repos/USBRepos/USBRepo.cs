@@ -1,4 +1,5 @@
-﻿using Sim_Card_Managment.data;
+﻿using Microsoft.EntityFrameworkCore;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 
 namespace Sim_Card_Managment.Repos
@@ -11,7 +12,13 @@ namespace Sim_Card_Managment.Repos
         {
             _context = context;
         }
-
+        public async Task<IEnumerable<Usb>> GetAvailableUsbsAsync()
+        {
+            return await _context.Usbs
+                // بتعدل الـ Where دي برضه عشان تجيب الأجهزة الفاضية بس
+                .Where(u => !_context.Serials.Any(ser => ser.UsbId == u.Id))
+                .ToListAsync();
+        }
         public IEnumerable<Usb> GetAll()
         {
             return _context.Usbs.ToList();

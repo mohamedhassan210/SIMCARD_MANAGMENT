@@ -41,6 +41,9 @@ builder.Services.AddScoped<IDeviceActionRepo, DeviceActionRepo>();
 builder.Services.AddScoped<IDeviceStatusRepo, DeviceStatusRepo>();
 builder.Services.AddScoped<IDeviceTransferRepo, DeviceTransferRepo>();
 builder.Services.AddScoped<INonEmployeeRepo, NonEmployeeRepo>();
+builder.Services.AddScoped<IDocumentTypeRepo, DocumentTypeRepo>();
+builder.Services.AddScoped<IDocumentRepo, DocumentRepo>();
+builder.Services.AddScoped<ISerialRepo, SerialRepo>();
 builder.Services.AddSession();
 var app = builder.Build();
 
