@@ -10,7 +10,6 @@ using System.Threading.Tasks; // ÃÖİäÇåÇ ÚÔÇä ÇáÜ async/await
 
 namespace Sim_Card_Managment.Controllers
 {
-    [RequirePermission]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepo _repo;
