@@ -1,7 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Access Denied";
+    Layout = null;
 }
-
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/all.min.css" />
 <div class="container text-center mt-5">
     <div class="alert alert-danger p-5 shadow-sm">
         <h1 class="display-4 text-danger">403 - Access Denied</h1>
@@ -11,3 +14,5 @@
         <a asp-controller="Home" asp-action="Index" class="btn btn-outline-danger mt-2">Back to Home</a>
     </div>
 </div>
+
+<script src="~/js/bootstrap.bundle.min.js"></script>
