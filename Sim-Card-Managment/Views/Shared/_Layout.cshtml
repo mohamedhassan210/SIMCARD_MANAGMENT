@@ -11,8 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Sim_Card_Managment</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/Sim_Card_Managment.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/main.css"/>
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/all.min.css" />
     <style>
    
@@ -219,18 +218,18 @@
                 <ul class="navbar-nav border border-1 border-white rounded-pill p-2 text-white bg-blur">
 
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "Home" && currentAction == "Index" ? "active" : "")"
+                        <a class="nav-link fw-bold px-4 text-black @(currentController == "/" && currentAction == "home" ? "active" : "")"
                            asp-controller="/" asp-action="home">Home</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "Home" && currentAction == "Sim" ? "active" : "")"
-                           asp-controller="Home" asp-action="Sim">Sim</a>
+                        <a class="nav-link fw-bold px-4 text-black @(currentController == "SIM" && currentAction == "Index" ? "active" : "")"
+                           asp-controller="SIM" asp-action="Index">Sim</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "Home" && currentAction == "Usb" ? "active" : "")"
-                           asp-controller="Home" asp-action="Usb">Usb</a>
+                        <a class="nav-link fw-bold px-4 text-black @(currentController == "USB" && currentAction == "Index" ? "active" : "")"
+                           asp-controller="USB" asp-action="Index">Usb</a>
                     </li>
 
                     <li class="nav-item">
@@ -257,7 +256,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/highcharts.js"></script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

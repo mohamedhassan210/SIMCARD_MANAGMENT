@@ -18,12 +18,19 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
 
         public IEnumerable<Employee> GetAll()
         {
-            return _context.Employees.Include(e=>e.User).Include(e=>e.Subscriptions).ToList();
+            // Êã ÅÖÇÝÉ Include áÌÏæá ÇáÇÔÊÑÇßÇÊ áßí íÚãá ÇáÜ Count ÇáÏíäÇãíßí Ýí ÇáÜ View
+            return _context.Employees
+                           .Include(e => e.User)
+                           .Include(e => e.Subscriptions)
+                           .ToList();
         }
 
         public Employee? GetById(Guid id)
         {
-            return _context.Employees.Find(id);
+            return _context.Employees
+                .Include(e => e.Subscriptions)
+                .Include(e => e.ReceivedTransfers)
+                .FirstOrDefault(e => e.Id == id);
         }
 
         public void Add(Employee employee)
@@ -40,7 +47,7 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
 
         public void Delete(Guid id)
         {
-            var employee = GetById(id);
+            var employee = _context.Employees.Find(id);
             if (employee != null)
             {
                 _context.Employees.Remove(employee);
