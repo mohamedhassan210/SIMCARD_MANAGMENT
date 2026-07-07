@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sim_Card_Managment.data;
 
@@ -11,9 +12,11 @@ using Sim_Card_Managment.data;
 namespace Sim_Card_Managment.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260706071123_m1")]
+    partial class m1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,68 +190,6 @@ namespace Sim_Card_Managment.Migrations
                     b.HasIndex("UsbId");
 
                     b.ToTable("DeviceTransfers");
-                });
-
-            modelBuilder.Entity("Sim_Card_Managment.Models.Document", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ActionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DocumentNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("DocumenttypeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SignatureData")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SignatureType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocumenttypeId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Documents");
-                });
-
-            modelBuilder.Entity("Sim_Card_Managment.Models.DocumentType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DocumentTypes");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Employee", b =>
@@ -442,45 +383,6 @@ namespace Sim_Card_Managment.Migrations
                         .IsUnique();
 
                     b.ToTable("ReceiverSignatures");
-                });
-
-            modelBuilder.Entity("Sim_Card_Managment.Models.Serial", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("DocumentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SerialNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<Guid?>("SimId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("UsbId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocumentId");
-
-                    b.HasIndex("SimId");
-
-                    b.HasIndex("UsbId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Serials");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Sim", b =>
@@ -783,25 +685,6 @@ namespace Sim_Card_Managment.Migrations
                     b.Navigation("Usb");
                 });
 
-            modelBuilder.Entity("Sim_Card_Managment.Models.Document", b =>
-                {
-                    b.HasOne("Sim_Card_Managment.Models.DocumentType", "DocumentType")
-                        .WithMany("Documents")
-                        .HasForeignKey("DocumenttypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
-                        .WithMany("Documents")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("DocumentType");
-                });
-
             modelBuilder.Entity("Sim_Card_Managment.Models.Employee", b =>
                 {
                     b.HasOne("Sim_Card_Managment.Models.User", "User")
@@ -848,39 +731,6 @@ namespace Sim_Card_Managment.Migrations
                     b.Navigation("SignedByUser");
 
                     b.Navigation("Subscription");
-                });
-
-            modelBuilder.Entity("Sim_Card_Managment.Models.Serial", b =>
-                {
-                    b.HasOne("Sim_Card_Managment.Models.Document", "Document")
-                        .WithMany("Serials")
-                        .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Sim_Card_Managment.Models.Sim", "Sim")
-                        .WithMany("Serials")
-                        .HasForeignKey("SimId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Sim_Card_Managment.Models.Usb", "Usb")
-                        .WithMany("Serials")
-                        .HasForeignKey("UsbId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
-                        .WithMany("Serials")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Document");
-
-                    b.Navigation("Sim");
-
-                    b.Navigation("Usb");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Subscription", b =>
@@ -954,16 +804,6 @@ namespace Sim_Card_Managment.Migrations
                     b.Navigation("Subscriptions");
                 });
 
-            modelBuilder.Entity("Sim_Card_Managment.Models.Document", b =>
-                {
-                    b.Navigation("Serials");
-                });
-
-            modelBuilder.Entity("Sim_Card_Managment.Models.DocumentType", b =>
-                {
-                    b.Navigation("Documents");
-                });
-
             modelBuilder.Entity("Sim_Card_Managment.Models.Employee", b =>
                 {
                     b.Navigation("ReceivedTransfers");
@@ -999,8 +839,6 @@ namespace Sim_Card_Managment.Migrations
 
                     b.Navigation("DeviceTransfers");
 
-                    b.Navigation("Serials");
-
                     b.Navigation("Subscriptions");
                 });
 
@@ -1017,8 +855,6 @@ namespace Sim_Card_Managment.Migrations
 
                     b.Navigation("DeviceTransfers");
 
-                    b.Navigation("Serials");
-
                     b.Navigation("Subscriptions");
                 });
 
@@ -1028,15 +864,11 @@ namespace Sim_Card_Managment.Migrations
 
                     b.Navigation("CreatedSubscriptions");
 
-                    b.Navigation("Documents");
-
                     b.Navigation("Employee");
 
                     b.Navigation("LoggedTransfers");
 
                     b.Navigation("ReportedStatuses");
-
-                    b.Navigation("Serials");
 
                     b.Navigation("Signatures");
                 });
