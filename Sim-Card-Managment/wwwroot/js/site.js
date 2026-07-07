@@ -83,13 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
             {
                 name: 'SIM',
                 // Data for [Sat, Sun, Mon, Tue, Wed]
-                data: [100, 0, 0, 0, 0],
+                data: [100, 50, 0, 0, 0],
                 color: '#E24D17' // The dark FATHALL brand orange
             },
             {
                 name: 'USB',
                 // Data for [Sat, Sun, Mon, Tue, Wed]
-                data: [45, 0, 0, 0, 0],
+                data: [45, 10, 0, 0, 0],
                 color: '#E08563' // A lighter, softer peach/orange
             }
         ],

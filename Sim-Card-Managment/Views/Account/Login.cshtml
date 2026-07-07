@@ -1,63 +1,20 @@
 ﻿@model Sim_Card_Managment.Viewmodel.LoginViewmodel
+@{
+     Layout = null; 
+}
+@{
+    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+}
 
 
-<style>
-    /* =========================================
-           Login Page Styles
-           ========================================= */
-    .login-section {
-        background-color: #E24D17;
-    }
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/all.min.css" />
+   
 
-    .login-card {
-        border-radius: 24px;
-        width: 100%;
-        max-width: 500px;
-        min-height: 500px;
-    }
 
-    .login-title {
-        font-size: 32px;
-    }
 
-    .login-input {
-        font-size: 0.9rem;
-        box-shadow: none;
-    }
-
-    .login-btn {
-        background-color: #E24D17;
-        color: white;
-        font-size: 1rem;
-        border: 2px solid #E24D17;
-        transition: all 0.2s ease-in-out;
-    }
-
-        .login-btn:hover {
-            background-color: #c74213;
-            border-color: #c74213;
-            color: #ffffff;
-        }
-
-    .forgot-password-link {
-        font-size: 0.85rem;
-        color: #555555;
-    }
-
-    .reset-text {
-        color: #E24D17;
-        font-weight: bold;
-    }
-
-    .form-control {
-        border: 2px solid transparent !important;
-    }
-
-        .form-control:focus {
-            box-shadow: none !important;
-            border: 2px solid #E24D17 !important;
-        }
-</style>
 
 <section class="login-section position-relative vh-100 vw-100 overflow-hidden d-flex align-items-center justify-content-center">
 
@@ -87,16 +44,18 @@
                 <label asp-for="RememberMe" class="form-check-label text-dark small" for="RememberMe">Remember Me</label>
             </div>
 
-            <a asp-action="ForgotPassword" class="forgot-password-link text-decoration-none mb-4 text-center">
-                Forgot your password? <span class="reset-text">Reset it</span>
-            </a>
+            
+            <span class="mb-3"  >
+                Forgot your password? <a asp-action="ResetPassword" class="forgot-password-link text-decoration-none mb-4 text-center reset-text">Reset It?</a>
+
+            </span>
+
 
             <button type="submit" class="btn login-btn rounded-pill px-5 py-2 w-100fw-bold">Login</button>
         </form>
     </div>
 
-    <div class="bg-shape shape-solid z-1"></div>
-    <div class="bg-shape shape-outline z-1"></div>
+    
 </section>
 
 <script src="~/js/bootstrap.bundle.min.js"></script>
