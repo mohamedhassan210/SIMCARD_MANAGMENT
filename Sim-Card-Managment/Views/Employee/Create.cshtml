@@ -1,10 +1,3 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,7 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        /* Orange background matching the image */
         body {
             background-color: #E24D17;
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -26,7 +18,6 @@
             margin: 0;
         }
 
-        /* Main Card Container */
         .create-card {
             background-color: #ffffff;
             border-radius: 30px;
@@ -35,7 +26,6 @@
             padding: 3rem 4rem;
         }
 
-        /* Title Styling */
         .title-header {
             font-weight: 700;
             font-size: 32px;
@@ -43,7 +33,6 @@
             margin-bottom: 2.5rem;
         }
 
-        /* Label Styling */
         .custom-label {
             font-weight: 500;
             color: #000;
@@ -51,9 +40,8 @@
             font-size: 14px;
         }
 
-        /* Input Styling */
         .custom-input {
-            background-color: #d8d8d8; /* Light gray background */
+            background-color: #d8d8d8; 
             border: none;
             border-radius: 12px;
             padding: 12px 18px;
@@ -65,10 +53,9 @@
 
             .custom-input:focus {
                 outline: none;
-                box-shadow: 0 0 0 2px #E24D17; /* Orange focus ring */
+                box-shadow: 0 0 0 2px #E24D17; 
             }
 
-        /* Custom Select Dropdown Styling */
         .custom-select {
             background-color: #d8d8d8;
             border: none;
@@ -78,7 +65,6 @@
             width: 100%;
             font-size: 14px;
             appearance: none;
-            /* Custom bold chevron arrow */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 1rem center;
@@ -91,7 +77,6 @@
                 box-shadow: 0 0 0 2px #E24D17;
             }
 
-        /* Buttons Styling */
         .btn-cancel {
             border: 1px solid #E24D17;
             background-color: #ffffff;
@@ -125,11 +110,22 @@
                 color: #fff;
             }
 
-        /* Mobile responsiveness adjustments */
-     
+        .custom-input.is-invalid {
+            box-shadow: 0 0 0 2px #D41212; 
+            background-color: #ffe6e6;
+        }
 
+        .error-msg {
+            color: #D41212;
+            font-size: 12px;
+            margin-top: 5px;
+            margin-left: 10px;
+            display: none;
+        }
 
-        
+        .custom-input.is-invalid ~ .error-msg {
+            display: block;
+        }
     </style>
 </head>
 
@@ -138,43 +134,90 @@
     <div class="create-card shadow">
         <h2 class="title-header">Create new employee</h2>
 
-        <div class="row g-4 mb-5">
-            <div class="col-md-6">
-                <label class="custom-label">Name</label>
-                <input type="text" class="custom-input" placeholder="Adham amr mohamed">
-            </div>
-            <div class="col-md-6">
-                <label class="custom-label">national id</label>
-                <input type="text" class="custom-input" placeholder="30906070********">
+        <form id="employeeForm" asp-controller="Employee" asp-action="Create" method="post">
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <label class="custom-label">Name</label>
+                    <input type="text" id="empName" class="custom-input" placeholder="Adham amr mohamed">
+                    <span class="error-msg">Name is required.</span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="custom-label">National ID</label>
+                    <input type="text" id="empNid" class="custom-input" placeholder="30906070********" maxlength="14" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <span class="error-msg">Please enter a valid 14-digit National ID.</span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="custom-label">Phone</label>
+                    <input type="text" id="empPhone" class="custom-input" placeholder="01556176733" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <span class="error-msg">Please enter a valid 11-digit phone number.</span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="custom-label">Department</label>
+                    <select id="empDept" class="custom-select">
+                        <option selected>IT</option>
+                        <option>HR</option>
+                        <option>Marketing</option>
+                        <option>Sales</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="custom-label">Position</label>
+                    <input type="text" id="empPosition" class="custom-input" placeholder="It manager">
+                    <span class="error-msg">Position is required.</span>
+                </div>
             </div>
 
-            <div class="col-md-6">
-                <label class="custom-label">Phone</label>
-                <input type="text" class="custom-input" placeholder="01556176733">
-            </div>
-            <div class="col-md-6">
-                <label class="custom-label">Department</label>
-                <select class="custom-select">
-                    <option selected>IT</option>
-                    <option>HR</option>
-                    <option>Marketing</option>
-                    <option>Sales</option>
-                </select>
+            <div class="d-flex justify-content-end gap-3 mt-4">
+                <a class="btn btn-cancel" asp-controller="Employee" asp-action="Index">Cancel</a>
+                <button type="submit" class="btn btn-create">Create</button>
             </div>
 
-            <div class="col-md-6">
-                <label class="custom-label">Position</label>
-                <input type="text" class="custom-input" placeholder="It manager">
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-end gap-3 mt-4">
-            <a type="button" class="btn btn-cancel" asp-controller="Employee" asp-action="index">Cancel</a>
-            <button type="submit" class="btn btn-create">Create</button>
-        </div>
+        </form>
     </div>
 
+    <script>
+        document.getElementById('employeeForm').addEventListener('submit', function (event) {
+            let isValid = true;
 
+           
+            document.querySelectorAll('.is-invalid').forEach(function(el) {
+                el.classList.remove('is-invalid');
+            });
+
+            const name = document.getElementById('empName');
+            if (name.value.trim() === '') {
+                name.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            const nid = document.getElementById('empNid');
+            if (nid.value.trim().length !== 14) {
+                nid.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            const phone = document.getElementById('empPhone');
+            if (phone.value.trim().length !== 11) {
+                phone.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            const position = document.getElementById('empPosition');
+            if (position.value.trim() === '') {
+                position.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
 
 </html>

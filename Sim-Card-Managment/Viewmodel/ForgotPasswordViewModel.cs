@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
 namespace Sim_Card_Managment.Viewmodel
 {
     public class ForgotPasswordViewModel

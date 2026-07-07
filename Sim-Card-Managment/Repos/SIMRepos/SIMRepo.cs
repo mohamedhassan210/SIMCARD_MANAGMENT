@@ -1,4 +1,5 @@
-﻿using Sim_Card_Managment.data;
+﻿using Microsoft.EntityFrameworkCore;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 
 namespace Sim_Card_Managment.Repos
@@ -10,6 +11,13 @@ namespace Sim_Card_Managment.Repos
         public SIMRepo(AppDbContext context)
         {
             _context = context;
+        }
+        public async Task<IEnumerable<Sim>> GetAvailableSimsAsync()
+        {
+            return await _context.Sims
+                // بتعدل الـ Where دي بناءً على الـ Business Logic بتاعك (مثلاً الشريحة مش مربوطة بسيريال)
+                .Where(s => !_context.Serials.Any(ser => ser.SimId == s.Id))
+                .ToListAsync();
         }
 
         public IEnumerable<Sim> GetAll()
