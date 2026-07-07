@@ -1,39 +1,60 @@
-﻿@font-face {
+﻿/*global CSS*/
+@font-face {
     font-family: 'Roboto';
     src: url(../Fonts/Roboto-VariableFont_wdth,wght.ttf) format("truetype");
 }
-/* Hide scrollbar for IE, Edge, and Firefox */
 html, body {
-    -ms-overflow-style: none; /* IE and Legacy Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
 }
 
-    /* Hide scrollbar for Chrome, Safari, and newer Edge */
     html::-webkit-scrollbar,
     body::-webkit-scrollbar {
         display: none;
     }
-
 .p-74 {
     padding-top: 74px !important;
 }
 
 body {
     font-family: "Roboto", sans-serif;
+
 }
-/* NavBar */
-/* ul bg */
 .bg-blur {
     background: linear-gradient(135deg,rgba(255,255,255,0.2),rgba(255,255,255,0.2)) !important;
     backdrop-filter: blur(90%) !important;
     -webkit-backdrop-filter: blur(90%) !important;
 }
+/*End global CSS*/
+
+
+/*Main CSS*/
+
+/*---------------------- Layout-----------------------*/
+/*-------------- Start Of NavBar ----------------------*/
+
 /* active Link */
 .navbar-nav .nav-link.active, .navbar-nav .nav-link.show{ color: #fff !important;
 background-color: #E24D17 !important;
 border-radius: 20px !important;
 }
-/* End Of NavBar */
+
+
+/*-------------- End Of NavBar ----------------------*/
+
+
+/*-------------- Start Of Side Bar ----------------------*/
+.offcanvas-header {
+    justify-content: flex-end !important;
+}
+
+    .offcanvas-header .btn-close {
+        background: none !important;
+        color: red !important;
+        opacity: 1;
+        background-color: white !important;
+        border-radius: 10px !important;
+    }
 /* Custom Sidebar Dropdown Styles */
 .sidebar-accordion .accordion-item {
     background: transparent;
@@ -73,82 +94,17 @@ border-radius: 20px !important;
     font-size: 0.95rem;
     color: #d1d1d1;
 }
-.hero_bg {
-    background-color: #E24D17;
-    width:100%;
-}
-
-.max-width {
-    max-width: 800px;
-}
+/*-------------- End Of Side Bar ----------------------*/
+/*---------------------- End of Layout-----------------------*/
 
 
 
 
 
-:root {
-    --brand-orange: #E24D17;
-}
 
 
 
-.glass-box {
-    background-color: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-}
 
-.custom-input {
-    width: 411px;
-    height: 56px;
-    border-radius: 30px;
-    background-color: #ffffff;
-    border: none;
-}
-
-/* THIS IS THE BUTTON CSS */
-.custom-btn {
-    width: 411px;
-    height: 56px;
-    background-color: #E24D17 !important;
-    /* Added !important just in case */
-    color: white !important;
-    font-size: 24px;
-    font-weight: 500;
-    border-radius: 30px !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-    .custom-btn:hover {
-        background-color: #c44111 !important;
-    }
-
-.bg-shape {
-    position: absolute;
-    width: 50vw;
-    height: 70vh;
-    border-radius: 189px;
-    border-bottom-left-radius: 20%;
-}
-
-.shape-solid {
-    bottom: -25vh;
-    right: -5vw;
-    background-color: var(--brand-orange);
-    transform: rotate(-55deg);
-}
-
-.shape-outline {
-    bottom: -60vh;
-    left: -25vw;
-    border: 4px solid var(--brand-orange);
-    transform: rotate(-20deg);
-}
 
 
 
@@ -175,36 +131,245 @@ border-radius: 20px !important;
 
     /* The filled/active state */
     .otp-input.active-otp {
-        background-color: var(--brand-orange);
-        border-color: var(--brand-orange);
+        background-color: #E24D17;
+        border-color: #E24D17;
         color: white;
     }
 
     /* When the user clicks on an empty box to type */
     .otp-input:focus {
-        border-color: var(--brand-orange);
+        border-color: #E24D17;
         box-shadow: 0 0 10px rgba(226, 77, 23, 0.4);
     }
 
-.offcanvas-header{
-    justify-content:flex-end !important;
 
 
+
+/*Start Login Page  */
+
+.login-section {
+    background-color: #E24D17;
 }
 
+.login-card {
+    border-radius: 24px;
+    width: 100%;
+    max-width: 500px;
+    min-height: 500px;
+}
 
+.login-title {
+    font-size: 32px;
+}
 
-    .offcanvas-header .btn-close {
-        background: none !important;
-        color: red !important;
-        opacity:1;
-        background-color: white !important;
-        border-radius: 10px !important;
+.login-input {
+    font-size: 0.9rem;
+    box-shadow: none;
+}
 
+.login-btn {
+    background-color: #E24D17;
+    color: white;
+    font-size: 1rem;
+    border: 2px solid #E24D17;
+    transition: all 0.2s ease-in-out;
+}
+
+    .login-btn:hover {
+        background-color: #c74213;
+        border-color: #c74213;
+        color: #ffffff;
     }
 
+.forgot-password-link {
+    font-size: 0.85rem;
+    color: #555555;
+}
+
+.reset-text {
+    color: #E24D17;
+    font-weight: bold;
+}
+
+.form-control {
+    border: 2px solid transparent !important;
+}
+
+    .form-control:focus {
+        box-shadow: none !important;
+        border: 2px solid #E24D17 !important;
+    }
+
+.form-check-input:checked {
+    background-color: #e24d17 !important;
+    border-color: #e24d17 !important;
+}
+
+.form-check-input:focus {
+    border-color: #e24d17 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/*End Login Page*/
+
+/*Start of Home Page */
+/* --- Global & Utility Layout --- */
+.hero_bg {
+    background-color: #E24D17;
+    width: 100%;
+}
+
+.maxW_Hero {
+    max-width: 800px;
+}
+
+.bg-light-gray {
+    background-color: #EEEEEE;
+}
+
+.rounded-31 {
+    border-radius: 31px;
+}
+
+.tight-spacing {
+    letter-spacing: -1px;
+}
+
+.section-title {
+    font-size: 2rem;
+    color: black;
+}
+
+.section-title-lg {
+    font-size: 2.2rem;
+    color: black;
+}
+
+/* --- Stat Cards --- */
+.stat-card {
+    background-color: #E24D17;
+    min-width: 280px;
+}
+
+.stat-svg-bg-sim,
+.stat-svg-bg-usb {
+    fill: #ffffff;
+    opacity: 0.15;
+    width: 250px;
+    height: 220px;
+    bottom: -10px;
+}
+
+.stat-svg-bg-sim {
+    right: -40px;
+}
+
+.stat-svg-bg-usb {
+    right: -20px;
+}
+
+.icon-box {
+    width: 32px;
+    height: 32px;
+}
+
+.icon-img {
+    width: 20px;
+}
+
+/* --- Badges --- */
+.badge-custom {
+    font-size: 0.85rem;
+}
+
+.badge-lost {
+    background-color: #C12A23;
+}
+
+.badge-replaced {
+    background-color: #19692C;
+}
+
+.badge-returned {
+    background-color: #111111;
+}
+
+/* --- Charts --- */
+.chart-container {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+}
+
+/* --- Tables & Data Containers --- */
+.table-decor-bg {
+    background-color: #E24D17;
+    bottom: -15px;
+    left: 15px;
+    width: 60%;
+    height: 60px;
+    border-radius: 0 0 100px 100px;
+    z-index: 0;
+    transform: rotate(3deg);
+}
+
+.table-card {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.custom-table {
+    color: #6c757d;
+}
+
+.table-header {
+    border-bottom: 1px solid #eaeaea;
+}
+
+.border-right-light {
+    border-right: 1px solid #eaeaea;
+}
+
+.w-60 {
+    width: 60px;
+}
+
+.w-200 {
+    width: 200px;
+}
+
+.custom-table tbody tr:not(:last-child) {
+    border-bottom: 1px solid #f4f4f4;
+}
+
+.table-text-dark {
+    color: #212529;
+    font-weight: 500;
+}
+
+.table-fade {
+    opacity: 0.5;
+    height: 70px;
+}
+
+/* --- Buttons & Interactives --- */
+.btn-custom-primary {
+    background-color: #E24D17;
+    bottom: 20px;
+    right: 20px;
+    border-radius: 25px;
+    padding: 10px 24px;
+    box-shadow: 0 4px 15px rgba(226, 77, 23, 0.4);
+    text-decoration: none;
+    z-index: 2;
+}
+
+.provider-logo-box {
+    width: 45px;
+    height: 45px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+/*End Of Home Page */
 
 
 
-
-     
