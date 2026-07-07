@@ -8,7 +8,6 @@ using System.Collections.Generic;
 
 namespace Sim_Card_Managment.Controllers
 {
-    [RequirePermission]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepo _repo;
