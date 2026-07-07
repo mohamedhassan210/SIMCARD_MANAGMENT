@@ -1,18 +1,22 @@
-﻿@font-face {
+﻿/*global CSS*/
+@font-face {
     font-family: 'Roboto';
     src: url(../Fonts/Roboto-VariableFont_wdth,wght.ttf) format("truetype");
 }
-/* Hide scrollbar for IE, Edge, and Firefox */
 html, body {
-    -ms-overflow-style: none; /* IE and Legacy Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
 }
 
-    /* Hide scrollbar for Chrome, Safari, and newer Edge */
     html::-webkit-scrollbar,
     body::-webkit-scrollbar {
         display: none;
     }
+
+/*End global CSS*/
+
+
+/*Main CSS*/
 
 .p-74 {
     padding-top: 74px !important;
@@ -128,28 +132,6 @@ border-radius: 20px !important;
         background-color: #c44111 !important;
     }
 
-.bg-shape {
-    position: absolute;
-    width: 50vw;
-    height: 70vh;
-    border-radius: 189px;
-    border-bottom-left-radius: 20%;
-}
-
-.shape-solid {
-    bottom: -25vh;
-    right: -5vw;
-    background-color: var(--brand-orange);
-    transform: rotate(-55deg);
-}
-
-.shape-outline {
-    bottom: -60vh;
-    left: -25vw;
-    border: 4px solid var(--brand-orange);
-    transform: rotate(-20deg);
-}
-
 
 
 /* --- OTP Input Boxes --- */
@@ -186,25 +168,90 @@ border-radius: 20px !important;
         box-shadow: 0 0 10px rgba(226, 77, 23, 0.4);
     }
 
-.offcanvas-header{
-    justify-content:flex-end !important;
 
 
+
+/*Start Login Page  */
+
+.login-section {
+    background-color: #E24D17;
 }
 
+.login-card {
+    border-radius: 24px;
+    width: 100%;
+    max-width: 500px;
+    min-height: 500px;
+}
 
+.login-title {
+    font-size: 32px;
+}
+
+.login-input {
+    font-size: 0.9rem;
+    box-shadow: none;
+}
+
+.login-btn {
+    background-color: #E24D17;
+    color: white;
+    font-size: 1rem;
+    border: 2px solid #E24D17;
+    transition: all 0.2s ease-in-out;
+}
+
+    .login-btn:hover {
+        background-color: #c74213;
+        border-color: #c74213;
+        color: #ffffff;
+    }
+
+.forgot-password-link {
+    font-size: 0.85rem;
+    color: #555555;
+}
+
+.reset-text {
+    color: #E24D17;
+    font-weight: bold;
+}
+
+.form-control {
+    border: 2px solid transparent !important;
+}
+
+    .form-control:focus {
+        box-shadow: none !important;
+        border: 2px solid #E24D17 !important;
+    }
+
+.form-check-input:checked {
+    background-color: #e24d17 !important;
+    border-color: #e24d17 !important;
+}
+
+.form-check-input:focus {
+    border-color: #e24d17 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/*End Login Page*/
+
+
+
+
+
+/*Side Bar*/
+.offcanvas-header {
+    justify-content: flex-end !important;
+}
 
     .offcanvas-header .btn-close {
         background: none !important;
         color: red !important;
-        opacity:1;
+        opacity: 1;
         background-color: white !important;
         border-radius: 10px !important;
-
     }
-
-
-
-
-
-     
