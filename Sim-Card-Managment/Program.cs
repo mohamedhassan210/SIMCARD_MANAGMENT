@@ -7,6 +7,7 @@ using Sim_Card_Managment.Repos.EmployeeRepos;
 using Sim_Card_Managment.Repos.GroupRepos;
 using Sim_Card_Managment.Repos.NonEmployeeRepos;
 using Sim_Card_Managment.Repos.QuoteRepo;
+using Sim_Card_Managment.Repositories;
 using Sim_Card_Managment.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,7 +45,7 @@ builder.Services.AddScoped<IDeviceTransferRepo, DeviceTransferRepo>();
 builder.Services.AddScoped<INonEmployeeRepo, NonEmployeeRepo>();
 builder.Services.AddScoped<IGroupRepo, GroupRepo>();
 builder.Services.AddScoped<IPermissionRepo, PermissionRepo>();
-builder.Services.AddScoped<ISerialRepo, SerialRepo>();
+builder.Services.AddScoped<IServiceProviderRepository, ServiceProviderRepository>();
 builder.Services.AddSession();
 var app = builder.Build();
 

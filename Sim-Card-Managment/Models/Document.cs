@@ -23,7 +23,8 @@ namespace Sim_Card_Managment.Models
         [Required(ErrorMessage = "يجب إدخال سيريال واحد على الأقل")]
         [Display(Name = "أرقام السيريال (مفصول بينهم بفاصلة أو سطر جديد)")]
         public string DocumentNumber { get; set; }
-
+        public Guid ServiceProviderId { get; set; }
+        public virtual ServiceProvider ServiceProvider { get; set; }
         public virtual ICollection<Serial> Serials { get; set; } = new List<Serial>();
     }
 }
