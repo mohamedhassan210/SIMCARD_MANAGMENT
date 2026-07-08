@@ -39,6 +39,11 @@ namespace Sim_Card_Managment.data
         public DbSet<Serial> Serials { get; set; }
         public DbSet<DocumentType> DocumentTypes { get; set; }
 
+
+        // ── Service Providor──────────────────────────────────────────────
+         public DbSet<Models.ServiceProvider> ServiceProviders { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -205,6 +210,28 @@ namespace Sim_Card_Managment.data
                 .HasOne(s => s.CreatedBy)
                 .WithMany(s => s.Serials)
                 .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
+            // ── ServiceProvider: Sim ──────────────────────────────
+            modelBuilder.Entity<Sim>()
+                .HasOne(s => s.ServiceProvider)
+                .WithMany(s => s.Sims)
+                .HasForeignKey(s => s.ServiceProviderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            // ── ServiceProvider: Usb ──────────────────────────────
+            modelBuilder.Entity<Usb>()
+                .HasOne(s => s.ServiceProvider)
+                .WithMany(s => s.Usbs)
+                .HasForeignKey(s => s.ServiceProviderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── ServiceProvider: Document ──────────────────────────────
+            modelBuilder.Entity<Models.Document>()
+                .HasOne(s => s.ServiceProvider)
+                .WithMany(s => s.Documents)
+                .HasForeignKey(s => s.ServiceProviderId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
