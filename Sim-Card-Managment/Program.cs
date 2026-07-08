@@ -44,6 +44,7 @@ builder.Services.AddScoped<IDeviceTransferRepo, DeviceTransferRepo>();
 builder.Services.AddScoped<INonEmployeeRepo, NonEmployeeRepo>();
 builder.Services.AddScoped<IGroupRepo, GroupRepo>();
 builder.Services.AddScoped<IPermissionRepo, PermissionRepo>();
+builder.Services.AddScoped<ISerialRepo, SerialRepo>();
 builder.Services.AddSession();
 var app = builder.Build();
 

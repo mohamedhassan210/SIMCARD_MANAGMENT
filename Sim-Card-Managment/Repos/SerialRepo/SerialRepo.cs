@@ -57,7 +57,7 @@ namespace Sim_Card_Managment.Repos
         public async Task AddRangeAsync(IEnumerable<Serial> serials)
         {
             await _context.Serials.AddRangeAsync(serials);
-        }+
+        }
 
         public async Task DeleteAsync(Guid id)
         {
