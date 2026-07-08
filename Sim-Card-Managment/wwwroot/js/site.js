@@ -3,6 +3,8 @@
 
 // Write your JavaScript code.
 document.addEventListener('DOMContentLoaded', () => {
+    if (!document.getElementById('sim-usage-chart')) return; 
+
 
     Highcharts.chart('sim-usage-chart', {
         chart: {
