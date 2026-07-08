@@ -9,5 +9,7 @@ namespace Sim_Card_Managment.Repos
         Task UpdateAsync(Document document);
         Task DeleteAsync(Guid id);
         Task<bool> SaveChangesAsync();
+        // Ensure your fetch method includes .Include(d => d.DocumentType).Include(d => d.CreatedBy).Include(d => d.Serials)
+        Task<IEnumerable<Document>> GetFilteredDocumentsAsync(string searchTerm, Guid? documentTypeId);
     }
 }

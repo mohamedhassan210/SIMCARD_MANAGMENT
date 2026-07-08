@@ -51,6 +51,22 @@ namespace Sim_Card_Managment.Repos
             _context.SaveChanges();
         }
 
+
+        public async Task<IEnumerable<Subscription>> GetAllWithHardwareDetailsAsync()
+        {
+            return await _context.Subscriptions
+                .Include(s => s.Employee)
+                .Include(s => s.NonEmployee)
+                .Include(s => s.Sim)
+                    .ThenInclude(sim => sim.Serials)
+                        .ThenInclude(ser => ser.Document)
+                .Include(s => s.Usb)
+                    .ThenInclude(usb => usb.Serials)
+                        .ThenInclude(ser => ser.Document)
+                .ToListAsync();
+        }
+
+
         public void Delete(Guid id)
         {
             var subscription = GetById(id);

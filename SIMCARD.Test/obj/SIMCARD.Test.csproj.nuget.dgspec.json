@@ -54,6 +54,14 @@
               "target": "Package",
               "version": "[4.2.0, )"
             },
+            "ClosedXML": {
+              "target": "Package",
+              "version": "[0.105.0, )"
+            },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[8.6.1, )"
+            },
             "FontAwesome": {
               "target": "Package",
               "version": "[4.7.0, )"
