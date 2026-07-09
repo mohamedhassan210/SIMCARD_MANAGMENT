@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sim_Card_Managment.data;
 
@@ -11,9 +12,11 @@ using Sim_Card_Managment.data;
 namespace Sim_Card_Managment.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260708110607_migraiotn")]
+    partial class migraiotn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -402,18 +405,9 @@ namespace Sim_Card_Managment.Migrations
                     b.Property<decimal>("ExtraAmount")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Period")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<Guid>("ServiceProviderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Total")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("ValidFrom")
                         .HasColumnType("datetime2");
@@ -422,8 +416,6 @@ namespace Sim_Card_Managment.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ServiceProviderId");
 
                     b.ToTable("Quotas");
                 });
@@ -529,6 +521,9 @@ namespace Sim_Card_Managment.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal?>("Fees")
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<string>("NetworkType")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
@@ -584,9 +579,6 @@ namespace Sim_Card_Managment.Migrations
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("Fees")
-                        .HasColumnType("decimal(10,2)");
 
                     b.Property<Guid?>("NonEmployeeId")
                         .HasColumnType("uniqueidentifier");
@@ -886,17 +878,6 @@ namespace Sim_Card_Managment.Migrations
                     b.Navigation("Permission");
                 });
 
-            modelBuilder.Entity("Sim_Card_Managment.Models.Quota", b =>
-                {
-                    b.HasOne("Sim_Card_Managment.Models.ServiceProvider", "ServiceProvider")
-                        .WithMany("Quotas")
-                        .HasForeignKey("ServiceProviderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ServiceProvider");
-                });
-
             modelBuilder.Entity("Sim_Card_Managment.Models.ReceiverSignature", b =>
                 {
                     b.HasOne("Sim_Card_Managment.Models.User", "SignedByUser")
@@ -1084,8 +1065,6 @@ namespace Sim_Card_Managment.Migrations
             modelBuilder.Entity("Sim_Card_Managment.Models.ServiceProvider", b =>
                 {
                     b.Navigation("Documents");
-
-                    b.Navigation("Quotas");
 
                     b.Navigation("Sims");
 

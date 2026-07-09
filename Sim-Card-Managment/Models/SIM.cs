@@ -19,8 +19,7 @@ namespace Sim_Card_Managment.Models
         [StringLength(10)]
         public string? NetworkType { get; set; }  // 4G / 5G
 
-        [Column(TypeName = "decimal(10,2)")]
-        public decimal? Fees { get; set; }
+
 
         [Required]
         [StringLength(20)]

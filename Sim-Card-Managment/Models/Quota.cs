@@ -20,7 +20,10 @@ namespace Sim_Card_Managment.Models
         public DateTime? ValidFrom { get; set; }
 
         public DateTime? ValidTo { get; set; }
-
+        public decimal Total { get; set; }
+        public bool IsActive { get; set; }
+        public Guid ServiceProviderId { get; set; }
+        public virtual ServiceProvider ServiceProvider { get; set; }
         // Navigation properties
         public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
     }

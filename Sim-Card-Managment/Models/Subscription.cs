@@ -33,6 +33,9 @@ namespace Sim_Card_Managment.Models
 
         public DateTime? EndDate { get; set; }  // null = open ended
 
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal? Fees { get; set; }
+
         [StringLength(500)]
         public string? Notes { get; set; }
 

@@ -233,6 +233,14 @@ namespace Sim_Card_Managment.data
                 .WithMany(s => s.Documents)
                 .HasForeignKey(s => s.ServiceProviderId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            // ── ServiceProvider: Qouta ──────────────────────────────
+            modelBuilder.Entity<Quota>()
+                .HasOne(s => s.ServiceProvider)
+                .WithMany(s => s.Quotas)
+                .HasForeignKey(s => s.ServiceProviderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
