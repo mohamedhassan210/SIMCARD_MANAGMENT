@@ -29,8 +29,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 // Ensure the path string matches "ConnectionStrings:conn"
 var connectionString = builder.Configuration.GetConnectionString("conn");
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<AuditInterceptor>();
+
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+{
+    options.UseSqlServer(connectionString);
+    options.AddInterceptors(sp.GetRequiredService<AuditInterceptor>());
+});
 builder.Services.AddScoped<IUSBRepo, USBRepo>();
 builder.Services.AddScoped<ISIMRepo, SIMRepo>();
 builder.Services.AddScoped<IQuotaRepo, QuotaRepo>();
