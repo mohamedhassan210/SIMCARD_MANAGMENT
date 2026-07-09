@@ -30,6 +30,7 @@
     </div>
     <!-- Offcanvas Sidebar Component -->
     <!-- Added data-bs-theme="dark" so the close button and accordion arrows automatically turn white -->
+   
     <aside class="offcanvas offcanvas-start bg-black bg-opacity-25  border-end border-secondary glass-box" tabindex="-1" id="leftSidebar" aria-labelledby="leftSidebarLabel" data-bs-theme="dark" style="border-radius: 0px 30px 30px 0px">
 
         <!-- Sidebar Header -->
@@ -206,48 +207,43 @@
 
         </div>
     </aside>
+
     <nav class="position-absolute top-0 navbar navbar-expand-lg w-100">
         <div class="container">
-            <a class="navbar-brand text-white fw-bold" asp-controller="Home" asp-action="Index">FATHALL SIM</a>
+
+            <a class="navbar-brand" asp-controller="Home" asp-action="home">
+                <img src="~/images/Logo.svg" alt="fathall sim Logo" style="max-height: 50px; width: auto;" />
+            </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-                <ul class="navbar-nav border border-1 border-white rounded-pill p-2 text-white bg-blur">
+            <div class="collapse navbar-collapse" id="navbarNav">
 
+                <ul class="navbar-nav mx-auto border border-1 border-white rounded-pill p-2 text-white bg-blur">
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "/" && currentAction == "home" ? "active" : "")"
-                           asp-controller="/" asp-action="home">Home</a>
+                        <a class="nav-link fw-bold px-4 text-black @(currentController == "Home" && currentAction == "home" ? "active" : "")"
+                           asp-controller="Home" asp-action="home">Home</a>
                     </li>
-
                     <li class="nav-item">
                         <a class="nav-link fw-bold px-4 text-black @(currentController == "SIM" && currentAction == "Index" ? "active" : "")"
-                           asp-controller="SIM" asp-action="Index">Sim</a>
+                           asp-controller="SIM" asp-action="Index">Devices</a>
                     </li>
-
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "USB" && currentAction == "Index" ? "active" : "")"
-                           asp-controller="USB" asp-action="Index">Usb</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <!-- Checks only the controller so it stays active on Details/Create pages inside Employee -->
                         <a class="nav-link fw-bold px-4 text-black @(currentController == "Employee" ? "active" : "")"
-                           asp-controller="Employee" asp-action="Index">Employees</a>
+                           asp-controller="Employee" asp-action="Index">Manage Users</a>
                     </li>
-
-                    <li class="nav-item">
-                        <!-- Checks only the controller so it stays active on Details/Create pages inside NonEmployee -->
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "NonEmployee" ? "active" : "")"
-                           asp-controller="NonEmployee" asp-action="Index">NonEmployees</a>
-                    </li>
-
                 </ul>
+
+                <div class="d-flex">
+                    <a class="btn btn-custom-outline rounded-pill fw-bold px-4"
+                       asp-controller="Account" asp-action="Logout">Log Out</a>
+                </div>
+
             </div>
         </div>
-    </nav>  
+    </nav>
     <div class="">
         <main role="main" class="pb-3">
             @RenderBody()

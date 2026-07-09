@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
             align: 'left',
             style: {
                 color: '#888888',
-                fontSize: '15px'
+                fontSize: '15px',
             }
 
         },
