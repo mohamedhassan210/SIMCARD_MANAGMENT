@@ -1,0 +1,133 @@
+﻿@model IEnumerable<Sim_Card_Managment.Models.Document>
+
+@{
+    ViewData["Title"] = "قائمة المستندات - Documents List";
+
+    // Capture the current search parameters from the URL query string to preserve them
+    var currentSearchTerm = Context.Request.Query["searchTerm"].ToString();
+    var currentDocumentTypeId = Context.Request.Query["documentTypeId"].ToString();
+}
+
+<div class="container-fluid my-4" dir="rtl">
+    <div class="d-flex justify-content-between align-items-center mb-4 bg-light p-3 rounded shadow-sm">
+        <div>
+            <h2 class="text-primary mb-1"><i class="fa-solid fa-folder-open me-2"></i> إدارة المستندات</h2>
+            <small class="text-muted">عرض وتصفية وتصدير بيانات حركة الشرائح والأجهزة</small>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Create" class="btn btn-primary fw-bold px-4">
+                <i class="fa-solid fa-plus-circle"></i> مستند جديد
+            </a>
+
+            <a asp-controller="Document" asp-action="ExportToExcel"
+               asp-route-searchTerm="@ViewBag.SearchTerm"
+               asp-route-documentTypeId="@ViewBag.DocumentTypeId"
+               class="btn btn-primary">
+                <i class="fa fa-file-excel"></i> حركة المستندات والإحصاء
+            </a>
+
+            <a asp-controller="Document" asp-action="ExportInventoryToExcel"
+               class="btn btn-success">
+                <i class="fa fa-users-cog"></i> عهد خطوط وأجهزة الموظفين
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-body bg-light rounded">
+            <form method="get" asp-action="Index" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">كلمة البحث (رقم السيريال / الملاحظات)</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <input type="text" name="searchTerm" value="@currentSearchTerm" class="form-control" placeholder="ادخل رقم السيريال أو جزء من الملاحظات..." />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">نوع المستند</label>
+                    <select name="documentTypeId" class="form-select" asp-items="ViewBag.DocumentTypes">
+                        <option value="">-- كل الأنواع --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-secondary w-100 fw-bold">
+                        <i class="fa-solid fa-filter"></i> تصفية
+                    </button>
+                    @if (!string.IsNullOrEmpty(currentSearchTerm) || !string.IsNullOrEmpty(currentDocumentTypeId))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-danger w-50 fw-bold">
+                            إلغاء
+                        </a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" style="width: 25%;">السيريال / أرقام المستند</th>
+                            <th scope="col">نوع المستند</th>
+                            <th scope="col">تاريخ الإجراء</th>
+                            <th scope="col">تاريخ الإنشاء</th>
+                            <th scope="col" style="width: 25%;">الملاحظات</th>
+                            <th scope="col" class="text-center" style="width: 15%;">خيارات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="fw-bold text-dark text-wrap">
+                                        @item.DocumentNumber
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info text-dark px-2 py-2 fs-6">
+                                            @(item.DocumentType?.DisplayName ?? "غير محدد")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @item.ActionDate.ToString("yyyy-MM-dd")
+                                    </td>
+                                    <td class="text-muted small">
+                                        @item.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+                                    </td>
+                                    <td class="text-wrap text-secondary">
+                                        @(string.IsNullOrEmpty(item.Notes) ? "-" : item.Notes)
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('هل أنت متأكد من رغبتك في حذف هذا المستند نهائياً؟');" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" title="حذف">
+                                                    <i class="fa-solid fa-trash"></i> حذف
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
+                                    لا توجد مستندات تطابق خيارات البحث الحالية.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

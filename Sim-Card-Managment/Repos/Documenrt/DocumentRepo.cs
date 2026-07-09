@@ -62,6 +62,32 @@ namespace Sim_Card_Managment.Repos
             }
         }
 
+
+
+        public async Task<IEnumerable<Document>> GetFilteredDocumentsAsync(string searchTerm, Guid? documentTypeId)
+        {
+            var query = _context.Documents
+                .Include(d => d.DocumentType)
+                .Include(d => d.CreatedBy)
+                .Include(d => d.Serials)
+                .AsQueryable();
+
+            // Filter by text search (Document number or Notes text match)
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(d => d.DocumentNumber.Contains(searchTerm) || d.Notes.Contains(searchTerm));
+            }
+
+            // Filter by Document Type dropdown selection
+            if (documentTypeId.HasValue)
+            {
+                query = query.Where(d => d.DocumenttypeId == documentTypeId.Value);
+            }
+
+            return await query.OrderByDescending(d => d.CreatedAt).ToListAsync();
+        }
+
+
         public async Task<bool> SaveChangesAsync()
         {
             return (await _context.SaveChangesAsync()) >= 0;
