@@ -9,5 +9,6 @@ namespace Sim_Card_Managment.Repos
         void Add(Subscription subscription);   
         void Update(Subscription subscription);
         void Delete(Guid id);
+        Task<IEnumerable<Subscription>> GetAllWithHardwareDetailsAsync();
     }
 }

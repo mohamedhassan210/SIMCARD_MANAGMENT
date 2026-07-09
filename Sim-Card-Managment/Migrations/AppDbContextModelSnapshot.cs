@@ -212,6 +212,9 @@ namespace Sim_Card_Managment.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("ServiceProviderId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("SignatureData")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -226,6 +229,8 @@ namespace Sim_Card_Managment.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DocumenttypeId");
+
+                    b.HasIndex("ServiceProviderId");
 
                     b.HasIndex("UserId");
 
@@ -483,6 +488,30 @@ namespace Sim_Card_Managment.Migrations
                     b.ToTable("Serials");
                 });
 
+            modelBuilder.Entity("Sim_Card_Managment.Models.ServiceProvider", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ServiceProviders");
+                });
+
             modelBuilder.Entity("Sim_Card_Managment.Models.Sim", b =>
                 {
                     b.Property<Guid>("Id")
@@ -509,6 +538,9 @@ namespace Sim_Card_Managment.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<Guid>("ServiceProviderId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -518,6 +550,8 @@ namespace Sim_Card_Managment.Migrations
 
                     b.HasIndex("SerialNumber")
                         .IsUnique();
+
+                    b.HasIndex("ServiceProviderId");
 
                     b.ToTable("Sims");
                 });
@@ -599,6 +633,9 @@ namespace Sim_Card_Managment.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<Guid>("ServiceProviderId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -608,6 +645,8 @@ namespace Sim_Card_Managment.Migrations
 
                     b.HasIndex("SerialNumber")
                         .IsUnique();
+
+                    b.HasIndex("ServiceProviderId");
 
                     b.ToTable("Usbs");
                 });
@@ -630,9 +669,6 @@ namespace Sim_Card_Managment.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastLogin")
@@ -791,6 +827,12 @@ namespace Sim_Card_Managment.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Sim_Card_Managment.Models.ServiceProvider", "ServiceProvider")
+                        .WithMany("Documents")
+                        .HasForeignKey("ServiceProviderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
                         .WithMany("Documents")
                         .HasForeignKey("UserId")
@@ -800,6 +842,8 @@ namespace Sim_Card_Managment.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("DocumentType");
+
+                    b.Navigation("ServiceProvider");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Employee", b =>
@@ -883,6 +927,17 @@ namespace Sim_Card_Managment.Migrations
                     b.Navigation("Usb");
                 });
 
+            modelBuilder.Entity("Sim_Card_Managment.Models.Sim", b =>
+                {
+                    b.HasOne("Sim_Card_Managment.Models.ServiceProvider", "ServiceProvider")
+                        .WithMany("Sims")
+                        .HasForeignKey("ServiceProviderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ServiceProvider");
+                });
+
             modelBuilder.Entity("Sim_Card_Managment.Models.Subscription", b =>
                 {
                     b.HasOne("Sim_Card_Managment.Models.DeviceAction", "Action")
@@ -938,6 +993,17 @@ namespace Sim_Card_Managment.Migrations
                     b.Navigation("Usb");
                 });
 
+            modelBuilder.Entity("Sim_Card_Managment.Models.Usb", b =>
+                {
+                    b.HasOne("Sim_Card_Managment.Models.ServiceProvider", "ServiceProvider")
+                        .WithMany("Usbs")
+                        .HasForeignKey("ServiceProviderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ServiceProvider");
+                });
+
             modelBuilder.Entity("Sim_Card_Managment.Models.User", b =>
                 {
                     b.HasOne("Sim_Card_Managment.Models.Group", "Group")
@@ -991,6 +1057,15 @@ namespace Sim_Card_Managment.Migrations
             modelBuilder.Entity("Sim_Card_Managment.Models.Quota", b =>
                 {
                     b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("Sim_Card_Managment.Models.ServiceProvider", b =>
+                {
+                    b.Navigation("Documents");
+
+                    b.Navigation("Sims");
+
+                    b.Navigation("Usbs");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Sim", b =>

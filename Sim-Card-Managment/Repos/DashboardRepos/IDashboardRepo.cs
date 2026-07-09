@@ -9,5 +9,8 @@ namespace Sim_Card_Managment.Repos
         int GetDeviceStatusCount(string statusType, bool isSim);
         IEnumerable<Employee> GetTopEmployees(int count);
         IEnumerable<Sim> GetTopSims(int count);
+
+        // Add this method: Returns a tuple containing the weekly chart counts
+        (int[] SimCounts, int[] UsbCounts) GetWeeklyActivityData();
     }
 }

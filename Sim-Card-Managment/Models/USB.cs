@@ -18,6 +18,7 @@ namespace Sim_Card_Managment.Models
         [StringLength(20)]
         public string Status { get; set; } = "Active";  // Active / Lost / Replaced / Returned
 
+
         public DateTime RegisteredAt { get; set; } = DateTime.Now;
 
         // Navigation properties
@@ -25,5 +26,9 @@ namespace Sim_Card_Managment.Models
         public virtual ICollection<DeviceTransfer> DeviceTransfers { get; set; } = new List<DeviceTransfer>();
         public virtual ICollection<DeviceStatus> DeviceStatuses { get; set; } = new List<DeviceStatus>();
         public virtual ICollection<Serial> Serials { get; set; } = new List<Serial>();
+        
+
+        public Guid ServiceProviderId { get; set; }
+        public virtual ServiceProvider ServiceProvider { get; set; }
     }
 }
