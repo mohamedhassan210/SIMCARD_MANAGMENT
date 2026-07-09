@@ -21,9 +21,9 @@
 
 
 <header class="hero_bg">
-    <section class="hero text-white pt-5 pb-5" id="hero_home">
-        <div class="maxW_Hero text-center mx-auto mt-4 mb-5">
-            <h2 class="fw-bolder display-1 mb-4">Streamline Your Staff SIM Cards</h2>
+    <section class=" text-white pt-5 pb-5" id="hero_home">
+        <div class="maxW_Hero text-center mx-auto my-auto mt-4 mb-5">
+            <h2 class="fw-bolder display-1 mb-4"><span class="fs-1 fw-normal">Streamline Your </span> <br /> Staff SIM Cards</h2>
             <p class="fs-3 fw-light">
                 Efficiently manage staff SIM cards, data plans, and assignments from a single dashboard
             </p>
@@ -162,26 +162,34 @@
 
         <div class="px-5 mt-5">
             <h2 class="fw-bold mb-3 section-title-lg">Explore SIM Cards</h2>
-            <div class="d-flex gap-2 mb-4">
-                <div class="bg-white rounded-3 d-flex justify-content-center align-items-center provider-logo-box">
-                    <a class="rounded-circle d-flex justify-content-center align-items-center cursor">
-                        <img src="~/img/we.png" alt="Alternate Text" />
-                    </a>
+            <div class="d-flex justify-content-between flex-nowrap align-items-center">
+                <div class="d-flex gap-2 mb-4">
+                    <div class="bg-white rounded-3 d-flex justify-content-center align-items-center provider-logo-box">
+                        <button class="rounded-circle d-flex justify-content-center align-items-center cursor border-0 bg-transparent">
+                            <img src="~/img/we.png" alt="Alternate Text" />
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-3 d-flex justify-content-center align-items-center provider-logo-box">
+                        <div>
+                            <button class="d-flex justify-content-center align-items-center cursor border-0 bg-transparent">
+                                <img src="~/img/fodafone.png" alt="Alternate Text" />
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-3 d-flex justify-content-center align-items-center provider-logo-box">
+                        <button class="rounded-circle d-flex justify-content-center align-items-center cursor border-0 bg-transparent">
+                            <img src="~/img/orange.png" alt="Alternate Text" />
+                        </button>
+                    </div>
+                    <button class="bg-white rounded-3 d-flex justify-content-center align-items-center cursor provider-logo-box border-0 bg-transparent">
+                        <img src="~/img/etisalat.png" alt="Alternate Text" />
+                    </button>
                 </div>
-                <div class="bg-white rounded-3 d-flex justify-content-center align-items-center provider-logo-box">
-                    <a class="d-flex justify-content-center align-items-center cursor">
-                        <img src="~/img/fodafone.png" alt="Alternate Text" />
-                    </a>
-                </div>
-                <div class="bg-white rounded-3 d-flex justify-content-center align-items-center provider-logo-box">
-                    <a class="rounded-circle d-flex justify-content-center align-items-center cursor">
-                        <img src="~/img/orange.png" alt="Alternate Text" />
-                    </a>
-                </div>
-                <a class="bg-white rounded-3 d-flex justify-content-center align-items-center cursor provider-logo-box">
-                    <img src="~/img/etisalat.png" alt="Alternate Text" />
-                </a>
+                <button class=" border-0 rounded-3 icon">
+                    <i class="fa-solid fa-filter-circle-xmark text-white"></i>
+                </button>
             </div>
+           
 
             <div class="position-relative">
                 <div class="position-absolute table-decor-bg"></div>
@@ -201,7 +209,7 @@
                                 @if (!recentSims.Any())
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center py-5 text-muted">No SIM cards available at the moment.</td>
+                                        <td colspan="5" class="text-center py-4 text-black">No SIM cards available at the moment.</td>
                                     </tr>
                                 }
                                 else

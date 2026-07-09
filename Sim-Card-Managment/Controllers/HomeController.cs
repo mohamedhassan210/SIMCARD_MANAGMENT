@@ -31,5 +31,16 @@ namespace Sim_Card_Managment.Controllers
 
             return View();
         }
+        [HttpGet]
+        public IActionResult GetWeeklyActivityData()
+        {
+            var chartData = _repo.GetWeeklyActivityData(); // Calling the repository
+
+            return Json(new
+            {
+                simData = chartData.SimCounts,
+                usbData = chartData.UsbCounts
+            });
+        }
     }
 }

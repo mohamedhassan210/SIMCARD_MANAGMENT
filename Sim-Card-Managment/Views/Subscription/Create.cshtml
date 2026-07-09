@@ -1,1 +1,450 @@
-﻿
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<style>
+    /* Custom Styling for specific colors and border */
+    .step-circle {
+        width: 32px;
+        height: 32px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .step-text {
+        font-size: 16px;
+        color: #333333;
+    }
+
+    /* Active Step Styling */
+    .step-active .step-circle {
+        background-color: #e65319;
+        color: #ffffff;
+    }
+
+    /* Inactive Step Styling */
+    .step-inactive .step-circle {
+        background-color: #e8e8e8;
+        color: #a0a0a0;
+    }
+
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 850px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin:0 auto;
+    }
+
+    /* Custom Header Styles */
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #212529;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+        .section-title i {
+            color: #e65319;
+            font-size: 1.2rem;
+        }
+
+    /* Form Controls */
+    .custom-form-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .custom-form-control,
+    .custom-form-select {
+        border-radius: 50px; /* Made it a pill shape */
+        padding: 0.6rem 1.25rem; /* Adjusted padding for the pill curve */
+        font-size: 0.9rem;
+        border: 2px solid #dee2e6 !important; /* Explicit border in static state */
+    }
+
+        .custom-form-control:focus,
+        .custom-form-select:focus {
+            border-color: #e65319 !important;
+            box-shadow: none; /* Removed the outer focus shadow/glow */
+            outline: none;
+        }
+
+    /* Selectable Cards */
+    .selection-card {
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        height: 100%;
+        background-color: #ffffff;
+    }
+
+        .selection-card:hover {
+            border-color: #babbbc;
+        }
+
+        .selection-card.active {
+            border: 1.5px solid #e65319;
+        }
+
+    .card-title-text {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        color: #212529;
+    }
+
+    .card-subtitle-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 0;
+    }
+
+    /* Checkmark for active employee card */
+    .check-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #e65319;
+        font-size: 1.6rem;
+        display: none;
+    }
+
+    .selection-card.active .check-icon {
+        display: block;
+    }
+
+    /* Toggle Buttons (SIM / USB) */
+    .type-toggle-btn {
+        flex: 1;
+        padding: 10px 16px;
+        border: 1px solid #dee2e6;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-align: center;
+        cursor: pointer;
+        background-color: #ffffff;
+        color: #212529;
+    }
+
+        .type-toggle-btn.active {
+            background-color: #e65319;
+            color: #ffffff;
+            border-color: #e65319;
+        }
+
+    .toggle-group {
+        display: flex;
+        max-width: 280px;
+        border-radius: 50px; /* Made the toggle group pill shaped too */
+        overflow: hidden;
+        margin-bottom: 24px;
+        border: 1px solid #dee2e6; /* Added border to toggle group */
+    }
+
+        .toggle-group .type-toggle-btn {
+            border: none; /* Remove individual borders since group has one */
+        }
+
+            .toggle-group .type-toggle-btn:first-child {
+                border-right: 1px solid #dee2e6; /* Add border between buttons */
+            }
+
+            .toggle-group .type-toggle-btn.active {
+                border-right-color: #e65319;
+            }
+
+
+    /* SIM Card specific styling */
+    .sim-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+
+    .sim-icon {
+        color: #6c757d;
+        font-size: 1.2rem;
+    }
+
+    .selection-card.active .sim-icon {
+        color: #e65319;
+    }
+
+    .badge-available {
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #198754;
+        border: 1px solid #198754;
+        border-radius: 12px;
+        padding: 3px 8px;
+    }
+
+    /* Helper/Status Text */
+    .status-text {
+        font-size: 0.75rem;
+        color: #e65319;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Checkbox & Bottom Actions */
+    .terms-text {
+        font-size: 0.85rem;
+        color: #212529;
+    }
+
+        .terms-text a {
+            color: #e65319;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+    .form-check-input:checked {
+        background-color: #e65319;
+        border-color: #e65319;
+    }
+
+    .form-check-input:focus {
+        box-shadow: none;
+        border-color: #e65319;
+    }
+
+    .btn-action {
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        min-width: 120px;
+    }
+
+    .btn-outline-back {
+        border: 1px solid #ced4da;
+        color: #6c757d;
+        background-color: #ffffff;
+    }
+
+        .btn-outline-back:hover {
+            background-color: #f8f9fa;
+        }
+
+    .btn-draft {
+        background-color: #a0a0a0;
+        color: #ffffff;
+        border: none;
+    }
+
+        .btn-draft:hover {
+            background-color: #8e8e8e;
+        }
+
+    .btn-activate {
+        background-color: #e65319;
+        color: #ffffff;
+        border: none;
+    }
+
+        .btn-activate:hover {
+            background-color: #d44a15;
+        }
+</style>
+
+<header>
+    <div class="p-100 w-100 mx-4">
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-4" style="font-size: 0.8rem; font-weight: 500;">
+                <li class="breadcrumb-item">
+                    <a href="#" class="text-decoration-none text-muted">Subscription</a>
+                </li>
+                <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">
+                    Create new subscription
+                </li>
+            </ol>
+        </nav>
+
+        <h1 class="fw-bold text-dark mb-3" style="font-size: 32px; letter-spacing: -0.5px;">
+            Setup New Subscription
+        </h1>
+
+        <p class="mb-0" style="color: #6c757d; font-size: 15px; line-height: 1.5; max-width: 480px;">
+            Complete the following steps to assign a system asset to an employee.
+        </p>
+    </div>
+</header>
+
+<section class="container-fluid px-4 mt-4">
+    <div class="row">
+        <div class="col-12 col-md-3 col-lg-2">
+            <div class="d-flex align-items-center mb-4 step-active">
+                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">
+                    1
+                </div>
+                <div class="step-text fw-bold">
+                    Employee
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center mb-4 step-inactive">
+                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">
+                    2
+                </div>
+                <div class="step-text">
+                    Device
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center step-inactive">
+                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">
+                    3
+                </div>
+                <div class="step-text">
+                    Schedule
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-9 col-lg-10">
+            <div class="form-container">
+
+                <div class="mb-5">
+                    <h2 class="section-title">
+                        <i class="fas fa-user"></i> Select Employee
+                    </h2>
+
+                    <div class="mb-4">
+                        <label class="custom-form-label">Employee Search</label>
+                        <input type="text" class="form-control custom-form-control bo" placeholder="Search by name or id">
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="selection-card active">
+                                <div class="card-title-text">Mohamed Hussien</div>
+                                <p class="card-subtitle-text">HR manager - ID 2334</p>
+                                <i class="fas fa-check-circle check-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="selection-card">
+                                <div class="card-title-text">Mohamed Hussien</div>
+                                <p class="card-subtitle-text">HR manager - ID 2334</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="status-text">
+                        <i class="fas fa-info-circle"></i> Sara mohamed selected
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <h2 class="section-title">
+                        <i class="fas fa-sim-card"></i> Device type
+                    </h2>
+
+                    <div class="toggle-group">
+                        <div class="type-toggle-btn active">SIM Card</div>
+                        <div class="type-toggle-btn text-muted">Usb</div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="custom-form-label">SIM cards</label>
+                            <input type="text" class="form-control custom-form-control" placeholder="Search by name or id">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="custom-form-label">select sim</label>
+                            <select class="form-select custom-form-select">
+                                <option selected>015524578710</option>
+                                <option value="1">015524578711</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="selection-card active">
+                                <div class="sim-card-header">
+                                    <i class="fas fa-sim-card sim-icon"></i>
+                                    <span class="badge-available">Available</span>
+                                </div>
+                                <div class="card-title-text">5G SIM</div>
+                                <p class="card-subtitle-text">Provider : We</p>
+                                <p class="card-subtitle-text">Serial : 250154541.013100</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="selection-card">
+                                <div class="sim-card-header">
+                                    <i class="fas fa-sim-card sim-icon"></i>
+                                    <span class="badge-available">Available</span>
+                                </div>
+                                <div class="card-title-text">5G SIM</div>
+                                <p class="card-subtitle-text">Provider : We</p>
+                                <p class="card-subtitle-text">Serial : 250154541.013100</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="status-text">
+                        <i class="fas fa-info-circle"></i> 250154541.013100 selected
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <h2 class="section-title">
+                        <i class="far fa-clock"></i> Schedule
+                    </h2>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="custom-form-label">Activation date</label>
+                            <input type="text" class="form-control custom-form-control" placeholder="8/7/2026" value="8/7/2026">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="custom-form-label">Contract duration</label>
+                            <select class="form-select custom-form-select">
+                                <option selected>1 year</option>
+                                <option value="2">2 years</option>
+                                <option value="3">3 years</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-check mb-5 d-flex align-items-start gap-2">
+                    <input class="form-check-input mt-1" type="checkbox" id="termsCheck">
+                    <label class="form-check-label terms-text" for="termsCheck">
+                        I agree to the <a href="#">Terms & Conditions</a> and privacy policy. I acknowledge that the selected employee is solely responsible for the use of the assigned asset.
+                    </label>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <button type="button" class="btn btn-action btn-outline-back">Back</button>
+                    <div class="d-flex gap-3">
+                        <button type="button" class="btn btn-action btn-draft">Save Draft</button>
+                        <button type="button" class="btn btn-action btn-activate">Activate Subscription</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>

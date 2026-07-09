@@ -1,4 +1,12 @@
 ﻿/*global CSS*/
+::selection {
+    background-color: #fe6a35 !important;
+    color: #fff !important;
+}
+::-moz-selection {
+    background-color: #fe6a35 !important;
+    color: #ffffff !important;
+}
 @font-face {
     font-family: 'Roboto';
     src: url(../Fonts/Roboto-VariableFont_wdth,wght.ttf) format("truetype");
@@ -12,8 +20,8 @@ html, body {
     body::-webkit-scrollbar {
         display: none;
     }
-.p-74 {
-    padding-top: 74px !important;
+.p-100 {
+    padding-top: 100px !important;
 }
 
 body {
@@ -39,6 +47,17 @@ background-color: #E24D17 !important;
 border-radius: 20px !important;
 }
 
+.btn-custom-outline {
+    color: black;
+    border: 2px solid black; /* You can change 2px to 1px if you prefer a thinner line */
+    background-color: transparent;
+    transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+    .btn-custom-outline:hover {
+        background-color: #E24D17;
+        color: white;
+    }
 
 /*-------------- End Of NavBar ----------------------*/
 
@@ -95,6 +114,7 @@ border-radius: 20px !important;
     color: #d1d1d1;
 }
 /*-------------- End Of Side Bar ----------------------*/
+/*==========================================================*/
 /*---------------------- End of Layout-----------------------*/
 
 
@@ -145,7 +165,7 @@ border-radius: 20px !important;
 
 
 
-/*Start Login Page  */
+/*-------------------------------------------------- Start Login Page --------------------------------------  */
 
 .login-section {
     background-color: #E24D17;
@@ -214,14 +234,18 @@ border-radius: 20px !important;
 /*End Login Page*/
 
 /*Start of Home Page */
-/* --- Global & Utility Layout --- */
 .hero_bg {
     background-color: #E24D17;
     width: 100%;
+    height: 70dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .maxW_Hero {
     max-width: 800px;
+
 }
 
 .bg-light-gray {
@@ -315,7 +339,7 @@ border-radius: 20px !important;
 }
 
 .table-card {
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 7px 10px rgba(0,0,0,0.5);
 }
 
 .custom-table {
@@ -369,7 +393,11 @@ border-radius: 20px !important;
     height: 45px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-/*End Of Home Page */
+.icon {
+    background-color: #E24D17;
+}
+
+/*------------------------------ End Of Home Page ------------------------------------ */
 
 
 
