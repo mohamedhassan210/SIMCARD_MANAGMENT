@@ -43,7 +43,26 @@ namespace Sim_Card_Managment.Controllers
             ViewBag.DocumentTypes = new SelectList(await _typeRepo.GetAllAsync(), "Id", "DisplayName");
             return View(documents);
         }
+        public async Task<IActionResult> InventoryReport(string? searchTerm)
+        {
+            var subscriptions = await _subscriptionRepo.GetAllWithHardwareDetailsAsync();
 
+            // Filter only active subscriptions (where EndDate is null)
+            var activeSubscriptions = subscriptions.Where(s => s.EndDate == null).AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                activeSubscriptions = activeSubscriptions.Where(s =>
+                    (s.Employee != null && s.Employee.Name.Contains(searchTerm)) ||
+                    (s.NonEmployee != null && s.NonEmployee.Name.Contains(searchTerm)) ||
+                    (s.Sim != null && (s.Sim.PhoneNumber.Contains(searchTerm) || s.Sim.SerialNumber.Contains(searchTerm))) ||
+                    (s.Usb != null && s.Usb.SerialNumber.Contains(searchTerm))
+                );
+            }
+
+            ViewBag.AllSubscriptions = subscriptions; // Passed to trace historical users
+            return View(activeSubscriptions.ToList());
+        }
         #region First Report
         [HttpGet]
         public async Task<IActionResult> ExportToExcel(string? searchTerm, Guid? documentTypeId)

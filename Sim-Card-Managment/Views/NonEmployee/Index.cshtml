@@ -1,21 +1,20 @@
-﻿<style>
-    /* =========================================
-               Employee Dashboard Styles
-               ========================================= */
+﻿@model IEnumerable<Sim_Card_Managment.ViewModels.NonEmployeeIndexViewModel>
 
-    /* Brand Colors */
+<style>
+    /* =========================================
+           Employee / NonEmployee Dashboard Styles
+           ========================================= */
+
     :root {
         --brand-orange: #E24D17;
         --bg-light: #F0F0F0;
         --border-gray: #D1D1D1;
     }
 
-    /* Background Color for the whole page */
     .main-bg {
         background-color: var(--bg-light);
     }
 
-    /* Typography & Utility Colors */
     .text-brand-orange {
         color: var(--brand-orange) !important;
     }
@@ -24,7 +23,6 @@
         background-color: var(--brand-orange) !important;
     }
 
-    /* Buttons */
     .btn-brand-orange {
         background-color: var(--brand-orange) !important;
         border-color: var(--brand-orange) !important;
@@ -37,7 +35,6 @@
             color: white !important;
         }
 
-    /* Search Bar Wrapper */
     .custom-search-wrapper {
         background-color: transparent;
         border: 1px solid var(--border-gray);
@@ -50,13 +47,11 @@
             background-color: white;
         }
 
-    /* Table Container (Orange Outline Box) */
     .table-container {
         border: 1px solid var(--brand-orange);
-        height: 500px; /* Adjust height as needed to force scrollbar */
+        height: 500px;
     }
 
-    /* Table Resets (Removing unwanted borders) */
     .custom-table th,
     .custom-table td {
         border-bottom: none !important;
@@ -69,21 +64,16 @@
         border-bottom: none !important;
     }
 
-    /* Badges styling */
     .badge {
         font-size: 0.65rem;
         letter-spacing: 0.5px;
     }
 
-    /* =========================================
-               Custom Scrollbar
-               ========================================= */
     .custom-scrollbar {
-        max-height: 150px; /* Adjust inner container height for scrolling */
+        max-height: 420px;
         overflow-y: auto;
     }
 
-        /* Scrollbar Track */
         .custom-scrollbar::-webkit-scrollbar {
             width: 25px;
         }
@@ -93,11 +83,10 @@
             border-radius: 10px;
         }
 
-        /* Scrollbar Thumb (The orange pill) */
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background-color: var(--brand-orange);
             border-radius: 10px;
-            border: 3px solid #E5E5E5; /* Creates padding effect inside the track */
+            border: 3px solid #E5E5E5;
         }
 
             .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -109,14 +98,14 @@
 
     <div class="mb-4">
         <h1 class="fw-bolder mb-3" style="font-size: 2.5rem;">
-            <span class="text-brand-orange">150</span> <span class="text-black">Non employees</span>
+            <span class="text-brand-orange">@Model.Count()</span> <span class="text-black">Non employees</span>
         </h1>
         <p class="text-muted fw-medium mb-4" style="max-width: 800px; font-size: 0.95rem;">
-            Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien.
+            Manage and view non-employee contractors and visitors assigned SIM cards and USB devices across your system.
         </p>
-        <button class="btn btn-brand-orange text-white rounded-pill px-4 py-2 fw-bold shadow-sm">
+        <a asp-action="Create" class="btn btn-brand-orange text-white rounded-pill px-4 py-2 fw-bold shadow-sm text-decoration-none">
             <i class="fa-solid fa-plus me-1"></i>Create new non employee
-        </button>
+        </a>
     </div>
 
     <div class="d-flex align-items-center gap-3 mb-4 w-100">
@@ -131,62 +120,51 @@
         </button>
     </div>
 
-    <div class="bg-white table-container position-relative pt-4 ps-2 pe-1 pb-2 " style="border-radius: 30px">
+    <div class="bg-white table-container position-relative pt-4 ps-2 pe-1 pb-2" style="border-radius: 30px">
 
         <div class="table-responsive custom-scrollbar pe-3">
             <table class="table custom-table align-middle text-start mb-0">
                 <thead>
                     <tr>
-                        <th scope="col" class="border-0 ps-4 text-dark fw-medium"></th>
+                        <th scope="col" class="border-0 ps-4 text-dark fw-medium">#</th>
                         <th scope="col" class="border-0 text-dark fw-medium">Name</th>
-                        <th scope="col" class="border-0 text-dark fw-medium">Id</th>
-                        <th scope="col" class="border-0 text-dark fw-medium">Phone</th>
+                        <th scope="col" class="border-0 text-dark fw-medium">Phone / Contact</th>
                         <th scope="col" class="border-0 text-dark fw-medium">Used</th>
                         <th scope="col" class="border-0"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="text-dark ps-4">0</td>
-                        <td class="text-dark">Adham Amr Mohamed</td>
-                        <td class="text-dark">012</td>
-                        <td class="text-dark">01556176733</td>
-                        <td class="py-3">
-                            <span class="badge bg-brand-orange rounded-pill me-1 px-3 py-2 fw-bold">1 SIM</span>
-                            <span class="badge bg-brand-orange rounded-pill px-3 py-2 fw-bold">2 USB</span>
-                        </td>
-                        <td class="text-end pe-4">
-                            <button class="btn btn-sm btn-brand-orange text-white rounded-2 px-2 py-1">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            </button>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td class="text-dark ps-4">1</td>
-                        <td class="text-dark">Adham Amr Mohamed</td>
-                        <td class="text-dark">012</td>
-                        <td class="text-dark">01556176733</td>
-                        <td class="py-3">
-                            <span class="badge bg-brand-orange rounded-pill px-3 py-2 fw-bold">2 USB</span>
-                        </td>
-                        <td class="text-end pe-4">
-                            <button class="btn btn-sm btn-brand-orange text-white rounded-2 px-2 py-1">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            </button>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td class="text-dark ps-4">2</td>
-                        <td class="text-dark">Adham Amr Mohamed</td>
-                        <td class="text-dark">012</td>
-                        <td class="text-dark">01556176733</td>
-                        <td class="py-3">
-                            <span class="badge bg-brand-orange rounded-pill px-3 py-2 fw-bold">1 SIM</span>
-                        </td>
-                        <td class="text-end pe-4"></td>
-                    </tr>
+                    @{
+                        int index = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-dark ps-4">@index</td>
+                            <td class="text-dark fw-bold">@item.Name</td>
+                            <td class="text-dark">@(item.ContactInfo ?? "N/A")</td>
+                            <td class="py-3">
+                                @if (item.ActiveSimOnlyCount > 0)
+                                {
+                                    <span class="badge bg-brand-orange rounded-pill me-1 px-3 py-2 fw-bold">@item.ActiveSimOnlyCount SIM</span>
+                                }
+                                @if (item.ActiveUsbCount > 0)
+                                {
+                                    <span class="badge bg-brand-orange rounded-pill px-3 py-2 fw-bold">@item.ActiveUsbCount USB</span>
+                                }
+                                @if (item.ActiveSimOnlyCount == 0 && item.ActiveUsbCount == 0)
+                                {
+                                    <span class="text-muted fs-7">None</span>
+                                }
+                            </td>
+                            <td class="text-end pe-4">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-brand-orange text-white rounded-2 px-2 py-1">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        index++;
+                    }
                 </tbody>
             </table>
         </div>
