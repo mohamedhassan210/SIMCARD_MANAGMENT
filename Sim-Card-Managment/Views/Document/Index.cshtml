@@ -1,133 +1,178 @@
-﻿@model IEnumerable<Sim_Card_Managment.Models.Document>
-
-@{
-    ViewData["Title"] = "قائمة المستندات - Documents List";
-
-    // Capture the current search parameters from the URL query string to preserve them
-    var currentSearchTerm = Context.Request.Query["searchTerm"].ToString();
-    var currentDocumentTypeId = Context.Request.Query["documentTypeId"].ToString();
-}
-
-<div class="container-fluid my-4" dir="rtl">
-    <div class="d-flex justify-content-between align-items-center mb-4 bg-light p-3 rounded shadow-sm">
-        <div>
-            <h2 class="text-primary mb-1"><i class="fa-solid fa-folder-open me-2"></i> إدارة المستندات</h2>
-            <small class="text-muted">عرض وتصفية وتصدير بيانات حركة الشرائح والأجهزة</small>
-        </div>
-        <div class="d-flex gap-2">
-            <a asp-action="Create" class="btn btn-primary fw-bold px-4">
-                <i class="fa-solid fa-plus-circle"></i> مستند جديد
-            </a>
-
-            <a asp-controller="Document" asp-action="ExportToExcel"
-               asp-route-searchTerm="@ViewBag.SearchTerm"
-               asp-route-documentTypeId="@ViewBag.DocumentTypeId"
-               class="btn btn-primary">
-                <i class="fa fa-file-excel"></i> حركة المستندات والإحصاء
-            </a>
-
-            <a asp-controller="Document" asp-action="ExportInventoryToExcel"
-               class="btn btn-success">
-                <i class="fa fa-users-cog"></i> عهد خطوط وأجهزة الموظفين
-            </a>
-        </div>
-    </div>
-
-    <div class="card mb-4 shadow-sm border-0">
-        <div class="card-body bg-light rounded">
-            <form method="get" asp-action="Index" class="row g-3 align-items-end">
-                <div class="col-md-5">
-                    <label class="form-label fw-bold">كلمة البحث (رقم السيريال / الملاحظات)</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-                        <input type="text" name="searchTerm" value="@currentSearchTerm" class="form-control" placeholder="ادخل رقم السيريال أو جزء من الملاحظات..." />
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">نوع المستند</label>
-                    <select name="documentTypeId" class="form-select" asp-items="ViewBag.DocumentTypes">
-                        <option value="">-- كل الأنواع --</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-secondary w-100 fw-bold">
-                        <i class="fa-solid fa-filter"></i> تصفية
-                    </button>
-                    @if (!string.IsNullOrEmpty(currentSearchTerm) || !string.IsNullOrEmpty(currentDocumentTypeId))
-                    {
-                        <a asp-action="Index" class="btn btn-outline-danger w-50 fw-bold">
-                            إلغاء
-                        </a>
-                    }
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped mb-0 align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th scope="col" style="width: 25%;">السيريال / أرقام المستند</th>
-                            <th scope="col">نوع المستند</th>
-                            <th scope="col">تاريخ الإجراء</th>
-                            <th scope="col">تاريخ الإنشاء</th>
-                            <th scope="col" style="width: 25%;">الملاحظات</th>
-                            <th scope="col" class="text-center" style="width: 15%;">خيارات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td class="fw-bold text-dark text-wrap">
-                                        @item.DocumentNumber
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info text-dark px-2 py-2 fs-6">
-                                            @(item.DocumentType?.DisplayName ?? "غير محدد")
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @item.ActionDate.ToString("yyyy-MM-dd")
-                                    </td>
-                                    <td class="text-muted small">
-                                        @item.CreatedAt.ToString("yyyy-MM-dd HH:mm")
-                                    </td>
-                                    <td class="text-wrap text-secondary">
-                                        @(string.IsNullOrEmpty(item.Notes) ? "-" : item.Notes)
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('هل أنت متأكد من رغبتك في حذف هذا المستند نهائياً؟');" style="display:inline;">
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-outline-danger btn-sm" title="حذف">
-                                                    <i class="fa-solid fa-trash"></i> حذف
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        try{
+                tailwind.config = {
+                    darkMode: "class",
+                    theme: {
+                        extend: {
+                            "colors": {
+                                "secondary-container": "#e5e2e1",
+                                "background": "#f7f9fb",
+                                "surface-bright": "#f7f9fb",
+                                "surface-variant": "#e0e3e5",
+                                "on-secondary": "#ffffff",
+                                "surface-container": "#eceef0",
+                                "on-secondary-fixed-variant": "#474646",
+                                "surface-container-lowest": "#ffffff",
+                                "tertiary": "#4d5d73",
+                                "tertiary-fixed": "#d3e4fe",
+                                "surface-container-highest": "#e0e3e5",
+                                "inverse-primary": "#ffb59e",
+                                "secondary": "#5f5e5e",
+                                "on-error-container": "#93000a",
+                                "error-container": "#ffdad6",
+                                "primary-fixed-dim": "#ffb59e",
+                                "primary-fixed": "#ffdbd0",
+                                "secondary-fixed": "#e5e2e1",
+                                "tertiary-container": "#66768d",
+                                "surface-dim": "#d8dadc",
+                                "surface-container-high": "#e6e8ea",
+                                "on-tertiary-container": "#fdfcff",
+                                "on-tertiary-fixed": "#0b1c30",
+                                "surface-container-low": "#f2f4f6",
+                                "secondary-fixed-dim": "#c8c6c5",
+                                "on-surface-variant": "#5a4139",
+                                "surface-tint": "#ae3200",
+                                "on-surface": "#191c1e",
+                                "inverse-surface": "#2d3133",
+                                "primary-container": "#d24209",
+                                "primary": "#a93100",
+                                "surface": "#f7f9fb",
+                                "outline": "#8e7067",
+                                "on-tertiary-fixed-variant": "#38485d",
+                                "on-primary-fixed-variant": "#852400",
+                                "tertiary-fixed-dim": "#b7c8e1",
+                                "on-error": "#ffffff",
+                                "on-tertiary": "#ffffff",
+                                "inverse-on-surface": "#eff1f3",
+                                "on-primary": "#ffffff",
+                                "on-primary-fixed": "#3a0b00",
+                                "on-primary-container": "#fffbff",
+                                "error": "#ba1a1a",
+                                "outline-variant": "#e3bfb4",
+                                "on-secondary-container": "#656464",
+                                "on-background": "#191c1e",
+                                "on-secondary-fixed": "#1c1b1b"
+                            },
+                            "borderRadius": {
+                                "DEFAULT": "0.25rem",
+                                "lg": "0.5rem",
+                                "xl": "0.75rem",
+                                "full": "9999px"
+                            },
+                            "spacing": {
+                                "margin-page": "24px",
+                                "base": "4px",
+                                "panel-split": "280px",
+                                "gutter": "16px"
+                            },
+                            "fontFamily": {
+                                "body-md": ["Inter"],
+                                "label-md": ["Inter"],
+                                "headline-md": ["Inter"],
+                                "body-lg": ["Inter"],
+                                "headline-lg": ["Inter"],
+                                "mono-data": ["JetBrains Mono"],
+                                "headline-sm": ["Inter"]
+                            },
+                            "fontSize": {
+                                "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                                "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                                "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                                "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                                "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                                "mono-data": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                                "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
                             }
                         }
-                        else
-                        {
-                            <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">
-                                    <i class="fa-solid fa-inbox fa-2x mb-2 d-block"></i>
-                                    لا توجد مستندات تطابق خيارات البحث الحالية.
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                    }
+                }
+            }catch(_e){}</script>
+    <meta charset="utf-8">
+
+
+
+    <style>
+        .full{
+            width: 1650px !important;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface bg-background antialiased flex h-screen overflow-hidden">
+    <!-- Main Content Wrapper -->
+    <main class="flex-1 flex flex-col h-full bg-background relative z-10 full min-w-0">
+        <!-- TopNavBar -->
+        <!-- Page Content -->
+        <div class="flex-1 overflow-auto p-margin-page w-full max-w-none">
+            <!-- Header Actions -->
+            <div class="flex justify-between items-center mb-6 w-full">
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg text-on-surface">Document Management</h2>
+                    <p class="font-body-md text-body-md text-secondary mt-1">View, filter, and export document records.</p>
+                </div>
+                <div class="flex gap-3">
+                    <a asp-action="Create" style="background-color: #e24d17;" class="flex items-center gap-2 px-4 py-2 rounded-md font-label-md text-label-md text-white shadow-sm transition-all hover:opacity-95">
+                        <span class="material-symbols-outlined text-[18px]">add</span>
+                        New Document
+                    </a>
+                </div>
+            </div>
+            <!-- Filter Section -->
+            <div class="bg-white rounded-lg border border-[#E2E8F0] p-4 mb-6 shadow-sm w-full">
+                <div class="flex flex-col md:flex-row gap-4 items-end w-full">
+                    <div class="flex-1 w-full">
+                        <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Search (Serial Number / Notes)</label>
+                        <div class="relative w-full">
+                            <span class="material-symbols-outlined absolute left-3 top-2.5 text-secondary text-[20px]">search</span>
+                            <input class="w-full pl-10 pr-3 py-2 border border-[#E2E8F0] rounded-md font-body-md text-body-md focus-ring text-on-surface bg-surface-bright" placeholder="Enter serial or partial notes..." type="text">
+                        </div>
+                    </div>
+                    <div class="w-full md:w-64">
+                        <label class="block font-label-md text-label-md text-on-surface-variant mb-1">Document Type</label>
+                        <select class="w-full px-3 py-2 border border-[#E2E8F0] rounded-md font-body-md text-body-md focus-ring text-on-surface bg-surface-bright appearance-none">
+                            <option>-- All Types --</option>
+                            <option>Receiving</option>
+                            <option>Dispatch</option>
+                            <option>Audit</option>
+                        </select>
+                    </div>
+                    <button class="w-full md:w-auto px-6 py-2 bg-secondary-container hover:bg-surface-variant text-on-surface rounded-md font-label-md text-label-md flex items-center justify-center gap-2 transition-colors border border-[#E2E8F0]">
+                        <span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+                </div>
+            </div>
+            <!-- Data Table Container -->
+            <div class="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden shadow-sm flex flex-col min-h-[400px] w-full">
+                <!-- Table Header -->
+                <div class="grid grid-cols-6 gap-4 p-4 bg-surface-container-low border-b border-[#E2E8F0] w-full">
+                    <div class="font-label-md text-label-md text-on-surface-variant col-span-1">Serial / Doc #</div>
+                    <div class="font-label-md text-label-md text-on-surface-variant col-span-1">Document Type</div>
+                    <div class="font-label-md text-label-md text-on-surface-variant col-span-1">Action Date</div>
+                    <div class="font-label-md text-label-md text-on-surface-variant col-span-1">Creation Date</div>
+                    <div class="font-label-md text-label-md text-on-surface-variant col-span-1">Notes</div>
+                    <div class="font-label-md text-label-md text-on-surface-variant col-span-1 text-right">Options</div>
+                </div>
+                <!-- Empty State -->
+                <div class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-surface-bright w-full">
+                    <div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-4xl text-secondary">description</span>
+                    </div>
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">No documents found</h3>
+                    <p class="font-body-md text-body-md text-secondary max-w-md">
+                        No documents match the current search criteria. Try adjusting your filters or search terms.
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    </main>
+
+</body>
+</html>
