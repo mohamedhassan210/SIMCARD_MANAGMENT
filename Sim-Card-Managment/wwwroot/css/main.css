@@ -41,7 +41,12 @@ body {
 /*---------------------- Layout-----------------------*/
 /*-------------- Start Of NavBar ----------------------*/
 
+.logo
+{
+    width: 80% !important;
+}
 /* active Link */
+
 .navbar-nav .nav-link.active, .navbar-nav .nav-link.show{ color: #fff !important;
 background-color: #E24D17 !important;
 border-radius: 20px !important;

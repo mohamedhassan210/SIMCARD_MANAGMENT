@@ -6,7 +6,7 @@ using System;
 
 namespace Sim_Card_Managment.Controllers
 {
-    [RequirePermission]
+   // [RequirePermission]
     public class SIMController : Controller
     {
         private readonly ISIMRepo _simRepo;

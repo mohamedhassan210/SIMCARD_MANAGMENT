@@ -1,174 +1,541 @@
-﻿@model IEnumerable<Sim_Card_Managment.ViewModels.EmployeeIndexViewModel>
-@{
-    ViewData["Title"] = "Employees Dashboard";
+﻿@{
+    //Layout = null;
 }
 
 <style>
-    .main-bg {
-        background-color: #F0F0F0;
+    /* ---------- Title ---------- */
+    .title-section {
+        margin-bottom: 24px;
     }
 
-    .text-brand-orange {
-        color: #E24D17 !important;
-    }
-
-    .bg-brand-orange {
-        background-color: #E24D17 !important;
-    }
-
-    .btn-brand-orange {
-        background-color: #E24D17 !important;
-        border-color: #E24D17 !important;
-        transition: all 0.2s ease-in-out;
-    }
-
-        .btn-brand-orange:hover {
-            background-color: #c74213 !important;
-            border-color: #c74213 !important;
-            color: white !important;
+        .title-section h1 {
+            font-size: 34px;
+            font-weight: 800;
+            color: #1a1a1a;
         }
 
-    .custom-search-wrapper {
-        background-color: transparent;
-        border: 1px solid #D1D1D1;
-        max-width: 400px;
+            .title-section h1 .num {
+                color: #e8552b;
+            }
+
+        .title-section p {
+            margin-top: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #6b6b6b;
+            max-width: 560px;
+        }
+
+    /* ---------- Create button ---------- */
+    .create-btn {
+        margin-top: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #e8552b;
+        color: #fff;
+        border: none;
+        padding: 13px 22px;
+        border-radius: 24px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+        .create-btn:hover {
+            background: #d64923;
+            transform: translateY(-1px);
+        }
+
+        .create-btn .plus {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+    /* ---------- Filters ---------- */
+    .filters {
+        margin-top: 34px;
+    }
+
+        .filters label {
+            display: block;
+            font-size: 12px;
+            color: #6b6b6b;
+            margin-bottom: 8px;
+        }
+
+    .filters-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .status-select {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fff;
+        border: 1px solid #dcdcdc;
+        border-radius: 10px;
+        padding: 11px 14px;
+        font-size: 13px;
+        color: #1a1a1a;
+        width: 150px;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+    }
+
+        .status-select:hover {
+            border-color: #e8552b;
+        }
+
+        .status-select svg {
+            width: 12px;
+            height: 12px;
+        }
+
+    .search-box {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        border: 1px solid #dcdcdc;
+        border-radius: 10px;
+        padding: 11px 14px;
+        transition: border-color 0.2s ease;
+    }
+
+        .search-box:focus-within {
+            border-color: #e8552b;
+        }
+
+        .search-box svg {
+            width: 15px;
+            height: 15px;
+            color: #a8a8a8;
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 13px;
+            width: 100%;
+            color: #1a1a1a;
+        }
+
+            .search-box input::placeholder {
+                color: #b3b3b3;
+            }
+
+    .filter-icon-btn {
+        background: #e8552b;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+        .filter-icon-btn:hover {
+            background: #d64923;
+        }
+
+        .filter-icon-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+    /* ---------- Table ---------- */
+    .table-wrap {
+        margin-top: 28px;
+    }
+
+    table {
         width: 100%;
+        border-collapse: collapse;
     }
 
-        .custom-search-wrapper:focus-within {
-            border-color: #E24D17;
-            background-color: white;
-        }
-
-    .form-select:focus {
-        border-color: #e24d17!important;
-    }    .table-container {
-        border: 1px solid #E24D17;
-        height: 500px;
+    thead th {
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        color: #1a1a1a;
+        padding-bottom: 12px;
+        vertical-align: top;
     }
 
-    .custom-table th, .custom-table td {
-        border-bottom: none !important;
-        border-right: none !important;
-        border-left: none !important;
+    thead tr {
+        border-bottom: 2px solid #e8552b;
+    }
+
+    tbody td {
+        font-size: 12.5px;
+        color: #1a1a1a;
+        padding: 16px 0;
+        border-bottom: 1px solid #e2e2e2;
         vertical-align: middle;
     }
 
-    .custom-table tbody tr {
-        border-bottom: none !important;
+    tbody tr:last-child td {
+        border-bottom: 1px solid #e2e2e2;
     }
 
-    .badge {
-        font-size: 0.65rem;
-        letter-spacing: 0.5px;
+    .asset-cell {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        line-height: 1.3;
     }
 
-    .custom-scrollbar {
-        max-height: 450px;
-        overflow-y: auto;
+        .asset-cell svg {
+            width: 14px;
+            height: 14px;
+            color: #1a1a1a;
+            flex-shrink: 0;
+        }
+
+    .view-btn {
+        display: inline-block;
+        border: 1.5px solid #e8552b;
+        color: #e8552b;
+        background: transparent;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 6px 18px;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 25px;
+        .view-btn:hover {
+            background: #e8552b;
+            color: #fff;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #E5E5E5;
-            border-radius: 10px;
+    th:nth-child(1), td:nth-child(1) {
+        width: 19%;
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+        width: 18%;
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 17%;
+    }
+
+    th:nth-child(4), td:nth-child(4) {
+        width: 18%;
+    }
+
+    th:nth-child(5), td:nth-child(5) {
+        width: 15%;
+    }
+
+    th:nth-child(6), td:nth-child(6) {
+        width: 13%;
+        text-align: right;
+    }
+
+    td:nth-child(6) {
+        text-align: right;
+    }
+
+    /* ---------- Footer ---------- */
+    .footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+        .footer .showing {
+            font-size: 12px;
+            color: #6b6b6b;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #E24D17;
-            border-radius: 10px;
-            border: 3px solid #E5E5E5;
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .pagination button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #dcdcdc;
+            background: #fff;
+            color: #6b6b6b;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background-color: #c74213;
+            .pagination button:hover {
+                border-color: #e8552b;
+                color: #e8552b;
+            }
+
+            .pagination button:active {
+                transform: scale(0.92);
+            }
+
+            .pagination button.page-num {
+                border: none;
+                background: transparent;
+                color: #1a1a1a;
+            }
+
+                .pagination button.page-num:hover {
+                    background: #fbeae5;
+                    color: #e8552b;
+                    border-color: transparent;
+                }
+
+            .pagination button.active {
+                background: #e8552b;
+                border-color: #e8552b;
+                color: #fff;
+            }
+
+                .pagination button.active:hover {
+                    background: #d64923;
+                    color: #fff;
+                }
+
+            .pagination button.arrow {
+                color: #888888;
             }
 </style>
 
-<section class="container-fluid  px-md-5 main-bg p-100" style="min-height: 100dvh;">
-    <div class="mb-4">
-        <h1 class="fw-bolder mb-3" style="font-size: 2.5rem;">
-            <span class="text-brand-orange">@(Model?.Count() ?? 0)</span> <span class="text-black">Employees</span>
-        </h1>
-        <p class="text-muted fw-medium mb-4" style="max-width: 800px; font-size: 0.95rem;">
-            Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien.
-        </p>
-        <a asp-controller="Employee" asp-action="Create" class="btn btn-brand-orange text-white rounded-pill px-4 py-2 fw-bold shadow-sm text-decoration-none">
-            <i class="fa-solid fa-plus me-1"></i> Create new employee
-        </a>
+<div class="page p-100 container-fluid px-4">
+
+    <!-- Title -->
+    <div class="title-section">
+        <h1><span class="num">120</span> Employees</h1>
+        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et massa mi. Aliquam in hendrerit urna. Pellentesque sit amet sapien.</p>
+        <button class="create-btn" type="button"><span class="plus">+</span> Create new employee</button>
     </div>
 
-    <div class="d-flex align-items-end gap-3 mb-4 w-100">
+    <!-- Filters -->
+    <div class="filters">
+        <div class="filters-row">
+            <!-- Status Filter -->
+            <div class="filter-group">
+                <label for="status-filter">Status</label>
+                <select id="status-filter" class="status-select">
+                    <option value="active" selected>Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
 
-        <div class="status-wrapper">
-            <label class="text-secondary mb-1" style="font-size: 12px; margin-left: 14px;">Status</label>
-            <select class="form-select rounded-pill shadow-none text-dark px-3" style="height: 46px; min-width: 160px; background-color: #f8f9fa;  cursor: pointer;">
-                <option selected>Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="all">All</option>
-            </select>
-        </div>
+            <!-- Employee Type Filter -->
+            <div class="filter-group">
+                <label for="employee-type-filter">Type</label>
+                <select id="employee-type-filter" class="status-select">
+                    <option value="all" selected>All Types</option>
+                    <option value="employee">Employee</option>
+                    <option value="non-employee">Non-Employee</option>
+                </select>
+            </div>
 
-        <div class="d-flex align-items-center px-3 rounded-pill custom-search-wrapper" style="height: 46px; min-width: 320px; background-color: #f8f9fa; ">
-            <i class="fa-solid fa-magnifying-glass text-muted me-2" style="font-size: 15px;"></i>
-            <input type="text" class="form-control bg-transparent border-0 text-dark shadow-none px-0" placeholder="Search by id or name">
-        </div>
+            <!-- Search Box -->
+            <div class="search-box">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <input type="text" placeholder="Search by id or name">
+            </div>
 
-        <button class="btn btn-brand-orange text-white rounded-3 shadow-sm d-flex align-items-center justify-content-center ms-auto" style="height: 46px; width: 46px;">
-            <i class="fa-solid fa-bars-staggered fs-5"></i>
-        </button>
-
-    </div>
-    <div class="bg-white table-container position-relative pt-4 ps-2 pe-1 pb-2 rounded-4">
-        <div class="table-responsive custom-scrollbar pe-3">
-            <table class="table custom-table align-middle text-start mb-0">
-                <thead>
-                    <tr>
-                        <th scope="col" class="border-0 ps-4 text-dark fw-medium">#</th>
-                        <th scope="col" class="border-0 text-dark fw-medium">Name</th>
-                        <th scope="col" class="border-0 text-dark fw-medium">National ID</th>
-                        <th scope="col" class="border-0 text-dark fw-medium">Used</th>
-                        <th scope="col" class="border-0"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        int indexCounter = 0;
-                        @foreach (var emp in Model)
-                        {
-                            <tr>
-                                <td class="text-dark ps-4">@indexCounter</td>
-                                <td class="text-dark fw-semibold">@emp.Name</td>
-                                <td class="text-dark">@(string.IsNullOrEmpty(emp.NationalID) ? "N/A" : emp.NationalID)</td>
-                                <td class="py-3">
-                                    <span class="badge bg-brand-orange rounded-pill me-1 px-3 py-2 fw-bold">
-                                        @emp.ActiveSimOnlyCount SIM
-                                    </span>
-                                    <span class="badge bg-brand-orange rounded-pill px-3 py-2 fw-bold">
-                                        @emp.ActiveUsbCount USB
-                                    </span>
-                                </td>
-                                <td class="text-end pe-4">
-                                    <a asp-controller="Employee" asp-action="Details" asp-route-id="@emp.Id" class="btn btn-sm btn-brand-orange text-white rounded-2 px-2 py-1">
-                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            indexCounter++;
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">No employees found.</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <!-- Filter Action Button -->
+            <div class="filter-icon-btn" role="button" tabindex="0">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 6H20M7 12H17M10 18H14" stroke="white" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </div>
         </div>
     </div>
-</section>
+    <!-- Table -->
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>employee id</th>
+                    <th>phone</th>
+                    <th>assigned assets</th>
+                    <th>Start date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Row 1 -->
+                <tr>
+                    <td>Sara Mohamed</td>
+                    <td>015FDWRFASF</td>
+                    <td>01556176733</td>
+                    <td>
+                        <div class="asset-cell">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M17 6H21V18H17" stroke="currentColor" stroke-width="1.5" />
+                            </svg>
+                            SIM<br>#202
+                        </div>
+                    </td>
+                    <td>Jan 12<br>2024</td>
+                    <td><button class="view-btn" type="button">VIEW</button></td>
+                </tr>
+                <!-- Row 2 -->
+                <tr>
+                    <td>Sara Mohamed</td>
+                    <td>015FDWRFASF</td>
+                    <td>01556176733</td>
+                    <td>
+                        <div class="asset-cell">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M17 6H21V18H17" stroke="currentColor" stroke-width="1.5" />
+                            </svg>
+                            SIM<br>#202
+                        </div>
+                    </td>
+                    <td>Jan 12<br>2024</td>
+                    <td><button class="view-btn" type="button">VIEW</button></td>
+                </tr>
+                <!-- Row 3 -->
+                <tr>
+                    <td>Sara Mohamed</td>
+                    <td>015FDWRFASF</td>
+                    <td>01556176733</td>
+                    <td>
+                        <div class="asset-cell">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M17 6H21V18H17" stroke="currentColor" stroke-width="1.5" />
+                            </svg>
+                            SIM<br>#202
+                        </div>
+                    </td>
+                    <td>Jan 12<br>2024</td>
+                    <td><button class="view-btn" type="button">VIEW</button></td>
+                </tr>
+                <!-- Row 4 -->
+                <tr>
+                    <td>Sara Mohamed</td>
+                    <td>015FDWRFASF</td>
+                    <td>01556176733</td>
+                    <td>
+                        <div class="asset-cell">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M17 6H21V18H17" stroke="currentColor" stroke-width="1.5" />
+                            </svg>
+                            SIM<br>#202
+                        </div>
+                    </td>
+                    <td>Jan 12<br>2024</td>
+                    <td><button class="view-btn" type="button">VIEW</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="showing" id="showingText">Showing 1-10 of 1,284 subscriptions</div>
+        <div class="pagination" id="paginationContainer">
+            <button class="arrow" type="button" id="prevBtn" title="Previous Page">&#8249;</button>
+            <button class="page-num" type="button" data-page="3">3</button>
+            <button class="page-num" type="button" data-page="2">2</button>
+            <button class="active" type="button" data-page="1">1</button>
+            <button class="arrow" type="button" id="nextBtn" title="Next Page">&#8250;</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const totalItems = 1284;
+        const itemsPerPage = 10;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        let currentPage = 1;
+
+        const showingText = document.getElementById("showingText");
+        const paginationContainer = document.getElementById("paginationContainer");
+
+        function updatePagination() {
+            // Calculate start and end item counts
+            const startItem = (currentPage - 1) * itemsPerPage + 1;
+            const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
+            // Update footer text dynamically
+            showingText.textContent = `Showing ${startItem}-${endItem} of ${totalItems.toLocaleString()} subscriptions`;
+
+            // Rebuild pagination buttons layout
+            let buttonsHTML = `<button class="arrow" type="button" id="prevBtn" title="Previous Page" ${currentPage === 1 ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}>&#8249;</button>`;
+
+            // Show a clean sliding window of page numbers
+            let startPage = Math.max(1, currentPage - 1);
+            let endPage = Math.min(totalPages, startPage + 2);
+            if (endPage - startPage < 2) {
+                startPage = Math.max(1, endPage - 2);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                if (i === currentPage) {
+                    buttonsHTML += `<button class="active" type="button" data-page="${i}">${i}</button>`;
+                } else {
+                    buttonsHTML += `<button class="page-num" type="button" data-page="${i}">${i}</button>`;
+                }
+            }
+
+            buttonsHTML += `<button class="arrow" type="button" id="nextBtn" title="Next Page" ${currentPage === totalPages ? 'style="opacity: 0.5; cursor: not-allowed;"' : ''}>&#8250;</button>`;
+
+            paginationContainer.innerHTML = buttonsHTML;
+        }
+
+        // Event listener for pagination clicks
+        paginationContainer.addEventListener("click", function (e) {
+            const target = e.target.closest("button");
+            if (!target) return;
+
+            if (target.classList.contains("page-num") || target.classList.contains("active")) {
+                const selectedPage = parseInt(target.getAttribute("data-page"));
+                if (selectedPage && selectedPage !== currentPage) {
+                    currentPage = selectedPage;
+                    updatePagination();
+                }
+            } else if (target.id === "prevBtn") {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updatePagination();
+                }
+            } else if (target.id === "nextBtn") {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updatePagination();
+                }
+            }
+        });
+
+        // Initialize state on load
+        updatePagination();
+    });
+</script>
