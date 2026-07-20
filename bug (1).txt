@@ -1,0 +1,57 @@
+Subject: Bug Report — Delete methods throw exception when ID not found + ServiceProvider.DisplayName required constraint
+
+Hi team,
+
+Running NUnit integration tests against the codebase using EF Core InMemory database. Found two issues that need fixes on the backend side.
+
+─────────────────────────────────────────────────────────────
+ISSUE 1 — Delete() methods throw exception when ID doesn't exist
+─────────────────────────────────────────────────────────────
+Affected repos:
+  - EmployeeRepo.Delete(Guid id)
+  - QuotaRepo.Delete(Guid id)
+  - SIMRepo.Delete(Guid id)
+
+Expected behavior:
+  Calling Delete() with a non-existent ID should do nothing silently.
+  This is standard behavior — if the record is already gone, the operation is a no-op.
+
+Actual behavior:
+  An exception is thrown when the ID doesn't exist in the database.
+
+Fix needed in each Delete() method — add a null check before removing:
+
+  var entity = _context.[DbSet].Find(id);
+  if (entity == null) return;
+  _context.[DbSet].Remove(entity);
+  _context.SaveChanges();
+
+─────────────────────────────────────────────────────────────
+ISSUE 2 — ServiceProvider requires DisplayName but it's not [Required] in the model
+─────────────────────────────────────────────────────────────
+File: Models/ServiceProvider.cs
+
+The model defines DisplayName as optional (no [Required] attribute):
+  [MaxLength(150)]
+  public string DisplayName { get; set; }
+
+But EF Core is enforcing it as required at the database level, causing this error at runtime and in tests:
+  "Required properties {'DisplayName'} are missing for the instance of entity type 'ServiceProvider'"
+
+This means somewhere in AppDbContext OnModelCreating() or in a Migration there is a constraint like:
+  .IsRequired()
+  on the DisplayName column — which contradicts the model definition.
+
+Fix needed — pick ONE of the following:
+  Option A (recommended): Remove the IsRequired() constraint from AppDbContext/Migration so it matches the model (nullable column).
+  Option B: Add [Required] to the model and make sure all ServiceProvider creation code always provides a DisplayName.
+
+Please check AppDbContext.OnModelCreating() and the latest Migration file for the ServiceProvider configuration.
+
+─────────────────────────────────────────────────────────────
+Current test results:
+  48 Passed
+  33 Failed — all 33 failures are caused by the two issues above
+  0 failures from business logic or architecture issues
+
+Thanks
