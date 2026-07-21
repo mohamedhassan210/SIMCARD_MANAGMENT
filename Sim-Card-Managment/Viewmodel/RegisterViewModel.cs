@@ -18,9 +18,5 @@ namespace Sim_Card_Managment.Viewmodel
 
         [Required]
         public Guid GroupId { get; set; }
-
-        public DateTime? LastLogin { get; set; }
-        public bool IsActive { get; set; } = true;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

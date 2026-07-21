@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-
-
 namespace Sim_Card_Managment.Repos.Account
 {
     public interface IAccountRepo
@@ -14,44 +12,26 @@ namespace Sim_Card_Managment.Repos.Account
         Task<UserOtp?> GetValidOtpByEmailAsync(string email);
         Task<User?> GetUserByEmailAsync(string email);
         bool Register(RegisterViewModel model);
-
         Task<LoginResult> Login(LoginViewmodel model);
-
         Task<bool> ResetPasswordAsync(ResetPasswordViewModel model);
-
         Task Logout();
-
         Task<UserProfileViewModel?> GetProfileByIdAsync(Guid id);
 
+        // الميثود الجديدة لجلب المجموعات من قاعدة البيانات
+        Task<List<Group>> GetAllGroupsAsync();
 
-
-        // 🔥 تم إضافة الـ Methods المتطورة لإدارة المستخدمين هنا 🔥
-
+        // 🔥 الـ Methods المتطورة لإدارة المستخدمين 🔥
         Task<List<UserListItemViewModel>> GetAllUsersAsync(string? search, Guid? groupId, bool? isActive);
-
         Task<EditUserViewModel?> GetUserForEditAsync(Guid id);
-
         Task<bool> UpdateUserAsync(EditUserViewModel model);
-
         Task<bool> ToggleUserActiveAsync(Guid id); // تجميد/تفعيل الحساب
-
         Task<bool> SoftDeleteUserAsync(Guid id);   // الحذف الذكي (إخفاء وليس مسح نهائي)
-
     }
-
-
 
     public class LoginResult
-
     {
-
         public bool IsSuccess { get; set; }
-
         public bool IsFirstLogin { get; set; }
-
         public string? ErrorMessage { get; set; }
-
     }
-
 }
-

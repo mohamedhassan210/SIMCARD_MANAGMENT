@@ -1,55 +1,36 @@
 ﻿using System;
-
 using System.Collections.Generic;
-
 using System.Linq;
-
 using System.Security.Claims;
-
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Authentication;
-
 using Microsoft.AspNetCore.Authentication.Cookies;
-
 using Microsoft.AspNetCore.Http;
-
 using Microsoft.EntityFrameworkCore;
-
 using Sim_Card_Managment.data;
-
 using Sim_Card_Managment.Models;
-
 using Sim_Card_Managment.Viewmodel;
-
-
 
 namespace Sim_Card_Managment.Repos.Account
 {
     public class AccountRepo : IAccountRepo
     {
-
         private readonly AppDbContext _context;
-
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-
         public AccountRepo(AppDbContext context, IHttpContextAccessor httpContextAccessor)
-
         {
-
             _context = context;
-
             _httpContextAccessor = httpContextAccessor;
-
         }
+
         public async Task<UserOtp> CreateAndSaveNewOtpAsync(string email, string otpCode)
         {
             var newOtp = new UserOtp
             {
                 Email = email,
                 OtpCode = otpCode,
-                ExpireDate = DateTime.Now.AddMinutes(15), // Code remains valid for 15 minutes
+                ExpireDate = DateTime.Now.AddMinutes(15), // كود صالح لمدة 15 دقيقة
                 IsUsed = false
             };
 
@@ -57,7 +38,8 @@ namespace Sim_Card_Managment.Repos.Account
             await _context.SaveChangesAsync();
             return newOtp;
         }
-    public async Task<UserOtp?> GetValidOtpByEmailAsync(string email)
+
+        public async Task<UserOtp?> GetValidOtpByEmailAsync(string email)
         {
             return await _context.UserOtps
                 .FirstOrDefaultAsync(o => o.Email == email && o.ExpireDate > DateTime.Now && !o.IsUsed);
@@ -70,128 +52,71 @@ namespace Sim_Card_Managment.Repos.Account
         }
 
         public bool Register(RegisterViewModel model)
-
         {
-
             try
-
             {
-
                 var user = new User
-
                 {
-
+                    Id = Guid.NewGuid(),
                     Username = model.Username,
-
-                    PasswordHash = model.PasswordHash,
-
+                    // تشفير كلمة المرور قبل حفظها في قاعدة البيانات
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.PasswordHash),
                     Email = model.Email,
-
                     GroupId = model.GroupId,
-
-                    IsActive = true,
-
-                    CreatedAt = DateTime.Now,
-
+                    IsActive = true, // الحساب ينزل نشط تلقائياً
+                    CreatedAt = DateTime.Now
                 };
 
                 _context.Users.Add(user);
-
                 _context.SaveChanges();
-
                 return true;
-
             }
-
             catch
-
             {
-
                 return false;
-
             }
-
         }
 
-
-
         public async Task<LoginResult> Login(LoginViewmodel model)
-
         {
-
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
-
-
-
-            if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
-
+            if (user == null || !user.IsActive || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
-
-                return new LoginResult { IsSuccess = false, ErrorMessage = "Invalid Username or Password." };
-
+                return new LoginResult { IsSuccess = false, ErrorMessage = "Invalid Username, Password, or Inactive Account." };
             }
-
-
-
             var claims = new List<Claim>
-
-            {
-
-                new Claim(ClaimTypes.Name, user.Username),
-
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-
-                new Claim(ClaimTypes.Email, user.Email ?? ""),
-
-                new Claim("GroupId", user.GroupId.ToString()),
-
-                new Claim(ClaimTypes.Role, user.Username.ToLower() == "manager" ? "Manager" : "Employee")
-
-            };
-
-
+    {
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Email, user.Email ?? ""),
+        new Claim("GroupId", user.GroupId.ToString()),
+        new Claim(ClaimTypes.Role, user.Username.ToLower() == "manager" ? "Manager" : "Employee")
+    };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-
-
             var authProperties = new AuthenticationProperties
-
             {
-
                 IsPersistent = model.RememberMe,
-
                 ExpiresUtc = model.RememberMe ? DateTimeOffset.UtcNow.AddDays(14) : null
-
             };
 
-
-
             await _httpContextAccessor.HttpContext!.SignInAsync(
-
                 CookieAuthenticationDefaults.AuthenticationScheme,
-
                 new ClaimsPrincipal(claimsIdentity),
-
                 authProperties);
 
+            user.LastLogin = DateTime.Now;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
 
-
-            if (user.PasswordHash == "123456")
-
+            if (model.Password == "123456")
             {
-
                 return new LoginResult { IsSuccess = true, IsFirstLogin = true };
-
             }
 
-
-
             return new LoginResult { IsSuccess = true, IsFirstLogin = false };
-
         }
-
-
 
         public async Task<bool> ResetPasswordAsync(ResetPasswordViewModel model)
         {
@@ -205,225 +130,119 @@ namespace Sim_Card_Managment.Repos.Account
             return true;
         }
 
-
-
         public async Task<UserProfileViewModel?> GetProfileByIdAsync(Guid id)
-
         {
-
             var user = await _context.Users.FindAsync(id);
-
-            if (user == null || user.IsActive) return null;
-
-
+            if (user == null || !user.IsActive) return null;
 
             return new UserProfileViewModel
-
             {
-
                 Id = user.Id,
-
                 FullName = user.Username,
-
                 Email = user.Email ?? "No Email",
-
                 Role = user.Username.ToLower() == "manager" ? "Manager" : "Employee"
-
             };
-
         }
-
-
 
         public async Task Logout()
-
         {
-
             await _httpContextAccessor.HttpContext!.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
         }
 
+        // جلب جميع المجموعات لربطها بالـ Dropdown في صفحة الـ View الجديد
+        public async Task<List<Group>> GetAllGroupsAsync()
+        {
+            return await _context.Groups.ToListAsync();
+        }
 
-
-        // --- 🔥 بداية ميثودز الـ User Management الجديدة والـ Advanced 🔥 ---
-
-
+        // --- 🔥 ميثودز الـ User Management والـ Advanced 🔥 ---
 
         public async Task<List<UserListItemViewModel>> GetAllUsersAsync(string? search, Guid? groupId, bool? isActive)
-
         {
-
-            // جلب المستخدمين الذين لم يتم حذفهم حذفاً ذكياً
-
-            var query = _context.Users.Where(u => u.IsActive == false).AsQueryable();
-
-
+            // جلب المستخدمين (هنا نلغي شرط u.IsActive == false ليعرض كل المستخدمين الحاليين)
+            var query = _context.Users.AsQueryable();
 
             // الفلترة بالبحث عن الاسم أو الإيميل
-
             if (!string.IsNullOrEmpty(search))
-
             {
-
                 query = query.Where(u => u.Username.Contains(search) || u.Email.Contains(search));
-
             }
-
-
 
             // الفلترة بناءً على المجموعة
-
             if (groupId.HasValue)
-
             {
-
                 query = query.Where(u => u.GroupId == groupId.Value);
-
             }
-
-
 
             // الفلترة بناءً على حالة الحساب (نشط / متجمد)
-
             if (isActive.HasValue)
-
             {
-
                 query = query.Where(u => u.IsActive == isActive.Value);
-
             }
 
-
-
             return await query.Select(u => new UserListItemViewModel
-
             {
-
                 Id = u.Id,
-
                 Username = u.Username,
-
                 Email = u.Email ?? "No Email",
-
                 IsActive = u.IsActive,
-
                 CreatedAt = u.CreatedAt,
-
                 Role = u.Username.ToLower() == "manager" ? "Manager" : "Employee"
-
             }).ToListAsync();
-
         }
-
-
 
         public async Task<EditUserViewModel?> GetUserForEditAsync(Guid id)
-
         {
-
             var user = await _context.Users.FindAsync(id);
-
-            if (user == null || user.IsActive) return null;
-
-
+            if (user == null) return null;
 
             return new EditUserViewModel
-
             {
-
                 Id = user.Id,
-
                 Username = user.Username,
-
                 Email = user.Email ?? "",
-
                 GroupId = user.GroupId,
-
                 Role = user.Username.ToLower() == "manager" ? "Manager" : "Employee"
-
             };
-
         }
-
-
 
         public async Task<bool> UpdateUserAsync(EditUserViewModel model)
-
         {
-
             var user = await _context.Users.FindAsync(model.Id);
-
-            if (user == null || user.IsActive) return false;
-
-
-
-            user.Email = model.Email;
-
-            user.GroupId = model.GroupId;
-
-
-
-            _context.Users.Update(user);
-
-            await _context.SaveChangesAsync();
-
-            return true;
-
-        }
-
-
-
-        public async Task<bool> ToggleUserActiveAsync(Guid id)
-
-        {
-
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null || user.IsActive) return false;
-
-
-
-            // عكس حالة الحساب الحالية للتجميد أو التفعيل السريع
-
-            user.IsActive = !user.IsActive;
-
-
-
-            _context.Users.Update(user);
-
-            await _context.SaveChangesAsync();
-
-            return true;
-
-        }
-
-
-
-        public async Task<bool> SoftDeleteUserAsync(Guid id)
-
-        {
-
-            var user = await _context.Users.FindAsync(id);
-
             if (user == null) return false;
 
-
-
-            // تحويل حالة الحذف الذكي إلى true ليختفي من العرض مع الحفاظ على سجلاته
-
-            user.IsActive = true;
-
-
+            user.Email = model.Email;
+            user.GroupId = model.GroupId;
 
             _context.Users.Update(user);
-
             await _context.SaveChangesAsync();
-
             return true;
-
         }
 
+        public async Task<bool> ToggleUserActiveAsync(Guid id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return false;
+
+            // عكس حالة الحساب الحالية للتجميد أو التفعيل السريع
+            user.IsActive = !user.IsActive;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> SoftDeleteUserAsync(Guid id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return false;
+
+            // الحذف الذكي: نجعل الحساب غير نشط أو نقوم بعمل حقل خاص بالـ IsDeleted لو متوفر بالموديل
+            user.IsActive = false;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
-
 }
-
