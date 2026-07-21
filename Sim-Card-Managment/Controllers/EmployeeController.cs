@@ -71,27 +71,28 @@ namespace Sim_Card_Managment.Controllers
         }
 
         // GET: /Employee/Create
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            var groupsFromDb = await _groupRepo.GetAllAsync();
-            ViewBag.GroupsList = groupsFromDb.ToList();
             return View();
         }
 
         // POST: /Employee/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Employee employee, Guid? SelectedGroupId)
+        public IActionResult Create(Employee employee)
         {
             if (!ModelState.IsValid)
             {
-                var groupsFromDb = await _groupRepo.GetAllAsync();
-                ViewBag.GroupsList = groupsFromDb.ToList();
                 return View(employee);
             }
 
+            // Set primary keys and defaults matching Employee model
             employee.Id = Guid.NewGuid();
+            employee.CreatedAt = DateTime.Now;
+            employee.IsActive = true;
+
             _employeeRepo.Add(employee);
+
             return RedirectToAction(nameof(Index));
         }
 

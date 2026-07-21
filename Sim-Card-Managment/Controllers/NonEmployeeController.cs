@@ -65,10 +65,17 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(NonEmployee nonEmployee)
         {
-            if (!ModelState.IsValid) return View(nonEmployee);
+            if (!ModelState.IsValid)
+            {
+                return View(nonEmployee);
+            }
+
             nonEmployee.Id = Guid.NewGuid();
+            nonEmployee.CreatedAt = DateTime.Now;
+
             _repo.Add(nonEmployee);
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction("Index", "Employee");
         }
 
         // GET: /NonEmployee/Edit/{id}
