@@ -11,8 +11,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Sim_Card_Managment</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/Sim_Card_Managment.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/main.css" />
+    <link rel="stylesheet" href="~/Sim_Card_Managment.styles.css"  />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/all.min.css" />
     <style>
 
@@ -171,8 +171,10 @@
         </div>
     </aside>
     <nav class="position-absolute top-0 navbar navbar-expand-lg w-100 ">
-        <div class="container">
-            <a class="navbar-brand text-white fw-bold" asp-controller="Home" asp-action="Index">FATHALL SIM</a>
+        <div class="container-fluid">
+            <a class="navbar-brand text-white fw-bold" asp-controller="home" asp-action="home">
+                <img src="~/images/Logo.svg" alt="LOGO" class="logo" />
+            </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -183,27 +185,18 @@
 
                     <li class="nav-item">
                         <a class="nav-link fw-bold px-4 text-black @(currentController == "/" && currentAction == "home" ? "active" : "")"
-                           asp-controller="/" asp-action="home">Home</a>
+                           asp-controller="/" asp-action="home">HOME</a>
                     </li>
 
                     <li class="nav-item">
                         <a class="nav-link fw-bold px-4 text-black @(currentController == "SIM" && currentAction == "Index" ? "active" : "")"
-                           asp-controller="SIM" asp-action="Index">Sim</a>
+                           asp-controller="SIM" asp-action="Index">DEVICES</a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "USB" && currentAction == "Index" ? "active" : "")"
-                           asp-controller="USB" asp-action="Index">Usb</a>
-                    </li>
-
+                   
                     <li class="nav-item">
                         <a class="nav-link fw-bold px-4 text-black @(currentController == "Employee" ? "active" : "")"
-                           asp-controller="Employee" asp-action="Index">Employees</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "NonEmployee" ? "active" : "")"
-                           asp-controller="NonEmployee" asp-action="Index">NonEmployees</a>
+                           asp-controller="Employee" asp-action="Index">USERS</a>
                     </li>
 
                 </ul>

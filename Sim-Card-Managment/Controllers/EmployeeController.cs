@@ -1,103 +1,108 @@
 using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.ViewModels;
 using Sim_Card_Managment.Repos.EmployeeRepos;
-using Sim_Card_Managment.Repos.GroupRepos; // 1. √÷›‰« «·‹ using «·Œ«’ »«·‹ Group Repo
+using Sim_Card_Managment.Repos.NonEmployeeRepos;
+using Sim_Card_Managment.Repos.GroupRepos;
 using Sim_Card_Managment.Models;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks; // √÷›‰«Â« ⁄‘«‰ «·‹ async/await
+using System.Threading.Tasks;
 
 namespace Sim_Card_Managment.Controllers
 {
   //  [RequirePermission]
     public class EmployeeController : Controller
     {
-        private readonly IEmployeeRepo _repo;
-        private readonly IGroupRepo _groupRepo; // 2. ⁄—›‰« „ €Ì— ··‹ Group Repo Â‰«
+        private readonly IEmployeeRepo _employeeRepo;
+        private readonly INonEmployeeRepo _nonEmployeeRepo;
+        private readonly IGroupRepo _groupRepo;
 
-        // 3. ﬁ„‰« »Õﬁ‰ «·‹ IGroupRepo œ«Œ· «·‹ Constructor
-        public EmployeeController(IEmployeeRepo repo, IGroupRepo groupRepo)
+        public EmployeeController(
+            IEmployeeRepo employeeRepo,
+            INonEmployeeRepo nonEmployeeRepo,
+            IGroupRepo groupRepo)
         {
-            _repo = repo;
+            _employeeRepo = employeeRepo;
+            _nonEmployeeRepo = nonEmployeeRepo;
             _groupRepo = groupRepo;
         }
 
         // GET: /Employee
-        public IActionResult Index()
+        // GET: Employee/Index
+        public async Task<IActionResult> Index(string status = "active", string type = "all")
         {
-            var employeesFromDb = _repo.GetAll()?.ToList();
-            var currentDate = DateTime.Now;
+            ViewBag.CurrentStatus = status;
+            ViewBag.CurrentType = type;
 
-            if (employeesFromDb == null)
+            var resultList = new List<PersonListItemViewModel>();
+
+            // 1. Fetch Employees
+            if (type == "all" || type == "employee")
             {
-                return View(new List<EmployeeIndexViewModel>());
+                // Calls your Employee repository method that includes Subscriptions
+                var employees = await _employeeRepo.GetPeopleListAsync(status);
+                resultList.AddRange(employees);
             }
 
-            var viewModelList = employeesFromDb.Select(emp => {
-                var activeSubs = emp.Subscriptions?
-                    .Where(s => s.StartDate <= currentDate && (s.EndDate == null || s.EndDate > currentDate))
-                    .ToList();
-
-                return new EmployeeIndexViewModel
+            // 2. Fetch Non-Employees
+            if (type == "all" || type == "non-employee")
+            {
+                if (status != "inactive") // Non-employees are fetched when status is "active" or "all"
                 {
-                    Id = emp.Id,
-                    Name = emp.Name,
-                    NationalID = emp.NationalID,
-                    ActiveSimOnlyCount = activeSubs?.Count(s => s.UsbId == null) ?? 0,
-                    ActiveUsbCount = activeSubs?.Count(s => s.UsbId != null) ?? 0
-                };
-            }).ToList();
+                    // Calls your NonEmployee repository method that includes Subscriptions
+                    var nonEmployees = await _nonEmployeeRepo.GetPeopleListAsync();
+                    resultList.AddRange(nonEmployees);
+                }
+            }
 
-            return View(viewModelList);
+            // 3. Combine and Order Alphabetically
+            var orderedModel = resultList.OrderBy(x => x.Name).ToList();
+
+            return View(orderedModel);
         }
 
         // GET: /Employee/Details/{id}
         public IActionResult Details(Guid id)
         {
-            return View();
+            var employee = _employeeRepo.GetById(id);
+            if (employee != null) return View("Details", employee);
+
+            return RedirectToAction("Details", "NonEmployee", new { id });
         }
 
-        // 4. ÕÊ·‰« œ«·… «·‹ GET ·‹ async ⁄‘«‰ «·‹ GroupRepo »Ì‘ €· »‹ Task
         // GET: /Employee/Create
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            // Ã·» «·„Ã„Ê⁄«  „‰ ﬁ«⁄œ… «·»Ì«‰«  „‰ Œ·«· «·—Ì»Ê“Ì Ê—Ì » «⁄ﬂ
-            var groupsFromDb = await _groupRepo.GetAllAsync();
-
-            // Ê÷⁄ «·„Ã„Ê⁄«  ›Ì ViewBag ⁄‘«‰ ’›Õ… «·‹ HTML  ﬁ—√Â«
-            ViewBag.GroupsList = groupsFromDb.ToList();
-
             return View();
         }
 
-        // 5.  ⁄œÌ· œ«·… «·‹ POST · ” ﬁ»· «·‹ Group «·„Œ «—…
         // POST: /Employee/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Employee employee, Guid? SelectedGroupId)
+        public IActionResult Create(Employee employee)
         {
             if (!ModelState.IsValid)
             {
-                // ·Ê «·»Ì«‰«  „‘ ﬂ«„·… Ê—Ã⁄‰« ·‰›” «·’›Õ…° »‰ÃÌ» «·‹ Groups  «‰Ì ⁄‘«‰ «·‹ Dropdown „Ì›÷«‘
-                var groupsFromDb = await _groupRepo.GetAllAsync();
-                ViewBag.GroupsList = groupsFromDb.ToList();
                 return View(employee);
             }
 
+            // Set primary keys and defaults matching Employee model
             employee.Id = Guid.NewGuid();
+            employee.CreatedAt = DateTime.Now;
+            employee.IsActive = true;
 
-            // „·ÕÊŸ…: «·‹ SelectedGroupId ‘«Ì· «·‹ ID » «⁄ «·Ã—Ê» «··Ì «Œ «—Â «·„” Œœ„ 
-            //  ﬁœ—Ì Â‰«  —»ÿÌÂ »«·„ÊŸ› √Ê »«·„” Œœ„ Õ”» «·‹ Logic «··Ì „ÿ·Ê» „‰ﬂ.
+            _employeeRepo.Add(employee);
 
-            _repo.Add(employee);
             return RedirectToAction(nameof(Index));
         }
 
         // GET: /Employee/Edit/{id}
-        public IActionResult Edit()
+        public IActionResult Edit(Guid id)
         {
-            return View();
+            var employee = _employeeRepo.GetById(id);
+            if (employee == null) return NotFound();
+            return View(employee);
         }
 
         // POST: /Employee/Edit/{id}
@@ -107,14 +112,14 @@ namespace Sim_Card_Managment.Controllers
         {
             if (id != employee.Id) return BadRequest();
             if (!ModelState.IsValid) return View(employee);
-            _repo.Update(employee);
+            _employeeRepo.Update(employee);
             return RedirectToAction(nameof(Index));
         }
 
         // GET: /Employee/Delete/{id}
         public IActionResult Delete(Guid id)
         {
-            var employee = _repo.GetById(id);
+            var employee = _employeeRepo.GetById(id);
             if (employee == null) return NotFound();
             return View(employee);
         }
@@ -124,7 +129,7 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)
         {
-            _repo.Delete(id);
+            _employeeRepo.Delete(id);
             return RedirectToAction(nameof(Index));
         }
     }

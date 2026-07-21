@@ -5,14 +5,97 @@
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/all.min.css" />
-<div class="container text-center mt-5">
-    <div class="alert alert-danger p-5 shadow-sm">
-        <h1 class="display-4 text-danger">403 - Access Denied</h1>
-        <p class="lead mt-3">Sorry, you do not have the required permissions to access this page.</p>
-        <hr class="my-4">
-        <p class="text-muted">Please contact your administrator if you believe this is a mistake.</p>
-        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-danger mt-2">Back to Home</a>
-    </div>
-</div>
 
+
+    <style>       
+
+        .container {
+            max-width: 450px;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        /* Icon Styling */
+        .icon-container {
+            margin-bottom: 10px;
+        } 
+
+        .icon-svg {
+            width: 90px;
+            height: 90px;
+        }
+
+        /* Typography */
+        .error-code {
+            font-size: 3.5rem;
+            font-weight: 300;
+            color: #DF5928; /* Primary Orange */
+            margin: 0;
+            letter-spacing: 8px;
+        }
+
+        .error-title {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin: 5px 0 20px 0;
+        }
+
+        .error-message {
+            font-size: 0.85rem;
+            color: #666666;
+            line-height: 1.5;
+            margin-bottom: 40px;
+            padding: 0 15px;
+        }
+
+        /* Divider Line */
+        .divider {
+            height: 2px;
+            background-color: #FBECE6; 
+            margin: 0 auto 30px auto;
+            width: 100%;
+        }
+
+        /* Button Styling */
+        .btn-home {
+            display: inline-block;
+            background-color: #DF5928;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 32px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+            .btn-home:hover {
+                background-color: #c94b1f;
+            }
+
+            .btn-home:active {
+                transform: scale(0.98);
+            }
+    </style>
+
+<body>
+    <div class="container">
+        <div class="icon-container">
+            <svg class="icon-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50,30 C32,30 15,45 8,50 C15,55 32,70 50,70 C58,70 65,67 72,63 C69,59 67,54 67,49 C67,39 75,31 85,31 C88,31 90,32 92,33 C85,24 68,30 50,30 Z M50,60 C44.5,60 40,55.5 40,50 C40,44.5 44.5,40 50,40 C55.5,40 60,44.5 60,50 C60,51.8 59.5,53.5 58.6,55 C55.5,52.5 51,52.5 48.5,55.5 C46,58.5 46.5,63 50,63 C49,63 50,60 50,60 Z" fill="#DF5928" />
+                <rect x="65" y="55" width="22" height="18" rx="4" fill="#DF5928" />
+                <path d="M70,55 L70,48 C70,44.7 72.7,42 76,42 C79.3,42 82,44.7 82,48 L82,55" fill="none" stroke="#DF5928" stroke-width="4.5" stroke-linecap="round" />
+            </svg>
+        </div>
+
+        <h1 class="error-code">403</h1>
+        <h2 class="error-title">Access denied</h2>
+        <p class="error-message">We're sorry, but BetorSpin is not available in your country due<br>to regulatory restrictions.</p>
+
+        <div class="divider"></div>
+
+        <a href="/" class="btn-home">Back to home</a>
+    </div>
+</body>
 <script src="~/js/bootstrap.bundle.min.js"></script>

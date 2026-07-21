@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
+using Sim_Card_Managment.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,34 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
         {
             _context = context;
         }
+        public async Task<List<PersonListItemViewModel>> GetPeopleListAsync(string status)
+        {
+            var query = _context.Employees
+                .AsNoTracking()
+                .Include(e => e.Subscriptions)
+                .AsQueryable();
 
+            if (status == "active")
+                query = query.Where(e => e.IsActive);
+            else if (status == "inactive")
+                query = query.Where(e => !e.IsActive);
+
+            return await query
+                .Select(e => new PersonListItemViewModel
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    ExtraInfo = e.Position,
+                    PersonType = "Employee",
+                    Identifier = e.NationalID,
+                    // Counts active subscriptions containing a SIM
+                    ActiveSimOnlyCount = e.Subscriptions.Count(s => s.EndDate == null && s.SimId != null),
+                    // Counts active subscriptions containing a USB
+                    ActiveUsbCount = e.Subscriptions.Count(s => s.EndDate == null && s.UsbId != null),
+                    StartDate = e.CreatedAt
+                })
+                .ToListAsync();
+        }
         public IEnumerable<Employee> GetAll()
         {
             //  „ ≈÷«›… Include ·ÃœÊ· «·«‘ —«ﬂ«  ·ﬂÌ Ì⁄„· «·‹ Count «·œÌ‰«„ÌﬂÌ ›Ì «·‹ View

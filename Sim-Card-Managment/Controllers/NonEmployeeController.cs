@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Authorization;
-using System;
+using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos.NonEmployeeRepos;
+using Sim_Card_Managment.ViewModels;
+using System;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -19,8 +20,30 @@ namespace Sim_Card_Managment.Controllers
         // GET: /NonEmployee
         public IActionResult Index()
         {
-            var nonEmployees = _repo.GetAll();
-            return View(nonEmployees);
+            var nonEmployeesFromDb = _repo.GetAll()?.ToList();
+            var currentDate = DateTime.Now;
+
+            if (nonEmployeesFromDb == null)
+            {
+                return View(new List<NonEmployeeIndexViewModel>());
+            }
+
+            var viewModelList = nonEmployeesFromDb.Select(ne => {
+                var activeSubs = ne.Subscriptions?
+                    .Where(s => s.StartDate <= currentDate && (s.EndDate == null || s.EndDate > currentDate))
+                    .ToList();
+
+                return new NonEmployeeIndexViewModel
+                {
+                    Id = ne.Id,
+                    Name = ne.Name,
+                    ContactInfo = ne.ContactInfo,
+                    ActiveSimOnlyCount = activeSubs?.Count(s => s.UsbId == null) ?? 0,
+                    ActiveUsbCount = activeSubs?.Count(s => s.UsbId != null) ?? 0
+                };
+            }).ToList();
+
+            return View(viewModelList);
         }
 
         // GET: /NonEmployee/Details/{id}
@@ -42,10 +65,17 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(NonEmployee nonEmployee)
         {
-            if (!ModelState.IsValid) return View(nonEmployee);
+            if (!ModelState.IsValid)
+            {
+                return View(nonEmployee);
+            }
+
             nonEmployee.Id = Guid.NewGuid();
+            nonEmployee.CreatedAt = DateTime.Now;
+
             _repo.Add(nonEmployee);
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction("Index", "Employee");
         }
 
         // GET: /NonEmployee/Edit/{id}

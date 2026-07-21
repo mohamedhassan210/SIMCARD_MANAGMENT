@@ -1,4 +1,5 @@
 using Sim_Card_Managment.Models;
+using Sim_Card_Managment.ViewModels;
 using System;
 using System.Collections.Generic;
 
@@ -11,5 +12,6 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
         void Add(Employee employee);
         void Update(Employee employee);
         void Delete(Guid id);
+        Task<List<PersonListItemViewModel>> GetPeopleListAsync(string status);
     }
 }
