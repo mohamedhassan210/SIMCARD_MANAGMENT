@@ -2,24 +2,60 @@
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Authorization;
-using System;
+using Sim_Card_Managment.Viewmodel;
 
 namespace Sim_Card_Managment.Controllers
 {
-   // [RequirePermission]
+    // [RequirePermission]
     public class SIMController : Controller
     {
         private readonly ISIMRepo _simRepo;
+        private readonly IUSBRepo _usbRepo;
 
-        public SIMController(ISIMRepo simRepo)
+        public SIMController(ISIMRepo simRepo, IUSBRepo usbRepo)
         {
             _simRepo = simRepo;
+            _usbRepo = usbRepo;
         }
 
         public IActionResult Index()
         {
-            var sims = _simRepo.GetAll();
-            return View(sims);
+            var sims = _simRepo.GetAll().Select(s => new DeviceDirectoryViewModel
+            {
+                Id = s.Id,
+                SerialNumber = s.SerialNumber,
+                DeviceType = "SIM",
+                ExtraInfo = s.NetworkType,
+                Identifier = s.PhoneNumber,
+                Status = s.Status,
+                AssignedTo = s.Subscriptions
+                                   .FirstOrDefault(sub => sub.EndDate == null)
+                                   ?.Employee?.Name,
+                ServiceProvider = s.ServiceProvider?.Name,
+                RegisteredAt = s.RegisteredAt
+            });
+
+            var usbs = _usbRepo.GetAll().Select(u => new DeviceDirectoryViewModel
+            {
+                Id = u.Id,
+                SerialNumber = u.SerialNumber,
+                DeviceType = "USB",
+                ExtraInfo = u.Model,
+                Identifier = null,
+                Status = u.Status,
+                AssignedTo = u.Subscriptions
+                                   .FirstOrDefault(sub => sub.EndDate == null)
+                                   ?.Employee?.Name,
+                ServiceProvider = u.ServiceProvider?.Name,
+                RegisteredAt = u.RegisteredAt
+            });
+
+            var model = sims.Concat(usbs)
+                            .OrderBy(d => d.DeviceType)
+                            .ThenBy(d => d.SerialNumber)
+                            .ToList();
+
+            return View(model);
         }
 
         [HttpGet]
@@ -35,7 +71,6 @@ namespace Sim_Card_Managment.Controllers
             {
                 sim.Id = Guid.NewGuid();
                 _simRepo.Add(sim);
-
                 return RedirectToAction(nameof(Index));
             }
 
@@ -46,10 +81,7 @@ namespace Sim_Card_Managment.Controllers
         public IActionResult Edit(Guid id)
         {
             var sim = _simRepo.GetById(id);
-
-            if (sim == null)
-                return NotFound();
-
+            if (sim == null) return NotFound();
             return View(sim);
         }
 
