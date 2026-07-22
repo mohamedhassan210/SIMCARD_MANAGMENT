@@ -21,5 +21,6 @@ namespace Sim_Card_Managment.Models
         public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
         public virtual ICollection<Sim> Sims { get; set; } = new List<Sim>();
         public virtual ICollection<Usb> Usbs { get; set; } = new List<Usb>();
+        public virtual ICollection<Quota> Quotas { get; set; }
     }
 }

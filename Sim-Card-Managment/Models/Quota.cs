@@ -23,5 +23,8 @@ namespace Sim_Card_Managment.Models
 
         // Navigation properties
         public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
+        public Guid ServiceProviderId { get; set; }
+        [ForeignKey(nameof(ServiceProviderId))]
+        public virtual ServiceProvider ServiceProvider { get; set; }
     }
 }
