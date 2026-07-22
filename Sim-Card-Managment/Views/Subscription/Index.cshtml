@@ -153,11 +153,16 @@
     <section class="p-100">
         <h1 class=" fw-bold ms-3">Subscription management</h1>
 
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex  flex-wrap justify-content-between align-items-center">
             <p class="ms-4 text-secondary">Monitor enterprise asset performance and usage metrics in real-time.</p>
-            <a class="btn active me-4 text-white rounded" style="background-color: #E24D17;" asp-controller="subscription" asp-action="create">
-                <i class="fa-solid fa-plus me-2"></i>Create new Subscription
-            </a>
+            <div class="d-flex flex-column gap-2">
+                <a class="btn active me-4 text-white rounded" style="background-color: #E24D17;" asp-controller="subscription" asp-action="create">
+                    <i class="fa-solid fa-plus me-2"></i>Exele
+                </a> <a class="btn active me-4 text-white rounded" style="background-color: #E24D17;" asp-controller="subscription" asp-action="create">
+                    <i class="fa-solid fa-plus me-2"></i>Create new Subscription
+                </a>
+            </div>
+           
 
         </div>
 

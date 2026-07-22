@@ -30,56 +30,7 @@
     </div>
     <aside class="offcanvas offcanvas-start bg-black bg-opacity-25  border-end border-secondary glass-box d-flex flex-column" tabindex="-1" id="leftSidebar" aria-labelledby="leftSidebarLabel" data-bs-theme="dark" style="border-radius: 0px 30px 30px 0px">
 
-        <style>
-            /* No border on the card itself */
-            .sidebar-accordion .accordion-item {
-                background-color: transparent;
-                border: none;
-                border-radius: 12px !important;
-                overflow: hidden;
-            }
-
-                .sidebar-accordion .accordion-item + .accordion-item {
-                    margin-top: 0.5rem;
-                }
-
-            /* Border only on the small triangle dropdown icon */
-            .sidebar-accordion .triangle-box {
-                border: 1px solid rgba(255, 255, 255, 0.35);
-                border-radius: 8px;
-            }
-
-            /* Static logout button pinned to the bottom of the sidebar */
-            .sidebar-logout-wrapper {
-                margin-top: auto;
-                padding: 1rem 1.25rem 1.25rem;
-                border-top: 1px solid rgba(255, 255, 255, 0.18);
-            }
-
-            .sidebar-logout-btn {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-                background-color: rgba(220, 53, 69, 0.15);
-                border: 1px solid rgba(220, 53, 69, 0.5);
-                color: #fff;
-                border-radius: 10px;
-                padding: 0.6rem 0.9rem;
-                font-size: 1rem;
-                transition: background-color 0.2s ease, border-color 0.2s ease;
-            }
-
-                .sidebar-logout-btn:hover {
-                    background-color: rgba(220, 53, 69, 0.35);
-                    border-color: rgba(220, 53, 69, 0.8);
-                    color: #fff;
-                }
-
-                .sidebar-logout-btn .icon-box-sub {
-                    background-color: rgba(220, 53, 69, 0.9);
-                }
-        </style>
+        
 
         <div class="offcanvas-header ">
 
@@ -107,7 +58,7 @@
                     <span class="text-white fs-6">User</span>
                 </div>
 
-                <div id="collapseUser" class="accordion-collapse collapse show " data-bs-parent="#sidebarMenu">
+                <div id="collapseUser" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
                     <div class="accordion-body p-0 pt-3 pb-3 ms-2">
                         <a asp-controller="Account" asp-action="Register" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
                             <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
@@ -228,6 +179,39 @@
                 </div>
             </div>
 
+            <div class="accordion-item mt-2">
+                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse"
+                     data-bs-target="#collapseSubscription" aria-expanded="true" style="cursor: pointer;">
+                    <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2">
+                            <path d="M12 6l-6 10h12z" />
+                        </svg>
+                    </div>
+                    <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <span class="text-white fs-6">Subscription</span>
+                </div>
+
+                <div id="collapseSubscription" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
+                    <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                        <a asp-controller="Subscription" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </div>
+                            <span class="sub-item-text">View subscription</span>
+                        </a>
+                        <a asp-controller="Subscription" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                            <span class="sub-item-text">Add subscription</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="sidebar-logout-wrapper">
@@ -240,7 +224,7 @@
         </div>
 
     </aside>
-    <nav class="position-fixed top-0 navbar navbar-expand-lg w-100 " >
+    <nav class="position-fixed top-0 navbar navbar-expand-lg w-100 ">
         <div class="container-fluid">
             <a class="navbar-brand text-white fw-bold" asp-controller="home" asp-action="home">
                 <img src="~/images/Logo.svg" alt="LOGO" class="logo" />
