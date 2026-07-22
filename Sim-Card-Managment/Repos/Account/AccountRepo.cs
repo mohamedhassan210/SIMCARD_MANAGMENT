@@ -90,6 +90,7 @@ namespace Sim_Card_Managment.Repos.Account
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new Claim(ClaimTypes.Email, user.Email ?? ""),
         new Claim("GroupId", user.GroupId.ToString()),
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new Claim(ClaimTypes.Role, user.Username.ToLower() == "manager" ? "Manager" : "Employee")
     };
 

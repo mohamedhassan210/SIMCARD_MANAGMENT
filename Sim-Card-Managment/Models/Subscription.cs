@@ -13,12 +13,12 @@ namespace Sim_Card_Managment.Models
         public Guid? NonEmployeeId { get; set; }  //nullable if assigned to Employee
 
         [Required]
-        public Guid SimId { get; set; }
+        public Guid? SimId { get; set; }
 
         public Guid? UsbId { get; set; }
 
         [Required]
-        public Guid QuotaId { get; set; }
+        public Guid? QuotaId { get; set; }
             
         [Required]
         public Guid ActionId { get; set; }
@@ -44,13 +44,13 @@ namespace Sim_Card_Managment.Models
         public virtual NonEmployee? NonEmployee { get; set; }
 
         [ForeignKey(nameof(SimId))]
-        public virtual Sim Sim { get; set; } = null!;
+        public virtual Sim? Sim { get; set; } = null!;
 
         [ForeignKey(nameof(UsbId))]
         public virtual Usb? Usb { get; set; }
 
         [ForeignKey(nameof(QuotaId))]
-        public virtual Quota Quota { get; set; } = null!;
+        public virtual Quota? Quota { get; set; } = null!;
 
         [ForeignKey(nameof(ActionId))]
         public virtual DeviceAction Action { get; set; } = null!;

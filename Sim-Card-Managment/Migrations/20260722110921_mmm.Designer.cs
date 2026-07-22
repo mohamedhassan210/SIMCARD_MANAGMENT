@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sim_Card_Managment.data;
 
@@ -11,9 +12,11 @@ using Sim_Card_Managment.data;
 namespace Sim_Card_Managment.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260722110921_mmm")]
+    partial class mmm
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -589,8 +592,7 @@ namespace Sim_Card_Managment.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid?>("QuotaId")
-                        .IsRequired()
+                    b.Property<Guid>("QuotaId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("SimId")

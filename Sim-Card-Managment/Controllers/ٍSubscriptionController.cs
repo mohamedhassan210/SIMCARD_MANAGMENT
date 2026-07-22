@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
+using Sim_Card_Managment.Repos.Account;
+using Sim_Card_Managment.Repos.EmployeeRepos;
 using Sim_Card_Managment.Repos.QuoteRepo;
+using Sim_Card_Managment.Viewmodel;
+using Sim_Card_Managment.ViewModels;
+using System.Security.Claims;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -12,125 +16,168 @@ namespace Sim_Card_Managment.Controllers
         private readonly ISIMRepo _simRepo;
         private readonly IUSBRepo _usbRepo;
         private readonly IQuotaRepo _quotaRepo;
+        private readonly IEmployeeRepo _employeeRepo;
+        private readonly IDeviceActionRepo _actionRepo;
+        private readonly IAccountRepo _accountRepo;
 
         public SubscriptionController(
             ISubscriptionRepo subscriptionRepo,
             ISIMRepo simRepo,
             IUSBRepo usbRepo,
-            IQuotaRepo quotaRepo)
+            IQuotaRepo quotaRepo,
+            IEmployeeRepo employeeRepo,
+            IDeviceActionRepo actionRepo,
+            IAccountRepo accountRepo)
         {
             _subscriptionRepo = subscriptionRepo;
             _simRepo = simRepo;
             _usbRepo = usbRepo;
             _quotaRepo = quotaRepo;
+            _employeeRepo = employeeRepo;
+            _actionRepo = actionRepo;
+            _accountRepo = accountRepo;
         }
 
+        // GET: Subscription/Index
+        [HttpGet]
         public IActionResult Index()
         {
             var subscriptions = _subscriptionRepo.GetAll();
+            ViewBag.SubscriptionCount = subscriptions.Count();
             return View(subscriptions);
         }
 
+        // GET: Subscription/Create
         [HttpGet]
         public IActionResult Create()
         {
-            LoadLists();
-            return View();
+            var model = new SubscriptionCreateViewModel
+            {
+                StartDate = DateTime.Today,
+                ContractDurationYears = 1
+            };
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Subscription subscription)
+        public IActionResult Create(SubscriptionCreateViewModel model)
         {
-            if (ModelState.IsValid)
+            // 1. Get the current user ID from the authentication claims cookie
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
-                subscription.Id = Guid.NewGuid();
-
-                _subscriptionRepo.Add(subscription);
-
-                TempData["Success"] = "Subscription Added Successfully";
-                return RedirectToAction(nameof(Index));
+                // Fallback: If for any reason the claim is missing, fetch a default user ID from DB
+                var defaultUser = _accountRepo.GetAllUsersAsync(null, null, true).Result.FirstOrDefault();
+                if (defaultUser != null)
+                {
+                    currentUserId = defaultUser.Id;
+                }
+                else
+                {
+                    ModelState.AddModelError("", "User authentication error. Please log in again.");
+                    return View(model);
+                }
             }
 
-            LoadLists();
-            return View(subscription);
-        }
+            // 2. Fetch Action from Repo
+            var createAction = _actionRepo.GetAllDeviceActions().FirstOrDefault(a => a.Name == "CreateSubscription")
+                              ?? _actionRepo.GetAllDeviceActions().FirstOrDefault();
 
-        [HttpGet]
-        public IActionResult Edit(/*Guid id*/)
-        {
-            //var subscription = _subscriptionRepo.GetById(id);
+            var actionId = createAction != null ? createAction.Id : Guid.NewGuid();
 
-            //if (subscription == null)
-            //    return NotFound();
-
-            //LoadLists();
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(Subscription subscription)
-        {
-            if (ModelState.IsValid)
+            // 3. Create Subscription Entity
+            var subscription = new Subscription
             {
-                _subscriptionRepo.Update(subscription);
+                Id = Guid.NewGuid(),
+                EmpId = model.SelectedEmployeeId,
 
-                TempData["Success"] = "Subscription Updated Successfully";
-                return RedirectToAction(nameof(Index));
-            }
+                SimId = model.DeviceType == "SIM" ? model.SelectedSimId.GetValueOrDefault() : Guid.Empty,
+                QuotaId = model.DeviceType == "SIM" ? model.SelectedQuotaId.GetValueOrDefault() : Guid.Empty,
+                UsbId = model.DeviceType == "USB" ? model.SelectedUsbId : null,
 
-            LoadLists();
-            return View(subscription);
-        }
+                ActionId = actionId,
 
-        [HttpGet]
-        public IActionResult Delete(Guid id)
-        {
-            var subscription = _subscriptionRepo.GetById(id);
+                // Set the authenticated user ID as CreatedBy
+                CreatedBy = currentUserId,
 
-            if (subscription == null)
-                return NotFound();
+                StartDate = model.StartDate,
+                EndDate = model.StartDate.AddYears(model.ContractDurationYears > 0 ? model.ContractDurationYears : 1),
+                CreatedDate = DateTime.Now
+            };
 
-            return View(subscription);
-        }
+            // 4. Save & Redirect
+            _subscriptionRepo.Add(subscription);
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(Guid id)
-        {
-            _subscriptionRepo.Delete(id);
-
-            TempData["Success"] = "Subscription Deleted Successfully";
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Details(Guid id)
+        // AJAX: Search Employees
+        [HttpGet]
+        public async Task<IActionResult> SearchEmployees(string query)
         {
-            var subscription = _subscriptionRepo.GetById(id);
+            if (string.IsNullOrWhiteSpace(query))
+                return Json(new List<object>());
 
-            if (subscription == null)
-                return NotFound();
+            var employees = await _employeeRepo.SearchActiveEmployeesAsync(query);
 
-            return View(subscription);
+            var result = employees.Select(e => new {
+                id = e.Id,
+                name = e.Name,
+                details = $"National ID: {e.NationalID}"
+            });
+
+            return Json(result);
         }
 
-        private void LoadLists()
+        // AJAX: Search SIMs
+        [HttpGet]
+        public async Task<IActionResult> SearchSims(string query)
         {
-            ViewBag.Sims = new SelectList(
-                _simRepo.GetAll(),
-                "Id",
-                "SerialNumber");
+            var sims = await _simRepo.GetAvailableSimsAsync(query);
 
-            ViewBag.Usbs = new SelectList(
-                _usbRepo.GetAll(),
-                "Id",
-                "SerialNumber");
+            var result = sims.Select(s => new {
+                id = s.Id,
+                phoneNumber = s.PhoneNumber,
+                serialNumber = s.SerialNumber,
+                networkType = s.NetworkType,
+                providerName = s.ServiceProvider?.Name ?? "Unknown",
+                providerId = s.ServiceProviderId
+            });
 
-            ViewBag.Quotas = new SelectList(
-                _quotaRepo.GetAll(),
-                "Id",
-                "BaseAmount");
+            return Json(result);
+        }
+
+        // AJAX: Search USBs
+        [HttpGet]
+        public async Task<IActionResult> SearchUsbs(string query)
+        {
+            var usbs = await _usbRepo.GetAvailableUsbsAsync(query);
+
+            var result = usbs.Select(u => new {
+                id = u.Id,
+                model = u.Model,
+                serialNumber = u.SerialNumber,
+                providerName = u.ServiceProvider?.Name ?? "Unknown"
+            });
+
+            return Json(result);
+        }
+
+        // AJAX: Get Quotas by Provider
+        [HttpGet]
+        public async Task<IActionResult> GetQuotasByProvider(Guid providerId)
+        {
+            var quotas = await _quotaRepo.GetQuotasByProviderIdAsync(providerId);
+
+            var result = quotas.Select(q => new {
+                id = q.Id,
+                baseAmount = q.BaseAmount,
+                extraAmount = q.ExtraAmount
+            });
+
+            return Json(result);
         }
     }
 }

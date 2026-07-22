@@ -13,5 +13,6 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
         void Update(Employee employee);
         void Delete(Guid id);
         Task<List<PersonListItemViewModel>> GetPeopleListAsync(string status);
+        Task<IEnumerable<Employee>> SearchActiveEmployeesAsync(string query);
     }
 }

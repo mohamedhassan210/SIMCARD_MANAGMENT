@@ -1,4 +1,5 @@
-﻿using Sim_Card_Managment.data;
+﻿using Microsoft.EntityFrameworkCore;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 
 namespace Sim_Card_Managment.Repos.QuoteRepo
@@ -11,7 +12,12 @@ namespace Sim_Card_Managment.Repos.QuoteRepo
         {
             _context = context;
         }
-
+        public async Task<IEnumerable<Quota>> GetQuotasByProviderIdAsync(Guid providerId)
+        {
+            return await _context.Quotas
+                .Where(q => q.ServiceProviderId == providerId)
+                .ToListAsync();
+        }
         public IEnumerable<Quota> GetAll()
         {
             return _context.Quotas.ToList();

@@ -16,6 +16,13 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
         {
             _context = context;
         }
+        public async Task<IEnumerable<Employee>> SearchActiveEmployeesAsync(string query)
+        {
+            return await _context.Employees
+                .Where(e => e.IsActive && (e.Name.Contains(query) || e.NationalID.Contains(query)))
+                .Take(6)
+                .ToListAsync();
+        }
         public async Task<List<PersonListItemViewModel>> GetPeopleListAsync(string status)
         {
             var query = _context.Employees

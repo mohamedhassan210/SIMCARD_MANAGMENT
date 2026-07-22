@@ -12,11 +12,21 @@ namespace Sim_Card_Managment.Repos
         {
             _context = context;
         }
+
         public async Task<IEnumerable<Usb>> GetAvailableUsbsAsync()
         {
             return await _context.Usbs
                 // بتعدل الـ Where دي برضه عشان تجيب الأجهزة الفاضية بس
                 .Where(u => !_context.Serials.Any(ser => ser.UsbId == u.Id))
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<Usb>> GetAvailableUsbsAsync(string query)
+        {
+            return await _context.Usbs
+                .Include(u => u.ServiceProvider)
+                .Where(u => u.Status == "Active" &&
+                            (string.IsNullOrEmpty(query) || u.SerialNumber.Contains(query) || u.Model.Contains(query)))
+                .Take(6)
                 .ToListAsync();
         }
         public IEnumerable<Usb> GetAll()

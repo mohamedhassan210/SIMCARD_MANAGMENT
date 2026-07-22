@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.CodeCoverage;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 
@@ -19,7 +20,15 @@ namespace Sim_Card_Managment.Repos
                 .Where(s => !_context.Serials.Any(ser => ser.SimId == s.Id))
                 .ToListAsync();
         }
-
+        public async Task<IEnumerable<Sim>> GetAvailableSimsAsync(string query)
+        {
+            return await _context.Sims
+                .Include(s => s.ServiceProvider)
+                .Where(s => s.Status == "Active" &&
+                            (string.IsNullOrEmpty(query) || s.PhoneNumber.Contains(query) || s.SerialNumber.Contains(query)))
+                .Take(6)
+                .ToListAsync();
+        }
         public IEnumerable<Sim> GetAll()
         {
             return _context.Sims.ToList();

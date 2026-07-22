@@ -1,10 +1,10 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Sim_Card_Managment.Viewmodel.SubscriptionCreateViewModel
+
 @{
+    ViewData["Title"] = "Create New Subscription";
 }
+
 <style>
-    /* Custom Styling for specific colors and border */
     .step-circle {
         width: 32px;
         height: 32px;
@@ -17,13 +17,11 @@
         color: #333333;
     }
 
-    /* Active Step Styling */
     .step-active .step-circle {
         background-color: #e65319;
         color: #ffffff;
     }
 
-    /* Inactive Step Styling */
     .step-inactive .step-circle {
         background-color: #e8e8e8;
         color: #a0a0a0;
@@ -35,10 +33,9 @@
         padding: 40px;
         max-width: 850px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        margin:0 auto;
+        margin: 0 auto;
     }
 
-    /* Custom Header Styles */
     .section-title {
         font-size: 1.25rem;
         font-weight: 700;
@@ -54,7 +51,6 @@
             font-size: 1.2rem;
         }
 
-    /* Form Controls */
     .custom-form-label {
         font-size: 0.8rem;
         font-weight: 600;
@@ -67,20 +63,19 @@
 
     .custom-form-control,
     .custom-form-select {
-        border-radius: 50px; /* Made it a pill shape */
-        padding: 0.6rem 1.25rem; /* Adjusted padding for the pill curve */
+        border-radius: 50px;
+        padding: 0.6rem 1.25rem;
         font-size: 0.9rem;
-        border: 2px solid #dee2e6 !important; /* Explicit border in static state */
+        border: 2px solid #dee2e6 !important;
     }
 
         .custom-form-control:focus,
         .custom-form-select:focus {
             border-color: #e65319 !important;
-            box-shadow: none; /* Removed the outer focus shadow/glow */
+            box-shadow: none;
             outline: none;
         }
 
-    /* Selectable Cards */
     .selection-card {
         border: 1px solid #dee2e6;
         border-radius: 12px;
@@ -113,7 +108,6 @@
         margin: 0;
     }
 
-    /* Checkmark for active employee card */
     .check-icon {
         position: absolute;
         right: 16px;
@@ -128,11 +122,9 @@
         display: block;
     }
 
-    /* Toggle Buttons (SIM / USB) */
     .type-toggle-btn {
         flex: 1;
         padding: 10px 16px;
-        border: 1px solid #dee2e6;
         font-weight: 600;
         font-size: 0.95rem;
         text-align: center;
@@ -144,46 +136,32 @@
         .type-toggle-btn.active {
             background-color: #e65319;
             color: #ffffff;
-            border-color: #e65319;
         }
 
     .toggle-group {
         display: flex;
         max-width: 280px;
-        border-radius: 50px; /* Made the toggle group pill shaped too */
+        border-radius: 50px;
         overflow: hidden;
         margin-bottom: 24px;
-        border: 1px solid #dee2e6; /* Added border to toggle group */
+        border: 1px solid #dee2e6;
     }
 
-        .toggle-group .type-toggle-btn {
-            border: none; /* Remove individual borders since group has one */
+        .toggle-group .type-toggle-btn:first-child {
+            border-right: 1px solid #dee2e6;
         }
 
-            .toggle-group .type-toggle-btn:first-child {
-                border-right: 1px solid #dee2e6; /* Add border between buttons */
-            }
-
-            .toggle-group .type-toggle-btn.active {
-                border-right-color: #e65319;
-            }
-
-
-    /* SIM Card specific styling */
     .sim-card-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
+        align-items: center;
         margin-bottom: 12px;
     }
 
-    .sim-icon {
-        color: #6c757d;
-        font-size: 1.2rem;
-    }
-
-    .selection-card.active .sim-icon {
-        color: #e65319;
+    .sp-logo-img {
+        height: 24px;
+        max-width: 70px;
+        object-fit: contain;
     }
 
     .badge-available {
@@ -195,7 +173,6 @@
         padding: 3px 8px;
     }
 
-    /* Helper/Status Text */
     .status-text {
         font-size: 0.75rem;
         color: #e65319;
@@ -205,7 +182,6 @@
         gap: 6px;
     }
 
-    /* Checkbox & Bottom Actions */
     .terms-text {
         font-size: 0.85rem;
         color: #212529;
@@ -219,11 +195,6 @@
 
     .form-check-input:checked {
         background-color: #e65319;
-        border-color: #e65319;
-    }
-
-    .form-check-input:focus {
-        box-shadow: none;
         border-color: #e65319;
     }
 
@@ -241,19 +212,11 @@
         background-color: #ffffff;
     }
 
-        .btn-outline-back:hover {
-            background-color: #f8f9fa;
-        }
-
     .btn-draft {
         background-color: #a0a0a0;
         color: #ffffff;
         border: none;
     }
-
-        .btn-draft:hover {
-            background-color: #8e8e8e;
-        }
 
     .btn-activate {
         background-color: #e65319;
@@ -271,7 +234,7 @@
         <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
             <ol class="breadcrumb mb-4" style="font-size: 0.8rem; font-weight: 500;">
                 <li class="breadcrumb-item">
-                    <a asp-controller="subscription" asp-action="index" class="text-decoration-none text-muted">Subscription</a>
+                    <a asp-controller="Subscription" asp-action="Index" class="text-decoration-none text-muted">Subscription</a>
                 </li>
                 <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">
                     Create new subscription
@@ -293,158 +256,337 @@
     <div class="row">
         <div class="col-12 col-md-3 col-lg-2">
             <div class="d-flex align-items-center mb-4 step-active">
-                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">
-                    1
-                </div>
-                <div class="step-text fw-bold">
-                    Employee
-                </div>
+                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">1</div>
+                <div class="step-text fw-bold">Employee</div>
             </div>
-
             <div class="d-flex align-items-center mb-4 step-inactive">
-                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">
-                    2
-                </div>
-                <div class="step-text">
-                    Device
-                </div>
+                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">2</div>
+                <div class="step-text">Device</div>
             </div>
-
             <div class="d-flex align-items-center step-inactive">
-                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">
-                    3
-                </div>
-                <div class="step-text">
-                    Schedule
-                </div>
+                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">3</div>
+                <div class="step-text">Schedule</div>
             </div>
         </div>
 
         <div class="col-12 col-md-9 col-lg-10">
-            <div class="form-container">
+            <form asp-action="Create" method="post" id="createSubscriptionForm">
+                <div class="form-container">
 
-                <div class="mb-5">
-                    <h2 class="section-title">
-                        <i class="fas fa-user"></i> Select Employee
-                    </h2>
+                    <input type="hidden" asp-for="SelectedEmployeeId" id="SelectedEmployeeId" />
+                    <input type="hidden" asp-for="DeviceType" id="DeviceType" value="SIM" />
+                    <input type="hidden" asp-for="SelectedSimId" id="SelectedSimId" />
+                    <input type="hidden" asp-for="SelectedUsbId" id="SelectedUsbId" />
+                    <input type="hidden" asp-for="SelectedQuotaId" id="SelectedQuotaId" />
 
-                    <div class="mb-4">
-                        <label class="custom-form-label">Employee Search</label>
-                        <input type="text" class="form-control custom-form-control bo" placeholder="Search by name or id">
-                    </div>
+                    <div class="mb-5">
+                        <h2 class="section-title">
+                            <i class="fas fa-user"></i> Select Employee
+                        </h2>
 
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="selection-card active">
-                                <div class="card-title-text">Mohamed Hussien</div>
-                                <p class="card-subtitle-text">HR manager - ID 2334</p>
-                                <i class="fas fa-check-circle check-icon"></i>
+                        <div class="mb-4">
+                            <label class="custom-form-label">Employee Search</label>
+                            <input type="text" id="empSearchInput" class="form-control custom-form-control" placeholder="Search by name or id">
+                        </div>
+
+                        <div class="row g-4" id="employeeCardsContainer">
+                            <div class="col-12 text-muted small fst-italic">
+                                Search for an employee above to display selection cards.
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="selection-card">
-                                <div class="card-title-text">Mohamed Hussien</div>
-                                <p class="card-subtitle-text">HR manager - ID 2334</p>
-                            </div>
+
+                        <div class="status-text mt-3" id="empStatusText" style="display: none;">
+                            <i class="fas fa-info-circle"></i> <span id="empStatusName">None</span> selected
                         </div>
                     </div>
 
-                    <div class="status-text">
-                        <i class="fas fa-info-circle"></i> Sara mohamed selected
-                    </div>
-                </div>
+                    <div class="mb-5">
+                        <h2 class="section-title">
+                            <i class="fas fa-sim-card"></i> Device type
+                        </h2>
 
-                <div class="mb-5">
-                    <h2 class="section-title">
-                        <i class="fas fa-sim-card"></i> Device type
-                    </h2>
-
-                    <div class="toggle-group">
-                        <div class="type-toggle-btn active">SIM Card</div>
-                        <div class="type-toggle-btn text-muted">Usb</div>
-                    </div>
-
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-6">
-                            <label class="custom-form-label">SIM cards</label>
-                            <input type="text" class="form-control custom-form-control" placeholder="Search by name or id">
+                        <div class="toggle-group">
+                            <div class="type-toggle-btn active" id="btnToggleSim" onclick="switchDeviceType('SIM')">SIM Card</div>
+                            <div class="type-toggle-btn text-muted" id="btnToggleUsb" onclick="switchDeviceType('USB')">USB</div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="custom-form-label">select sim</label>
-                            <select class="form-select custom-form-select">
-                                <option selected>015524578710</option>
-                                <option value="1">015524578711</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="selection-card active">
-                                <div class="sim-card-header">
-                                    <i class="fas fa-sim-card sim-icon"></i>
-                                    <span class="badge-available">Available</span>
+                        <div id="simSection">
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="custom-form-label">SIM Search</label>
+                                    <input type="text" id="simSearchInput" class="form-control custom-form-control" placeholder="Search by phone or serial">
                                 </div>
-                                <div class="card-title-text">5G SIM</div>
-                                <p class="card-subtitle-text">Provider : We</p>
-                                <p class="card-subtitle-text">Serial : 250154541.013100</p>
+                            </div>
+                            <div class="row g-4" id="simCardsContainer"></div>
+                            <div class="status-text mt-3" id="simStatusText" style="display: none;">
+                                <i class="fas fa-info-circle"></i> <span id="simStatusSerial">None</span> selected
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="selection-card">
-                                <div class="sim-card-header">
-                                    <i class="fas fa-sim-card sim-icon"></i>
-                                    <span class="badge-available">Available</span>
+
+                        <div id="usbSection" style="display: none;">
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="custom-form-label">USB Search</label>
+                                    <input type="text" id="usbSearchInput" class="form-control custom-form-control" placeholder="Search by model or serial">
                                 </div>
-                                <div class="card-title-text">5G SIM</div>
-                                <p class="card-subtitle-text">Provider : We</p>
-                                <p class="card-subtitle-text">Serial : 250154541.013100</p>
+                            </div>
+                            <div class="row g-4" id="usbCardsContainer"></div>
+                            <div class="status-text mt-3" id="usbStatusText" style="display: none;">
+                                <i class="fas fa-info-circle"></i> <span id="usbStatusSerial">None</span> selected
                             </div>
                         </div>
                     </div>
 
-                    <div class="status-text">
-                        <i class="fas fa-info-circle"></i> 250154541.013100 selected
-                    </div>
-                </div>
-
-                <div class="mb-5">
-                    <h2 class="section-title">
-                        <i class="far fa-clock"></i> Schedule
-                    </h2>
-
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label class="custom-form-label">Activation date</label>
-                            <input type="text" class="form-control custom-form-control" placeholder="8/7/2026" value="8/7/2026">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="custom-form-label">Contract duration</label>
-                            <select class="form-select custom-form-select">
-                                <option selected>1 year</option>
-                                <option value="2">2 years</option>
-                                <option value="3">3 years</option>
-                            </select>
+                    <div class="mb-5" id="quotaAreaSection">
+                        <h2 class="section-title">
+                            <i class="fas fa-tachometer-alt"></i> Quota
+                        </h2>
+                        <p class="text-muted small" id="quotaInstruction">Select a SIM card first to view provider quotas.</p>
+                        <div class="row g-4" id="quotaCardsContainer"></div>
+                        <div class="status-text mt-3" id="quotaStatusText" style="display: none;">
+                            <i class="fas fa-info-circle"></i> <span id="quotaStatusVal">None</span> selected
                         </div>
                     </div>
-                </div>
 
-                <div class="form-check mb-5 d-flex align-items-start gap-2">
-                    <input class="form-check-input mt-1" type="checkbox" id="termsCheck">
-                    <label class="form-check-label terms-text" for="termsCheck">
-                        I agree to the <a href="#">Terms & Conditions</a> and privacy policy. I acknowledge that the selected employee is solely responsible for the use of the assigned asset.
-                    </label>
-                </div>
+                    <div class="mb-5">
+                        <h2 class="section-title">
+                            <i class="far fa-clock"></i> Schedule
+                        </h2>
 
-                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                    <button type="button" class="btn btn-action btn-outline-back">Back</button>
-                    <div class="d-flex gap-3">
-                        <button type="button" class="btn btn-action btn-draft">Save Draft</button>
-                        <button type="button" class="btn btn-action btn-activate">Activate Subscription</button>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="custom-form-label">Activation date</label>
+                                <input type="date" asp-for="StartDate" class="form-control custom-form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="custom-form-label">Contract duration</label>
+                                <select asp-for="ContractDurationYears" class="form-select custom-form-select">
+                                    <option value="1">1 year</option>
+                                    <option value="2">2 years</option>
+                                    <option value="3">3 years</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-            </div>
+                    <div class="form-check mb-5 d-flex align-items-start gap-2">
+                        <input class="form-check-input mt-1" type="checkbox" asp-for="AgreedToTerms" id="termsCheck">
+                        <label class="form-check-label terms-text" for="termsCheck">
+                            I agree to the <a href="#">Terms & Conditions</a> and privacy policy. I acknowledge that the selected employee is solely responsible for the use of the assigned asset.
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-action btn-outline-back text-center text-decoration-none">Back</a>
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-action btn-draft">Save Draft</button>
+                            <button type="submit" class="btn btn-action btn-activate">Activate Subscription</button>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        function getProviderLogo(providerName) {
+            const name = (providerName || '').toLowerCase();
+            if (name.includes('orange')) return '/images/orange-logo.png';
+            if (name.includes('vodafone')) return '/images/vodafone-logo.png';
+            if (name.includes('we')) return '/images/we-logo.png';
+            if (name.includes('etisalat')) return '/images/etisalat-logo.png';
+            return '';
+        }
+
+        // Live Employee Search
+        $('#empSearchInput').on('input', function () {
+            const query = $(this).val();
+            if (!query.trim()) {
+                $('#employeeCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search for an employee above to display selection cards.</div>');
+                return;
+            }
+
+            $.get('/Subscription/SearchEmployees', { query: query }, function (data) {
+                let html = '';
+                if (!data || data.length === 0) {
+                    html = '<div class="col-12 text-muted small">No active employees found matching query.</div>';
+                } else {
+                    data.forEach(emp => {
+                        const isSelected = $('#SelectedEmployeeId').val() === emp.id;
+                        html += `
+                            <div class="col-md-6">
+                                <div class="selection-card ${isSelected ? 'active' : ''}" onclick="selectEmployee('${emp.id}', '${emp.name}', this)">
+                                    <div class="card-title-text">${emp.name}</div>
+                                    <p class="card-subtitle-text">${emp.details}</p>
+                                    <i class="fas fa-check-circle check-icon"></i>
+                                </div>
+                            </div>`;
+                    });
+                }
+                $('#employeeCardsContainer').html(html);
+            });
+        });
+
+        function selectEmployee(id, name, cardEl) {
+            $('#employeeCardsContainer .selection-card').removeClass('active');
+            $(cardEl).addClass('active');
+            $('#SelectedEmployeeId').val(id);
+            $('#empStatusName').text(name);
+            $('#empStatusText').show();
+        }
+
+        // Switch Device Type
+        function switchDeviceType(type) {
+            $('#DeviceType').val(type);
+            if (type === 'SIM') {
+                $('#btnToggleSim').addClass('active').removeClass('text-muted');
+                $('#btnToggleUsb').removeClass('active').addClass('text-muted');
+                $('#simSection').show();
+                $('#usbSection').hide();
+                $('#quotaAreaSection').slideDown();
+
+                $('#SelectedUsbId').val('');
+                $('#usbStatusText').hide();
+            } else {
+                $('#btnToggleUsb').addClass('active').removeClass('text-muted');
+                $('#btnToggleSim').removeClass('active').addClass('text-muted');
+                $('#usbSection').show();
+                $('#simSection').hide();
+                $('#quotaAreaSection').slideUp();
+
+                $('#SelectedSimId').val('');
+                $('#SelectedQuotaId').val('');
+                $('#simStatusText').hide();
+                $('#quotaStatusText').hide();
+                loadUsbs('');
+            }
+        }
+
+        // SIM Search
+        $('#simSearchInput').on('input', function () {
+            loadSims($(this).val());
+        });
+
+        function loadSims(query) {
+            $.get('/Subscription/SearchSims', { query: query }, function (data) {
+                let html = '';
+                if (!data || data.length === 0) {
+                    html = '<div class="col-12 text-muted small">No available SIM cards found.</div>';
+                } else {
+                    data.forEach(sim => {
+                        const logoSrc = getProviderLogo(sim.providerName);
+                        const logoHtml = logoSrc
+                            ? `<img src="${logoSrc}" alt="${sim.providerName}" class="sp-logo-img" />`
+                            : `<span class="fw-bold text-dark" style="font-size:0.85rem">${sim.providerName}</span>`;
+
+                        const isSelected = $('#SelectedSimId').val() === sim.id;
+                        html += `
+                            <div class="col-md-6">
+                                <div class="selection-card ${isSelected ? 'active' : ''}" onclick="selectSim('${sim.id}', '${sim.phoneNumber}', '${sim.providerId}', this)">
+                                    <div class="sim-card-header">
+                                        ${logoHtml}
+                                        <span class="badge-available">Active</span>
+                                    </div>
+                                    <div class="card-title-text">${sim.networkType} SIM (${sim.phoneNumber})</div>
+                                    <p class="card-subtitle-text">Provider : ${sim.providerName}</p>
+                                    <p class="card-subtitle-text">Serial : ${sim.serialNumber}</p>
+                                    <i class="fas fa-check-circle check-icon"></i>
+                                </div>
+                            </div>`;
+                    });
+                }
+                $('#simCardsContainer').html(html);
+            });
+        }
+
+        function selectSim(simId, phoneNumber, providerId, cardEl) {
+            $('#simCardsContainer .selection-card').removeClass('active');
+            $(cardEl).addClass('active');
+            $('#SelectedSimId').val(simId);
+            $('#simStatusSerial').text(phoneNumber);
+            $('#simStatusText').show();
+
+            loadQuotasForProvider(providerId);
+        }
+
+        // USB Search
+        $('#usbSearchInput').on('input', function () {
+            loadUsbs($(this).val());
+        });
+
+        function loadUsbs(query) {
+            $.get('/Subscription/SearchUsbs', { query: query }, function (data) {
+                let html = '';
+                if (!data || data.length === 0) {
+                    html = '<div class="col-12 text-muted small">No available USB modems found.</div>';
+                } else {
+                    data.forEach(usb => {
+                        const isSelected = $('#SelectedUsbId').val() === usb.id;
+                        html += `
+                            <div class="col-md-6">
+                                <div class="selection-card ${isSelected ? 'active' : ''}" onclick="selectUsb('${usb.id}', '${usb.serialNumber}', this)">
+                                    <div class="sim-card-header">
+                                        <i class="fas fa-usb text-secondary" style="font-size: 1.2rem;"></i>
+                                        <span class="badge-available">Active</span>
+                                    </div>
+                                    <div class="card-title-text">${usb.model}</div>
+                                    <p class="card-subtitle-text">Provider : ${usb.providerName}</p>
+                                    <p class="card-subtitle-text">Serial : ${usb.serialNumber}</p>
+                                    <i class="fas fa-check-circle check-icon"></i>
+                                </div>
+                            </div>`;
+                    });
+                }
+                $('#usbCardsContainer').html(html);
+            });
+        }
+
+        function selectUsb(usbId, serialNumber, cardEl) {
+            $('#usbCardsContainer .selection-card').removeClass('active');
+            $(cardEl).addClass('active');
+            $('#SelectedUsbId').val(usbId);
+            $('#usbStatusSerial').text(serialNumber);
+            $('#usbStatusText').show();
+        }
+
+        // Load Quotas
+        function loadQuotasForProvider(providerId) {
+            $('#quotaInstruction').hide();
+            $.get('/Subscription/GetQuotasByProvider', { providerId: providerId }, function (data) {
+                let html = '';
+                if (!data || data.length === 0) {
+                    html = '<div class="col-12 text-muted small">No quotas configured for this provider.</div>';
+                } else {
+                    data.forEach(q => {
+                        const isSelected = $('#SelectedQuotaId').val() === q.id;
+                        html += `
+                            <div class="col-md-6">
+                                <div class="selection-card ${isSelected ? 'active' : ''}" onclick="selectQuota('${q.id}', '${q.baseAmount} GB', this)">
+                                    <div class="card-title-text">${q.baseAmount} GB Base Quota</div>
+                                    <p class="card-subtitle-text">Extra Amount: $${q.extraAmount}</p>
+                                    <i class="fas fa-check-circle check-icon"></i>
+                                </div>
+                            </div>`;
+                    });
+                }
+                $('#quotaCardsContainer').html(html);
+            });
+        }
+
+        function selectQuota(quotaId, displayVal, cardEl) {
+            $('#quotaCardsContainer .selection-card').removeClass('active');
+            $(cardEl).addClass('active');
+            $('#SelectedQuotaId').val(quotaId);
+            $('#quotaStatusVal').text(displayVal);
+            $('#quotaStatusText').show();
+        }
+
+        // Initial Load
+        $(document).ready(function () {
+            loadSims('');
+        });
+    </script>
+}
