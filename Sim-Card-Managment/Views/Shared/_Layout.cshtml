@@ -170,6 +170,7 @@
 
         </div>
     </aside>
+
     <nav class="position-absolute top-0 navbar navbar-expand-lg w-100 ">
         <div class="container-fluid">
             <a class="navbar-brand text-white fw-bold" asp-controller="home" asp-action="home">
@@ -185,7 +186,7 @@
 
                     <li class="nav-item">
                         <a class="nav-link fw-bold px-4 text-black @(currentController == "/" && currentAction == "home" ? "active" : "")"
-                           asp-controller="/" asp-action="home">HOME</a>
+                           asp-controller="Home" asp-action="home">HOME</a>
                     </li>
 
                     <li class="nav-item">
