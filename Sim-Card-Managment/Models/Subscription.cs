@@ -10,7 +10,7 @@ namespace Sim_Card_Managment.Models
 
         public Guid? EmpId { get; set; }          // nullable if assigned to NonEmployee
 
-        public Guid? NonEmployeeId { get; set; }  // nullable if assigned to Employee
+        public Guid? NonEmployeeId { get; set; }  //nullable if assigned to Employee
 
         [Required]
         public Guid SimId { get; set; }

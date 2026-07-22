@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj": {}
+    "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
+    "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
+        "projectUniqueName": "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
         "projectName": "Sim-Card-Managment",
-        "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
-        "packagesPath": "C:\\Users\\sd\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\obj\\",
+        "projectPath": "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
+        "packagesPath": "C:\\Users\\SD\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\sd\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\SD\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -128,20 +128,20 @@
         }
       }
     },
-    "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj": {
+    "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+        "projectUniqueName": "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
         "projectName": "SIMCARD.Test",
-        "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
-        "packagesPath": "C:\\Users\\sd\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\obj\\",
+        "projectPath": "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+        "packagesPath": "C:\\Users\\SD\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\sd\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\SD\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -156,8 +156,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
-                "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj"
+              "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
+                "projectPath": "C:\\Users\\SD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj"
               }
             }
           }
