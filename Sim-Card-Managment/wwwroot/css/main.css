@@ -64,6 +64,11 @@ border-radius: 20px !important;
         color: white;
     }
 
+.navbar {
+    z-index: 999;
+    background-color: #E24D17
+}
+
 /*-------------- End Of NavBar ----------------------*/
 
 

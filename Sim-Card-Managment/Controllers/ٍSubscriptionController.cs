@@ -57,15 +57,15 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(/*Guid id*/)
         {
-            var subscription = _subscriptionRepo.GetById(id);
+            //var subscription = _subscriptionRepo.GetById(id);
 
-            if (subscription == null)
-                return NotFound();
+            //if (subscription == null)
+            //    return NotFound();
 
-            LoadLists();
-            return View(subscription);
+            //LoadLists();
+            return View();
         }
 
         [HttpPost]
