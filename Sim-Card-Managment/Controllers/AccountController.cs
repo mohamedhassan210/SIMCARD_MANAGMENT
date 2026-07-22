@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Viewmodel;
@@ -10,8 +12,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Mail;
 using System.Net;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -52,7 +52,7 @@ namespace Sim_Card_Managment.Controllers
                     return RedirectToAction("ResetPassword", new { username = model.Username });
                 }
 
-                return RedirectToAction("ManageUsers", "Account");
+                return RedirectToAction("home", "Home");
             }
 
             ModelState.AddModelError("", loginResult.ErrorMessage ?? "Invalid login attempt.");
@@ -104,15 +104,22 @@ namespace Sim_Card_Managment.Controllers
             var user = await _accountRepo.GetUserByEmailAsync(model.Email);
             if (user == null)
             {
+                // Security best practice: don't reveal if an email doesn't exist, 
+                // or show a generic error to prevent email harvesting.
                 ModelState.AddModelError("", "This email address is not registered in the system.");
                 return View(model);
             }
 
+            // Try to find an existing valid OTP first
             var validOtpRecord = await _accountRepo.GetValidOtpByEmailAsync(model.Email);
 
+            // If no valid OTP exists, generate a brand new one on the fly!
             if (validOtpRecord == null)
             {
+                // Example: Generate a random 6-digit number
                 string newOtpCode = new Random().Next(100000, 999999).ToString();
+
+                // Save it via your repository layer
                 validOtpRecord = await _accountRepo.CreateAndSaveNewOtpAsync(model.Email, newOtpCode);
             }
 
@@ -129,10 +136,10 @@ namespace Sim_Card_Managment.Controllers
                         From = new MailAddress("YoussefElsayedAhmedJ5@gmail.com", "SIM & USB Management System"),
                         Subject = "Your Secure Login OTP Code",
                         Body = $@"
-                        <h3>Hello {user.Username},</h3>
-                        <p>You requested a secure login access link via your email address.</p>
-                        <p>Your active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></p>
-                        <p>This code is temporary. Please use it before it expires.</p>",
+                    <h3>Hello {user.Username},</h3>
+                    <p>You requested a secure login access link via your email address.</p>
+                    <p>Your active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></p>
+                    <p>This code is temporary. Please use it before it expires.</p>",
                         IsBodyHtml = true
                     };
 
@@ -140,7 +147,7 @@ namespace Sim_Card_Managment.Controllers
                     await smtpClient.SendMailAsync(mailMessage);
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 ModelState.AddModelError("", "Failed to send the email. Please contact your system administrator.");
                 return View(model);
@@ -149,10 +156,10 @@ namespace Sim_Card_Managment.Controllers
             TempData["TargetEmail"] = model.Email;
             return RedirectToAction("VerifyOtp");
         }
-
         [HttpGet]
         public IActionResult VerifyOtp()
         {
+            // Retrieve the target email passed from the forgot password panel step
             var email = TempData["TargetEmail"] as string;
             if (string.IsNullOrEmpty(email)) return RedirectToAction("ForgotPassword");
 
@@ -166,6 +173,7 @@ namespace Sim_Card_Managment.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
+            // Fetch the latest OTP record for this email
             var validOtpRecord = await _accountRepo.GetValidOtpByEmailAsync(model.Email);
 
             if (validOtpRecord == null)
@@ -174,28 +182,39 @@ namespace Sim_Card_Managment.Controllers
                 return View(model);
             }
 
+            // 1. Check Expiration first
             if (validOtpRecord.ExpireDate < DateTime.Now)
             {
                 ModelState.AddModelError("", "This OTP has expired. Please request a new code.");
                 return View(model);
             }
 
+            // 2. Check if already used (if your DB tracks this)
             if (validOtpRecord.IsUsed)
             {
                 ModelState.AddModelError("", "This OTP has already been used. Please request a new code.");
                 return View(model);
             }
 
+            // 3. Check if the code matches
             if (validOtpRecord.OtpCode != model.OtpCode.Trim())
             {
                 ModelState.AddModelError("", "Incorrect OTP. Please check the code and try again.");
                 return View(model);
             }
 
+            // --- Success Flow ---
             var user = await _accountRepo.GetUserByEmailAsync(model.Email);
             if (user != null)
             {
+                // Optional: Mark the OTP record as used in your DB if your system supports it
+                // validOtpRecord.IsUsed = true;
+                // await _accountRepo.UpdateOtpStatusAsync(validOtpRecord);
+
+                // Clear session limit tracking on successful verification
                 HttpContext.Session.Remove("ResendCount_" + model.Email);
+
+                // Redirect directly to your existing ResetPassword action with the username route parameter
                 return RedirectToAction("ResetPassword", new { username = user.Username });
             }
 
@@ -212,16 +231,19 @@ namespace Sim_Card_Managment.Controllers
             string sessionKey = $"ResendCount_{email}";
             int currentResends = HttpContext.Session.GetInt32(sessionKey) ?? 0;
 
+            // 🛑 Rule Check: If they hit 10 resends, cut them off
             if (currentResends >= 10)
             {
-                TempData["ErrorMessage"] = "You have reached the maximum layout of 10 resends. Please contact support.";
+                TempData["ErrorMessage"] = "You have reached the maximum layout of 10 resends. Please contact support at support@company.com.";
                 TempData["TargetEmail"] = email;
                 return RedirectToAction("VerifyOtp");
             }
 
+            // Increment resend count tracker
             currentResends++;
             HttpContext.Session.SetInt32(sessionKey, currentResends);
 
+            // Generate a new OTP code
             string newOtpCode = new Random().Next(100000, 999999).ToString();
             var validOtpRecord = await _accountRepo.CreateAndSaveNewOtpAsync(email, newOtpCode);
 
@@ -262,27 +284,18 @@ namespace Sim_Card_Managment.Controllers
         #region 3. User Registration (Manager-Only)
 
         [HttpGet]
-        // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> Register()
+        [Authorize(Roles = "Manager")]
+        public IActionResult Register()
         {
-            // جلب المجموعات من قاعدة البيانات وتحويلها لـ SelectList للـ Dropdown
-            var groups = await _accountRepo.GetAllGroupsAsync();
-            ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(groups, "Id", "Name");
-
-            return View(new RegisterViewModel());
+            return View();
         }
 
         [HttpPost]
-        // [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public IActionResult Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                var groups = await _accountRepo.GetAllGroupsAsync();
-                ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(groups, "Id", "Name");
-                return View(model);
-            }
+            if (!ModelState.IsValid) return View(model);
 
             var isCreated = _accountRepo.Register(model);
             if (isCreated)
@@ -292,15 +305,12 @@ namespace Sim_Card_Managment.Controllers
             }
 
             ModelState.AddModelError("", "Registration failed.");
-
-            var groupsRetry = await _accountRepo.GetAllGroupsAsync();
-            ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(groupsRetry, "Id", "Name");
             return View(model);
         }
 
         #endregion
 
-        #region 4. User Profile Details
+        #region 4. User Profile Details (Advanced Security)
 
         [HttpGet]
         [Authorize]
@@ -342,10 +352,11 @@ namespace Sim_Card_Managment.Controllers
 
         #endregion
 
-        #region 6. User Management (Manager Only)
+        #region 🔥 6. User Management (Advanced Features - Manager Only) 🔥
 
+        // 1. شاشة عرض وإدارة المستخدمين مع البحث والفلترة
         [HttpGet]
-        // [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> ManageUsers(string? search, Guid? groupId, bool? isActive)
         {
             var users = await _accountRepo.GetAllUsersAsync(search, groupId, isActive);
@@ -357,8 +368,9 @@ namespace Sim_Card_Managment.Controllers
             return View(users);
         }
 
+        // 2. شاشة تعديل بيانات مستخدم (HttpGet)
         [HttpGet]
-        // [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> EditUser(Guid id)
         {
             var model = await _accountRepo.GetUserForEditAsync(id);
@@ -370,8 +382,9 @@ namespace Sim_Card_Managment.Controllers
             return View(model);
         }
 
+        // 3. استقبال بيانات التعديل وحفظها (HttpPost)
         [HttpPost]
-        // [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(EditUserViewModel model)
         {
@@ -388,8 +401,9 @@ namespace Sim_Card_Managment.Controllers
             return View(model);
         }
 
+        // 4. تجميد أو تفعيل الحساب بزرار واحد سريع (Toggle Active)
         [HttpPost]
-        // [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleActive(Guid id)
         {
@@ -405,8 +419,9 @@ namespace Sim_Card_Managment.Controllers
             return RedirectToAction("ManageUsers");
         }
 
+        // 5. الحذف الذكي بدون مسح نهائي (Soft Delete)
         [HttpPost]
-        // [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
