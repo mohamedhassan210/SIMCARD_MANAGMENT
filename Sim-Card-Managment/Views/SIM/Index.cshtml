@@ -1,11 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
-
-@model IEnumerable<Sim_Card_Managment.ViewModels.PersonListItemViewModel>
+﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.DeviceDirectoryViewModel>
 
 @{
     string currentStatus = ViewBag.CurrentStatus ?? "active";
@@ -13,7 +6,6 @@
 }
 
 <style>
-    /* ---------- Title ---------- */
     .title-section {
         margin-bottom: 24px;
     }
@@ -36,7 +28,6 @@
             max-width: 560px;
         }
 
-    /* ---------- Buttons ---------- */
     .create-btn-group {
         display: flex;
         gap: 12px;
@@ -77,7 +68,6 @@
             border-color: #e8552b;
         }
 
-    /* ---------- Filters ---------- */
     .filters {
         margin-top: 34px;
     }
@@ -96,9 +86,6 @@
     }
 
     .status-select {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
         background: #fff;
         border: 1px solid #dcdcdc;
         border-radius: 10px;
@@ -150,7 +137,6 @@
                 color: #b3b3b3;
             }
 
-    /* ---------- Table ---------- */
     .table-wrap {
         margin-top: 28px;
     }
@@ -181,20 +167,6 @@
         vertical-align: middle;
     }
 
-    .asset-cell {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        line-height: 1.3;
-    }
-
-        .asset-cell svg {
-            width: 14px;
-            height: 14px;
-            color: #1a1a1a;
-            flex-shrink: 0;
-        }
-
     .badge-type {
         display: inline-block;
         font-size: 10px;
@@ -204,12 +176,12 @@
         text-transform: uppercase;
     }
 
-    .badge-employee {
+    .badge-sim {
         background: #e6f4ea;
         color: #137333;
     }
 
-    .badge-non-employee {
+    .badge-usb {
         background: #feefc3;
         color: #b06000;
     }
@@ -238,27 +210,30 @@
     }
 
     th:nth-child(2), td:nth-child(2) {
-        width: 14%;
+        width: 10%;
     }
 
     th:nth-child(3), td:nth-child(3) {
-        width: 18%;
+        width: 16%;
     }
 
     th:nth-child(4), td:nth-child(4) {
-        width: 20%;
+        width: 18%;
     }
 
     th:nth-child(5), td:nth-child(5) {
-        width: 14%;
+        width: 12%;
     }
 
     th:nth-child(6), td:nth-child(6) {
-        width: 12%;
+        width: 14%;
+    }
+
+    th:nth-child(7), td:nth-child(7) {
+        width: 8%;
         text-align: right;
     }
 
-    /* ---------- Footer ---------- */
     .footer {
         display: flex;
         align-items: center;
@@ -320,42 +295,44 @@
 
     <div class="title-section">
         <h1><span class="num">@Model.Count()</span> Devices</h1>
-        <p>Manage all assigned personnel, contractors, and external device holders in one central place.</p>
+        <p>Manage all registered SIM cards and USB modems, track their status and current assignments.</p>
 
         <div class="create-btn-group">
             <a asp-controller="SIM" asp-action="Create" class="create-btn"><span>+</span> New SIM</a>
-            <a asp-controller="USB" asp-action="Create" class="create-btn create-btn-secondary"><span>+</span> New USb</a>
+            <a asp-controller="USB" asp-action="Create" class="create-btn create-btn-secondary"><span>+</span> New USB</a>
         </div>
     </div>
 
-    <form id="filterForm" method="get" asp-controller="Employee" asp-action="Index" class="filters">
+    <form id="filterForm" method="get" asp-controller="SIM" asp-action="Index" class="filters">
         <div class="filters-row">
             <div class="filter-group">
                 <label for="status-filter">Status</label>
                 <select id="status-filter" name="status" class="status-select" onchange="this.form.submit()">
-                    <!option value="active" @(currentStatus == "active" ? "selected" : "")>Active</!option>
-                    <!option value="inactive" @(currentStatus == "inactive" ? "selected" : "")>Inactive</!option>
-                    <!option value="all" @(currentStatus == "all" ? "selected" : "")>All</!option>
+                    <option value="active">Active</option>
+                    <option value="lost">Lost</option>
+                    <option value="replaced">Replaced</option>
+                    <option value="returned">Returned</option>
+                    <option value="all">All</option>
                 </select>
             </div>
 
             <div class="filter-group">
-                <label for="employee-type-filter">Type</label>
-                <select id="employee-type-filter" name="type" class="status-select" onchange="this.form.submit()">
-                    <!option value="all" @(currentType == "all" ? "selected" : "")>All Types</!option>
-                    <!option value="employee" @(currentType == "employee" ? "selected" : "")>Employee</!option>
-                    <!option value="non-employee" @(currentType == "non-employee" ? "selected" : "")>Non-Employee</!option>
+                <label for="device-type-filter">Type</label>
+                <select id="device-type-filter" name="type" class="status-select" onchange="this.form.submit()">
+                    <option value="all">All Types</option>
+                    <option value="sim">SIM</option>
+                    <option value="usb">USB</option>
                 </select>
             </div>
 
             <div class="filter-group" style="flex: 1;">
-                <label for="search-input">Search (Client-Side)</label>
+                <label for="search-input">Search</label>
                 <div class="search-box">
                     <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
                         <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>
-                    <input id="search-input" type="text" placeholder="Type name, ID, or contact to search instantly..." autocomplete="off">
+                    <input id="search-input" type="text" placeholder="Search by serial number, phone number, or assignee..." autocomplete="off">
                 </div>
             </div>
         </div>
@@ -365,11 +342,12 @@
         <table id="directoryTable">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>Serial Number</th>
                     <th>Type</th>
-                    <th>ID / Contact</th>
-                    <th>Assigned Assets</th>
-                    <th>Start Date</th>
+                    <th>Phone Number</th>
+                    <th>Assigned To</th>
+                    <th>Status</th>
+                    <th>Registered At</th>
                     <th></th>
                 </tr>
             </thead>
@@ -378,40 +356,31 @@
                 {
                     foreach (var item in Model)
                     {
-                        <tr class="person-row">
+                        <tr class="device-row">
                             <td class="col-name">
-                                <strong>@item.Name</strong>
+                                <strong>@item.SerialNumber</strong>
                                 @if (!string.IsNullOrEmpty(item.ExtraInfo))
                                 {
                                     <div style="font-size: 11px; color: #888;">@item.ExtraInfo</div>
                                 }
                             </td>
                             <td>
-                                <span class="badge-type @(item.PersonType == "Employee" ? "badge-employee" : "badge-non-employee")">
-                                    @item.PersonType
+                                <span class="badge-type @(item.DeviceType == "SIM" ? "badge-sim" : "badge-usb")">
+                                    @item.DeviceType
                                 </span>
                             </td>
-                            <td class="col-identifier">@item.Identifier</td>
-                            <td>
-                                <div class="asset-cell">
-                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="3" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.5" />
-                                        <path d="M17 6H21V18H17" stroke="currentColor" stroke-width="1.5" />
-                                    </svg>
-                                    <div>
-                                        SIMs: @item.ActiveSimOnlyCount | USBs: @item.ActiveUsbCount
-                                    </div>
-                                </div>
-                            </td>
-                            <td>@item.StartDate.ToString("MMM dd, yyyy")</td>
+                            <td>@(item.Identifier ?? "—")</td>
+                            <td>@(item.AssignedTo ?? "Unassigned")</td>
+                            <td>@item.Status</td>
+                            <td>@item.RegisteredAt.ToString("MMM dd, yyyy")</td>
                             <td style="text-align: right;">
-                                @if (item.PersonType == "Employee")
+                                @if (item.DeviceType == "SIM")
                                 {
-                                    <a asp-controller="Employee" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                                    <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
                                 }
                                 else
                                 {
-                                    <a asp-controller="NonEmployee" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                                    <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
                                 }
                             </td>
                         </tr>
@@ -419,8 +388,8 @@
                 }
             </tbody>
             <tr id="noResultsRow" style="display: none;">
-                <td colspan="6" style="text-align: center; padding: 32px; color: #888;">
-                    No matching personnel found.
+                <td colspan="7" style="text-align: center; padding: 32px; color: #888;">
+                    No devices found.
                 </td>
             </tr>
         </table>
@@ -435,71 +404,59 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const searchInput = document.getElementById("search-input");
-        const allRows = Array.from(document.querySelectorAll("#tableBody tr.person-row"));
-        const noResultsRow = document.getElementById("noResultsRow");
-        const showingText = document.getElementById("showingText");
+        // Restore filter state
+        document.getElementById("status-filter").value = "@currentStatus";
+        document.getElementById("device-type-filter").value = "@currentType";
+
+        const searchInput         = document.getElementById("search-input");
+        const allRows             = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
+        const noResultsRow        = document.getElementById("noResultsRow");
+        const showingText         = document.getElementById("showingText");
         const paginationContainer = document.getElementById("paginationContainer");
 
-        const itemsPerPage = 7; // Fixed 7 items per page requirement
+        const itemsPerPage = 7;
         let visibleRows = [...allRows];
         let currentPage = 1;
 
         function renderTable() {
             const totalVisible = visibleRows.length;
-            const totalPages = Math.max(1, Math.ceil(totalVisible / itemsPerPage));
+            const totalPages   = Math.max(1, Math.ceil(totalVisible / itemsPerPage));
 
             if (currentPage > totalPages) currentPage = totalPages;
 
             const startIdx = (currentPage - 1) * itemsPerPage;
-            const endIdx = startIdx + itemsPerPage;
+            const endIdx   = startIdx + itemsPerPage;
 
-            // Hide all rows first
             allRows.forEach(row => row.style.display = "none");
-
-            // Show page slice
             visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
 
-            // Handle empty search result display
             if (totalVisible === 0) {
-                noResultsRow.style.display = "";
-                showingText.textContent = "Showing 0 records";
+                noResultsRow.style.display    = "";
+                showingText.textContent       = "Showing 0 records";
                 paginationContainer.innerHTML = "";
                 return;
             } else {
                 noResultsRow.style.display = "none";
             }
 
-            // Update stats
-            const actualEnd = Math.min(endIdx, totalVisible);
-            showingText.textContent = `Showing ${startIdx + 1}-${actualEnd} of ${totalVisible} records`;
+            const actualEnd         = Math.min(endIdx, totalVisible);
+            showingText.textContent = `Showing ${startIdx + 1}–${actualEnd} of ${totalVisible} records`;
 
-            // Render pagination controls
             let html = `<button type="button" class="arrow" id="prevBtn" ${currentPage === 1 ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8249;</button>`;
-
             for (let i = 1; i <= totalPages; i++) {
                 html += `<button type="button" class="${i === currentPage ? 'active' : 'page-num'}" data-page="${i}">${i}</button>`;
             }
-
             html += `<button type="button" class="arrow" id="nextBtn" ${currentPage === totalPages ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8250;</button>`;
-
             paginationContainer.innerHTML = html;
         }
 
-        // Live JavaScript Search Filter
         searchInput.addEventListener("input", function () {
             const query = this.value.trim().toLowerCase();
-
-            visibleRows = allRows.filter(row => {
-                const text = row.innerText.toLowerCase();
-                return text.includes(query);
-            });
-
+            visibleRows = allRows.filter(row => row.innerText.toLowerCase().includes(query));
             currentPage = 1;
             renderTable();
         });
 
-        // Pagination Click Handler
         paginationContainer.addEventListener("click", function (e) {
             const btn = e.target.closest("button");
             if (!btn || btn.disabled) return;
@@ -516,7 +473,6 @@
             renderTable();
         });
 
-        // Initial render
         renderTable();
     });
 </script>

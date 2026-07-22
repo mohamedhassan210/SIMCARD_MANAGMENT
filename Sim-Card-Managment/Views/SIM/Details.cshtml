@@ -1,0 +1,223 @@
+﻿<style>
+    /* --- Responsive Typography --- */
+    .emp-title {
+        font-size: clamp(2rem, 5vw, 4rem); /* Scales between 32px and 64px */
+        font-weight: bold;
+        line-height: 1.2;
+        word-wrap: break-word;
+    }
+
+    .emp-badge {
+        font-size: clamp(1.2rem, 2.5vw, 2rem); /* Scales between ~19px and 32px */
+        color: #E24D17;
+        white-space: nowrap;
+    }
+
+    .emp-id {
+        font-size: clamp(1.1rem, 2vw, 1.5rem); /* Scales between ~17px and 24px */
+    }
+
+    /* --- Existing Styles --- */
+    .roundedbutton {
+        border-radius: 70px !important;
+        width: 200px !important;
+        height: 62px !important;
+    }
+
+    .main-info-card {
+        background-color: #fffaf8;
+        border: 1px solid #df531b;
+        border-radius: 16px;
+        margin: 41px;
+    }
+
+    .icon-orange {
+        fill: #df531b;
+    }
+
+    .employee-details p {
+        font-size: 1.2rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .sim-card-active {
+        width: 320px;
+        min-width: 320px;
+        height: 250px;
+        background: linear-gradient(-45deg, transparent 35px, #df531b 0);
+        border-radius: 16px;
+        color: #ffffff;
+        padding: 20px;
+    }
+
+    .sim-card-inactive-wrapper {
+        width: 320px;
+        min-width: 320px;
+        height: 250px;
+        background: linear-gradient(-45deg, transparent 35px, #df531b 0);
+        border-radius: 16px;
+        padding: 1px;
+    }
+
+    .sim-card-inactive-inner {
+        background: linear-gradient(-45deg, transparent 34px, #ffffff 0);
+        border-radius: 15px;
+        height: 100%;
+        width: 100%;
+        padding: 20px;
+        color: #000000;
+    }
+
+    .we-logo {
+        background-color: #5b2d90;
+        color: white;
+        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .sim-card-active .we-logo {
+        border: 2px solid #ffffff;
+    }
+
+    .badge-active {
+        background-color: #007a27;
+        color: white;
+        font-size: 13px;
+        padding: 5px 18px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .text-label {
+        font-weight: 600;
+    }
+
+    .sim-data-row {
+        font-size: 17px;
+        margin-bottom: 0.4rem;
+    }
+
+    .sim-label {
+        font-weight: 600;
+        margin-right: 4px;
+    }
+
+    .sim-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: auto;
+    }
+</style>
+
+<body style="background-color: #EEEDED; margin-top: 30px">
+
+    <section class="p-5">
+        <h2 class="emp-title">Adham amr mohamed <span class="emp-badge ms-2">2 sim</span></h2>
+
+        <p class="emp-id fw-medium">309060702500484</p>
+
+        <div class="d-flex flex-wrap gap-4 mt-4">
+            <a class="btn active text-white roundedbutton" style="background-color: #E24D17; font-size: 20px;" asp-controller="Employee" asp-action="Edit">
+                <i class="fa-solid fa-pen-to-square me-2"></i>Edit Details
+            </a>
+
+            <button class="btn active text-white roundedbutton" style="background-color: #D41212; font-size: 20px;" onclick="confirmDelete()">
+                <i class="fa-solid fa-trash-can me-2"></i>Delete
+            </button>
+
+            <button class="btn active text-white roundedbutton" style="background-color: #115D11; font-size: 20px;">
+                <img src="~/img/vscode-icons_file-type-excel.png" alt="" class="me-2">Export
+            </button>
+        </div>
+    </section>
+
+    <div class="main-info-card p-5">
+
+        <div class="d-flex align-items-center mb-4">
+            <svg class="icon-orange me-3" width="32" height="32" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+            </svg>
+            <h4 class="m-0 text-label fs-3">Employee Information</h4>
+        </div>
+
+        <div class="mb-5 ms-2 employee-details">
+            <p><span class="text-label">Name :</span> Adham Amr Mohamed Mohamed</p>
+            <p><span class="text-label">Id :</span> 309060702500484</p>
+            <p><span class="text-label">Phone :</span> 01556176733</p>
+            <p><span class="text-label">Department :</span> </p>
+        </div>
+
+        <h5 class="fw-bold mb-4 ms-2 fs-4">Cards</h5>
+
+        <div class="d-flex gap-4 overflow-auto pb-2">
+
+            <div class="sim-card-active d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <span class="badge-active mt-1">Active</span>
+                    <div class="we-logo">we</div>
+                </div>
+                <div class="sim-data-row"><span class="sim-label">Dial number</span> 01556176733</div>
+                <div class="sim-data-row"><span class="sim-label">Serial</span> 5284874102482</div>
+                <div class="sim-data-row"><span class="sim-label">Quota</span> 1.7</div>
+                <div class="sim-data-row"><span class="sim-label">Extra quota</span> 1.7</div>
+                <div class="sim-title mt-auto pt-2">SIM 1</div>
+            </div>
+
+            <div class="sim-card-inactive-wrapper">
+                <div class="sim-card-inactive-inner d-flex flex-column">
+                    <div class="d-flex justify-content-end mb-4">
+                        <div class="we-logo">we</div>
+                    </div>
+                    <div class="sim-data-row mt-1"><span class="sim-label">Dial number :</span><br> 01556176733</div>
+                    <div class="sim-data-row mt-2"><span class="sim-label">Serial :</span><br> 5284874102482</div>
+                    <div class="sim-title mt-auto pt-2">SIM 1</div>
+                </div>
+            </div>
+
+            <div class="sim-card-inactive-wrapper">
+                <div class="sim-card-inactive-inner d-flex flex-column">
+                    <div class="d-flex justify-content-end mb-4">
+                        <div class="we-logo" style="visibility: hidden;">we</div>
+                    </div>
+                    <div class="sim-data-row mt-1"><span class="sim-label">Dial number :</span><br> 01556176733</div>
+                    <div class="sim-data-row mt-2"><span class="sim-label">Serial :</span><br> 5284874102482</div>
+                    <div class="sim-title mt-auto pt-2">SIM 1</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function confirmDelete() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#D41212', // Matches your red button
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Place your actual backend deletion logic here (e.g., redirect or AJAX call)
+
+                    Swal.fire(
+                        'Deleted!',
+                        'The employee has been deleted.',
+                        'success'
+                    )
+                }
+            })
+        }
+    </script>
+</body>
