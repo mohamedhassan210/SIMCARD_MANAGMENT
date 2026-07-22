@@ -132,22 +132,18 @@
 <body>
 
     <div class="create-card shadow">
-        <h2 class="title-header">Create new employee</h2>
+        <h2 class="title-header">Create new SIM</h2>
 
         <form id="employeeForm" asp-controller="Employee" asp-action="Create" method="post">
 
             <div class="row g-4 mb-5">
                 <div class="col-md-6">
-                    <label class="custom-label">Name</label>
-                    <input type="text" id="empName" class="custom-input" placeholder="Adham amr mohamed">
-                    <span class="error-msg">Name is required.</span>
+                    <label class="custom-label">Serial Number</label>
+                    <input type="text" id="empid" class="custom-input" placeholder="06465485765765">
+                    <span class="error-msg">SerialNumber is required.</span>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="custom-label">National ID</label>
-                    <input type="text" id="empNid" class="custom-input" placeholder="30906070********" maxlength="14" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <span class="error-msg">Please enter a valid 14-digit National ID.</span>
-                </div>
+               
 
                 <div class="col-md-6">
                     <label class="custom-label">Phone</label>
@@ -156,24 +152,38 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label">Department</label>
+                    <label class="custom-label">Network Type</label>
                     <select id="empDept" class="custom-select">
-                        <option selected>IT</option>
-                        <option>HR</option>
-                        <option>Marketing</option>
-                        <option>Sales</option>
+                        <option selected>4G</option>
+                        <option>5G</option>
+                        
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="custom-label">Status</label>
+                    <select id="empDept" class="custom-select">
+                        <option selected>active</option>
+                        <option>lost</option>
+                        <option >replaced</option>
+                        <option>returned</option>
                     </select>
                 </div>
 
+
                 <div class="col-md-6">
-                    <label class="custom-label">Position</label>
-                    <input type="text" id="empPosition" class="custom-input" placeholder="It manager">
-                    <span class="error-msg">Position is required.</span>
+                    <label class="custom-label">Server Provider</label>
+                    <select id="empDept" class="custom-select">
+                        <option selected>we</option>
+                        <option>orange</option>
+                        <option>etisalt</option>
+                        <option>vodafone</option>
+                    </select>
                 </div>
+                
             </div>
 
             <div class="d-flex justify-content-end gap-3 mt-4">
-                <a class="btn btn-cancel" asp-controller="Employee" asp-action="Index">Cancel</a>
+                <a class="btn btn-cancel" asp-controller="SIM" asp-action="Index">Cancel</a>
                 <button type="submit" class="btn btn-create">Create</button>
             </div>
 
