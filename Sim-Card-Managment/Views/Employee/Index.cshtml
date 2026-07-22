@@ -226,30 +226,12 @@
             color: #fff;
         }
 
-    th:nth-child(1), td:nth-child(1) {
-        width: 22%;
-    }
-
-    th:nth-child(2), td:nth-child(2) {
-        width: 14%;
-    }
-
-    th:nth-child(3), td:nth-child(3) {
-        width: 18%;
-    }
-
-    th:nth-child(4), td:nth-child(4) {
-        width: 20%;
-    }
-
-    th:nth-child(5), td:nth-child(5) {
-        width: 14%;
-    }
-
-    th:nth-child(6), td:nth-child(6) {
-        width: 12%;
-        text-align: right;
-    }
+    th:nth-child(1), td:nth-child(1) { width: 22%; }
+    th:nth-child(2), td:nth-child(2) { width: 14%; }
+    th:nth-child(3), td:nth-child(3) { width: 18%; }
+    th:nth-child(4), td:nth-child(4) { width: 20%; }
+    th:nth-child(5), td:nth-child(5) { width: 14%; }
+    th:nth-child(6), td:nth-child(6) { width: 12%; text-align: right; }
 
     /* ---------- Footer ---------- */
     .footer {
@@ -321,23 +303,24 @@
         </div>
     </div>
 
-    <form id="filterForm" method="get" asp-controller="Employee" asp-action="Index" class="filters">
+    <!-- Changed form to div so pressing enter doesn't reload the page -->
+    <div class="filters">
         <div class="filters-row">
             <div class="filter-group">
                 <label for="status-filter">Status</label>
-                <select id="status-filter" name="status" class="status-select" onchange="this.form.submit()">
-                    <!option value="active" @(currentStatus == "active" ? "selected" : "")>Active</!option>
-                    <!option value="inactive" @(currentStatus == "inactive" ? "selected" : "")>Inactive</!option>
-                    <!option value="all" @(currentStatus == "all" ? "selected" : "")>All</!option>
+                <select id="status-filter" class="status-select">
+                    <option value="active" selected="@(currentStatus == "active" ? "selected" : null)">Active</option>
+                    <option value="inactive" selected="@(currentStatus == "inactive" ? "selected" : null)">Inactive</option>
+                    <option value="all" selected="@(currentStatus == "all" ? "selected" : null)">All</option>
                 </select>
             </div>
 
             <div class="filter-group">
                 <label for="employee-type-filter">Type</label>
-                <select id="employee-type-filter" name="type" class="status-select" onchange="this.form.submit()">
-                    <!option value="all" @(currentType == "all" ? "selected" : "")>All Types</!option>
-                    <!option value="employee" @(currentType == "employee" ? "selected" : "")>Employee</!option>
-                    <!option value="non-employee" @(currentType == "non-employee" ? "selected" : "")>Non-Employee</!option>
+                <select id="employee-type-filter" class="status-select">
+                    <option value="all" selected="@(currentType == "all" ? "selected" : null)">All Types</option>
+                    <option value="employee" selected="@(currentType == "employee" ? "selected" : null)">Employee</option>
+                    <option value="non-employee" selected="@(currentType == "non-employee" ? "selected" : null)">Non-Employee</option>
                 </select>
             </div>
 
@@ -352,7 +335,7 @@
                 </div>
             </div>
         </div>
-    </form>
+    </div>
 
     <div class="table-wrap">
         <table id="directoryTable">
@@ -371,7 +354,8 @@
                 {
                     foreach (var item in Model)
                     {
-                        <tr class="person-row">
+
+                        <tr class="person-row" data-status="@(item.IsActive ? "active" : "inactive")">
                             <td class="col-name">
                                 <strong>@item.Name</strong>
                                 @if (!string.IsNullOrEmpty(item.ExtraInfo))
@@ -429,6 +413,9 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("search-input");
+        const typeFilter = document.getElementById("employee-type-filter");
+        const statusFilter = document.getElementById("status-filter");
+
         const allRows = Array.from(document.querySelectorAll("#tableBody tr.person-row"));
         const noResultsRow = document.getElementById("noResultsRow");
         const showingText = document.getElementById("showingText");
@@ -479,18 +466,36 @@
             paginationContainer.innerHTML = html;
         }
 
-        // Live JavaScript Search Filter
-        searchInput.addEventListener("input", function () {
-            const query = this.value.trim().toLowerCase();
+        // Unified filtration function for Search, Type, and Status
+        function applyFilters() {
+            const query = searchInput.value.trim().toLowerCase();
+            const selectedType = typeFilter.value.toLowerCase();
+            const selectedStatus = statusFilter.value.toLowerCase();
 
             visibleRows = allRows.filter(row => {
+                // 1. Check text search
                 const text = row.innerText.toLowerCase();
-                return text.includes(query);
+                const matchesSearch = text.includes(query);
+
+                // 2. Check Type (Reads the text directly from your badge span)
+                const typeText = row.querySelector(".badge-type").innerText.trim().toLowerCase();
+                const matchesType = (selectedType === "all" || typeText === selectedType);
+
+                // 3. Check Status (Reads from the data-status attribute on the tr)
+                const statusText = row.getAttribute("data-status") || "active";
+                const matchesStatus = (selectedStatus === "all" || statusText === selectedStatus);
+
+                return matchesSearch && matchesType && matchesStatus;
             });
 
-            currentPage = 1;
+            currentPage = 1; // Reset to page 1 after filtering
             renderTable();
-        });
+        }
+
+        // Event listeners for all client-side inputs
+        searchInput.addEventListener("input", applyFilters);
+        typeFilter.addEventListener("change", applyFilters);
+        statusFilter.addEventListener("change", applyFilters);
 
         // Pagination Click Handler
         paginationContainer.addEventListener("click", function (e) {
@@ -510,6 +515,6 @@
         });
 
         // Initial render
-        renderTable();
+        applyFilters();
     });
 </script>

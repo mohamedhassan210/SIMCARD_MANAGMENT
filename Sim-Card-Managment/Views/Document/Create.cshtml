@@ -137,26 +137,14 @@
         <form id="employeeForm" asp-controller="Employee" asp-action="Create" method="post">
 
             <div class="row g-4 mb-5">
-                <div class="col-md-6">
-                    <label class="custom-label">Name</label>
+                <div class="col-md-12">
+                    <label class="custom-label">Document number</label>
                     <input type="text" id="empName" class="custom-input" placeholder="Adham amr mohamed">
-                    <span class="error-msg">Name is required.</span>
+                    <span class="error-msg">Document number is required.</span>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="custom-label">National ID</label>
-                    <input type="text" id="empNid" class="custom-input" placeholder="30906070********" maxlength="14" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <span class="error-msg">Please enter a valid 14-digit National ID.</span>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="custom-label">Phone</label>
-                    <input type="text" id="empPhone" class="custom-input" placeholder="01556176733" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <span class="error-msg">Please enter a valid 11-digit phone number.</span>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="custom-label">Department</label>
+                <div class="col-md-12">
+                    <label class="custom-label">Document Type</label>
                     <select id="empDept" class="custom-select">
                         <option selected>IT</option>
                         <option>HR</option>
@@ -165,11 +153,36 @@
                     </select>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="custom-label">Position</label>
-                    <input type="text" id="empPosition" class="custom-input" placeholder="It manager">
-                    <span class="error-msg">Position is required.</span>
+                <div class="col-md-4">
+                    <label class="custom-label">SIM Count</label>
+                    <input type="text" id="empPhone" class="custom-input" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <span class="error-msg">Please enter a valid 11-digit phone number.</span>
                 </div>
+                <div class="col-md-4">
+                    <label class="custom-label">USB Count</label>
+                    <input type="text" id="empPhone" class="custom-input" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <span class="error-msg">Please enter a valid 11-digit phone number.</span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="custom-label">Server Provider</label>
+                    <select id="empDept" class="custom-select">
+                        <option selected>IT</option>
+                        <option>HR</option>
+                        <option>Marketing</option>
+                        <option>Sales</option>
+                    </select>
+                </div>
+
+
+                <div class="col-md-12">
+                    <label class="custom-label">Notes</label>
+                    <textarea type="text" id="empName" class="custom-input" ></textarea>
+                    <span class="error-msg">Document number is required.</span>
+                </div>
+
+
+                
             </div>
 
             <div class="d-flex justify-content-end gap-3 mt-4">

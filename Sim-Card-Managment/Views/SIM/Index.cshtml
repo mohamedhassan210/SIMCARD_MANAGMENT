@@ -1,10 +1,5 @@
 ﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.DeviceDirectoryViewModel>
 
-@{
-    string currentStatus = ViewBag.CurrentStatus ?? "all";
-    string currentType = ViewBag.CurrentType ?? "all";
-}
-
 <style>
     /* ---------- Title ---------- */
     .title-section {
@@ -86,6 +81,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-wrap: wrap;
     }
 
     .status-select {
@@ -117,6 +113,7 @@
         border-radius: 10px;
         padding: 11px 14px;
         transition: border-color 0.2s ease;
+        min-width: 250px;
     }
 
         .search-box:focus-within {
@@ -146,6 +143,7 @@
     /* ---------- Table ---------- */
     .table-wrap {
         margin-top: 28px;
+        overflow-x: auto;
     }
 
     table {
@@ -307,26 +305,28 @@
         </div>
     </div>
 
-    <form id="filterForm" method="get" asp-controller="SIM" asp-action="Index" class="filters">
+    <!-- Form changed to preventDefault to stop page reloads during JS filtering -->
+    <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
         <div class="filters-row">
             <div class="filter-group">
                 <label for="status-filter">Status</label>
-                <select id="status-filter" name="status" class="status-select" onchange="this.form.submit()">
-                    <!option value="active" @(currentStatus == "active" ? "selected" : "")>Active</!option>
-                    <!option value="available" @(currentStatus == "available" ? "selected" : "")>Available</!option>
-                    <!option value="all" @(currentStatus == "all" ? "selected" : "")>All</!option>
+                <select id="status-filter" class="status-select">
+                    <option value="all">All</option>
+                    <option value="active">Active</option>
+                    <option value="available">Available</option>
                 </select>
             </div>
 
             <div class="filter-group">
                 <label for="device-type-filter">Type</label>
-                <select id="device-type-filter" name="type" class="status-select" onchange="this.form.submit()">
-                    <!option value="all" @(currentType == "all" ? "selected" : "")>All Types</!option>
-                    <!option value="sim" @(currentType == "sim" ? "selected" : "")>SIM Card</!option>
-                    <!option value="usb" @(currentType == "usb" ? "selected" : "")>USB Modem</!option>
+                <select id="device-type-filter" class="status-select">
+                    <option value="all">All Types</option>
+                    <option value="sim">SIM Card</option>
+                    <option value="usb">USB Modem</option>
                 </select>
             </div>
 
+            
             <div class="filter-group" style="flex: 1;">
                 <label for="search-input">Search (Client-Side)</label>
                 <div class="search-box">
@@ -357,7 +357,11 @@
                 {
                     foreach (var item in Model)
                     {
-                        <tr class="device-row">
+                        <!-- Added Data Attributes here to easily read status, type, and assignment type via JS -->
+                        <tr class="device-row"
+                            data-status="@(item.Status?.ToLower() ?? "")"
+                            data-type="@(item.DeviceType?.ToLower() ?? "")"
+                            data-assignee-type="@(item.AssignedToType?.ToLower() ?? "")">
                             <td>
                                 <strong>@item.SerialNumber</strong>
                                 @if (!string.IsNullOrEmpty(item.ProviderName))
@@ -426,6 +430,10 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("search-input");
+        const statusFilter = document.getElementById("status-filter");
+        const typeFilter = document.getElementById("device-type-filter");
+        const empFilter = document.getElementById("emp-filter");
+
         const allRows = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
         const noResultsRow = document.getElementById("noResultsRow");
         const showingText = document.getElementById("showingText");
@@ -434,6 +442,44 @@
         const itemsPerPage = 7;
         let visibleRows = [...allRows];
         let currentPage = 1;
+
+        // Centralized filter function
+        function applyFilters() {
+            const query = searchInput.value.trim().toLowerCase();
+            const statusVal = statusFilter.value.toLowerCase();
+            const typeVal = typeFilter.value.toLowerCase();
+            const empVal = empFilter.value.toLowerCase();
+
+            visibleRows = allRows.filter(row => {
+                // 1. Check Search Query
+                const text = row.innerText.toLowerCase();
+                const matchesSearch = text.includes(query);
+
+                // 2. Check Status Filter
+                const rowStatus = row.getAttribute("data-status");
+                const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
+
+                // 3. Check Type Filter
+                const rowType = row.getAttribute("data-type");
+                const matchesType = (typeVal === "all") || (rowType === typeVal);
+
+                // 4. Check Employee / Non-Employee Filter
+                const rowAssigneeType = row.getAttribute("data-assignee-type");
+                const isEmployee = rowAssigneeType.includes("employee") || rowAssigneeType.includes("emp");
+
+                let matchesEmp = true;
+                if (empVal === "emp") {
+                    matchesEmp = isEmployee;
+                } else if (empVal === "non-emp") {
+                    matchesEmp = !isEmployee;
+                }
+
+                return matchesSearch && matchesStatus && matchesType && matchesEmp;
+            });
+
+            currentPage = 1; // Reset to first page whenever a filter changes
+            renderTable();
+        }
 
         function renderTable() {
             const totalVisible = visibleRows.length;
@@ -444,7 +490,10 @@
             const startIdx = (currentPage - 1) * itemsPerPage;
             const endIdx = startIdx + itemsPerPage;
 
+            // Hide all rows initially
             allRows.forEach(row => row.style.display = "none");
+
+            // Show only the paginated slice of visible rows
             visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
 
             if (totalVisible === 0) {
@@ -470,18 +519,13 @@
             paginationContainer.innerHTML = html;
         }
 
-        searchInput.addEventListener("input", function () {
-            const query = this.value.trim().toLowerCase();
+        // Event Listeners for Filters
+        searchInput.addEventListener("input", applyFilters);
+        statusFilter.addEventListener("change", applyFilters);
+        typeFilter.addEventListener("change", applyFilters);
+        empFilter.addEventListener("change", applyFilters);
 
-            visibleRows = allRows.filter(row => {
-                const text = row.innerText.toLowerCase();
-                return text.includes(query);
-            });
-
-            currentPage = 1;
-            renderTable();
-        });
-
+        // Event Listener for Pagination
         paginationContainer.addEventListener("click", function (e) {
             const btn = e.target.closest("button");
             if (!btn || btn.disabled) return;
@@ -498,6 +542,7 @@
             renderTable();
         });
 
+        // Initial render
         renderTable();
     });
 </script>
