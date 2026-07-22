@@ -66,7 +66,8 @@ border-radius: 20px !important;
 
 .navbar {
     z-index: 999;
-    background-color: #E24D17
+    background-color: #E24D17;
+    border-bottom:2px solid rgba(255, 255, 255, 0.7);
 }
 
 /*-------------- End Of NavBar ----------------------*/
@@ -84,11 +85,7 @@ border-radius: 20px !important;
         background-color: white !important;
         border-radius: 10px !important;
     }
-/* Custom Sidebar Dropdown Styles */
-.sidebar-accordion .accordion-item {
-    background: transparent;
-    border: none;
-}
+
 
 /* Rotate the triangle when collapsed */
 .sidebar-toggle-btn .toggle-triangle {
@@ -123,21 +120,60 @@ border-radius: 20px !important;
     font-size: 0.95rem;
     color: #d1d1d1;
 }
+
+/* No border on the card itself */
+.sidebar-accordion .accordion-item {
+    background-color: transparent;
+    border: none;
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.sidebar-accordion .accordion-item + .accordion-item {
+    margin-top: 0.5rem;
+}
+
+/* Border only on the small triangle dropdown icon */
+.sidebar-accordion .triangle-box {
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+}
+
+/* Static logout button pinned to the bottom of the sidebar */
+.sidebar-logout-wrapper {
+    margin-top: auto;
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.sidebar-logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: rgba(220, 53, 69, 0.15);
+    border: 1px solid rgba(220, 53, 69, 0.5);
+    color: #fff;
+    border-radius: 10px;
+    padding: 0.6rem 0.9rem;
+    font-size: 1rem;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+    .sidebar-logout-btn:hover {
+        background-color: rgba(220, 53, 69, 0.35);
+        border-color: rgba(220, 53, 69, 0.8);
+        color: #fff;
+    }
+
+    .sidebar-logout-btn .icon-box-sub {
+        background-color: rgba(220, 53, 69, 0.9);
+    }
+
+
 /*-------------- End Of Side Bar ----------------------*/
 /*==========================================================*/
 /*---------------------- End of Layout-----------------------*/
-
-
-
-
-
-
-
-
-
-
-
-
 /* --- OTP Input Boxes --- */
 .otp-input {
     width: 75px;
