@@ -23,7 +23,7 @@
         }
         .rounded {
             border-radius: 70px !important;
-            width: 386x !important;
+            width: 386px !important;
             padding: 10px !important;
         }
 
@@ -150,14 +150,14 @@
 
 <body>
 
-    <section class="p-74">
+    <section class="p-100">
         <h1 class=" fw-bold ms-3">Subscription management</h1>
 
         <div class="d-flex justify-content-between align-items-center">
             <p class="ms-4 text-secondary">Monitor enterprise asset performance and usage metrics in real-time.</p>
-            <button class="btn active me-4 text-white rounded" style="background-color: #E24D17;">
+            <a class="btn active me-4 text-white rounded" style="background-color: #E24D17;" asp-controller="subscription" asp-action="create">
                 <i class="fa-solid fa-plus me-2"></i>Create new Subscription
-            </button>
+            </a>
 
         </div>
 
