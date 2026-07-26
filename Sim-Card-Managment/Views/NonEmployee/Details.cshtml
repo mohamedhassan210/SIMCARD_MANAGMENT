@@ -1,7 +1,7 @@
-﻿@model Sim_Card_Managment.Models.Employee
+﻿@model Sim_Card_Managment.Models.NonEmployee
 
 @{
-    ViewData["Title"] = "Employee Details";
+    ViewData["Title"] = "Non-Employee Details";
     var activeSubscriptions = Model.Subscriptions?.Where(s => s.EndDate == null || s.EndDate > DateTime.Now).ToList() ?? new();
 }
 
@@ -18,6 +18,8 @@
         --text-dark: #1E293B;
         --text-muted: #64748B;
         --card-border: #E2E8F0;
+        --visitor-amber: #B06000;
+        --visitor-bg: #FEEFC3;
     }
 
     /* Page Header */
@@ -38,13 +40,13 @@
 
     .emp-badge {
         font-size: 0.875rem;
-        background-color: rgba(223, 83, 27, 0.1);
-        color: var(--brand-orange);
+        background-color: var(--visitor-bg);
+        color: var(--visitor-amber);
         font-weight: 700;
         padding: 6px 16px;
         border-radius: 50px;
         vertical-align: middle;
-        border: 1px solid rgba(223, 83, 27, 0.2);
+        border: 1px solid rgba(176, 96, 0, 0.2);
     }
 
     .emp-id-chip {
@@ -226,12 +228,12 @@
                     <div class="d-flex align-items-center gap-3 flex-wrap">
                         <h1 class="emp-title m-0">@Model.Name</h1>
                         <span class="emp-badge">
-                            <i class="fa-solid fa-sim-card me-1"></i> @activeSubscriptions.Count Active SIM(s)
+                            <i class="fa-solid fa-user-tag me-1"></i> Non-Employee / External
                         </span>
                     </div>
                     <div class="mt-2">
                         <span class="emp-id-chip">
-                            <i class="fa-regular fa-id-card me-2"></i> @(Model.NationalID ?? "N/A")
+                            <i class="fa-solid fa-phone me-2"></i> @(Model.ContactInfo ?? "No Phone")
                         </span>
                     </div>
                 </div>
@@ -261,24 +263,24 @@
                     <i class="fa-solid fa-user-gear"></i>
                 </div>
                 <div>
-                    <h3 class="m-0 fs-5 fw-bold text-dark">Employee Details</h3>
-                    <p class="m-0 text-muted small">Personal and employment information</p>
+                    <h3 class="m-0 fs-5 fw-bold text-dark">Non-Employee Information</h3>
+                    <p class="m-0 text-muted small">External contact details and asset assignments</p>
                 </div>
             </div>
 
             <div class="p-4 p-md-5">
                 <div class="row g-4 mb-5">
-                    <div class="col-12 col-sm-6 col-md-3">
+                    <div class="col-12 col-sm-6 col-md-4">
                         <div class="info-grid-label">Full Name</div>
                         <div class="info-grid-value">@Model.Name</div>
                     </div>
-                    <div class="col-12 col-sm-6 col-md-3">
-                        <div class="info-grid-label">National ID</div>
-                        <div class="info-grid-value">@(Model.NationalID ?? "N/A")</div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                        <div class="info-grid-label">Contact Phone</div>
+                        <div class="info-grid-value">@(Model.ContactInfo ?? "N/A")</div>
                     </div>
-                    <div class="col-12 col-sm-6 col-md-3">
-                        <div class="info-grid-label">Job Title / Department</div>
-                        <div class="info-grid-value">@(Model.Position ?? "Unassigned")</div>
+                    <div class="col-12 col-sm-6 col-md-4">
+                        <div class="info-grid-label">Type</div>
+                        <div class="info-grid-value">@(Model.Type ?? "N/A")</div>
                     </div>
                 </div>
 
@@ -286,7 +288,9 @@
 
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <h4 class="fw-bold fs-5 m-0 text-dark">Assigned Subscriptions & Assets</h4>
-                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-normal">Total Cards: @(Model.Subscriptions?.Count ?? 0)</span>
+                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-normal">
+                        Total Cards: @(Model.Subscriptions?.Count ?? 0)
+                    </span>
                 </div>
 
                 <div class="d-flex gap-4 overflow-auto pb-3 pt-1">
@@ -297,16 +301,19 @@
                         {
                             bool isActive = sub.EndDate == null || sub.EndDate > DateTime.Now;
 
-
+                            
+                            // 1. Safely retrieve the provider name with full null checks
                             string rawProvider = sub.Sim?.ServiceProvider?.Name?.ToLower().Trim() ?? "";
                         
+                            // 2. Pattern match to ensure partial strings like "Orange Egypt" match "orange.png"
                             string logoFileName = rawProvider switch
                             {
-                                var p when p.Contains("vodafone") => "fodafone.png",
+                                var p when p.Contains("vodafone") => "vodafone.png",
                                 var p when p.Contains("orange")   => "orange.png",
                                 var p when p.Contains("etisalat") || p.Contains("e&") => "etisalat.png",
                                 _ => "we.png" // default fallback
                             };
+                        
 
                             <div class="sim-card @(isActive ? "sim-card-active" : "sim-card-outline")">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -336,7 +343,7 @@
                     }
                     else
                     {
-                        <p class="text-muted italic">No SIM cards or assets currently assigned.</p>
+                        <p class="text-muted italic">No SIM cards or assets currently assigned to this non-employee.</p>
                     }
                 </div>
             </div>
@@ -349,7 +356,7 @@
     <script>
         function confirmDelete() {
             Swal.fire({
-                title: 'Delete Employee Profile?',
+                title: 'Delete Non-Employee Profile?',
                 text: "This action cannot be undone.",
                 icon: 'warning',
                 showCancelButton: true,

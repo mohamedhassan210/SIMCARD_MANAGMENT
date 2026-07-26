@@ -14,5 +14,6 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
 
         // Add this method:
         Task<IEnumerable<NonEmployee>> SearchNonEmployeesAsync(string query);
+        IEnumerable<string> GetDistinctTypes();
     }
 }

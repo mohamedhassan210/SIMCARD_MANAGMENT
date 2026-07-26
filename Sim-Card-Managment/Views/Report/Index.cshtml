@@ -1,17 +1,13 @@
-﻿<!DOCTYPE html>
+﻿@model IEnumerable<Sim_Card_Managment.Models.Subscription>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports Dashboard</title>
 
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
-    <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -33,23 +29,17 @@
             padding: 2rem 0;
         }
 
-        /* Top Navigation */
         .header-nav {
             display: flex;
             align-items: center;
             margin-bottom: 3rem;
         }
 
-        .brand-logos img {
-            height: 32px;
-            margin-right: 15px;
-        }
-
         .pill-nav-container {
             flex-grow: 1;
             display: flex;
             justify-content: center;
-            margin-right: 150px; /* Offset to center navigation perfectly */
+            margin-right: 150px;
         }
 
         .pill-nav {
@@ -76,7 +66,6 @@
                     box-shadow: 0 2px 4px rgba(229, 80, 38, 0.3);
                 }
 
-        /* Hero Text */
         .page-title {
             font-size: 2.5rem;
             font-weight: 700;
@@ -91,7 +80,6 @@
             margin-bottom: 2.5rem;
         }
 
-        /* Report Cards */
         .report-card {
             background-color: #ffffff;
             border-radius: 16px;
@@ -139,7 +127,6 @@
             color: rgba(255, 255, 255, 0.9);
         }
 
-        /* Buttons */
         .btn-view-online {
             background-color: var(--brand-orange);
             color: white;
@@ -151,6 +138,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            text-decoration: none;
         }
 
             .btn-view-online:hover {
@@ -170,10 +158,12 @@
             justify-content: center;
             font-size: 1.1rem;
             transition: all 0.2s;
+            text-decoration: none;
         }
 
             .btn-icon-outline:hover {
                 background-color: #fbeae5;
+                color: var(--brand-orange);
             }
 
         .btn-export-light {
@@ -189,10 +179,12 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0.75rem;
+            text-decoration: none;
         }
 
             .btn-export-light:hover {
                 background-color: #f8f9fa;
+                color: var(--text-dark);
             }
 
         .btn-excel {
@@ -205,6 +197,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            text-decoration: none;
         }
 
             .btn-excel:hover {
@@ -212,7 +205,6 @@
                 color: white;
             }
 
-        /* Table & Filters */
         .section-title {
             font-size: 1.75rem;
             font-weight: 700;
@@ -236,12 +228,6 @@
             font-size: 0.9rem;
             color: #4b5563;
         }
-
-            .filter-input:focus {
-                background-color: transparent;
-                box-shadow: none;
-                border-color: var(--brand-orange);
-            }
 
         .date-input-wrapper {
             position: relative;
@@ -288,31 +274,6 @@
                 border-bottom: 1px solid #e5e7eb;
             }
 
-            .custom-table tr:last-child td {
-                border-bottom: none;
-            }
-
-        .device-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-            .device-info i {
-                color: #6b7280;
-                font-size: 1.2rem;
-            }
-
-            .device-info div {
-                line-height: 1.3;
-            }
-
-        .quota-text {
-            color: var(--brand-orange);
-            font-weight: 700;
-            font-size: 1.05rem;
-        }
-
         .status-badge {
             display: inline-block;
             border: 1px solid #10b981;
@@ -321,7 +282,6 @@
             padding: 0.25rem 1rem;
             font-size: 0.75rem;
             font-weight: 600;
-            background: transparent;
         }
     </style>
 </head>
@@ -329,9 +289,7 @@
 
     <div class="container">
 
-        <!-- Top Navigation Area -->
         <header class="header-nav">
-            <!-- Logo Placeholders (Styled as text to match visual if actual images are missing) -->
             <div class="brand-logos d-flex align-items-center gap-2">
                 <span style="color:var(--brand-orange); font-weight:800; font-size:1.4rem; letter-spacing:-0.5px;">
                     <i class="bi bi-box-fill"></i> FATHALLA
@@ -341,147 +299,160 @@
 
             <div class="pill-nav-container">
                 <nav class="pill-nav">
-                    <a href="#">Home</a>
-                    <a href="#">Sim</a>
-                    <a href="#">Usb</a>
-                    <a href="#" class="active">Employees</a>
+                    <a asp-controller="Home" asp-action="Index">Home</a>
+                    <a asp-controller="Sim" asp-action="Index">Sim</a>
+                    <a asp-controller="Usb" asp-action="Index">Usb</a>
+                    <a asp-controller="Employee" asp-action="Index" class="active">Employees</a>
                 </nav>
             </div>
         </header>
 
-        <!-- Hero Section -->
         <div class="mb-5">
             <h1 class="page-title">Reports</h1>
             <p class="page-subtitle">Monitor enterprise asset performance and usage metrics in real-time.</p>
         </div>
 
-        <!-- Cards Section -->
         <div class="row g-4 mb-5">
-            <!-- Card 1 -->
             <div class="col-md-4">
                 <div class="report-card">
                     <div class="icon-box">
                         <i class="bi bi-device-hdd-fill"></i>
                     </div>
-                    <h3 class="card-title">Device Status Report</h3>
-                    <p class="card-text">Real-time health monitoring of all assigned USB devices and SIM cards across departments.</p>
+                    <h3 class="card-title">Subscriptions Report</h3>
+                    <p class="card-text">Real-time status monitoring of all active and historical subscriptions across departments.</p>
                     <div class="d-flex align-items-center gap-3">
-                        <button class="btn-view-online">
+                        <a asp-controller="Report" asp-action="ViewSubscriptionsOnline" target="_blank" class="btn-view-online">
                             View online <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn-icon-outline">
+                        </a>
+                        <a asp-controller="Report" asp-action="ExportSubscriptionsExcel" class="btn-icon-outline" title="Download Excel">
                             <i class="bi bi-file-earmark-text"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 2 -->
             <div class="col-md-4">
                 <div class="report-card">
                     <div class="icon-box">
                         <i class="bi bi-person-fill"></i>
                     </div>
-                    <h3 class="card-title">All Employees</h3>
-                    <p class="card-text">Real-time health monitoring of all assigned USB devices and SIM cards across departments.</p>
+                    <h3 class="card-title">All Employees Report</h3>
+                    <p class="card-text">Detailed breakdown of all employees, assigned SIM cards, and USB devices count.</p>
                     <div class="d-flex align-items-center gap-3">
-                        <button class="btn-view-online">
+                        <a asp-controller="Report" asp-action="ViewEmployeesOnline" target="_blank" class="btn-view-online">
                             View online <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn-icon-outline">
+                        </a>
+                        <a asp-controller="Report" asp-action="ExportEmployeesExcel" class="btn-icon-outline" title="Download Excel">
                             <i class="bi bi-file-earmark-text"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 3 (Orange) -->
             <div class="col-md-4">
                 <div class="report-card bg-orange">
                     <h3 class="card-title mb-2">Bulk export</h3>
                     <p class="card-text">Download all system reports for the current fiscal period in Excel format.</p>
                     <div class="mt-auto">
-                        <button class="btn-export-light">
-                            Export all to excel <i class="bi bi-file-earmark-spreadsheet text-dark"></i>
-                        </button>
-                        <button class="btn-export-light mb-0">
-                            Email pdf bandle <i class="bi bi-envelope text-dark"></i>
-                        </button>
+                        <a asp-controller="Report" asp-action="ExportSubscriptionsExcel" class="btn-export-light">
+                            Export Subscriptions <i class="bi bi-file-earmark-spreadsheet text-dark"></i>
+                        </a>
+                        <a asp-controller="Report" asp-action="ExportEmployeesExcel" class="btn-export-light mb-0">
+                            Export Employees <i class="bi bi-file-earmark-spreadsheet text-dark"></i>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Subscription Reports Section -->
-        <h2 class="section-title">Subscription reports</h2>
 
-        <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
-            <div class="d-flex gap-4 flex-wrap">
-                <div>
-                    <label class="filter-label">Date</label>
-                    <div class="date-input-wrapper">
-                        <input type="text" class="form-control filter-input" value="may 1 - 2026 - july 2 -2023" readonly>
-                        <i class="bi bi-calendar3"></i>
-                    </div>
-                </div>
-                <div>
-                    <label class="filter-label">Status</label>
-                    <select class="form-control filter-input status-select">
-                        <option>Active</option>
-                    </select>
-                </div>
+<h2 class="section-title">Subscription reports</h2>
+
+<div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+    <div class="d-flex gap-4 flex-wrap">
+        <div>
+            <label class="filter-label">Date</label>
+            <div class="date-input-wrapper">
+                <input type="text" class="form-control filter-input" value="May 1, 2026 - Jul 2, 2026" readonly>
+                <i class="bi bi-calendar3"></i>
             </div>
-            <button class="btn-excel">
-                <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export
-            </button>
         </div>
+        <div>
+            <label class="filter-label">Status</label>
+            <select class="form-control filter-input status-select">
+                <option>Active</option>
+            </select>
+        </div>
+    </div>
 
-        <div class="table-responsive mb-5">
-            <table class="custom-table">
-                <thead>
+    <a asp-controller="Report" asp-action="ExportSubscriptionsExcel" class="btn-excel">
+        <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Subscriptions Excel
+    </a>
+</div>
+
+<div class="table-responsive mb-5">
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>Subscriber</th>
+                <th>Device</th>
+                <th>Quota</th>
+                <th>Monthly fees</th>
+                <th>Status</th>
+                <th>Start date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var sub in Model)
+                {
+                    bool isActive = sub.EndDate == null || sub.EndDate > DateTime.Now;
+                    string subscriberName = sub.Employee?.Name ?? sub.NonEmployee?.Name ?? "Unassigned";
+
                     <tr>
-                        <th>Subscriber</th>
-                        <th>Device</th>
-                        <th>Quota</th>
-                        <th>Monthly fees</th>
-                        <th>Status</th>
-                        <th>Start date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Row 1 -->
-                    <tr>
-                        <td class="fw-medium">Sara Mohamed</td>
+                        <td class="fw-medium">@subscriberName</td>
                         <td>
-                            <div class="device-info">
-                                <i class="bi bi-sim"></i>
-                                <div>SIM<br>#202</div>
+                            <div class="device-info d-flex align-items-center gap-2">
+                                @if (sub.Sim != null)
+                                {
+                                    <i class="bi bi-sim fs-5"></i>
+                                    <div>SIM<br>#@(sub.Sim.PhoneNumber ?? sub.Sim.Id.ToString().Substring(0, 5))</div>
+                                }
+                                else if (sub.Usb != null)
+                                {
+                                    <i class="bi bi-usb-drive fs-5"></i>
+                                    <div>USB<br>#@(sub.Usb.SerialNumber ?? sub.Usb.Id.ToString().Substring(0, 5))</div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
                             </div>
                         </td>
-                        <td class="quota-text">500GB</td>
+                        <td class="quota-text">@(sub.Quota?.BaseAmount+sub.Quota?.ExtraAmount ?? 0)</td>
                         <td>Monthly fees</td>
-                        <td><span class="status-badge">Active</span></td>
-                        <td class="text-muted" style="line-height: 1.3">Jan 12<br>2024</td>
-                    </tr>
-                    <!-- Row 2 -->
-                    <tr>
-                        <td class="fw-medium">Sara Mohamed</td>
                         <td>
-                            <div class="device-info">
-                                <i class="bi bi-sim"></i>
-                                <div>SIM<br>#202</div>
-                            </div>
+                            <span class="status-badge" style="border-color: @(isActive ? "#10b981" : "#ef4444"); color: @(isActive ? "#10b981" : "#ef4444");">
+                                @(isActive ? "Active" : "Inactive")
+                            </span>
                         </td>
-                        <td class="quota-text">500GB</td>
-                        <td>Monthly fees</td>
-                        <td><span class="status-badge">Active</span></td>
-                        <td class="text-muted" style="line-height: 1.3">Jan 12<br>2024</td>
+                        <td class="text-muted" style="line-height: 1.3">
+                            @sub.StartDate.ToString("MMM dd")<br>@sub.StartDate.ToString("yyyy")
+                        </td>
                     </tr>
-                </tbody>
-            </table>
-        </div>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">No subscriptions found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
-        <!-- Employees Section -->
         <h2 class="section-title">Employees</h2>
 
         <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
@@ -489,7 +460,7 @@
                 <div>
                     <label class="filter-label">Date</label>
                     <div class="date-input-wrapper">
-                        <input type="text" class="form-control filter-input" value="may 1 - 2026 - july 2 -2023" readonly>
+                        <input type="text" class="form-control filter-input" value="May 1, 2026 - Jul 2, 2026" readonly>
                         <i class="bi bi-calendar3"></i>
                     </div>
                 </div>
@@ -500,59 +471,14 @@
                     </select>
                 </div>
             </div>
-            <button class="btn-excel">
-                <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export
-            </button>
-        </div>
 
-        <div class="table-responsive mb-5">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Subscriber</th>
-                        <th>Device</th>
-                        <th>Quota</th>
-                        <th>Monthly fees</th>
-                        <th>Status</th>
-                        <th>Start date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Row 1 -->
-                    <tr>
-                        <td class="fw-medium">Sara Mohamed</td>
-                        <td>
-                            <div class="device-info">
-                                <i class="bi bi-sim"></i>
-                                <div>SIM<br>#202</div>
-                            </div>
-                        </td>
-                        <td class="quota-text">500GB</td>
-                        <td>Monthly fees</td>
-                        <td><span class="status-badge">Active</span></td>
-                        <td class="text-muted" style="line-height: 1.3">Jan 12<br>2024</td>
-                    </tr>
-                    <!-- Row 2 -->
-                    <tr>
-                        <td class="fw-medium">Sara Mohamed</td>
-                        <td>
-                            <div class="device-info">
-                                <i class="bi bi-sim"></i>
-                                <div>SIM<br>#202</div>
-                            </div>
-                        </td>
-                        <td class="quota-text">500GB</td>
-                        <td>Monthly fees</td>
-                        <td><span class="status-badge">Active</span></td>
-                        <td class="text-muted" style="line-height: 1.3">Jan 12<br>2024</td>
-                    </tr>
-                </tbody>
-            </table>
+            <a asp-controller="Report" asp-action="ExportEmployeesExcel" class="btn-excel">
+                <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Employees Excel
+            </a>
         </div>
 
     </div>
 
-    <!-- Bootstrap JS (Optional, for components that require JS like dropdowns) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

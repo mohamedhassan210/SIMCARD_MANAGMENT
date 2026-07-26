@@ -66,7 +66,13 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
         public Employee? GetById(Guid id)
         {
             return _context.Employees
-                .Include(e => e.Subscriptions)
+                .Include(e => e.Subscriptions!)
+                    .ThenInclude(s => s.Sim)
+                        .ThenInclude(s=>s.ServiceProvider)
+                .Include(e => e.Subscriptions!)
+                    .ThenInclude(s => s.Usb)
+                .Include(e => e.Subscriptions!)
+                    .ThenInclude(s => s.Quota)
                 .Include(e => e.ReceivedTransfers)
                 .FirstOrDefault(e => e.Id == id);
         }
@@ -93,11 +99,21 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
 
         public void Delete(Guid id)
         {
+            // Find all subscriptions associated with this employee
+            var subscriptions = _context.Subscriptions
+                .Where(s => s.EmpId == id)
+                .ToList();
+
+            if (subscriptions.Any())
+            {
+                _context.Subscriptions.RemoveRange(subscriptions);
+            }
+
             var employee = _context.Employees.Find(id);
             if (employee != null)
             {
                 _context.Employees.Remove(employee);
-                _context.SaveChanges();
+                _context.SaveChanges(); // Saves both subscription removals and employee deletion
             }
         }
     }

@@ -17,7 +17,15 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
         {
             _context = context;
         }
-
+        public IEnumerable<string> GetDistinctTypes()
+        {
+            return _context.NonEmployees
+                .Where(n => !string.IsNullOrEmpty(n.Type))
+                .Select(n => n.Type!)
+                .Distinct()
+                .OrderBy(t => t)
+                .ToList();
+        }
         // Add this implementation:
         public async Task<IEnumerable<NonEmployee>> SearchNonEmployeesAsync(string query)
         {
@@ -66,7 +74,15 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
 
         public NonEmployee? GetById(Guid id)
         {
-            return _context.NonEmployees.Find(id);
+            return _context.NonEmployees
+                .Include(e => e.Subscriptions!)
+                    .ThenInclude(s => s.Sim)
+                        .ThenInclude(s=>s.ServiceProvider)
+                .Include(e => e.Subscriptions!)
+                    .ThenInclude(s => s.Usb)
+                .Include(e => e.Subscriptions!)
+                    .ThenInclude(s => s.Quota)
+                .FirstOrDefault(e => e.Id == id);
         }
 
         public void Add(NonEmployee nonEmployee)
@@ -83,11 +99,21 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
 
         public void Delete(Guid id)
         {
-            var ne = GetById(id);
-            if (ne != null)
+            // Find all subscriptions associated with this non-employee
+            var subscriptions = _context.Subscriptions
+                .Where(s => s.NonEmployeeId == id)
+                .ToList();
+
+            if (subscriptions.Any())
             {
-                _context.NonEmployees.Remove(ne);
-                _context.SaveChanges();
+                _context.Subscriptions.RemoveRange(subscriptions);
+            }
+
+            var nonEmployee = _context.NonEmployees.Find(id);
+            if (nonEmployee != null)
+            {
+                _context.NonEmployees.Remove(nonEmployee);
+                _context.SaveChanges(); // Saves both subscription removals and non-employee deletion
             }
         }
     }

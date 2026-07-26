@@ -1,59 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
-using Sim_Card_Managment.Authorization;
 using Sim_Card_Managment.Models;
+using Sim_Card_Managment.Repos.EmployeeRepos;
 using Sim_Card_Managment.Repos.NonEmployeeRepos;
-using Sim_Card_Managment.ViewModels;
 using System;
 
 namespace Sim_Card_Managment.Controllers
 {
-    [RequirePermission]
     public class NonEmployeeController : Controller
     {
-        private readonly INonEmployeeRepo _repo;
+        private readonly INonEmployeeRepo _nonEmployeeRepo;
+        private readonly IEmployeeRepo _employeeRepo;
 
-        public NonEmployeeController(INonEmployeeRepo repo)
+        public NonEmployeeController(INonEmployeeRepo nonEmployeeRepo, IEmployeeRepo employeeRepo)
         {
-            _repo = repo;
+            _nonEmployeeRepo = nonEmployeeRepo;
+            _employeeRepo = employeeRepo;
         }
-
-        // GET: /NonEmployee
-        public IActionResult Index()
-        {
-            var nonEmployeesFromDb = _repo.GetAll()?.ToList();
-            var currentDate = DateTime.Now;
-
-            if (nonEmployeesFromDb == null)
-            {
-                return View(new List<NonEmployeeIndexViewModel>());
-            }
-
-            var viewModelList = nonEmployeesFromDb.Select(ne => {
-                var activeSubs = ne.Subscriptions?
-                    .Where(s => s.StartDate <= currentDate && (s.EndDate == null || s.EndDate > currentDate))
-                    .ToList();
-
-                return new NonEmployeeIndexViewModel
-                {
-                    Id = ne.Id,
-                    Name = ne.Name,
-                    ContactInfo = ne.ContactInfo,
-                    ActiveSimOnlyCount = activeSubs?.Count(s => s.UsbId == null) ?? 0,
-                    ActiveUsbCount = activeSubs?.Count(s => s.UsbId != null) ?? 0
-                };
-            }).ToList();
-
-            return View(viewModelList);
-        }
-
-        // GET: /NonEmployee/Details/{id}
-        public IActionResult Details(Guid id)
-        {
-            var nonEmployee = _repo.GetById(id);
-            if (nonEmployee == null) return NotFound();
-            return View(nonEmployee);
-        }
-
         // GET: /NonEmployee/Create
         public IActionResult Create()
         {
@@ -73,45 +35,93 @@ namespace Sim_Card_Managment.Controllers
             nonEmployee.Id = Guid.NewGuid();
             nonEmployee.CreatedAt = DateTime.Now;
 
-            _repo.Add(nonEmployee);
+            _nonEmployeeRepo.Add(nonEmployee);
 
             return RedirectToAction("Index", "Employee");
         }
+        // GET: /NonEmployee/Details/{id}
+        public IActionResult Details(Guid id)
+        {
+            // 1. Fetch non-employee by ID
+            var nonEmployee = _nonEmployeeRepo.GetById(id);
+            if (nonEmployee != null)
+            {
+                return View("Details", nonEmployee);
+            }
+
+            // 2. Fallback: Check if person is an Employee
+            var employee = _employeeRepo.GetById(id);
+            if (employee != null)
+            {
+                return RedirectToAction("Details", "Employee", new { id = id });
+            }
+
+            return NotFound();
+        }
+        private void PopulateTypesDropdown()
+        {
+            // Fetch distinct types via repository
+            var existingTypes = _nonEmployeeRepo.GetDistinctTypes();
+
+            // Default categories
+            var defaultTypes = new List<string> { "Contractor", "Visitor", "Consultant", "Vendor", "Temporary" };
+
+            // Merge defaults with existing DB types without duplicates
+            var allTypes = defaultTypes.Union(existingTypes).Distinct().ToList();
+
+            ViewBag.TypeOptions = allTypes;
+        }
 
         // GET: /NonEmployee/Edit/{id}
+        [HttpGet]
         public IActionResult Edit(Guid id)
         {
-            var nonEmployee = _repo.GetById(id);
-            if (nonEmployee == null) return NotFound();
+            var nonEmployee = _nonEmployeeRepo.GetById(id);
+            if (nonEmployee == null)
+            {
+                return NotFound();
+            }
+
+            PopulateTypesDropdown();
             return View(nonEmployee);
         }
 
         // POST: /NonEmployee/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Guid id, NonEmployee nonEmployee)
+        public IActionResult Edit(NonEmployee nonEmployee, string? CustomType)
         {
-            if (id != nonEmployee.Id) return BadRequest();
-            if (!ModelState.IsValid) return View(nonEmployee);
-            _repo.Update(nonEmployee);
-            return RedirectToAction(nameof(Index));
-        }
+            // Handle "SomethingElse" custom type input
+            if (nonEmployee.Type == "SomethingElse")
+            {
+                if (string.IsNullOrWhiteSpace(CustomType))
+                {
+                    ModelState.AddModelError("Type", "Please specify the custom category type.");
+                }
+                else
+                {
+                    nonEmployee.Type = CustomType.Trim();
+                }
+            }
 
-        // GET: /NonEmployee/Delete/{id}
-        public IActionResult Delete(Guid id)
-        {
-            var nonEmployee = _repo.GetById(id);
-            if (nonEmployee == null) return NotFound();
+            if (ModelState.IsValid)
+            {
+                _nonEmployeeRepo.Update(nonEmployee);
+                return RedirectToAction("Details", "NonEmployee", new { id = nonEmployee.Id });
+            }
+
+            // Reload dropdown options if model validation fails
+            PopulateTypesDropdown();
             return View(nonEmployee);
         }
 
-        // POST: /NonEmployee/DeleteConfirmed/{id}
+        // POST: /NonEmployee/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)
         {
-            _repo.Delete(id);
-            return RedirectToAction(nameof(Index));
+            _nonEmployeeRepo.Delete(id);
+            return RedirectToAction("Index", "Employee");
         }
     }
 }
