@@ -31,7 +31,7 @@ namespace Sim_Card_Managment.Controllers
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("home", "Home");
             }
             return View();
         }
