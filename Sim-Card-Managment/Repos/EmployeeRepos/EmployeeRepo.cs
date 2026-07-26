@@ -35,6 +35,8 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
             else if (status == "inactive")
                 query = query.Where(e => !e.IsActive);
 
+            var now = DateTime.Now;
+
             return await query
                 .Select(e => new PersonListItemViewModel
                 {
@@ -43,10 +45,11 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
                     ExtraInfo = e.Position,
                     PersonType = "Employee",
                     Identifier = e.NationalID,
-                    // Counts active subscriptions containing a SIM
-                    ActiveSimOnlyCount = e.Subscriptions.Count(s => s.EndDate == null && s.SimId != null),
-                    // Counts active subscriptions containing a USB
-                    ActiveUsbCount = e.Subscriptions.Count(s => s.EndDate == null && s.UsbId != null),
+
+                    // FIX: Check if EndDate is in the future (or null if you support non-expiring subscriptions)
+                    ActiveSimOnlyCount = e.Subscriptions.Count(s => s.SimId != null && (s.EndDate == null || s.EndDate >= now)),
+                    ActiveUsbCount = e.Subscriptions.Count(s => s.UsbId != null && (s.EndDate == null || s.EndDate >= now)),
+
                     StartDate = e.CreatedAt
                 })
                 .ToListAsync();

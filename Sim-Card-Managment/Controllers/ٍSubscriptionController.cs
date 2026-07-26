@@ -3,6 +3,7 @@ using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Repos.EmployeeRepos;
+using Sim_Card_Managment.Repos.NonEmployeeRepos;
 using Sim_Card_Managment.Repos.QuoteRepo;
 using Sim_Card_Managment.Viewmodel;
 using Sim_Card_Managment.ViewModels;
@@ -17,6 +18,7 @@ namespace Sim_Card_Managment.Controllers
         private readonly IUSBRepo _usbRepo;
         private readonly IQuotaRepo _quotaRepo;
         private readonly IEmployeeRepo _employeeRepo;
+        private readonly INonEmployeeRepo _nonEmployeeRepo; // Added Non-Employee Repo
         private readonly IDeviceActionRepo _actionRepo;
         private readonly IAccountRepo _accountRepo;
 
@@ -26,6 +28,7 @@ namespace Sim_Card_Managment.Controllers
             IUSBRepo usbRepo,
             IQuotaRepo quotaRepo,
             IEmployeeRepo employeeRepo,
+            INonEmployeeRepo nonEmployeeRepo, // Inject INonEmployeeRepo
             IDeviceActionRepo actionRepo,
             IAccountRepo accountRepo)
         {
@@ -34,6 +37,7 @@ namespace Sim_Card_Managment.Controllers
             _usbRepo = usbRepo;
             _quotaRepo = quotaRepo;
             _employeeRepo = employeeRepo;
+            _nonEmployeeRepo = nonEmployeeRepo;
             _actionRepo = actionRepo;
             _accountRepo = accountRepo;
         }
@@ -63,12 +67,27 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(SubscriptionCreateViewModel model)
         {
-            // 1. Get the current user ID from the authentication claims cookie
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // 1. Validation: Enforce SIM selection (Mandatory)
+            if (!model.SelectedSimId.HasValue || model.SelectedSimId.Value == Guid.Empty)
+            {
+                ModelState.AddModelError("SelectedSimId", "A SIM card is required to create a subscription.");
+            }
 
+            // 2. Validation: Enforce Recipient selection
+            if (!model.SelectedEmployeeId.HasValue || model.SelectedEmployeeId.Value == Guid.Empty)
+            {
+                ModelState.AddModelError("SelectedEmployeeId", "A valid recipient must be selected.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // 3. Authentication Check
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
-                // Fallback: If for any reason the claim is missing, fetch a default user ID from DB
                 var defaultUser = _accountRepo.GetAllUsersAsync(null, null, true).Result.FirstOrDefault();
                 if (defaultUser != null)
                 {
@@ -81,54 +100,71 @@ namespace Sim_Card_Managment.Controllers
                 }
             }
 
-            // 2. Fetch Action from Repo
+            // 4. Fetch Action
             var createAction = _actionRepo.GetAllDeviceActions().FirstOrDefault(a => a.Name == "CreateSubscription")
                               ?? _actionRepo.GetAllDeviceActions().FirstOrDefault();
-
             var actionId = createAction != null ? createAction.Id : Guid.NewGuid();
 
-            // 3. Create Subscription Entity
+            // 5. Create Subscription Entity
             var subscription = new Subscription
             {
                 Id = Guid.NewGuid(),
-                EmpId = model.SelectedEmployeeId,
 
-                SimId = model.DeviceType == "SIM" ? model.SelectedSimId.GetValueOrDefault() : Guid.Empty,
-                QuotaId = model.DeviceType == "SIM" ? model.SelectedQuotaId.GetValueOrDefault() : Guid.Empty,
-                UsbId = model.DeviceType == "USB" ? model.SelectedUsbId : null,
+                // Assign to EmpId OR NonEmployeeId depending on the toggle state
+                EmpId = !model.IsNonEmployee ? model.SelectedEmployeeId : null,
+                NonEmployeeId = model.IsNonEmployee ? model.SelectedEmployeeId : null,
+
+                // Directly map SIM, Quota, and USB
+                SimId = model.SelectedSimId.Value,
+                QuotaId = model.SelectedQuotaId ?? Guid.Empty,
+                UsbId = model.SelectedUsbId,
 
                 ActionId = actionId,
-
-                // Set the authenticated user ID as CreatedBy
                 CreatedBy = currentUserId,
-
                 StartDate = model.StartDate,
                 EndDate = model.StartDate.AddYears(model.ContractDurationYears > 0 ? model.ContractDurationYears : 1),
                 CreatedDate = DateTime.Now
             };
 
-            // 4. Save & Redirect
+            // 6. Save Entity
             _subscriptionRepo.Add(subscription);
 
             return RedirectToAction(nameof(Index));
         }
 
-        // AJAX: Search Employees
+        // AJAX: Search Recipients (Handles both Employee & Non-Employee queries)
         [HttpGet]
-        public async Task<IActionResult> SearchEmployees(string query)
+        public async Task<IActionResult> SearchRecipients(string query, bool isNonEmployee)
         {
             if (string.IsNullOrWhiteSpace(query))
                 return Json(new List<object>());
 
-            var employees = await _employeeRepo.SearchActiveEmployeesAsync(query);
+            if (isNonEmployee)
+            {
+                // Query Non-Employee Repository
+                var nonEmployees = await _nonEmployeeRepo.SearchNonEmployeesAsync(query);
 
-            var result = employees.Select(e => new {
-                id = e.Id,
-                name = e.Name,
-                details = $"National ID: {e.NationalID}"
-            });
+                var result = nonEmployees.Select(n => new {
+                    id = n.Id,
+                    name = n.Name,
+                    details = $"Non-Employee | Contact: {n.ContactInfo ?? "N/A"}"
+                });
 
-            return Json(result);
+                return Json(result);
+            }
+            else
+            {
+                // Query Employee Repository
+                var employees = await _employeeRepo.SearchActiveEmployeesAsync(query);
+
+                var result = employees.Select(e => new {
+                    id = e.Id,
+                    name = e.Name,
+                    details = $"National ID: {e.NationalID}"
+                });
+
+                return Json(result);
+            }
         }
 
         // AJAX: Search SIMs

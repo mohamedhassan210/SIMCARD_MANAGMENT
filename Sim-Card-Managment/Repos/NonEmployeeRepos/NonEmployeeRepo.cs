@@ -5,6 +5,7 @@ using Sim_Card_Managment.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sim_Card_Managment.Repos.NonEmployeeRepos
 {
@@ -16,8 +17,29 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
         {
             _context = context;
         }
+
+        // Add this implementation:
+        public async Task<IEnumerable<NonEmployee>> SearchNonEmployeesAsync(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return new List<NonEmployee>();
+
+            var lowerQuery = query.ToLower();
+
+            return await _context.NonEmployees
+                .AsNoTracking()
+                .Where(ne =>
+                    (ne.Name != null && ne.Name.ToLower().Contains(lowerQuery)) ||
+                    (ne.ContactInfo != null && ne.ContactInfo.ToLower().Contains(lowerQuery)) ||
+                    (ne.Type != null && ne.Type.ToLower().Contains(lowerQuery)))
+                .Take(10) // Limit results for fast auto-complete UI performance
+                .ToListAsync();
+        }
+
         public async Task<List<PersonListItemViewModel>> GetPeopleListAsync()
         {
+            var now = DateTime.Now;
+
             return await _context.NonEmployees
                 .AsNoTracking()
                 .Include(ne => ne.Subscriptions)
@@ -28,14 +50,15 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
                     ExtraInfo = ne.Type,
                     PersonType = "Non-Employee",
                     Identifier = ne.ContactInfo,
-                    // Counts active subscriptions containing a SIM
-                    ActiveSimOnlyCount = ne.Subscriptions.Count(s => s.EndDate == null && s.SimId != null),
-                    // Counts active subscriptions containing a USB
-                    ActiveUsbCount = ne.Subscriptions.Count(s => s.EndDate == null && s.UsbId != null),
+
+                    ActiveSimOnlyCount = ne.Subscriptions.Count(s => s.SimId != null && (s.EndDate == null || s.EndDate >= now)),
+                    ActiveUsbCount = ne.Subscriptions.Count(s => s.UsbId != null && (s.EndDate == null || s.EndDate >= now)),
+
                     StartDate = ne.CreatedAt
                 })
                 .ToListAsync();
         }
+
         public IEnumerable<NonEmployee> GetAll()
         {
             return _context.NonEmployees.ToList();

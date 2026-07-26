@@ -5,10 +5,14 @@ namespace Sim_Card_Managment.Viewmodel
 {
     public class SubscriptionCreateViewModel
     {
-        public Guid SelectedEmployeeId { get; set; }
+        // 1. Changed to Guid? so .HasValue and .Value work properly
+        public Guid? SelectedEmployeeId { get; set; }
+
+        // 2. Added IsNonEmployee property for UI toggle mapping
+        public bool IsNonEmployee { get; set; } = false;
+
         public string DeviceType { get; set; } = "SIM";
 
-        // MUST be Guid? so MVC doesn't mark model invalid when submitting in USB mode
         public Guid? SelectedSimId { get; set; }
         public Guid? SelectedQuotaId { get; set; }
         public Guid? SelectedUsbId { get; set; }

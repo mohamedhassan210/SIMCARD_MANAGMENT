@@ -12,9 +12,9 @@ namespace Sim_Card_Managment.Repos
             _context = context;
         }
 
-        public int GetActiveSimsCount() => _context.Subscriptions.Count(s => s.EndDate == null);
+        public int GetActiveSimsCount() => _context.Sims.Count();
 
-        public int GetActiveUsbsCount() => _context.Subscriptions.Count(s => s.EndDate == null && s.UsbId != null);
+        public int GetActiveUsbsCount() => _context.Usbs.Count();
 
         public int GetDeviceStatusCount(string statusType, bool isSim)
         {
