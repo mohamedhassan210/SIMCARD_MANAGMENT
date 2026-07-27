@@ -20,7 +20,10 @@ namespace Sim_Card_Managment.Controllers
             _simRepo = simRepo;
             _usbRepo = usbRepo;
         }
-
+        public IActionResult Details()
+        {
+            return View();
+        }
         // GET: /SIM or /SIM/Index?status=active&type=all
         public IActionResult Index(string status = "all", string type = "all")
         {

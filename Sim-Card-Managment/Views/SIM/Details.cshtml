@@ -1,223 +1,367 @@
-﻿<style>
-    /* --- Responsive Typography --- */
+﻿@model Sim_Card_Managment.Models.Employee
+
+@{
+    ViewData["Title"] = "Employee Details";
+    var activeSubscriptions = Model.Subscriptions?.Where(s => s.EndDate == null || s.EndDate > DateTime.Now).ToList() ?? new();
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/all.min.css" />
+
+<style>
+    :root {
+        --brand-orange: #DF531B;
+        --brand-orange-light: #FFF8F6;
+        --brand-purple: #5B2D90;
+        --bg-canvas: #F4F5F8;
+        --text-dark: #1E293B;
+        --text-muted: #64748B;
+        --card-border: #E2E8F0;
+    }
+
+    /* Page Header */
+    .page-header {
+        background: #FFFFFF;
+        border-bottom: 1px solid var(--card-border);
+        padding: 2.5rem 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    }
+
     .emp-title {
-        font-size: clamp(2rem, 5vw, 4rem); /* Scales between 32px and 64px */
-        font-weight: bold;
-        line-height: 1.2;
-        word-wrap: break-word;
+        font-size: clamp(1.75rem, 4vw, 2.75rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text-dark);
     }
 
     .emp-badge {
-        font-size: clamp(1.2rem, 2.5vw, 2rem); /* Scales between ~19px and 32px */
-        color: #E24D17;
-        white-space: nowrap;
+        font-size: 0.875rem;
+        background-color: rgba(223, 83, 27, 0.1);
+        color: var(--brand-orange);
+        font-weight: 700;
+        padding: 6px 16px;
+        border-radius: 50px;
+        vertical-align: middle;
+        border: 1px solid rgba(223, 83, 27, 0.2);
     }
 
-    .emp-id {
-        font-size: clamp(1.1rem, 2vw, 1.5rem); /* Scales between ~17px and 24px */
+    .emp-id-chip {
+        display: inline-flex;
+        align-items: center;
+        background: #F1F5F9;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.03em;
     }
 
-    /* --- Existing Styles --- */
-    .roundedbutton {
-        border-radius: 70px !important;
-        width: 200px !important;
-        height: 62px !important;
+    /* Buttons */
+    .btn-custom {
+        height: 48px;
+        padding: 0 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
+    .btn-primary-orange {
+        background-color: var(--brand-orange);
+        color: #FFFFFF;
+        border: none;
+    }
+
+        .btn-primary-orange:hover {
+            background-color: #c94614;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
+        }
+
+    .btn-danger-soft {
+        background-color: #FEF2F2;
+        color: #DC2626;
+        border: 1px solid #FCA5A5;
+    }
+
+        .btn-danger-soft:hover {
+            background-color: #DC2626;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 38, 38, 0.2);
+        }
+
+    /* Info Card */
     .main-info-card {
-        background-color: #fffaf8;
-        border: 1px solid #df531b;
-        border-radius: 16px;
-        margin: 41px;
+        background-color: #FFFFFF;
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        overflow: hidden;
     }
 
-    .icon-orange {
-        fill: #df531b;
+    .card-header-styled {
+        border-bottom: 1px solid var(--card-border);
+        padding: 1.5rem 2rem;
+        background: linear-gradient(180deg, var(--brand-orange-light) 0%, #FFFFFF 100%);
     }
 
-    .employee-details p {
-        font-size: 1.2rem;
-        margin-bottom: 0.6rem;
-    }
-
-    .sim-card-active {
-        width: 320px;
-        min-width: 320px;
-        height: 250px;
-        background: linear-gradient(-45deg, transparent 35px, #df531b 0);
-        border-radius: 16px;
-        color: #ffffff;
-        padding: 20px;
-    }
-
-    .sim-card-inactive-wrapper {
-        width: 320px;
-        min-width: 320px;
-        height: 250px;
-        background: linear-gradient(-45deg, transparent 35px, #df531b 0);
-        border-radius: 16px;
-        padding: 1px;
-    }
-
-    .sim-card-inactive-inner {
-        background: linear-gradient(-45deg, transparent 34px, #ffffff 0);
-        border-radius: 15px;
-        height: 100%;
-        width: 100%;
-        padding: 20px;
-        color: #000000;
-    }
-
-    .we-logo {
-        background-color: #5b2d90;
-        color: white;
-        border-radius: 50%;
-        width: 38px;
-        height: 38px;
+    .section-icon-wrapper {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background-color: rgba(223, 83, 27, 0.12);
+        color: var(--brand-orange);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: bold;
-        font-size: 16px;
+        font-size: 1.25rem;
     }
 
-    .sim-card-active .we-logo {
-        border: 2px solid #ffffff;
-    }
-
-    .badge-active {
-        background-color: #007a27;
-        color: white;
-        font-size: 13px;
-        padding: 5px 18px;
-        border-radius: 20px;
-        font-weight: 600;
-    }
-
-    .text-label {
-        font-weight: 600;
-    }
-
-    .sim-data-row {
-        font-size: 17px;
-        margin-bottom: 0.4rem;
-    }
-
-    .sim-label {
-        font-weight: 600;
-        margin-right: 4px;
-    }
-
-    .sim-title {
-        font-size: 22px;
+    .info-grid-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
         font-weight: 700;
-        margin-top: auto;
+        margin-bottom: 4px;
+    }
+
+    .info-grid-value {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    /* SIM Cards */
+    .sim-card {
+        width: 320px;
+        min-width: 320px;
+        height: 210px;
+        border-radius: 18px;
+        padding: 1.25rem;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+        .sim-card:hover {
+            transform: translateY(-4px);
+        }
+
+    .sim-card-active {
+        background: linear-gradient(135deg, #DF531B 0%, #B83A0B 100%);
+        color: #FFFFFF;
+        box-shadow: 0 12px 24px rgba(223, 83, 27, 0.3);
+    }
+
+    .sim-card-outline {
+        background: #FFFFFF;
+        border: 2px solid var(--card-border);
+        color: var(--text-dark);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.03);
+    }
+
+    /* Provider Logo Styling */
+    .provider-logo {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: contain;
+        background-color: #FFFFFF;
+        padding: 3px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .sim-card-active .provider-logo {
+        border: 2px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .badge-status-active {
+        background-color: #22C55E;
+        color: #FFFFFF;
+        font-size: 0.75rem;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .sim-metric-label {
+        font-size: 0.75rem;
+        opacity: 0.8;
+        font-weight: 600;
+    }
+
+    .sim-metric-value {
+        font-size: 0.95rem;
+        font-weight: 700;
+    }
+
+    .sim-footer-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        text-transform: uppercase;
     }
 </style>
 
-<body style="background-color: #EEEDED; margin-top: 30px">
+<body>
 
-    <section class="p-5">
-        <h2 class="emp-title">Adham amr mohamed <span class="emp-badge ms-2">2 sim</span></h2>
+    <header class="page-header p-100">
+        <div class="container-fluid px-lg-5">
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
 
-        <p class="emp-id fw-medium">309060702500484</p>
-
-        <div class="d-flex flex-wrap gap-4 mt-4">
-            <a class="btn active text-white roundedbutton" style="background-color: #E24D17; font-size: 20px;" asp-controller="Employee" asp-action="Edit">
-                <i class="fa-solid fa-pen-to-square me-2"></i>Edit Details
-            </a>
-
-            <button class="btn active text-white roundedbutton" style="background-color: #D41212; font-size: 20px;" onclick="confirmDelete()">
-                <i class="fa-solid fa-trash-can me-2"></i>Delete
-            </button>
-
-            <button class="btn active text-white roundedbutton" style="background-color: #115D11; font-size: 20px;">
-                <img src="~/img/vscode-icons_file-type-excel.png" alt="" class="me-2">Export
-            </button>
-        </div>
-    </section>
-
-    <div class="main-info-card p-5">
-
-        <div class="d-flex align-items-center mb-4">
-            <svg class="icon-orange me-3" width="32" height="32" viewBox="0 0 24 24">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
-            <h4 class="m-0 text-label fs-3">Employee Information</h4>
-        </div>
-
-        <div class="mb-5 ms-2 employee-details">
-            <p><span class="text-label">Name :</span> Adham Amr Mohamed Mohamed</p>
-            <p><span class="text-label">Id :</span> 309060702500484</p>
-            <p><span class="text-label">Phone :</span> 01556176733</p>
-            <p><span class="text-label">Department :</span> </p>
-        </div>
-
-        <h5 class="fw-bold mb-4 ms-2 fs-4">Cards</h5>
-
-        <div class="d-flex gap-4 overflow-auto pb-2">
-
-            <div class="sim-card-active d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-start mb-4">
-                    <span class="badge-active mt-1">Active</span>
-                    <div class="we-logo">we</div>
-                </div>
-                <div class="sim-data-row"><span class="sim-label">Dial number</span> 01556176733</div>
-                <div class="sim-data-row"><span class="sim-label">Serial</span> 5284874102482</div>
-                <div class="sim-data-row"><span class="sim-label">Quota</span> 1.7</div>
-                <div class="sim-data-row"><span class="sim-label">Extra quota</span> 1.7</div>
-                <div class="sim-title mt-auto pt-2">SIM 1</div>
-            </div>
-
-            <div class="sim-card-inactive-wrapper">
-                <div class="sim-card-inactive-inner d-flex flex-column">
-                    <div class="d-flex justify-content-end mb-4">
-                        <div class="we-logo">we</div>
+                <div>
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <h1 class="emp-title m-0">@Model.Name</h1>
+                        <span class="emp-badge">
+                            <i class="fa-solid fa-sim-card me-1"></i> @activeSubscriptions.Count Active SIM(s)
+                        </span>
                     </div>
-                    <div class="sim-data-row mt-1"><span class="sim-label">Dial number :</span><br> 01556176733</div>
-                    <div class="sim-data-row mt-2"><span class="sim-label">Serial :</span><br> 5284874102482</div>
-                    <div class="sim-title mt-auto pt-2">SIM 1</div>
+                    <div class="mt-2">
+                        <span class="emp-id-chip">
+                            <i class="fa-regular fa-id-card me-2"></i> @(Model.NationalID ?? "N/A")
+                        </span>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-custom btn-primary-orange">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Details
+                    </a>
+
+                    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" id="deleteForm" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="button" class="btn btn-custom btn-danger-soft" onclick="confirmDelete()">
+                            <i class="fa-solid fa-trash-can"></i> Delete
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <main class="container-fluid px-lg-5 pb-5">
+        <div class="main-info-card">
+
+            <div class="card-header-styled d-flex align-items-center gap-3">
+                <div class="section-icon-wrapper">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <div>
+                    <h3 class="m-0 fs-5 fw-bold text-dark">Employee Details</h3>
+                    <p class="m-0 text-muted small">Personal and employment information</p>
                 </div>
             </div>
 
-            <div class="sim-card-inactive-wrapper">
-                <div class="sim-card-inactive-inner d-flex flex-column">
-                    <div class="d-flex justify-content-end mb-4">
-                        <div class="we-logo" style="visibility: hidden;">we</div>
+            <div class="p-4 p-md-5">
+                <div class="row g-4 mb-5">
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-grid-label">Full Name</div>
+                        <div class="info-grid-value">@Model.Name</div>
                     </div>
-                    <div class="sim-data-row mt-1"><span class="sim-label">Dial number :</span><br> 01556176733</div>
-                    <div class="sim-data-row mt-2"><span class="sim-label">Serial :</span><br> 5284874102482</div>
-                    <div class="sim-title mt-auto pt-2">SIM 1</div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-grid-label">National ID</div>
+                        <div class="info-grid-value">@(Model.NationalID ?? "N/A")</div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-grid-label">Job Title / Department</div>
+                        <div class="info-grid-value">@(Model.Position ?? "Unassigned")</div>
+                    </div>
+                </div>
+
+                <hr class="my-4 text-border opacity-25">
+
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h4 class="fw-bold fs-5 m-0 text-dark">Assigned Subscriptions & Assets</h4>
+                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-normal">Total Cards: @(Model.Subscriptions?.Count ?? 0)</span>
+                </div>
+
+                <div class="d-flex gap-4 overflow-auto pb-3 pt-1">
+                    @if (Model.Subscriptions != null && Model.Subscriptions.Any())
+                    {
+                        int index = 1;
+                        foreach (var sub in Model.Subscriptions)
+                        {
+                            bool isActive = sub.EndDate == null || sub.EndDate > DateTime.Now;
+
+
+                            string rawProvider = sub.Sim?.ServiceProvider?.Name?.ToLower().Trim() ?? "";
+
+                            string logoFileName = rawProvider switch
+                            {
+                                var p when p.Contains("vodafone") => "fodafone.png",
+                                var p when p.Contains("orange") => "orange.png",
+                                var p when p.Contains("etisalat") || p.Contains("e&") => "etisalat.png",
+                                _ => "we.png" // default fallback
+                            };
+
+                            <div class="sim-card @(isActive ? "sim-card-active" : "sim-card-outline")">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="@(isActive ? "badge-status-active" : "badge bg-secondary opacity-50 text-white rounded-pill px-2 py-1 small")">
+                                        @(isActive ? "Active" : "Inactive")
+                                    </span>
+
+                                    <img src="~/img/@logoFileName"
+                                         asp-append-version="true"
+                                         alt="@rawProvider logo"
+                                         class="provider-logo"
+                                         onerror="this.onerror=null; this.src='/img/we.png';" />
+                                </div>
+                                <div class="my-2">
+                                    <div class="sim-metric-label">DIAL NUMBER</div>
+                                    <div class="sim-metric-value mb-2">@(sub.Sim?.PhoneNumber ?? "N/A")</div>
+                                    <div class="sim-metric-label">SERIAL NUMBER</div>
+                                    <div class="sim-metric-value">@(sub.Sim?.SerialNumber ?? "N/A")</div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end pt-2 border-top border-white border-opacity-25">
+                                    <span class="sim-footer-title">SIM @index</span>
+                                    <small class="fw-bold opacity-75">Quota: @(sub.Quota?.BaseAmount + sub.Quota?.ExtraAmount ?? 0)</small>
+                                </div>
+                            </div>
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted italic">No SIM cards or assets currently assigned.</p>
+                    }
                 </div>
             </div>
 
         </div>
-    </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function confirmDelete() {
             Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+                title: 'Delete Employee Profile?',
+                text: "This action cannot be undone.",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#D41212', // Matches your red button
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Yes, Delete',
+                customClass: { popup: 'rounded-4' }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Place your actual backend deletion logic here (e.g., redirect or AJAX call)
-
-                    Swal.fire(
-                        'Deleted!',
-                        'The employee has been deleted.',
-                        'success'
-                    )
+                    document.getElementById('deleteForm').submit();
                 }
-            })
+            });
         }
     </script>
 </body>
