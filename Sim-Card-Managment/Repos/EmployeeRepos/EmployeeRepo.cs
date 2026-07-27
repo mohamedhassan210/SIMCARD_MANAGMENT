@@ -30,9 +30,11 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
                 .Include(e => e.Subscriptions)
                 .AsQueryable();
 
-            if (status == "active")
+            var normalizedStatus = status?.ToLower().Trim();
+
+            if (normalizedStatus == "active")
                 query = query.Where(e => e.IsActive);
-            else if (status == "inactive")
+            else if (normalizedStatus == "inactive")
                 query = query.Where(e => !e.IsActive);
 
             var now = DateTime.Now;
@@ -45,11 +47,9 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
                     ExtraInfo = e.Position,
                     PersonType = "Employee",
                     Identifier = e.NationalID,
-
-                    // FIX: Check if EndDate is in the future (or null if you support non-expiring subscriptions)
+                    IsActive = e.IsActive, // Ensure IsActive is mapped to the view model
                     ActiveSimOnlyCount = e.Subscriptions.Count(s => s.SimId != null && (s.EndDate == null || s.EndDate >= now)),
                     ActiveUsbCount = e.Subscriptions.Count(s => s.UsbId != null && (s.EndDate == null || s.EndDate >= now)),
-
                     StartDate = e.CreatedAt
                 })
                 .ToListAsync();

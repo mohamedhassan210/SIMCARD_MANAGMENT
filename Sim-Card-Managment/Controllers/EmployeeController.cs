@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace Sim_Card_Managment.Controllers
 {
-  //  [RequirePermission]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepo _employeeRepo;
@@ -28,32 +27,26 @@ namespace Sim_Card_Managment.Controllers
             _groupRepo = groupRepo;
         }
 
-        // GET: /Employee
-        // GET: Employee/Index
-        public async Task<IActionResult> Index(string status = "active", string type = "all")
+        // GET: /Employee/Index
+        public async Task<IActionResult> Index(string status = "all", string type = "all")
         {
             ViewBag.CurrentStatus = status;
             ViewBag.CurrentType = type;
 
             var resultList = new List<PersonListItemViewModel>();
 
-            // 1. Fetch Employees
+            // 1. Fetch Employees (Fetch "all" so client-side JavaScript can filter and count properly)
             if (type == "all" || type == "employee")
             {
-                // Calls your Employee repository method that includes Subscriptions
-                var employees = await _employeeRepo.GetPeopleListAsync(status);
+                var employees = await _employeeRepo.GetPeopleListAsync("all");
                 resultList.AddRange(employees);
             }
 
-            // 2. Fetch Non-Employees
+            // 2. Fetch Non-Employees (External visitors/contractors)
             if (type == "all" || type == "non-employee")
             {
-                if (status != "inactive") // Non-employees are fetched when status is "active" or "all"
-                {
-                    // Calls your NonEmployee repository method that includes Subscriptions
-                    var nonEmployees = await _nonEmployeeRepo.GetPeopleListAsync();
-                    resultList.AddRange(nonEmployees);
-                }
+                var nonEmployees = await _nonEmployeeRepo.GetPeopleListAsync();
+                resultList.AddRange(nonEmployees);
             }
 
             // 3. Combine and Order Alphabetically
@@ -65,14 +58,12 @@ namespace Sim_Card_Managment.Controllers
         // GET: /Employee/Details/{id}
         public IActionResult Details(Guid id)
         {
-            // 1. Check if employee exists
             var employee = _employeeRepo.GetById(id);
             if (employee != null)
             {
                 return View("Details", employee);
             }
 
-            // 2. If not found in Employees, check Non-Employees
             var nonEmployee = _nonEmployeeRepo.GetById(id);
             if (nonEmployee != null)
             {
@@ -98,7 +89,6 @@ namespace Sim_Card_Managment.Controllers
                 return View(employee);
             }
 
-            // Set primary keys and defaults matching Employee model
             employee.Id = Guid.NewGuid();
             employee.CreatedAt = DateTime.Now;
             employee.IsActive = true;
@@ -128,7 +118,7 @@ namespace Sim_Card_Managment.Controllers
         {
             if (ModelState.IsValid)
             {
-                _employeeRepo.Update(employee); // Make sure your repository has an Update method
+                _employeeRepo.Update(employee);
                 return RedirectToAction("Details", new { id = employee.Id });
             }
 
@@ -148,7 +138,16 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)
         {
-            _employeeRepo.Delete(id);
+            var employee = _employeeRepo.GetById(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            // Soft delete: Change IsActive status to false instead of removing the record from DB
+            employee.IsActive = false;
+            _employeeRepo.Update(employee);
+
             return RedirectToAction(nameof(Index));
         }
     }

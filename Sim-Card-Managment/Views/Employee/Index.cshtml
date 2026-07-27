@@ -332,28 +332,19 @@
         <div class="filters-row">
             <div class="filter-group">
                 <label for="status-filter">Status</label>
-                <!--
-                    FIX: previously used `selected="@(currentStatus == "active")"` which prints
-                    selected="True" / selected="False" on EVERY option. In HTML, the mere presence
-                    of the `selected` attribute marks an option selected regardless of its value,
-                    so the browser was always honoring the LAST option in the markup ("All") no
-                    matter what currentStatus actually was. Now we only emit the bare `selected`
-                    keyword when the condition is true, and we also store the intended value in
-                    data-initial as a JS-side safety net (see script below).
-                -->
-                <select id="status-filter" class="status-select" data-initial="@currentStatus">
-                    <option value="active" @(currentStatus == "active" ? "selected" : "")>Active</option>
-                    <option value="inactive" @(currentStatus == "inactive" ? "selected" : "")>Inactive</option>
-                    <option value="all" @(currentStatus == "all" ? "selected" : "")>All</option>
+                <select id="status-filter" class="status-select">
+                    <option value="active" selected="@(currentStatus == "active")">Active</option>
+                    <option value="inactive" selected="@(currentStatus == "inactive")">Inactive</option>
+                    <option value="all" selected="@(currentStatus == "all")">All</option>
                 </select>
             </div>
 
             <div class="filter-group">
                 <label for="employee-type-filter">Type</label>
-                <select id="employee-type-filter" class="status-select" data-initial="@currentType">
-                    <option value="all" @(currentType == "all" ? "selected" : "")>All Types</option>
-                    <option value="employee" @(currentType == "employee" ? "selected" : "")>Employee</option>
-                    <option value="non-employee" @(currentType == "non-employee" ? "selected" : "")>Non-Employee</option>
+                <select id="employee-type-filter" class="status-select">
+                    <option value="all" selected="@(currentType == "all")">All Types</option>
+                    <option value="employee" selected="@(currentType == "employee")">Employee</option>
+                    <option value="non-employee" selected="@(currentType == "non-employee")">Non-Employee</option>
                 </select>
             </div>
 
@@ -387,9 +378,11 @@
                 {
                     foreach (var item in Model)
                     {
-                        var statusValue = item.IsActive ? "active" : "inactive";
+                        // Logic update: Employees check IsActive; Non-Employees default to active
+                        bool isRowActive = item.PersonType == "Employee" ? item.IsActive : true;
+                        var statusValue = isRowActive ? "active" : "inactive";
                         var rawType = (item.PersonType ?? "").ToLower().Replace(" ", "-");
-                        var rowClass = !item.IsActive ? "person-row inactive-row" : "person-row";
+                        var rowClass = !isRowActive ? "person-row inactive-row" : "person-row";
 
                         <tr class="@rowClass" data-status="@statusValue" data-type="@rawType">
                             <td class="col-name">
@@ -451,17 +444,6 @@
         const searchInput = document.getElementById("search-input");
         const typeFilter = document.getElementById("employee-type-filter");
         const statusFilter = document.getElementById("status-filter");
-
-        // FIX: force the dropdown's actual value to match what the server intended
-        // (data-initial), instead of trusting the rendered `selected` attribute.
-        // This is a safety net in case markup rendering ever produces an
-        // unexpected/duplicate `selected` attribute again.
-        if (statusFilter.dataset.initial) {
-            statusFilter.value = statusFilter.dataset.initial;
-        }
-        if (typeFilter.dataset.initial) {
-            typeFilter.value = typeFilter.dataset.initial;
-        }
 
         const allRows = Array.from(document.querySelectorAll("#tableBody tr.person-row"));
         const noResultsRow = document.getElementById("noResultsRow");
