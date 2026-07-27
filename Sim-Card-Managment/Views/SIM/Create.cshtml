@@ -1,3 +1,9 @@
+@model Sim_Card_Managment.Models.Sim
+
+@{
+    Layout = null;
+}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,7 +27,7 @@
         .create-card {
             background-color: #ffffff;
             border-radius: 30px;
-            max-width: 750px;
+            max-width: 800px;
             width: 100%;
             padding: 3rem 4rem;
         }
@@ -40,30 +46,23 @@
             font-size: 14px;
         }
 
-        .custom-input {
+        .custom-input, .custom-select {
             background-color: #d8d8d8;
             border: none;
             border-radius: 12px;
             padding: 12px 18px;
-            color: #555;
+            color: #333;
             width: 100%;
             font-size: 14px;
             transition: box-shadow 0.2s ease-in-out;
         }
 
-            .custom-input:focus {
+            .custom-input:focus, .custom-select:focus {
                 outline: none;
                 box-shadow: 0 0 0 2px #E24D17;
             }
 
         .custom-select {
-            background-color: #d8d8d8;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 18px;
-            color: #555;
-            width: 100%;
-            font-size: 14px;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
@@ -71,11 +70,6 @@
             background-size: 1.2em;
             cursor: pointer;
         }
-
-            .custom-select:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px #E24D17;
-            }
 
         .btn-cancel {
             border: 1px solid #E24D17;
@@ -85,7 +79,7 @@
             padding: 10px 45px;
             font-weight: 700;
             font-size: 15px;
-            transition: all 0.3s ease;
+            text-decoration: none;
         }
 
             .btn-cancel:hover {
@@ -101,30 +95,26 @@
             padding: 10px 45px;
             font-weight: 700;
             font-size: 15px;
-            transition: all 0.3s ease;
         }
 
             .btn-create:hover {
                 background-color: #c84111;
-                border-color: #c84111;
                 color: #fff;
             }
 
-        .custom-input.is-invalid {
-            box-shadow: 0 0 0 2px #D41212;
-            background-color: #ffe6e6;
-        }
-
-        .error-msg {
+        .field-error {
             color: #D41212;
             font-size: 12px;
-            margin-top: 5px;
-            margin-left: 10px;
-            display: none;
+            margin-top: 4px;
         }
 
-        .custom-input.is-invalid ~ .error-msg {
-            display: block;
+        .provider-badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
         }
     </style>
 </head>
@@ -132,89 +122,83 @@
 <body>
 
     <div class="create-card shadow">
-        <h2 class="title-header">Create new SIM</h2>
+        <h2 class="title-header">Create New SIM</h2>
 
-        <form id="employeeForm" asp-controller="Sim" asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-            <div class="row g-4 mb-5">
+        <form id="simForm" asp-controller="SIM" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="custom-label">Serial Number</label>
-                    <input type="text" id="empid" class="custom-input" placeholder="06465485765765">
-                    <span class="error-msg">SerialNumber is required.</span>
+                    <label class="custom-label" asp-for="SerialNumber">Serial Number</label>
+                    <input type="text" class="custom-input" asp-for="SerialNumber" placeholder="Enter serial number" required />
+                    <span asp-validation-for="SerialNumber" class="field-error"></span>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label">Phone</label>
-                    <input type="text" id="empPhone" class="custom-input" placeholder="01556176733" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <span class="error-msg">Please enter a valid 11-digit phone number.</span>
+                    <label class="custom-label" asp-for="PhoneNumber">Phone Number</label>
+                    <input type="text" id="phoneInput" class="custom-input" asp-for="PhoneNumber" placeholder="e.g. 010..., 012..., 015..." required />
+                    <div id="providerDetected" class="provider-badge" style="display:none;"></div>
+                    <span asp-validation-for="PhoneNumber" class="field-error"></span>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label">Network Type</label>
-                    <!-- Note: Consider changing duplicate id="empDept" to unique IDs in your HTML if you plan to use them in JS later -->
-                    <select id="empDept1" class="custom-select">
-                        <option selected>4G</option>
-                        <option>5G</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label class="custom-label">Status</label>
-                    <select id="empDept2" class="custom-select">
-                        <option selected>active</option>
-                        <option>lost</option>
-                        <option>replaced</option>
-                        <option>returned</option>
+                    <label class="custom-label" asp-for="NetworkType">Network Type</label>
+                    <select class="custom-select" asp-for="NetworkType">
+                        <option value="4G">4G</option>
+                        <option value="5G">5G</option>
+                        <option value="3G">3G</option>
                     </select>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label">Server Provider</label>
-                    <select id="empDept3" class="custom-select">
-                        <option selected>we</option>
-                        <option>orange</option>
-                        <option>etisalt</option>
-                        <option>vodafone</option>
+                    <label class="custom-label" asp-for="Status">Status</label>
+                    <select class="custom-select" asp-for="Status">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Lost">Lost</option>
+                        <option value="Replaced">Replaced</option>
                     </select>
                 </div>
             </div>
 
             <div class="d-flex justify-content-end gap-3 mt-4">
                 <a class="btn btn-cancel" asp-controller="SIM" asp-action="Index">Cancel</a>
-                <button type="submit" class="btn btn-create">Create</button>
+                <button type="submit" class="btn btn-create">Create SIM</button>
             </div>
-
         </form>
     </div>
 
     <script>
-        document.getElementById('employeeForm').addEventListener('submit', function (event) {
-            let isValid = true;
+        document.getElementById('phoneInput').addEventListener('input', function () {
+            const val = this.value.trim();
+            const badge = document.getElementById('providerDetected');
 
-            // Remove invalid class from all elements before re-evaluating
-            document.querySelectorAll('.is-invalid').forEach(function(el) {
-                el.classList.remove('is-invalid');
-            });
-
-            // 1. Validate Serial Number (Matches id="empid")
-            const serialNumber = document.getElementById('empid');
-            if (serialNumber.value.trim() === '') {
-                serialNumber.classList.add('is-invalid');
-                isValid = false;
-            }
-
-            // 2. Validate Phone Number (Matches id="empPhone")
-            const phone = document.getElementById('empPhone');
-            if (phone.value.trim().length !== 11) {
-                phone.classList.add('is-invalid');
-                isValid = false;
-            }
-
-            // Prevent form submission if any validation fails
-            if (!isValid) {
-                event.preventDefault();
+            if (val.startsWith('010')) {
+                badge.style.display = 'inline-block';
+                badge.style.backgroundColor = '#e60000';
+                badge.style.color = '#ffffff';
+                badge.innerText = 'Detected Provider: Vodafone';
+            } else if (val.startsWith('012')) {
+                badge.style.display = 'inline-block';
+                badge.style.backgroundColor = '#ff6600';
+                badge.style.color = '#ffffff';
+                badge.innerText = 'Detected Provider: Orange';
+            } else if (val.startsWith('015')) {
+                badge.style.display = 'inline-block';
+                badge.style.backgroundColor = '#5f259f';
+                badge.style.color = '#ffffff';
+                badge.innerText = 'Detected Provider: WE';
+            } else if (val.startsWith('011')) {
+                badge.style.display = 'inline-block';
+                badge.style.backgroundColor = '#78be20';
+                badge.style.color = '#ffffff';
+                badge.innerText = 'Detected Provider: Etisalat';
+            } else {
+                badge.style.display = 'none';
             }
         });
     </script>
 </body>
-
 </html>

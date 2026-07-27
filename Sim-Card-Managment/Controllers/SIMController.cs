@@ -3,6 +3,7 @@ using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Authorization;
 using Sim_Card_Managment.Viewmodel;
+using Sim_Card_Managment.data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,17 +15,48 @@ namespace Sim_Card_Managment.Controllers
     {
         private readonly ISIMRepo _simRepo;
         private readonly IUSBRepo _usbRepo;
+        private readonly AppDbContext _context;
 
-        public SIMController(ISIMRepo simRepo, IUSBRepo usbRepo)
+        public SIMController(ISIMRepo simRepo, IUSBRepo usbRepo, AppDbContext context)
         {
             _simRepo = simRepo;
             _usbRepo = usbRepo;
+            _context = context;
         }
-        public IActionResult Details()
+
+        private Sim_Card_Managment.Models.ServiceProvider? DetectServiceProvider(string phoneNumber)
         {
-            return View();
+            if (string.IsNullOrWhiteSpace(phoneNumber)) return null;
+
+            string cleanedPhone = phoneNumber.Trim();
+            string targetProviderName = string.Empty;
+
+            if (cleanedPhone.StartsWith("010"))
+            {
+                targetProviderName = "Vodafone";
+            }
+            else if (cleanedPhone.StartsWith("012"))
+            {
+                targetProviderName = "Orange";
+            }
+            else if (cleanedPhone.StartsWith("015"))
+            {
+                targetProviderName = "WE";
+            }
+            else if (cleanedPhone.StartsWith("011"))
+            {
+                targetProviderName = "Etisalat";
+            }
+            else
+            {
+                return null;
+            }
+
+            return _context.ServiceProviders
+                .FirstOrDefault(sp => sp.Name.ToLower() == targetProviderName.ToLower());
         }
-        // GET: /SIM or /SIM/Index?status=active&type=all
+
+        // GET: /SIM or /SIM/Index?status=all&type=all
         public IActionResult Index(string status = "all", string type = "all")
         {
             ViewBag.CurrentStatus = status.ToLower();
@@ -40,28 +72,22 @@ namespace Sim_Card_Managment.Controllers
 
                 if (status != "all")
                 {
-                    query = query.Where(s => s.Status.ToLower() == status);
+                    query = query.Where(s => s.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
                 }
 
                 simsList = query.Select(s => new DeviceDirectoryViewModel
                 {
                     Id = s.Id,
                     SerialNumber = s.SerialNumber,
-                    DeviceType = "SIM",
-                    ExtraInfo = s.NetworkType,
                     Identifier = s.PhoneNumber,
+                    DeviceType = "SIM Card",
+                    ServiceProvider = s.ServiceProvider?.Name ?? "N/A",
                     Status = s.Status,
-                    // Safe null-checks using ?. to prevent CS8602 warning
-                    AssignedTo = s.Subscriptions
-                                    .Where(sub => sub.EndDate == null)
-                                    .Select(sub => sub.Employee != null ? sub.Employee.Name : sub.NonEmployee != null ? sub.NonEmployee.Name : null)
-                                    .FirstOrDefault(),
-                    AssignedToType = s.Subscriptions
-                                    .Where(sub => sub.EndDate == null)
-                                    .Select(sub => sub.Employee != null ? "Employee" : sub.NonEmployee != null ? "NonEmployee" : null)
-                                    .FirstOrDefault(),
-                    ServiceProvider = s.ServiceProvider != null ? s.ServiceProvider.Name : null,
-                    RegisteredAt = s.RegisteredAt
+                    RegisteredAt = s.RegisteredAt,
+                    AssignedTo = s.Subscriptions?
+                        .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
+                        .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
+                        .FirstOrDefault() ?? "Unassigned"
                 });
             }
 
@@ -72,50 +98,69 @@ namespace Sim_Card_Managment.Controllers
 
                 if (status != "all")
                 {
-                    query = query.Where(u => u.Status.ToLower() == status);
+                    query = query.Where(u => u.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
                 }
 
                 usbsList = query.Select(u => new DeviceDirectoryViewModel
                 {
                     Id = u.Id,
                     SerialNumber = u.SerialNumber,
-                    DeviceType = "USB",
+                    Identifier = "N/A",
                     ExtraInfo = u.Model,
-                    Identifier = null,
+                    DeviceType = "USB Modem",
+                    ServiceProvider = u.ServiceProvider?.Name ?? "N/A",
                     Status = u.Status,
-                    // Safe null-checks using ?. to prevent CS8602 warning
-                    AssignedTo = u.Subscriptions
-                                    .Where(sub => sub.EndDate == null)
-                                    .Select(sub => sub.Employee != null ? sub.Employee.Name : sub.NonEmployee != null ? sub.NonEmployee.Name : null)
-                                    .FirstOrDefault(),
-                    AssignedToType = u.Subscriptions
-                                    .Where(sub => sub.EndDate == null)
-                                    .Select(sub => sub.Employee != null ? "Employee" : sub.NonEmployee != null ? "NonEmployee" : null)
-                                    .FirstOrDefault(),
-                    ServiceProvider = u.ServiceProvider != null ? u.ServiceProvider.Name : null,
-                    RegisteredAt = u.RegisteredAt
+                    RegisteredAt = u.RegisteredAt,
+                    AssignedTo = u.Subscriptions?
+                        .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
+                        .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
+                        .FirstOrDefault() ?? "Unassigned"
                 });
             }
 
-            // 3. Combine and Order
-            var model = simsList.Concat(usbsList)
-                                .OrderBy(d => d.DeviceType)
-                                .ThenBy(d => d.SerialNumber)
-                                .ToList();
+            var combinedDirectory = simsList.Concat(usbsList)
+                                            .OrderByDescending(d => d.RegisteredAt)
+                                            .ToList();
 
-            return View(model);
+            return View(combinedDirectory);
         }
 
+        // GET: /SIM/Details/{id}
+        [HttpGet]
+        public IActionResult Details(Guid id)
+        {
+            var sim = _simRepo.GetById(id);
+            if (sim == null) return NotFound();
+
+            return View(sim);
+        }
+
+        // GET: /SIM/Create
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        // POST: /SIM/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Sim sim)
         {
+            var provider = DetectServiceProvider(sim.PhoneNumber);
+            if (provider != null)
+            {
+                sim.ServiceProviderId = provider.Id;
+                sim.ServiceProvider = provider;
+            }
+            else
+            {
+                ModelState.AddModelError("PhoneNumber", "Could not detect a valid Service Provider for this phone number prefix.");
+            }
+
+            ModelState.Remove(nameof(Sim.ServiceProvider));
+            ModelState.Remove(nameof(Sim.ServiceProviderId));
+
             if (ModelState.IsValid)
             {
                 sim.Id = Guid.NewGuid();
@@ -127,18 +172,35 @@ namespace Sim_Card_Managment.Controllers
             return View(sim);
         }
 
+        // GET: /SIM/Edit/{id}
         [HttpGet]
         public IActionResult Edit(Guid id)
         {
             var sim = _simRepo.GetById(id);
             if (sim == null) return NotFound();
+
             return View(sim);
         }
 
+        // POST: /SIM/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Sim sim)
         {
+            var provider = DetectServiceProvider(sim.PhoneNumber);
+            if (provider != null)
+            {
+                sim.ServiceProviderId = provider.Id;
+                sim.ServiceProvider = provider;
+            }
+            else
+            {
+                ModelState.AddModelError("PhoneNumber", "Could not detect a valid Service Provider for this phone number prefix.");
+            }
+
+            ModelState.Remove(nameof(Sim.ServiceProvider));
+            ModelState.Remove(nameof(Sim.ServiceProviderId));
+
             if (ModelState.IsValid)
             {
                 _simRepo.Update(sim);
@@ -148,19 +210,30 @@ namespace Sim_Card_Managment.Controllers
             return View(sim);
         }
 
+        // GET: /SIM/Delete/{id}
         [HttpGet]
         public IActionResult Delete(Guid id)
         {
             var sim = _simRepo.GetById(id);
             if (sim == null) return NotFound();
+
             return View(sim);
         }
 
+        // POST: /SIM/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(Guid id)
         {
-            _simRepo.Delete(id);
+            var sim = _simRepo.GetById(id);
+            if (sim == null)
+            {
+                return NotFound();
+            }
+
+            sim.Status = "Removed";
+            _simRepo.Update(sim);
+
             return RedirectToAction(nameof(Index));
         }
     }
