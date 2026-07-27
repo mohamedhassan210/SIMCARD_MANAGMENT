@@ -305,7 +305,6 @@
         </div>
     </div>
 
-    <!-- Form changed to preventDefault to stop page reloads during JS filtering -->
     <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
         <div class="filters-row">
             <div class="filter-group">
@@ -326,7 +325,6 @@
                 </select>
             </div>
 
-            
             <div class="filter-group" style="flex: 1;">
                 <label for="search-input">Search (Client-Side)</label>
                 <div class="search-box">
@@ -357,7 +355,6 @@
                 {
                     foreach (var item in Model)
                     {
-                        <!-- Added Data Attributes here to easily read status, type, and assignment type via JS -->
                         <tr class="device-row"
                             data-status="@(item.Status?.ToLower() ?? "")"
                             data-type="@(item.DeviceType?.ToLower() ?? "")"
@@ -432,7 +429,6 @@
         const searchInput = document.getElementById("search-input");
         const statusFilter = document.getElementById("status-filter");
         const typeFilter = document.getElementById("device-type-filter");
-        const empFilter = document.getElementById("emp-filter");
 
         const allRows = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
         const noResultsRow = document.getElementById("noResultsRow");
@@ -448,7 +444,6 @@
             const query = searchInput.value.trim().toLowerCase();
             const statusVal = statusFilter.value.toLowerCase();
             const typeVal = typeFilter.value.toLowerCase();
-            const empVal = empFilter.value.toLowerCase();
 
             visibleRows = allRows.filter(row => {
                 // 1. Check Search Query
@@ -463,21 +458,10 @@
                 const rowType = row.getAttribute("data-type");
                 const matchesType = (typeVal === "all") || (rowType === typeVal);
 
-                // 4. Check Employee / Non-Employee Filter
-                const rowAssigneeType = row.getAttribute("data-assignee-type");
-                const isEmployee = rowAssigneeType.includes("employee") || rowAssigneeType.includes("emp");
-
-                let matchesEmp = true;
-                if (empVal === "emp") {
-                    matchesEmp = isEmployee;
-                } else if (empVal === "non-emp") {
-                    matchesEmp = !isEmployee;
-                }
-
-                return matchesSearch && matchesStatus && matchesType && matchesEmp;
+                return matchesSearch && matchesStatus && matchesType;
             });
 
-            currentPage = 1; // Reset to first page whenever a filter changes
+            currentPage = 1; // Reset to page 1 on filter update
             renderTable();
         }
 
@@ -493,7 +477,7 @@
             // Hide all rows initially
             allRows.forEach(row => row.style.display = "none");
 
-            // Show only the paginated slice of visible rows
+            // Display paginated slice
             visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
 
             if (totalVisible === 0) {
@@ -523,9 +507,8 @@
         searchInput.addEventListener("input", applyFilters);
         statusFilter.addEventListener("change", applyFilters);
         typeFilter.addEventListener("change", applyFilters);
-        empFilter.addEventListener("change", applyFilters);
 
-        // Event Listener for Pagination
+        // Event Listener for Pagination Controls
         paginationContainer.addEventListener("click", function (e) {
             const btn = e.target.closest("button");
             if (!btn || btn.disabled) return;
@@ -542,7 +525,7 @@
             renderTable();
         });
 
-        // Initial render
-        renderTable();
+        // Initial execution
+        applyFilters();
     });
 </script>

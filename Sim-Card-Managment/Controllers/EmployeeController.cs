@@ -65,10 +65,21 @@ namespace Sim_Card_Managment.Controllers
         // GET: /Employee/Details/{id}
         public IActionResult Details(Guid id)
         {
+            // 1. Check if employee exists
             var employee = _employeeRepo.GetById(id);
-            if (employee != null) return View("Details", employee);
+            if (employee != null)
+            {
+                return View("Details", employee);
+            }
 
-            return RedirectToAction("Details", "NonEmployee", new { id });
+            // 2. If not found in Employees, check Non-Employees
+            var nonEmployee = _nonEmployeeRepo.GetById(id);
+            if (nonEmployee != null)
+            {
+                return RedirectToAction("Details", "NonEmployee", new { id = id });
+            }
+
+            return NotFound();
         }
 
         // GET: /Employee/Create
@@ -98,22 +109,30 @@ namespace Sim_Card_Managment.Controllers
         }
 
         // GET: /Employee/Edit/{id}
+        [HttpGet]
         public IActionResult Edit(Guid id)
         {
             var employee = _employeeRepo.GetById(id);
-            if (employee == null) return NotFound();
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
             return View(employee);
         }
 
         // POST: /Employee/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Guid id, Employee employee)
+        public IActionResult Edit(Employee employee)
         {
-            if (id != employee.Id) return BadRequest();
-            if (!ModelState.IsValid) return View(employee);
-            _employeeRepo.Update(employee);
-            return RedirectToAction(nameof(Index));
+            if (ModelState.IsValid)
+            {
+                _employeeRepo.Update(employee); // Make sure your repository has an Update method
+                return RedirectToAction("Details", new { id = employee.Id });
+            }
+
+            return View(employee);
         }
 
         // GET: /Employee/Delete/{id}

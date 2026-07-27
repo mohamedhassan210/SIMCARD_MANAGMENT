@@ -1,7 +1,9 @@
-﻿@model Sim_Card_Managment.Models.Employee
+﻿@model Sim_Card_Managment.Models.NonEmployee
 
 @{
-    ViewData["Title"] = "Edit Employee";
+    ViewData["Title"] = "Edit Non-Employee";
+    var typeOptions = ViewBag.TypeOptions as List<string> ?? new List<string>();
+    bool isCustomType = !string.IsNullOrEmpty(Model.Type) && !typeOptions.Contains(Model.Type);
 }
 
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -111,38 +113,83 @@
 <body>
 
     <div class="edit-card shadow">
-        <h2 class="title-header">Edit Employee</h2>
+        <h2 class="title-header">Edit Non-Employee</h2>
 
-        <form asp-action="Edit" method="post">
+        <form asp-controller="NonEmployee" asp-action="Edit" method="post">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
 
             <div class="row g-4 mb-5">
                 <div class="col-md-6">
-                    <label class="custom-label" asp-for="Name">Name</label>
+                    <label class="custom-label" asp-for="Name">Full Name</label>
                     <input asp-for="Name" class="custom-input" placeholder="Enter full name" />
                     <span asp-validation-for="Name"></span>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label" asp-for="NationalID">National ID</label>
-                    <input asp-for="NationalID" class="custom-input" placeholder="Enter national ID" />
-                    <span asp-validation-for="NationalID"></span>
+                    <label class="custom-label" asp-for="ContactInfo">Contact Info</label>
+                    <input asp-for="ContactInfo" class="custom-input" placeholder="Enter contact info / phone" />
+                    <span asp-validation-for="ContactInfo"></span>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label" asp-for="Position">Job Title / Position</label>
-                    <input asp-for="Position" class="custom-input" placeholder="Enter job title" />
-                    <span asp-validation-for="Position"></span>
+                    <label class="custom-label" asp-for="Type">Category Type</label>
+                    <select id="nonEmpType" name="Type" class="custom-select">
+                        <option value="">-- Select Type --</option>
+                        @foreach (var typeItem in typeOptions)
+                        {
+                            if (!isCustomType && Model.Type == typeItem)
+                            {
+                                <option value="@typeItem" selected>@typeItem</option>
+                            }
+                            else
+                            {
+                                <option value="@typeItem">@typeItem</option>
+                            }
+                        }
+                        @if (isCustomType)
+                        {
+                            <option value="SomethingElse" selected>Something Else</option>
+                        }
+                        else
+                        {
+                            <option value="SomethingElse">Something Else</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Type"></span>
+                </div>
+
+                <div class="col-md-6" id="customTypeContainer" style="display: @(isCustomType ? "block" : "none");">
+                    <label class="custom-label">Specify Custom Type</label>
+                    <input type="text" id="CustomType" name="CustomType" class="custom-input"
+                           value="@(isCustomType? Model.Type: "")" placeholder="Enter new category type" />
                 </div>
             </div>
 
             <div class="d-flex justify-content-end gap-3 mt-4">
-                <a class="btn btn-cancel" asp-controller="Employee" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+                <a class="btn btn-cancel" asp-controller="NonEmployee" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
                 <button type="submit" class="btn btn-save">Save Changes</button>
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const selectType = document.getElementById("nonEmpType");
+            const customContainer = document.getElementById("customTypeContainer");
+            const customInput = document.getElementById("CustomType");
+
+            selectType.addEventListener("change", function () {
+                if (this.value === "SomethingElse") {
+                    customContainer.style.display = "block";
+                    customInput.focus();
+                } else {
+                    customContainer.style.display = "none";
+                    customInput.value = "";
+                }
+            });
+        });
+    </script>
 
 </body>
 
