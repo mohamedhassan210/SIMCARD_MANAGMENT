@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "RgBf0KTVqVE=",
+  "dgSpecHash": "TT6QmAca8fQ=",
   "success": true,
   "projectFilePath": "D:\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
   "expectedPackageFiles": [
@@ -8,7 +8,14 @@
     "C:\\Users\\m.eldokany\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\closedxml\\0.105.0\\closedxml.0.105.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\closedxml.parser\\2.0.0\\closedxml.parser.2.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\coverlet.collector\\6.0.0\\coverlet.collector.6.0.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\documentformat.openxml\\3.1.1\\documentformat.openxml.3.1.1.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\documentformat.openxml.framework\\3.1.1\\documentformat.openxml.framework.3.1.1.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\epplus\\8.6.1\\epplus.8.6.1.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\epplus.interfaces\\8.4.0\\epplus.interfaces.8.4.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\excelnumberformat\\1.1.0\\excelnumberformat.1.1.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\fontawesome\\4.7.0\\fontawesome.4.7.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.applicationinsights\\2.23.0\\microsoft.applicationinsights.2.23.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.3.9\\microsoft.aspnetcore.authentication.abstractions.2.3.9.nupkg.sha512",
@@ -39,12 +46,17 @@
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.entityframeworkcore.sqlserver\\8.0.28\\microsoft.entityframeworkcore.sqlserver.8.0.28.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\8.0.0\\microsoft.extensions.caching.abstractions.8.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.caching.memory\\8.0.1\\microsoft.extensions.caching.memory.8.0.1.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.configuration\\8.0.0\\microsoft.extensions.configuration.8.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\8.0.0\\microsoft.extensions.configuration.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.configuration.fileextensions\\8.0.1\\microsoft.extensions.configuration.fileextensions.8.0.1.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.configuration.json\\8.0.1\\microsoft.extensions.configuration.json.8.0.1.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\8.0.1\\microsoft.extensions.dependencyinjection.8.0.1.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.2\\microsoft.extensions.dependencyinjection.abstractions.8.0.2.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.dependencymodel\\8.0.2\\microsoft.extensions.dependencymodel.8.0.2.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.diagnostics.abstractions\\8.0.1\\microsoft.extensions.diagnostics.abstractions.8.0.1.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.fileproviders.abstractions\\8.0.0\\microsoft.extensions.fileproviders.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.fileproviders.physical\\8.0.0\\microsoft.extensions.fileproviders.physical.8.0.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.filesystemglobbing\\8.0.0\\microsoft.extensions.filesystemglobbing.8.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.hosting.abstractions\\8.0.1\\microsoft.extensions.hosting.abstractions.8.0.1.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.logging\\8.0.1\\microsoft.extensions.logging.8.0.1.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.2\\microsoft.extensions.logging.abstractions.8.0.2.nupkg.sha512",
@@ -59,6 +71,7 @@
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.identitymodel.protocols\\6.35.0\\microsoft.identitymodel.protocols.6.35.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.identitymodel.protocols.openidconnect\\6.35.0\\microsoft.identitymodel.protocols.openidconnect.6.35.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.identitymodel.tokens\\6.35.0\\microsoft.identitymodel.tokens.6.35.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.io.recyclablememorystream\\3.0.1\\microsoft.io.recyclablememorystream.3.0.1.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.net.http.headers\\2.3.9\\microsoft.net.http.headers.2.3.9.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.net.test.sdk\\18.7.0\\microsoft.net.test.sdk.18.7.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
@@ -78,6 +91,8 @@
     "C:\\Users\\m.eldokany\\.nuget\\packages\\nunit\\4.6.1\\nunit.4.6.1.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\nunit.analyzers\\3.9.0\\nunit.analyzers.3.9.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\nunit3testadapter\\6.2.0\\nunit3testadapter.6.2.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\rbush.signed\\4.0.0\\rbush.signed.4.0.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\sixlabors.fonts\\1.0.0\\sixlabors.fonts.1.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.buffers\\4.6.0\\system.buffers.4.6.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.clientmodel\\1.0.0\\system.clientmodel.1.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.collections.immutable\\8.0.0\\system.collections.immutable.8.0.0.nupkg.sha512",
@@ -87,6 +102,7 @@
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.formats.asn1\\8.0.2\\system.formats.asn1.8.0.2.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.identitymodel.tokens.jwt\\6.35.0\\system.identitymodel.tokens.jwt.6.35.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\system.io.packaging\\8.0.1\\system.io.packaging.8.0.1.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.memory.data\\1.0.2\\system.memory.data.1.0.2.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
@@ -96,7 +112,9 @@
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.security.accesscontrol\\6.0.0\\system.security.accesscontrol.6.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.security.cryptography.cng\\5.0.0\\system.security.cryptography.cng.5.0.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\system.security.cryptography.pkcs\\8.0.1\\system.security.cryptography.pkcs.8.0.1.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.security.cryptography.protecteddata\\6.0.0\\system.security.cryptography.protecteddata.6.0.0.nupkg.sha512",
+    "C:\\Users\\m.eldokany\\.nuget\\packages\\system.security.cryptography.xml\\8.0.3\\system.security.cryptography.xml.8.0.3.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.security.permissions\\6.0.0\\system.security.permissions.6.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.security.principal.windows\\5.0.0\\system.security.principal.windows.5.0.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
@@ -106,5 +124,12 @@
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.threading.tasks.extensions\\4.6.0\\system.threading.tasks.extensions.4.6.0.nupkg.sha512",
     "C:\\Users\\m.eldokany\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file D:\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }
