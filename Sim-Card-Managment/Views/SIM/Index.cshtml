@@ -312,7 +312,7 @@
                 <select id="status-filter" class="status-select">
                     <option value="all">All</option>
                     <option value="active">Active</option>
-                    <option value="inactive">inactive</option>
+                    <option value="inactive">Inactive</option>
                 </select>
             </div>
 
@@ -326,7 +326,7 @@
             </div>
 
             <div class="filter-group" style="flex: 1;">
-                <label for="search-input">Search (Client-Side)</label>
+                <label for="search-input">Search</label>
                 <div class="search-box">
                     <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
@@ -355,9 +355,18 @@
                 {
                     foreach (var item in Model)
                     {
+                        @* FIX: normalize data-type to exactly "sim" or "usb" so it always
+                           matches the dropdown's option values, regardless of whether
+                           item.DeviceType is "SIM", "USB", or "USB Modem" etc. *@
+                        var normalizedType = (item.DeviceType != null && item.DeviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase))
+                        ? "sim"
+                        : (item.DeviceType != null && item.DeviceType.Contains("USB", StringComparison.OrdinalIgnoreCase))
+                        ? "usb"
+                        : "";
+
                         <tr class="device-row"
                             data-status="@(item.Status?.ToLower() ?? "")"
-                            data-type="@(item.DeviceType?.ToLower() ?? "")"
+                            data-type="@normalizedType"
                             data-assignee-type="@(item.AssignedToType?.ToLower() ?? "")">
                             <td>
                                 <strong>@item.SerialNumber</strong>
@@ -439,29 +448,42 @@
         let visibleRows = [...allRows];
         let currentPage = 1;
 
-        // Centralized filter function
+        // Set initial select values from URL params if present
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("status")) {
+            statusFilter.value = urlParams.get("status").toLowerCase();
+        }
+        if (urlParams.has("type")) {
+            typeFilter.value = urlParams.get("type").toLowerCase();
+        }
+
+        // Handle URL update for server-side state synchronization
+        function updateUrlParams() {
+            const statusVal = statusFilter.value;
+            const typeVal = typeFilter.value;
+            window.location.href = `?status=${statusVal}&type=${typeVal}`;
+        }
+
+        // Local filtering logic for instant live search
         function applyFilters() {
             const query = searchInput.value.trim().toLowerCase();
             const statusVal = statusFilter.value.toLowerCase();
             const typeVal = typeFilter.value.toLowerCase();
 
             visibleRows = allRows.filter(row => {
-                // 1. Check Search Query
                 const text = row.innerText.toLowerCase();
                 const matchesSearch = text.includes(query);
 
-                // 2. Check Status Filter
                 const rowStatus = row.getAttribute("data-status");
                 const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
 
-                // 3. Check Type Filter
                 const rowType = row.getAttribute("data-type");
                 const matchesType = (typeVal === "all") || (rowType === typeVal);
 
                 return matchesSearch && matchesStatus && matchesType;
             });
 
-            currentPage = 1; // Reset to page 1 on filter update
+            currentPage = 1;
             renderTable();
         }
 
@@ -474,10 +496,7 @@
             const startIdx = (currentPage - 1) * itemsPerPage;
             const endIdx = startIdx + itemsPerPage;
 
-            // Hide all rows initially
             allRows.forEach(row => row.style.display = "none");
-
-            // Display paginated slice
             visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
 
             if (totalVisible === 0) {
@@ -503,12 +522,14 @@
             paginationContainer.innerHTML = html;
         }
 
-        // Event Listeners for Filters
+        // Live input search
         searchInput.addEventListener("input", applyFilters);
-        statusFilter.addEventListener("change", applyFilters);
-        typeFilter.addEventListener("change", applyFilters);
 
-        // Event Listener for Pagination Controls
+        // Update URL and reload data when dropdown filters change
+        statusFilter.addEventListener("change", updateUrlParams);
+        typeFilter.addEventListener("change", updateUrlParams);
+
+        // Pagination handler
         paginationContainer.addEventListener("click", function (e) {
             const btn = e.target.closest("button");
             if (!btn || btn.disabled) return;
@@ -525,7 +546,7 @@
             renderTable();
         });
 
-        // Initial execution
+        // Initialize view render
         applyFilters();
     });
 </script>
