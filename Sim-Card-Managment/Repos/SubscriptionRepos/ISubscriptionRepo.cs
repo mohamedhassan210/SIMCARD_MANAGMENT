@@ -6,10 +6,10 @@ namespace Sim_Card_Managment.Repos
     {
         Task<IEnumerable<Subscription>> GetAllSubscriptionsWithDetailsAsync();
         IEnumerable<Subscription> GetAll();
-        Subscription? GetById(Guid id);
+        Subscription? GetById(int id);
         void Add(Subscription subscription);   
         void Update(Subscription subscription);
-        void Delete(Guid id);
+        void Delete(int id);
         Task<IEnumerable<Subscription>> GetAllWithHardwareDetailsAsync();
     }
 }

@@ -8,10 +8,10 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
     public interface IEmployeeRepo
     {
         IEnumerable<Employee> GetAll();
-        Employee? GetById(Guid id);
+        Employee? GetById(int id);
         void Add(Employee employee);
         void Update(Employee employee);
-        void Delete(Guid id);
+        void Delete(int id);
         Task<List<PersonListItemViewModel>> GetPeopleListAsync(string status);
         Task<IEnumerable<Employee>> SearchActiveEmployeesAsync(string query);
     }

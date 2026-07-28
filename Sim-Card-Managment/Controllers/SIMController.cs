@@ -127,7 +127,7 @@ namespace Sim_Card_Managment.Controllers
 
         // GET: /SIM/Details/{id}
         [HttpGet]
-        public IActionResult Details(Guid id)
+        public IActionResult Details(int id)
         {
             var sim = _simRepo.GetById(id);
             if (sim == null) return NotFound();
@@ -163,7 +163,7 @@ namespace Sim_Card_Managment.Controllers
 
             if (ModelState.IsValid)
             {
-                sim.Id = Guid.NewGuid();
+                //sim.Id = int.Newint();
                 sim.RegisteredAt = DateTime.Now;
                 _simRepo.Add(sim);
                 return RedirectToAction(nameof(Index));
@@ -174,7 +174,7 @@ namespace Sim_Card_Managment.Controllers
 
         // GET: /SIM/Edit/{id}
         [HttpGet]
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(int id)
         {
             var sim = _simRepo.GetById(id);
             if (sim == null) return NotFound();
@@ -212,7 +212,7 @@ namespace Sim_Card_Managment.Controllers
 
         // GET: /SIM/Delete/{id}
         [HttpGet]
-        public IActionResult Delete(Guid id)
+        public IActionResult Delete(int id)
         {
             var sim = _simRepo.GetById(id);
             if (sim == null) return NotFound();
@@ -223,7 +223,7 @@ namespace Sim_Card_Managment.Controllers
         // POST: /SIM/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(Guid id)
+        public IActionResult DeleteConfirmed(int id)
         {
             var sim = _simRepo.GetById(id);
             if (sim == null)

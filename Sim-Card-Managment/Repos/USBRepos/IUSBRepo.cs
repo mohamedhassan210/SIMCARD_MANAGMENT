@@ -7,9 +7,9 @@ namespace Sim_Card_Managment.Repos
         Task<IEnumerable<Usb>> GetAvailableUsbsAsync(string query);
         Task<IEnumerable<Usb>> GetAvailableUsbsAsync();
         IEnumerable<Usb> GetAll();
-        Usb? GetById(Guid id);
+        Usb? GetById(int id);
         void Add(Usb usb);
         void Update(Usb usb);
-        void Delete(Guid id);
+        void Delete(int id);
     }
 }

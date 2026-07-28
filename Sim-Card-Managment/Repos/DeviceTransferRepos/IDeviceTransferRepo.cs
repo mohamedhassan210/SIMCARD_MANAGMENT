@@ -5,9 +5,9 @@ namespace Sim_Card_Managment.Repos
     public interface IDeviceTransferRepo
     {
         IEnumerable<DeviceTransfer> GetAllDeviceTransfers();
-        DeviceTransfer? GetDeviceTransferbyId(Guid id);
+        DeviceTransfer? GetDeviceTransferbyId(int id);
         void AddDeviceTransfer(DeviceTransfer deviceTransfer);
-        Subscription? GetSubscriptionById(Guid id);
+        Subscription? GetSubscriptionById(int id);
         void AddSubscription(Subscription subscription);
         void CompleteTransaction();
     }

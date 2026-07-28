@@ -6,7 +6,7 @@ namespace Sim_Card_Managment.Models
     public class UserOtp
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [EmailAddress]

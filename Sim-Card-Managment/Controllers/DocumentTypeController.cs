@@ -39,7 +39,7 @@ namespace Sim_Card_Managment.Controllers
                 // Mapping من ViewModel لـ Domain Model
                 var documentType = new DocumentType
                 {
-                    Id = Guid.NewGuid(),
+                    //Id = int.Newint(),
                     Name = model.Name,
                     DisplayName = model.DisplayName
                 };
@@ -51,7 +51,7 @@ namespace Sim_Card_Managment.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Edit(Guid id)
+        public async Task<IActionResult> Edit(int id)
         {
             var type = await _repo.GetByIdAsync(id);
             if (type == null) return NotFound();
@@ -67,7 +67,7 @@ namespace Sim_Card_Managment.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, DocumentTypeViewModel model)
+        public async Task<IActionResult> Edit(int id, DocumentTypeViewModel model)
         {
             if (id != model.Id) return BadRequest();
 

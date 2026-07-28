@@ -17,7 +17,7 @@ namespace Sim_Card_Managment.Repos
             return _context.DeviceTransfers.ToList();
         }
 
-        public DeviceTransfer? GetDeviceTransferbyId(Guid id)
+        public DeviceTransfer? GetDeviceTransferbyId(int id)
         {
             return _context.DeviceTransfers.Find(id);
         }
@@ -27,7 +27,7 @@ namespace Sim_Card_Managment.Repos
             _context.DeviceTransfers.Add(deviceTransfer);
         }
 
-        public Subscription? GetSubscriptionById(Guid id)
+        public Subscription? GetSubscriptionById(int id)
         {
             return _context.Subscriptions.Find(id);
         }

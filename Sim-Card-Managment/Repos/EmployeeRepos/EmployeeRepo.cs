@@ -63,7 +63,7 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
                            .ToList();
         }
 
-        public Employee? GetById(Guid id)
+        public Employee? GetById(int id)
         {
             return _context.Employees
                 .Include(e => e.Subscriptions!)
@@ -97,7 +97,7 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
             _context.SaveChanges();
         }
 
-        public void Delete(Guid id)
+        public void Delete(int id)
         {
             // Find all subscriptions associated with this employee
             var subscriptions = _context.Subscriptions

@@ -34,7 +34,7 @@ namespace Sim_Card_Managment.Controllers
         {
             if (ModelState.IsValid)
             {
-                quota.Id = Guid.NewGuid();
+                //quota.Id = int.Newint();
 
                 _quotaRepo.Add(quota);
 
@@ -47,7 +47,7 @@ namespace Sim_Card_Managment.Controllers
 
         // GET: Quota/Edit/{id}
         [HttpGet]
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(int id)
         {
             var quota = _quotaRepo.GetById(id);
 
@@ -75,7 +75,7 @@ namespace Sim_Card_Managment.Controllers
 
         // GET: Quota/Delete/{id}
         [HttpGet]
-        public IActionResult Delete(Guid id)
+        public IActionResult Delete(int id)
         {
             var quota = _quotaRepo.GetById(id);
 
@@ -88,7 +88,7 @@ namespace Sim_Card_Managment.Controllers
         // POST: Quota/DeleteConfirmed/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(Guid id)
+        public IActionResult DeleteConfirmed(int id)
         {
             _quotaRepo.Delete(id);
 
@@ -97,7 +97,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         // GET: Quota/Details/{id}
-        public IActionResult Details(Guid id)
+        public IActionResult Details(int id)
         {
             var quota = _quotaRepo.GetById(id);
 

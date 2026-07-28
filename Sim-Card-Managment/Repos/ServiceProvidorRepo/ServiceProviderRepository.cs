@@ -19,7 +19,7 @@ namespace Sim_Card_Managment.Repositories
             return await _context.ServiceProviders.OrderBy(p => p.DisplayName).ToListAsync();
         }
 
-        public async Task<Models.ServiceProvider?> GetByIdAsync(Guid id)
+        public async Task<Models.ServiceProvider?> GetByIdAsync(int id)
         {
             return await _context.ServiceProviders.FirstOrDefaultAsync(p => p.Id == id);
         }
@@ -35,7 +35,7 @@ namespace Sim_Card_Managment.Repositories
             await Task.CompletedTask;
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(int id)
         {
             var provider = await _context.ServiceProviders.FindAsync(id);
             if (provider != null)

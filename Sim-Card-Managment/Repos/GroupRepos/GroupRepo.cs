@@ -14,13 +14,13 @@ public class GroupRepo : IGroupRepo
         return list.OrderBy(g => g.Name);
     }
 
-    public async Task<Group?> GetByIdWithPermissionsAsync(Guid id)
+    public async Task<Group?> GetByIdWithPermissionsAsync(int id)
         => await _db.Groups
             .Include(g => g.GroupPermissions)
                 .ThenInclude(gp => gp.Permission)
             .FirstOrDefaultAsync(g => g.Id == id);
 
-    public async Task AssignPermissionsAsync(Guid groupId, IEnumerable<Guid> permissionIds)
+    public async Task AssignPermissionsAsync(int groupId, IEnumerable<int> permissionIds)
     {
         var existing = _db.GroupPermissions.Where(gp => gp.GroupId == groupId);
         _db.GroupPermissions.RemoveRange(existing);

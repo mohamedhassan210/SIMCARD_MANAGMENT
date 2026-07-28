@@ -18,8 +18,8 @@ namespace Sim_Card_Managment.Repos
 
         public int GetDeviceStatusCount(string statusType, bool isSim)
         {
-            if (isSim) return _context.DeviceStatuses.Count(d => d.StatusType == statusType && d.SimId != null);
-            else return _context.DeviceStatuses.Count(d => d.StatusType == statusType && d.UsbId != null);
+            if (isSim) return _context.DeviceStatuses.Count(d => d.StatusType.Name == statusType && d.SimId != null);
+            else return _context.DeviceStatuses.Count(d => d.StatusType.Name == statusType && d.UsbId != null);
         }
 
         public IEnumerable<Employee> GetTopEmployees(int count) => _context.Employees.Take(count).ToList();

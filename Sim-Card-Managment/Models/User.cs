@@ -10,7 +10,7 @@ namespace Sim_Card_Managment.Models
     {
         [Key]
 
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
 
 
@@ -40,7 +40,7 @@ namespace Sim_Card_Managment.Models
 
         [Required]
 
-        public Guid GroupId { get; set; }
+        public int GroupId { get; set; }
 
 
 

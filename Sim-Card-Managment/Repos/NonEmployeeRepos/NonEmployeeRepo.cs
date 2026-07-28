@@ -72,7 +72,7 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
             return _context.NonEmployees.ToList();
         }
 
-        public NonEmployee? GetById(Guid id)
+        public NonEmployee? GetById(int id)
         {
             return _context.NonEmployees
                 .Include(e => e.Subscriptions!)
@@ -97,7 +97,7 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
             _context.SaveChanges();
         }
 
-        public void Delete(Guid id)
+        public void Delete(int id)
         {
             // Find all subscriptions associated with this non-employee
             var subscriptions = _context.Subscriptions

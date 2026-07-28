@@ -7,7 +7,7 @@ namespace Sim_Card_Managment.Viewmodel
     {
         [Required(ErrorMessage = "برجاء اختيار نوع المستند")]
         [Display(Name = "نوع المستند")]
-        public Guid DocumentTypeId { get; set; }
+        public int DocumentTypeId { get; set; }
 
         [Required(ErrorMessage = "برجاء اختيار تاريخ الإجراء")]
         [Display(Name = "تاريخ الإجراء")]
@@ -29,10 +29,10 @@ namespace Sim_Card_Managment.Viewmodel
 
         // لربط السيريالات بـ SIM أو USB اختيارياً عند الإنشاء
         [Display(Name = "ربط بـ SIM Card (اختياري)")]
-        public Guid? SelectedSimId { get; set; }
+        public int? SelectedSimId { get; set; }
 
         [Display(Name = "ربط بـ USB Modem (اختياري)")]
-        public Guid? SelectedUsbId { get; set; }
+        public int? SelectedUsbId { get; set; }
 
         // القوائم المنسدلة للواجهة (الداتا لييست)
         public SelectList? DocumentTypes { get; set; }

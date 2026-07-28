@@ -6,10 +6,10 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
     public interface INonEmployeeRepo
     {
         IEnumerable<NonEmployee> GetAll();
-        NonEmployee? GetById(Guid id);
+        NonEmployee? GetById(int id);
         void Add(NonEmployee nonEmployee);
         void Update(NonEmployee nonEmployee);
-        void Delete(Guid id);
+        void Delete(int id);
         Task<List<PersonListItemViewModel>> GetPeopleListAsync();
 
         // Add this method:

@@ -22,7 +22,7 @@ namespace Sim_Card_Managment.Repos
                 .ToList();
         }
 
-        public DeviceStatus? GetDeviceStatusbyId(Guid id)
+        public DeviceStatus? GetDeviceStatusbyId(int id)
         {
             return _context.DeviceStatuses
                 .Include(d => d.Sim)
@@ -39,7 +39,7 @@ namespace Sim_Card_Managment.Repos
             _context.SaveChanges();
         }
 
-        public void DeleteStatus(Guid id)
+        public void DeleteStatus(int id)
         {
             var status = GetDeviceStatusbyId(id);
             if (status != null)

@@ -5,16 +5,16 @@ namespace Sim_Card_Managment.Models
     public class NonEmployee
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        [StringLength(200)]
+        [StringLength(50)]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(200)]
+        [StringLength(50)]
         public string? ContactInfo { get; set; }
 
-        [StringLength(100)]
+        [StringLength(50)]
         public string? Type { get; set; }  // e.g. Contractor, Visitor
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;

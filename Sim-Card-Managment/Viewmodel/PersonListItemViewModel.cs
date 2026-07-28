@@ -4,7 +4,7 @@ namespace Sim_Card_Managment.ViewModels
 {
     public class PersonListItemViewModel
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string PersonType { get; set; } = "Employee"; // "Employee" or "Non-Employee"
         public string Identifier { get; set; } = string.Empty; // NationalID or ContactInfo

@@ -4,10 +4,10 @@ namespace Sim_Card_Managment.Repos
     public interface IDocumentTypeRepo
     {
         Task<IEnumerable<DocumentType>> GetAllAsync();
-        Task<DocumentType?> GetByIdAsync(Guid id);
+        Task<DocumentType?> GetByIdAsync(int id);
         Task AddAsync(DocumentType documentType);
         Task UpdateAsync(DocumentType documentType);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(int id);
         Task<bool> SaveChangesAsync();
     }
 }

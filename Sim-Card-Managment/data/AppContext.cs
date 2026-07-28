@@ -1,6 +1,7 @@
 ﻿using System.Reflection.Metadata;
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
+using Sim_Card_Management.Models;
 using Sim_Card_Managment.Models;
 
 namespace Sim_Card_Managment.data
@@ -22,6 +23,7 @@ namespace Sim_Card_Managment.data
         public DbSet<ReceiverSignature> ReceiverSignatures { get; set; }
         public DbSet<DeviceTransfer> DeviceTransfers { get; set; }
         public DbSet<DeviceStatus> DeviceStatuses { get; set; }
+        public DbSet<DeviceStatusType> DeviceStatusesType { get; set; }
 
         // ── Audit ────────────────────────────────────────────────────
         public DbSet<AuditLog> AuditLogs { get; set; }
@@ -38,6 +40,8 @@ namespace Sim_Card_Managment.data
         public DbSet<Models.Document> Documents { get; set; }
         public DbSet<Serial> Serials { get; set; }
         public DbSet<DocumentType> DocumentTypes { get; set; }
+        public DbSet<DocumentDetails> DocumentDetails { get; set; }
+        public DbSet<ItemType> ItemTypes { get; set; }
 
 
         // ── Service Providor──────────────────────────────────────────────
@@ -109,6 +113,14 @@ namespace Sim_Card_Managment.data
                 .WithMany()
                 .HasForeignKey(ds => ds.ReplacedByUsbId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // ── DeviceStatus: DeviceStatusType ─────────────────────────
+            modelBuilder.Entity<DeviceStatus>()
+                .HasOne(ds => ds.StatusType)
+                .WithMany(u => u.DeviceStatuses)
+                .HasForeignKey(ds => ds.StatusTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             // ── Subscription: disable cascade on multiple paths ────────
             modelBuilder.Entity<Subscription>()
@@ -184,11 +196,25 @@ namespace Sim_Card_Managment.data
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ── Document: Serials ──────────────────────────────
-            modelBuilder.Entity<Serial>()
-                .HasOne(s => s.Document)
-                .WithMany(d => d.Serials)
+            // ── Document: DocumentDetails ──────────────────────────────
+            modelBuilder.Entity<DocumentDetails>()
+                .HasOne(d => d.Document)
+                .WithMany(d => d.DocumentDetails)
                 .HasForeignKey(s => s.DocumentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── DocumentDetails: Serials ──────────────────────────────
+            modelBuilder.Entity<Serial>()
+                .HasOne(s => s.DocumentDetails)
+                .WithMany(d => d.Serials)
+                .HasForeignKey(s => s.DocumentDetailsId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── DocumentDetails: ItemType ──────────────────────────────
+            modelBuilder.Entity<DocumentDetails>()
+                .HasOne(s => s.ItemType)
+                .WithMany(d => d.DocumentDetails)
+                .HasForeignKey(s => s.ItemTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // ── Usb: Serials ──────────────────────────────

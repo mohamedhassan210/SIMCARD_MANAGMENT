@@ -19,7 +19,7 @@ namespace Sim_Card_Managment.Controllers
             return View(transfers);
         }
 
-        public IActionResult Details(Guid id)
+        public IActionResult Details(int id)
         {
             var deviceTransfer = _repo.GetDeviceTransferbyId(id);
             if (deviceTransfer == null) return NotFound();
@@ -48,7 +48,7 @@ namespace Sim_Card_Managment.Controllers
                     // 2. Create the new subscription (leave EndDate as null so it is Active)
                     var newSubscription = new Subscription
                     {
-                        Id = Guid.NewGuid(),
+                        //Id = int.Newint(),
                         EmpId = deviceTransfer.ToEmpId,
                         SimId = deviceTransfer.SimId ?? oldSubscription.SimId,
                         UsbId = deviceTransfer.UsbId ?? oldSubscription.UsbId,
@@ -60,7 +60,7 @@ namespace Sim_Card_Managment.Controllers
                         ActionId = oldSubscription.ActionId
                     };
 
-                    deviceTransfer.Id = Guid.NewGuid();
+                    //deviceTransfer.Id = int.Newint();
                     deviceTransfer.NewSubscriptionId = newSubscription.Id;
 
                     _repo.AddSubscription(newSubscription);

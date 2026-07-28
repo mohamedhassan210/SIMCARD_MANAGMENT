@@ -10,7 +10,7 @@ namespace Sim_Card_Managment.Viewmodel
 
     {
 
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         public string Username { get; set; } = string.Empty;
 
@@ -18,7 +18,7 @@ namespace Sim_Card_Managment.Viewmodel
 
         public string Role { get; set; } = string.Empty;
 
-        public string GroupName { get; set; } = string.Empty; // Advanced: عشان نعرض اسم الجروب بدل الـ GUID المبهم
+        public string GroupName { get; set; } = string.Empty; // Advanced: عشان نعرض اسم الجروب بدل الـ int المبهم
 
         public bool IsActive { get; set; }
 

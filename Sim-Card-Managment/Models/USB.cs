@@ -5,7 +5,7 @@ namespace Sim_Card_Managment.Models
     public class Usb
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -28,7 +28,7 @@ namespace Sim_Card_Managment.Models
         public virtual ICollection<Serial> Serials { get; set; } = new List<Serial>();
         
 
-        public Guid ServiceProviderId { get; set; }
+        public int ServiceProviderId { get; set; }
         public virtual ServiceProvider ServiceProvider { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace Sim_Card_Managment.Models
     public class ServiceProvider
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(100)]

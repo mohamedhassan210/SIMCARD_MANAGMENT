@@ -13,10 +13,11 @@ namespace Sim_Card_Managment.Repos
             _context = context;
         }
 
-        public async Task<IEnumerable<Serial>> GetAllAsync(string? serialNumber = null, Guid? documentId = null)
+        public async Task<IEnumerable<Serial>> GetAllAsync(string? serialNumber = null, int? documentId = null)
         {
             var query = _context.Serials
-                .Include(s => s.Document)
+                .Include(s => s.DocumentDetails)
+                .ThenInclude(d=>d.Document)
                 .Include(s => s.CreatedBy)
                 .Include(s => s.Sim)
                 .Include(s => s.Usb)
@@ -24,7 +25,7 @@ namespace Sim_Card_Managment.Repos
 
             if (documentId.HasValue)
             {
-                query = query.Where(s => s.DocumentId == documentId.Value);
+                query = query.Where(s => s.DocumentDetails.DocumentId == documentId.Value);
             }
 
             if (!string.IsNullOrWhiteSpace(serialNumber))
@@ -35,10 +36,11 @@ namespace Sim_Card_Managment.Repos
             return await query.ToListAsync();
         }
 
-        public async Task<Serial?> GetByIdAsync(Guid id)
+        public async Task<Serial?> GetByIdAsync(int id)
         {
             return await _context.Serials
-                .Include(s => s.Document)
+                .Include(s => s.DocumentDetails)
+                .ThenInclude(d => d.Document)
                 .Include(s => s.Sim)
                 .Include(s => s.Usb)
                 .FirstOrDefaultAsync(s => s.Id == id);
@@ -59,7 +61,7 @@ namespace Sim_Card_Managment.Repos
             await _context.Serials.AddRangeAsync(serials);
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(int id)
         {
             var serial = await _context.Serials.FindAsync(id);
             if (serial != null)

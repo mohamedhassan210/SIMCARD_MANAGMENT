@@ -36,7 +36,7 @@ namespace Sim_Card_Managment.Repos
                 .ToList();
         }
 
-        public Subscription? GetById(Guid id)
+        public Subscription? GetById(int id)
         {
             return _context.Subscriptions
                 .Include(s => s.Employee)
@@ -69,15 +69,17 @@ namespace Sim_Card_Managment.Repos
                 .Include(s => s.NonEmployee)
                 .Include(s => s.Sim)
                     .ThenInclude(sim => sim.Serials)
-                        .ThenInclude(ser => ser.Document)
+                        .ThenInclude(ser => ser.DocumentDetails)
+                        .ThenInclude(d=> d.Document)
                 .Include(s => s.Usb)
                     .ThenInclude(usb => usb.Serials)
+                    .ThenInclude(ser => ser.DocumentDetails)
                         .ThenInclude(ser => ser.Document)
                 .ToListAsync();
         }
 
 
-        public void Delete(Guid id)
+        public void Delete(int id)
         {
             var subscription = GetById(id);
 

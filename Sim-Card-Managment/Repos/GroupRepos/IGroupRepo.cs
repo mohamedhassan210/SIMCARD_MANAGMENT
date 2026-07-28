@@ -3,7 +3,7 @@
     public interface IGroupRepo
     {
         Task<IEnumerable<Models.Group>> GetAllAsync();
-        Task<Models.Group?> GetByIdWithPermissionsAsync(Guid id);
-        Task AssignPermissionsAsync(Guid groupId, IEnumerable<Guid> permissionIds);
+        Task<Models.Group?> GetByIdWithPermissionsAsync(int id);
+        Task AssignPermissionsAsync(int groupId, IEnumerable<int> permissionIds);
     }
 }

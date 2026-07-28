@@ -42,7 +42,7 @@ namespace Sim_Card_Managment.Repos
                 .ToList();
         }
 
-        public Usb? GetById(Guid id)
+        public Usb? GetById(int id)
         {
             return _context.Usbs
                 .Include(u => u.ServiceProvider)
@@ -67,7 +67,7 @@ namespace Sim_Card_Managment.Repos
             _context.SaveChanges();
         }
 
-        public void Delete(Guid id)
+        public void Delete(int id)
         {
             var usb = _context.Usbs.Find(id);
             if (usb != null)

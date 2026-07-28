@@ -6,25 +6,25 @@ namespace Sim_Card_Managment.Models
     public class Subscription
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
-        public Guid? EmpId { get; set; }          // nullable if assigned to NonEmployee
+        public int? EmpId { get; set; }          // nullable if assigned to NonEmployee
 
-        public Guid? NonEmployeeId { get; set; }  //nullable if assigned to Employee
-
-        [Required]
-        public Guid? SimId { get; set; }
-
-        public Guid? UsbId { get; set; }
+        public int? NonEmployeeId { get; set; }  //nullable if assigned to Employee
 
         [Required]
-        public Guid? QuotaId { get; set; }
+        public int? SimId { get; set; }
+
+        public int? UsbId { get; set; }
+
+        [Required]
+        public int? QuotaId { get; set; }
             
         [Required]
-        public Guid ActionId { get; set; }
+        public int ActionId { get; set; }
 
         [Required]
-        public Guid CreatedBy { get; set; }
+        public int CreatedBy { get; set; }
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 

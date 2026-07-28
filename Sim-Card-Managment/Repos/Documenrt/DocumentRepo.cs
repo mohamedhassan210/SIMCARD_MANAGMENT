@@ -13,7 +13,7 @@ namespace Sim_Card_Managment.Repos
             _context = context;
         }
 
-        public async Task<IEnumerable<Document>> GetAllAsync(string? searchTerm = null, Guid? documentTypeId = null)
+        public async Task<IEnumerable<Document>> GetAllAsync(string? searchTerm = null, int? documentTypeId = null)
         {
             var query = _context.Documents
                 .Include(d => d.DocumentType)
@@ -33,12 +33,13 @@ namespace Sim_Card_Managment.Repos
             return await query.OrderByDescending(d => d.CreatedAt).ToListAsync();
         }
 
-        public async Task<Document?> GetByIdAsync(Guid id)
+        public async Task<Document?> GetByIdAsync(int id)
         {
             return await _context.Documents
                 .Include(d => d.DocumentType)
                 .Include(d => d.CreatedBy)
-                .Include(d => d.Serials)
+                .Include(d => d.DocumentDetails)
+                .ThenInclude(d=>d.Serials)
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
 
@@ -53,7 +54,7 @@ namespace Sim_Card_Managment.Repos
             await Task.CompletedTask;
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(int id)
         {
             var document = await _context.Documents.FindAsync(id);
             if (document != null)
@@ -64,12 +65,13 @@ namespace Sim_Card_Managment.Repos
 
 
 
-        public async Task<IEnumerable<Document>> GetFilteredDocumentsAsync(string searchTerm, Guid? documentTypeId)
+        public async Task<IEnumerable<Document>> GetFilteredDocumentsAsync(string searchTerm, int? documentTypeId)
         {
             var query = _context.Documents
                 .Include(d => d.DocumentType)
                 .Include(d => d.CreatedBy)
-                .Include(d => d.Serials)
+                .Include(d => d.DocumentDetails)
+                .ThenInclude(d => d.Serials)
                 .AsQueryable();
 
             // Filter by text search (Document number or Notes text match)

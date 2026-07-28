@@ -51,13 +51,13 @@ namespace Sim_Card_Managment.Authorization
                 return;
             }
 
-            Guid? groupId = null;
+            int? groupId = null;
 
-            if (Guid.TryParse(userIdStr, out var parsedGuid))
+            if (int.TryParse(userIdStr, out var parsedint))
             {
                 groupId = await _db.Users
-                    .Where(u => u.Id == parsedGuid && u.IsActive)
-                    .Select(u => (Guid?)u.GroupId)
+                    .Where(u => u.Id == parsedint && u.IsActive)
+                    .Select(u => (int?)u.GroupId)
                     .FirstOrDefaultAsync();
             }
 
@@ -65,7 +65,7 @@ namespace Sim_Card_Managment.Authorization
             {
                 groupId = await _db.Users
                     .Where(u => u.Username == userIdStr && u.IsActive)
-                    .Select(u => (Guid?)u.GroupId)
+                    .Select(u => (int?)u.GroupId)
                     .FirstOrDefaultAsync();
             }
 
@@ -77,7 +77,7 @@ namespace Sim_Card_Managment.Authorization
 
             var permissionId = await _db.Permissions
                 .Where(p => p.ControllerName == controllerName && p.ActionName == actionName)
-                .Select(p => (Guid?)p.Id)
+                .Select(p => (int?)p.Id)
                 .FirstOrDefaultAsync();
 
             if (permissionId == null)

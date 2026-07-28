@@ -56,7 +56,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         // GET: /Employee/Details/{id}
-        public IActionResult Details(Guid id)
+        public IActionResult Details(int id)
         {
             var employee = _employeeRepo.GetById(id);
             if (employee != null)
@@ -89,7 +89,7 @@ namespace Sim_Card_Managment.Controllers
                 return View(employee);
             }
 
-            employee.Id = Guid.NewGuid();
+            //employee.Id = int.Newint();
             employee.CreatedAt = DateTime.Now;
             employee.IsActive = true;
 
@@ -100,7 +100,7 @@ namespace Sim_Card_Managment.Controllers
 
         // GET: /Employee/Edit/{id}
         [HttpGet]
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(int id)
         {
             var employee = _employeeRepo.GetById(id);
             if (employee == null)
@@ -126,7 +126,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         // GET: /Employee/Delete/{id}
-        public IActionResult Delete(Guid id)
+        public IActionResult Delete(int id)
         {
             var employee = _employeeRepo.GetById(id);
             if (employee == null) return NotFound();
@@ -136,7 +136,7 @@ namespace Sim_Card_Managment.Controllers
         // POST: /Employee/DeleteConfirmed/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(Guid id)
+        public IActionResult DeleteConfirmed(int id)
         {
             var employee = _employeeRepo.GetById(id);
             if (employee == null)

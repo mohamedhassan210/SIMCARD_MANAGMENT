@@ -4,7 +4,7 @@ namespace Sim_Card_Managment.ViewModels
 {
     public class ServiceProviderViewModel
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "برجاء إدخال اسم الشركة الفريد")]
         [Display(Name = "اسم الشركة (إنجليزي)")]

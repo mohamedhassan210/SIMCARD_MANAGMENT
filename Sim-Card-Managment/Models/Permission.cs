@@ -5,14 +5,14 @@ namespace Sim_Card_Managment.Models
     public class Permission
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        [StringLength(100)]
+        [StringLength(50)]
         public string ActionName { get; set; } = string.Empty;  // e.g. Create, Read, Update, Delete
 
         [Required]
-        [StringLength(100)]
+        [StringLength(50)]
         public string ControllerName { get; set; } = string.Empty;  // e.g. SubscriptionController
 
         [StringLength(500)]

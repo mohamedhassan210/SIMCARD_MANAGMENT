@@ -13,6 +13,6 @@ public class PermissionRepo : IPermissionRepo
         return list.OrderBy(p => p.ControllerName).ThenBy(p => p.ActionName);
     }
 
-    public async Task<Permission?> GetByIdAsync(Guid id)
+    public async Task<Permission?> GetByIdAsync(int id)
         => await _db.Permissions.FindAsync(id);
 }

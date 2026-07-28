@@ -18,7 +18,7 @@ namespace Sim_Card_Managment.Repos
             return await _context.DocumentTypes.OrderBy(dt => dt.DisplayName).ToListAsync();
         }
 
-        public async Task<DocumentType?> GetByIdAsync(Guid id)
+        public async Task<DocumentType?> GetByIdAsync(int id)
         {
             return await _context.DocumentTypes.FirstOrDefaultAsync(dt => dt.Id == id);
         }
@@ -34,7 +34,7 @@ namespace Sim_Card_Managment.Repos
             await Task.CompletedTask;
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(int id)
         {
             var documentType = await _context.DocumentTypes.FindAsync(id);
             if (documentType != null)

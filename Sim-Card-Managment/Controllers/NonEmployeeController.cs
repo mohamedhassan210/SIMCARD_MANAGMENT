@@ -32,7 +32,7 @@ namespace Sim_Card_Managment.Controllers
                 return View(nonEmployee);
             }
 
-            nonEmployee.Id = Guid.NewGuid();
+            //nonEmployee.Id = int.Newint();
             nonEmployee.CreatedAt = DateTime.Now;
 
             _nonEmployeeRepo.Add(nonEmployee);
@@ -40,7 +40,7 @@ namespace Sim_Card_Managment.Controllers
             return RedirectToAction("Index", "Employee");
         }
         // GET: /NonEmployee/Details/{id}
-        public IActionResult Details(Guid id)
+        public IActionResult Details(int id)
         {
             // 1. Fetch non-employee by ID
             var nonEmployee = _nonEmployeeRepo.GetById(id);
@@ -74,7 +74,7 @@ namespace Sim_Card_Managment.Controllers
 
         // GET: /NonEmployee/Edit/{id}
         [HttpGet]
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(int id)
         {
             var nonEmployee = _nonEmployeeRepo.GetById(id);
             if (nonEmployee == null)
@@ -118,7 +118,7 @@ namespace Sim_Card_Managment.Controllers
         // POST: /NonEmployee/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(Guid id)
+        public IActionResult DeleteConfirmed(int id)
         {
             _nonEmployeeRepo.Delete(id);
             return RedirectToAction("Index", "Employee");

@@ -51,7 +51,7 @@ namespace Sim_Card_Managment.Services
 
                 db.Permissions.Add(new Permission
                 {
-                    Id = Guid.NewGuid(),
+                    //Id = int.Newint(),
                     ControllerName = item.Controller,
                     ActionName = item.Action,
                     Description = $"{item.Controller}.{item.Action}"

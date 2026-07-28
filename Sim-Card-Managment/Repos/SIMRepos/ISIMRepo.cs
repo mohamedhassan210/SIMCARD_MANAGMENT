@@ -9,9 +9,9 @@ namespace Sim_Card_Managment.Repos
         Task<IEnumerable<Sim>> GetAvailableSimsAsync(string query);
 
         IEnumerable<Sim> GetAll();
-        Sim? GetById(Guid id);
+        Sim? GetById(int id);
         void Add(Sim sim);
         void Update(Sim sim);
-        void Delete(Guid id);
+        void Delete(int id);
     }
 }

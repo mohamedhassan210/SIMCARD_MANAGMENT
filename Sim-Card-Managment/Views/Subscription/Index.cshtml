@@ -237,7 +237,7 @@
                     ?? "Unassigned";
 
                     // 2. Resolve Device info (SIM vs USB Modem)
-                    bool isSim = sub.SimId != Guid.Empty;
+                    bool isSim = sub.SimId != 0;
                     string deviceType = isSim ? "SIM" : "USB";
                     string deviceSerial = isSim ? sub.Sim?.SerialNumber : sub.Usb?.SerialNumber;
 

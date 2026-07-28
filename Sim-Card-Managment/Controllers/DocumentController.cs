@@ -37,7 +37,7 @@ namespace Sim_Card_Managment.Controllers
             _subscriptionRepo = subscriptionRepo;
         }
 
-        public async Task<IActionResult> Index(string? searchTerm, Guid? documentTypeId)
+        public async Task<IActionResult> Index(string? searchTerm, int? documentTypeId)
         {
             var documents = await _documentRepo.GetAllAsync(searchTerm, documentTypeId);
             ViewBag.DocumentTypes = new SelectList(await _typeRepo.GetAllAsync(), "Id", "DisplayName");
@@ -65,7 +65,7 @@ namespace Sim_Card_Managment.Controllers
         }
         #region First Report
         [HttpGet]
-        public async Task<IActionResult> ExportToExcel(string? searchTerm, Guid? documentTypeId)
+        public async Task<IActionResult> ExportToExcel(string? searchTerm, int? documentTypeId)
         {
             ExcelPackage.License.SetNonCommercialPersonal("MyName");
 
@@ -114,8 +114,8 @@ namespace Sim_Card_Managment.Controllers
                     worksheet.Cells[row, 1].Value = doc.DocumentNumber;
                     worksheet.Cells[row, 2].Value = doc.DocumentType?.DisplayName ?? "N/A";
                     worksheet.Cells[row, 3].Value = doc.ActionDate.ToString("yyyy-MM-dd");
-                    worksheet.Cells[row, 4].Value = doc.Serials?.Count(s => s.SimId != null) ?? 0;
-                    worksheet.Cells[row, 5].Value = doc.Serials?.Count(s => s.UsbId != null) ?? 0;
+                    worksheet.Cells[row, 4].Value = (doc.DocumentDetails.Where(d=>d.ItemType.Name == "Sim").FirstOrDefault()).Serials?.Count(s => s.SimId != null) ?? 0;
+                    worksheet.Cells[row, 5].Value = (doc.DocumentDetails.Where(d => d.ItemType.Name == "Usb").FirstOrDefault()).Serials?.Count(s => s.UsbId != null) ?? 0;
                     worksheet.Cells[row, 6].Value = doc.Notes ?? "";
                     row++;
                 }
@@ -217,7 +217,7 @@ namespace Sim_Card_Managment.Controllers
         public async Task<IActionResult> Create(DocumentCreateViewModel model)
         {
             // جلب معرّف المستخدم الحالي (يتم استبداله بنظام الـ Auth الفعلي لديك)
-            var currentUserId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+            var currentUserId = int.Parse("00000000-0000-0000-0000-000000000001");
 
             if (ModelState.IsValid)
             {
@@ -243,7 +243,7 @@ namespace Sim_Card_Managment.Controllers
                 // 3. نقوم بعمل Mapping من الـ ViewModel إلى الـ Domain Model (Document)
                 var document = new Document
                 {
-                    Id = Guid.NewGuid(),
+                    //Id = int.Newint(),
                     DocumenttypeId = model.DocumentTypeId,
                     ActionDate = model.ActionDate,
                     Notes = model.Notes ?? string.Empty,
@@ -254,20 +254,20 @@ namespace Sim_Card_Managment.Controllers
                     DocumentNumber = model.DocumentNumber
                 };
 
-                // 4. بناء كائنات الـ Serial وإضافتها للمستند مع الحقول المطلوبة (Id, DocumentId, UserId)
-                foreach (var sn in serialNumbers)
-                {
-                    document.Serials.Add(new Serial
-                    {
-                        Id = Guid.NewGuid(),
-                        SerialNumber = sn,
-                        UserId = currentUserId,
-                        CreatedDate = DateTime.UtcNow,
-                        DocumentId = document.Id,
-                        SimId = model.SelectedSimId, // ربط الـ SIM المختار من القائمة
-                        UsbId = model.SelectedUsbId  // ربط الـ USB المختار من القائمة
-                    });
-                }
+                //// 4. بناء كائنات الـ Serial وإضافتها للمستند مع الحقول المطلوبة (Id, DocumentId, UserId)
+                //foreach (var sn in serialNumbers)
+                //{
+                //    document.Serials.Add(new Serial
+                //    {
+                //        //Id = int.Newint(),
+                //        SerialNumber = sn,
+                //        UserId = currentUserId,
+                //        CreatedDate = DateTime.UtcNow,
+                //        DocumentId = document.Id,
+                //        SimId = model.SelectedSimId, // ربط الـ SIM المختار من القائمة
+                //        UsbId = model.SelectedUsbId  // ربط الـ USB المختار من القائمة
+                //    });
+                //}
 
                 // 5. الحفظ النهائي في قاعدة البيانات
                 await _documentRepo.AddAsync(document);
@@ -291,7 +291,7 @@ namespace Sim_Card_Managment.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _documentRepo.DeleteAsync(id);
             await _documentRepo.SaveChangesAsync();

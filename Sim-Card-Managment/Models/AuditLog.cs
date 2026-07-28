@@ -6,7 +6,7 @@ namespace Sim_Card_Managment.Models
     public class AuditLog
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -16,10 +16,10 @@ namespace Sim_Card_Managment.Models
         [StringLength(10)]
         public string ActionType { get; set; } = string.Empty;  // INSERT / UPDATE / DELETE
 
-        public Guid RecordId { get; set; }
+        public int RecordId { get; set; }
 
         [Required]
-        public Guid PerformedBy { get; set; }
+        public int PerformedBy { get; set; }
 
         public DateTime PerformedAt { get; set; } = DateTime.Now;
 

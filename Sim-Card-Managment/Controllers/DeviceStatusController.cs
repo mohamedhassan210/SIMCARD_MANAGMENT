@@ -19,7 +19,7 @@ namespace Sim_Card_Managment.Controllers
             return View(statuses);
         }
 
-        public IActionResult Details(Guid id)
+        public IActionResult Details(int id)
         {
             var deviceStatus = _repo.GetDeviceStatusbyId(id);
             if (deviceStatus == null) return NotFound();
@@ -38,14 +38,14 @@ namespace Sim_Card_Managment.Controllers
         {
             if (ModelState.IsValid)
             {
-                deviceStatus.Id = Guid.NewGuid();
+                //deviceStatus.Id = int.Newint();
                 _repo.AddDeviceStatus(deviceStatus);
                 return RedirectToAction(nameof(Index));
             }
             return View(deviceStatus);
         }
 
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(int id)
         {
             var deviceStatus = _repo.GetDeviceStatusbyId(id);
             if (deviceStatus == null) return NotFound();
@@ -55,7 +55,7 @@ namespace Sim_Card_Managment.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Guid id, DeviceStatus deviceStatus)
+        public IActionResult Edit(int id, DeviceStatus deviceStatus)
         {
             if (id != deviceStatus.Id) return NotFound();
 
@@ -67,7 +67,7 @@ namespace Sim_Card_Managment.Controllers
             return View(deviceStatus);
         }
 
-        public IActionResult Delete(Guid id)
+        public IActionResult Delete(int id)
         {
             var deviceStatus = _repo.GetDeviceStatusbyId(id);
             if (deviceStatus == null) return NotFound();
@@ -77,7 +77,7 @@ namespace Sim_Card_Managment.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(Guid id)
+        public IActionResult DeleteConfirmed(int id)
         {
             _repo.DeleteStatus(id);
             return RedirectToAction(nameof(Index));

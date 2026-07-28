@@ -3,5 +3,5 @@
 public interface IPermissionRepo
 {
     Task<IEnumerable<Permission>> GetAllAsync();
-    Task<Permission?> GetByIdAsync(Guid id);
+    Task<Permission?> GetByIdAsync(int id);
 }

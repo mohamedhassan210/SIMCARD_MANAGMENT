@@ -1,20 +1,21 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Sim_Card_Management.Models;
 
 namespace Sim_Card_Managment.Models
 {
     public class DeviceStatus
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
-        public Guid? SimId { get; set; }
+        public int? SimId { get; set; }
 
-        public Guid? UsbId { get; set; }
+        public int? UsbId { get; set; }
 
-        [Required]
-        [StringLength(30)]
-        public string StatusType { get; set; } = string.Empty;  // Lost / Replaced / Returned / Damaged
+        public int StatusTypeId { get; set; }
+        [ForeignKey(nameof(StatusTypeId))]
+        public DeviceStatusType StatusType { get; set; }   // Lost / Replaced / Returned / Damaged
 
         [Required]
         public DateTime StatusDate { get; set; }
@@ -23,11 +24,11 @@ namespace Sim_Card_Managment.Models
         public string? Notes { get; set; }
 
         [Required]
-        public Guid ReportedBy { get; set; }
+        public int ReportedBy { get; set; }
 
-        public Guid? ReplacedBySimId { get; set; }  // new SIM if replaced
+        public int? ReplacedBySimId { get; set; }  // new SIM if replaced
 
-        public Guid? ReplacedByUsbId { get; set; }  // new USB if replaced
+        public int? ReplacedByUsbId { get; set; }  // new USB if replaced
 
         // Navigation properties
         [ForeignKey(nameof(SimId))]

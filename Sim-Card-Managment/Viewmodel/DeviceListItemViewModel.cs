@@ -4,7 +4,7 @@ namespace Sim_Card_Managment.Viewmodel
 {
     public class DeviceListItemViewModel
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string DeviceType { get; set; } = string.Empty; // "SIM" or "USB"
         public string SerialNumber { get; set; } = string.Empty;
         public string Detail { get; set; } = string.Empty; // Phone Number for SIM, Model for USB

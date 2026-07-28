@@ -26,25 +26,25 @@ namespace Sim_Card_Managment.Controllers
             _usbRepo = usbRepo;
         }
 
-        public async Task<IActionResult> Index(string? serialNumber, Guid? documentId)
-        {
-            var serials = await _serialRepo.GetAllAsync(serialNumber, documentId);
+        //public async Task<IActionResult> Index(string? serialNumber, int? documentId)
+        //{
+        //    var serials = await _serialRepo.GetAllAsync(serialNumber, documentId);
 
-            // تحويل البيانات لـ SerialListItemViewModel من أجل عرض نظيف وآمن
-            var viewModel = serials.Select(s => new SerialListItemViewModel
-            {
-                Id = s.Id,
-                SerialNumber = s.SerialNumber,
-                DocumentNumber = s.Document?.DocumentNumber ?? "بدون مستند",
-                DocumentTypeName = s.Document?.DocumentType?.DisplayName ?? "غير محدد",
-                SimPhoneNumber = s.Sim?.SerialNumber, // أو PhoneNumber حسب الحقل المتوفر لديك
-                UsbModelOrSerial = s.Usb?.SerialNumber,
-                CreatedByUserName = s.CreatedBy?.Username ?? "System",
-                CreatedDate = s.CreatedDate
-            });
+        //    // تحويل البيانات لـ SerialListItemViewModel من أجل عرض نظيف وآمن
+        //    //var viewModel = serials.Select(s => new SerialListItemViewModel
+        //    //{
+        //    //    Id = s.Id,
+        //    //    SerialNumber = s.SerialNumber,
+        //    //    DocumentNumber = s.Document?.DocumentNumber ?? "بدون مستند",
+        //    //    DocumentTypeName = s.Document?.DocumentType?.DisplayName ?? "غير محدد",
+        //    //    SimPhoneNumber = s.Sim?.SerialNumber, // أو PhoneNumber حسب الحقل المتوفر لديك
+        //    //    UsbModelOrSerial = s.Usb?.SerialNumber,
+        //    //    CreatedByUserName = s.CreatedBy?.Username ?? "System",
+        //    //    CreatedDate = s.CreatedDate
+        //    //});
 
-            return View(viewModel);
-        }
+        //    return View(viewModel);
+        //}
 
         public async Task<IActionResult> Create()
         {
@@ -55,41 +55,41 @@ namespace Sim_Card_Managment.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(SerialCreateViewModel model)
-        {
-            // جلب الـ UserId الخاص بالمستخدم الحالي من الـ Session أو الـ Identity
-            model.UserId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        //public async Task<IActionResult> Create(SerialCreateViewModel model)
+        //{
+        //    // جلب الـ UserId الخاص بالمستخدم الحالي من الـ Session أو الـ Identity
+        //    model.UserId = int.Parse("00000000-0000-0000-0000-000000000001");
 
-            if (ModelState.IsValid)
-            {
-                // التحقق من فرادة السيريال في النظام
-                if (await _serialRepo.ExistsAsync(model.SerialNumber))
-                {
-                    ModelState.AddModelError("SerialNumber", "رقم السيريال هذا مسجل مسبقاً في النظام!");
-                    await PopulateLookupListsAsync(model);
-                    return View(model);
-                }
+        //    if (ModelState.IsValid)
+        //    {
+        //        // التحقق من فرادة السيريال في النظام
+        //        if (await _serialRepo.ExistsAsync(model.SerialNumber))
+        //        {
+        //            ModelState.AddModelError("SerialNumber", "رقم السيريال هذا مسجل مسبقاً في النظام!");
+        //            await PopulateLookupListsAsync(model);
+        //            return View(model);
+        //        }
 
-                // Mapping من ViewModel إلى الـ Domain Model الأساسي لقاعدة البيانات
-                var serial = new Serial
-                {
-                    Id = Guid.NewGuid(),
-                    SerialNumber = model.SerialNumber,
-                    DocumentId = model.DocumentId,
-                    SimId = model.SimId,
-                    UsbId = model.UsbId,
-                    UserId = model.UserId,
-                    CreatedDate = DateTime.UtcNow
-                };
+        //        // Mapping من ViewModel إلى الـ Domain Model الأساسي لقاعدة البيانات
+        //        var serial = new Serial
+        //        {
+        //            //Id = int.Newint(),
+        //            SerialNumber = model.SerialNumber,
+        //            DocumentId = model.DocumentId,
+        //            SimId = model.SimId,
+        //            UsbId = model.UsbId,
+        //            UserId = model.UserId,
+        //            CreatedDate = DateTime.UtcNow
+        //        };
 
-                await _serialRepo.AddAsync(serial);
-                await _serialRepo.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+        //        await _serialRepo.AddAsync(serial);
+        //        await _serialRepo.SaveChangesAsync();
+        //        return RedirectToAction(nameof(Index));
+        //    }
 
-            await PopulateLookupListsAsync(model);
-            return View(model);
-        }
+        //    await PopulateLookupListsAsync(model);
+        //    return View(model);
+        //}
 
         // ميثود مساعدة لتعبئة الـ 3 قوائم المطلوبة (Documents, SIMs, USBs)
         private async Task PopulateLookupListsAsync(SerialCreateViewModel model)

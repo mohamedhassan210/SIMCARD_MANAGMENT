@@ -4,7 +4,7 @@ namespace Sim_Card_Managment.Viewmodel
 {
     public class SerialListItemViewModel
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Display(Name = "رقم السيريال")]
         public string SerialNumber { get; set; }

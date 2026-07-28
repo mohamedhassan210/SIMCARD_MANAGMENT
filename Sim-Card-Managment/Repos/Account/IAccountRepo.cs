@@ -15,17 +15,17 @@ namespace Sim_Card_Managment.Repos.Account
         Task<LoginResult> Login(LoginViewmodel model);
         Task<bool> ResetPasswordAsync(ResetPasswordViewModel model);
         Task Logout();
-        Task<UserProfileViewModel?> GetProfileByIdAsync(Guid id);
+        Task<UserProfileViewModel?> GetProfileByIdAsync(int id);
 
         // الميثود الجديدة لجلب المجموعات من قاعدة البيانات
         Task<List<Group>> GetAllGroupsAsync();
 
         // 🔥 الـ Methods المتطورة لإدارة المستخدمين 🔥
-        Task<List<UserListItemViewModel>> GetAllUsersAsync(string? search, Guid? groupId, bool? isActive);
-        Task<EditUserViewModel?> GetUserForEditAsync(Guid id);
+        Task<List<UserListItemViewModel>> GetAllUsersAsync(string? search, int? groupId, bool? isActive);
+        Task<EditUserViewModel?> GetUserForEditAsync(int id);
         Task<bool> UpdateUserAsync(EditUserViewModel model);
-        Task<bool> ToggleUserActiveAsync(Guid id); // تجميد/تفعيل الحساب
-        Task<bool> SoftDeleteUserAsync(Guid id);   // الحذف الذكي (إخفاء وليس مسح نهائي)
+        Task<bool> ToggleUserActiveAsync(int id); // تجميد/تفعيل الحساب
+        Task<bool> SoftDeleteUserAsync(int id);   // الحذف الذكي (إخفاء وليس مسح نهائي)
     }
 
     public class LoginResult

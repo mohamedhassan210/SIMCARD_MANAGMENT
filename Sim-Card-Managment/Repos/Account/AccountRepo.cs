@@ -57,7 +57,7 @@ namespace Sim_Card_Managment.Repos.Account
             {
                 var user = new User
                 {
-                    Id = Guid.NewGuid(),
+                    //Id = int.Newint(),
                     Username = model.Username,
                     // تشفير كلمة المرور قبل حفظها في قاعدة البيانات
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.PasswordHash),
@@ -131,7 +131,7 @@ namespace Sim_Card_Managment.Repos.Account
             return true;
         }
 
-        public async Task<UserProfileViewModel?> GetProfileByIdAsync(Guid id)
+        public async Task<UserProfileViewModel?> GetProfileByIdAsync(int id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null || !user.IsActive) return null;
@@ -158,7 +158,7 @@ namespace Sim_Card_Managment.Repos.Account
 
         // --- 🔥 ميثودز الـ User Management والـ Advanced 🔥 ---
 
-        public async Task<List<UserListItemViewModel>> GetAllUsersAsync(string? search, Guid? groupId, bool? isActive)
+        public async Task<List<UserListItemViewModel>> GetAllUsersAsync(string? search, int? groupId, bool? isActive)
         {
             // جلب المستخدمين (هنا نلغي شرط u.IsActive == false ليعرض كل المستخدمين الحاليين)
             var query = _context.Users.AsQueryable();
@@ -192,7 +192,7 @@ namespace Sim_Card_Managment.Repos.Account
             }).ToListAsync();
         }
 
-        public async Task<EditUserViewModel?> GetUserForEditAsync(Guid id)
+        public async Task<EditUserViewModel?> GetUserForEditAsync(int id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null) return null;
@@ -220,7 +220,7 @@ namespace Sim_Card_Managment.Repos.Account
             return true;
         }
 
-        public async Task<bool> ToggleUserActiveAsync(Guid id)
+        public async Task<bool> ToggleUserActiveAsync(int id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null) return false;
@@ -233,7 +233,7 @@ namespace Sim_Card_Managment.Repos.Account
             return true;
         }
 
-        public async Task<bool> SoftDeleteUserAsync(Guid id)
+        public async Task<bool> SoftDeleteUserAsync(int id)
         {
             var user = await _context.Users.FindAsync(id);
             if (user == null) return false;

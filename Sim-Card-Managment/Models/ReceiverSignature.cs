@@ -6,20 +6,20 @@ namespace Sim_Card_Managment.Models
     public class ReceiverSignature
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        public Guid SubscriptionId { get; set; }
+        public int SubscriptionId { get; set; }
 
         [Required]
-        public Guid SignedBy { get; set; }
+        public int SignedBy { get; set; }
 
         [Required]
         public DateTime SignedDate { get; set; }
 
         [StringLength(20)]
         public string? SignatureType { get; set; }  // Physical / Digital
-
+        [MaxLength(50)]
         public string? SignatureData { get; set; }  // base64 or file path
 
         // Navigation properties

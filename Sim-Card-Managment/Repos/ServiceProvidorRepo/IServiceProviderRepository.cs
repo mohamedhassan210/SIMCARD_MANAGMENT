@@ -3,10 +3,10 @@
     public interface IServiceProviderRepository
     {
         Task<IEnumerable<Models.ServiceProvider>> GetAllAsync();
-        Task<Models.ServiceProvider?> GetByIdAsync(Guid id);
+        Task<Models.ServiceProvider?> GetByIdAsync(int id);
         Task AddAsync(Models.ServiceProvider provider);
         Task UpdateAsync(Models.ServiceProvider provider);
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(int id);
         Task<bool> SaveChangesAsync();
     }
 }

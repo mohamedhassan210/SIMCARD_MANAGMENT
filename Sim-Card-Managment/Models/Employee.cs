@@ -6,7 +6,7 @@ namespace Sim_Card_Managment.Models
     public class Employee
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [StringLength(200)]
@@ -19,9 +19,10 @@ namespace Sim_Card_Managment.Models
         [StringLength(50)]
         public string NationalID { get; set; } = string.Empty;
 
-        public Guid? UserId { get; set; }
+        public int? UserId { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        [MaxLength(50)]
         public string EmpCode { get; set; }
         public bool IsActive { get; set; } = true; 
 

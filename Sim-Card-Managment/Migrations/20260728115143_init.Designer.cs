@@ -9,11 +9,11 @@ using Sim_Card_Managment.data;
 
 #nullable disable
 
-namespace Sim_Card_Managment.Migrations
+namespace Sim_Card_Management.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260709070510_Add_SP_Quota_relation")]
-    partial class Add_SP_Quota_relation
+    [Migration("20260728115143_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,11 +25,74 @@ namespace Sim_Card_Managment.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Sim_Card_Management.Models.DeviceStatusType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DeviceStatusesType");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.DocumentDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ItemTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("ItemTypeId");
+
+                    b.ToTable("DocumentDetails");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.ItemType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ItemTypes");
+                });
+
             modelBuilder.Entity("Sim_Card_Managment.Models.AuditLog", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ActionType")
                         .IsRequired()
@@ -53,11 +116,11 @@ namespace Sim_Card_Managment.Migrations
                     b.Property<DateTime>("PerformedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PerformedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("PerformedBy")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("RecordId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("RecordId")
+                        .HasColumnType("int");
 
                     b.Property<string>("TableName")
                         .IsRequired()
@@ -73,9 +136,11 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.DeviceAction", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ActionStatus")
                         .IsRequired()
@@ -98,36 +163,36 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.DeviceStatus", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid?>("ReplacedBySimId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("ReplacedBySimId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("ReplacedByUsbId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("ReplacedByUsbId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("ReportedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ReportedBy")
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("SimId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("SimId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("StatusDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("StatusType")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                    b.Property<int>("StatusTypeId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("UsbId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("UsbId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -139,6 +204,8 @@ namespace Sim_Card_Managment.Migrations
 
                     b.HasIndex("SimId");
 
+                    b.HasIndex("StatusTypeId");
+
                     b.HasIndex("UsbId");
 
                     b.ToTable("DeviceStatuses");
@@ -146,34 +213,36 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.DeviceTransfer", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("FromSubscriptionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("NewSubscriptionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("FromSubscriptionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NewSubscriptionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Reason")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid?>("SimId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("SimId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("ToEmpId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ToEmpId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("TransferDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UsbId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("UsbId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -194,9 +263,11 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Document", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("ActionDate")
                         .HasColumnType("datetime2");
@@ -206,28 +277,32 @@ namespace Sim_Card_Managment.Migrations
 
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid>("DocumenttypeId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("DocumenttypeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Notes")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid>("ServiceProviderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ServiceProviderId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SignatureData")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("SignatureType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -242,13 +317,16 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.DocumentType", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -261,12 +339,19 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Employee", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("EmpCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -285,8 +370,8 @@ namespace Sim_Card_Managment.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -302,9 +387,11 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Group", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -328,11 +415,11 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.GroupPermission", b =>
                 {
-                    b.Property<Guid>("GroupId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("PermissionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
 
                     b.HasKey("GroupId", "PermissionId");
 
@@ -343,25 +430,27 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.NonEmployee", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ContactInfo")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Type")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -370,19 +459,21 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Permission", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ActionName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ControllerName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
@@ -395,9 +486,11 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Quota", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("BaseAmount")
                         .HasColumnType("decimal(10,2)");
@@ -405,24 +498,14 @@ namespace Sim_Card_Managment.Migrations
                     b.Property<decimal>("ExtraAmount")
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<decimal>("Fees")
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Period")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<Guid>("ServiceProviderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Total")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("ValidFrom")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ValidTo")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("ServiceProviderId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -433,25 +516,28 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.ReceiverSignature", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("SignatureData")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("SignatureType")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<Guid>("SignedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("SignedBy")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("SignedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("SubscriptionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("SubscriptionId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -465,33 +551,35 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Serial", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("DocumentId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("DocumentDetailsId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SerialNumber")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid?>("SimId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("SimId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("UsbId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("UsbId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DocumentId");
+                    b.HasIndex("DocumentDetailsId");
 
                     b.HasIndex("SimId");
 
@@ -504,9 +592,11 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.ServiceProvider", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
@@ -528,9 +618,11 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Sim", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("NetworkType")
                         .HasMaxLength(10)
@@ -549,8 +641,8 @@ namespace Sim_Card_Managment.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid>("ServiceProviderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ServiceProviderId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -569,21 +661,23 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Subscription", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("ActionId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ActionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("EmpId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("EmpId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
@@ -591,24 +685,26 @@ namespace Sim_Card_Managment.Migrations
                     b.Property<decimal?>("Fees")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<Guid?>("NonEmployeeId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("NonEmployeeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid>("QuotaId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("QuotaId")
+                        .IsRequired()
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("SimId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("SimId")
+                        .IsRequired()
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UsbId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("UsbId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -631,9 +727,11 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Usb", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Model")
                         .HasMaxLength(200)
@@ -647,8 +745,8 @@ namespace Sim_Card_Managment.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid>("ServiceProviderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ServiceProviderId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -667,9 +765,11 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -679,8 +779,8 @@ namespace Sim_Card_Managment.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<Guid>("GroupId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -712,9 +812,11 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.UserOtp", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -735,6 +837,25 @@ namespace Sim_Card_Managment.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserOtps");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.DocumentDetails", b =>
+                {
+                    b.HasOne("Sim_Card_Managment.Models.Document", "Document")
+                        .WithMany("DocumentDetails")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Sim_Card_Management.Models.ItemType", "ItemType")
+                        .WithMany("DocumentDetails")
+                        .HasForeignKey("ItemTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+
+                    b.Navigation("ItemType");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.AuditLog", b =>
@@ -771,6 +892,12 @@ namespace Sim_Card_Managment.Migrations
                         .HasForeignKey("SimId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Sim_Card_Management.Models.DeviceStatusType", "StatusType")
+                        .WithMany("DeviceStatuses")
+                        .HasForeignKey("StatusTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Sim_Card_Managment.Models.Usb", "Usb")
                         .WithMany("DeviceStatuses")
                         .HasForeignKey("UsbId")
@@ -783,6 +910,8 @@ namespace Sim_Card_Managment.Migrations
                     b.Navigation("ReportedByUser");
 
                     b.Navigation("Sim");
+
+                    b.Navigation("StatusType");
 
                     b.Navigation("Usb");
                 });
@@ -838,8 +967,7 @@ namespace Sim_Card_Managment.Migrations
                     b.HasOne("Sim_Card_Managment.Models.DocumentType", "DocumentType")
                         .WithMany("Documents")
                         .HasForeignKey("DocumenttypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Sim_Card_Managment.Models.ServiceProvider", "ServiceProvider")
                         .WithMany("Documents")
@@ -921,9 +1049,9 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Serial", b =>
                 {
-                    b.HasOne("Sim_Card_Managment.Models.Document", "Document")
+                    b.HasOne("Sim_Card_Management.Models.DocumentDetails", "DocumentDetails")
                         .WithMany("Serials")
-                        .HasForeignKey("DocumentId")
+                        .HasForeignKey("DocumentDetailsId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -945,7 +1073,7 @@ namespace Sim_Card_Managment.Migrations
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("Document");
+                    b.Navigation("DocumentDetails");
 
                     b.Navigation("Sim");
 
@@ -1040,6 +1168,21 @@ namespace Sim_Card_Managment.Migrations
                     b.Navigation("Group");
                 });
 
+            modelBuilder.Entity("Sim_Card_Management.Models.DeviceStatusType", b =>
+                {
+                    b.Navigation("DeviceStatuses");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.DocumentDetails", b =>
+                {
+                    b.Navigation("Serials");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.ItemType", b =>
+                {
+                    b.Navigation("DocumentDetails");
+                });
+
             modelBuilder.Entity("Sim_Card_Managment.Models.DeviceAction", b =>
                 {
                     b.Navigation("Subscriptions");
@@ -1047,7 +1190,7 @@ namespace Sim_Card_Managment.Migrations
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Document", b =>
                 {
-                    b.Navigation("Serials");
+                    b.Navigation("DocumentDetails");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.DocumentType", b =>

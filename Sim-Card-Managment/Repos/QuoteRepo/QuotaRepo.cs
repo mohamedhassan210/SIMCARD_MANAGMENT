@@ -12,7 +12,7 @@ namespace Sim_Card_Managment.Repos.QuoteRepo
         {
             _context = context;
         }
-        public async Task<IEnumerable<Quota>> GetQuotasByProviderIdAsync(Guid providerId)
+        public async Task<IEnumerable<Quota>> GetQuotasByProviderIdAsync(int providerId)
         {
             return await _context.Quotas
                 .Where(q => q.ServiceProviderId == providerId)
@@ -23,7 +23,7 @@ namespace Sim_Card_Managment.Repos.QuoteRepo
             return _context.Quotas.ToList();
         }
 
-        public Quota? GetById(Guid id)
+        public Quota? GetById(int id)
         {
             return _context.Quotas.Find(id);
         }
@@ -40,7 +40,7 @@ namespace Sim_Card_Managment.Repos.QuoteRepo
             _context.SaveChanges();
         }
 
-        public void Delete(Guid id)
+        public void Delete(int id)
         {
             var quota = GetById(id);
 

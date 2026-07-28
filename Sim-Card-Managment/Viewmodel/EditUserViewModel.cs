@@ -6,7 +6,7 @@ namespace Sim_Card_Managment.Viewmodel
     public class EditUserViewModel
     {
         [Required]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         // الـ Username للعرض فقط في الشاشة وليس للتعديل
         public string Username { get; set; } = string.Empty;
@@ -17,7 +17,7 @@ namespace Sim_Card_Managment.Viewmodel
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "يجب تحديد المجموعة")]
-        public Guid GroupId { get; set; }
+        public int GroupId { get; set; }
 
         [Required(ErrorMessage = "يجب تحديد الصلاحية")]
         public string Role { get; set; } = string.Empty; // "Manager" أو "Employee"

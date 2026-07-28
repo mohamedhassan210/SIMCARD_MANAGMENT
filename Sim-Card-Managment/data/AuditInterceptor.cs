@@ -28,7 +28,7 @@ namespace Sim_Card_Managment.data
 
             // No authenticated user — system operation, skip audit
             var userIdStr = http?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!Guid.TryParse(userIdStr, out var userId))
+            if (!int.TryParse(userIdStr, out var userId))
                 return await base.SavingChangesAsync(eventData, result, cancellationToken);
 
             var ipAddress = http?.Connection?.RemoteIpAddress?.ToString();
@@ -57,9 +57,9 @@ namespace Sim_Card_Managment.data
                 var tableName = entry.Metadata.GetTableName()
                                 ?? entry.Entity.GetType().Name;
 
-                // Resolve record Id — all your entities use Guid Id
+                // Resolve record Id — all your entities use int Id
                 var idProp = entry.Properties.FirstOrDefault(p => p.Metadata.Name == "Id");
-                var recordId = idProp?.CurrentValue is Guid g ? g : Guid.Empty;
+                var recordId = idProp?.CurrentValue is int g ? g : 0;
 
                 // Scalar properties only — no navigation, no circular refs
                 var current = entry.Properties
@@ -86,7 +86,7 @@ namespace Sim_Card_Managment.data
 
                 auditEntries.Add(new AuditLog
                 {
-                    Id = Guid.NewGuid(),
+                    //Id = int.Newint(),
                     TableName = tableName,
                     ActionType = actionType,
                     RecordId = recordId,

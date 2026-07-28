@@ -6,10 +6,10 @@ namespace Sim_Card_Managment.Models
     public class GroupPermission
     {
         [Required]
-        public Guid GroupId { get; set; }
+        public int GroupId { get; set; }
 
         [Required]
-        public Guid PermissionId { get; set; }
+        public int PermissionId { get; set; }
 
         // Navigation properties
         [ForeignKey(nameof(GroupId))]

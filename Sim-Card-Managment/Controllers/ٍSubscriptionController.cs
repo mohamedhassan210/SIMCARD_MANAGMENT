@@ -68,13 +68,13 @@ namespace Sim_Card_Managment.Controllers
         public IActionResult Create(SubscriptionCreateViewModel model)
         {
             // 1. Validation: Enforce SIM selection (Mandatory)
-            if (!model.SelectedSimId.HasValue || model.SelectedSimId.Value == Guid.Empty)
+            if (!model.SelectedSimId.HasValue || model.SelectedSimId.Value == 0)
             {
                 ModelState.AddModelError("SelectedSimId", "A SIM card is required to create a subscription.");
             }
 
             // 2. Validation: Enforce Recipient selection
-            if (!model.SelectedEmployeeId.HasValue || model.SelectedEmployeeId.Value == Guid.Empty)
+            if (!model.SelectedEmployeeId.HasValue || model.SelectedEmployeeId.Value == 0)
             {
                 ModelState.AddModelError("SelectedEmployeeId", "A valid recipient must be selected.");
             }
@@ -86,7 +86,7 @@ namespace Sim_Card_Managment.Controllers
 
             // 3. Authentication Check
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdClaim, out Guid currentUserId))
+            if (!int.TryParse(userIdClaim, out int currentUserId))
             {
                 var defaultUser = _accountRepo.GetAllUsersAsync(null, null, true).Result.FirstOrDefault();
                 if (defaultUser != null)
@@ -103,12 +103,12 @@ namespace Sim_Card_Managment.Controllers
             // 4. Fetch Action
             var createAction = _actionRepo.GetAllDeviceActions().FirstOrDefault(a => a.Name == "CreateSubscription")
                               ?? _actionRepo.GetAllDeviceActions().FirstOrDefault();
-            var actionId = createAction != null ? createAction.Id : Guid.NewGuid();
+            var actionId = createAction != null ? createAction.Id : 0;
 
             // 5. Create Subscription Entity
             var subscription = new Subscription
             {
-                Id = Guid.NewGuid(),
+                //Id = int.Newint(),
 
                 // Assign to EmpId OR NonEmployeeId depending on the toggle state
                 EmpId = !model.IsNonEmployee ? model.SelectedEmployeeId : null,
@@ -116,7 +116,7 @@ namespace Sim_Card_Managment.Controllers
 
                 // Directly map SIM, Quota, and USB
                 SimId = model.SelectedSimId.Value,
-                QuotaId = model.SelectedQuotaId ?? Guid.Empty,
+                //QuotaId = model.SelectedQuotaId ?? int.Empty,
                 UsbId = model.SelectedUsbId,
 
                 ActionId = actionId,
@@ -203,7 +203,7 @@ namespace Sim_Card_Managment.Controllers
 
         // AJAX: Get Quotas by Provider
         [HttpGet]
-        public async Task<IActionResult> GetQuotasByProvider(Guid providerId)
+        public async Task<IActionResult> GetQuotasByProvider(int providerId)
         {
             var quotas = await _quotaRepo.GetQuotasByProviderIdAsync(providerId);
 

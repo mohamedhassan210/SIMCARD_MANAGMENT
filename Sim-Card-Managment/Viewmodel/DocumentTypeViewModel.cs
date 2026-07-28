@@ -4,7 +4,7 @@ namespace Sim_Card_Managment.Viewmodel
 {
     public class DocumentTypeViewModel
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "برجاء إدخال اسم النظام الفريد (Name)")]
         [MaxLength(100, ErrorMessage = "الاسم لا يمكن أن يتجاوز 100 حرف")]

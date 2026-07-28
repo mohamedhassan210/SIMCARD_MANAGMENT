@@ -29,7 +29,7 @@ namespace Sim_Card_Managment.Controllers
 
         // GET: /USB/Details/{id}
         [HttpGet]
-        public IActionResult Details(Guid id)
+        public IActionResult Details(int id)
         {
             var usb = _usbRepo.GetById(id);
             if (usb == null)
@@ -57,7 +57,7 @@ namespace Sim_Card_Managment.Controllers
 
             if (ModelState.IsValid)
             {
-                usb.Id = Guid.NewGuid();
+                //usb.Id = int.Newint();
                 usb.RegisteredAt = DateTime.Now;
                 _usbRepo.Add(usb);
                 return RedirectToAction("Index", "SIM", new { type = "usb" });
@@ -69,7 +69,7 @@ namespace Sim_Card_Managment.Controllers
 
         // GET: /USB/Edit/{id}
         [HttpGet]
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(int id)
         {
             var usb = _usbRepo.GetById(id);
             if (usb == null)
@@ -100,7 +100,7 @@ namespace Sim_Card_Managment.Controllers
 
         // GET: /USB/Delete/{id}
         [HttpGet]
-        public IActionResult Delete(Guid id)
+        public IActionResult Delete(int id)
         {
             var usb = _usbRepo.GetById(id);
             if (usb == null)
@@ -114,7 +114,7 @@ namespace Sim_Card_Managment.Controllers
         // POST: /USB/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(Guid id)
+        public IActionResult DeleteConfirmed(int id)
         {
             var usb = _usbRepo.GetById(id);
             if (usb == null)

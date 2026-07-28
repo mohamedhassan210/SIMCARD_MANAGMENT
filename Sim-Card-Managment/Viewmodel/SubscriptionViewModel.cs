@@ -7,7 +7,7 @@ namespace Sim_Card_Managment.ViewModels.Subscription
     // ─────────────────────────────────────────────
     public class SubscriptionIndexVM
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         // Subscriber
         public string SubscriberName { get; set; } = string.Empty;   // Employee or NonEmployee
@@ -38,23 +38,23 @@ namespace Sim_Card_Managment.ViewModels.Subscription
     public class SubscriptionCreateVM
     {
         // Subscriber — one of these two must be set
-        public Guid? EmpId { get; set; }
-        public Guid? NonEmployeeId { get; set; }
+        public int? EmpId { get; set; }
+        public int? NonEmployeeId { get; set; }
 
         [Required(ErrorMessage = "SIM card is required.")]
         [Display(Name = "SIM Card")]
-        public Guid SimId { get; set; }
+        public int SimId { get; set; }
 
         [Display(Name = "USB Device")]
-        public Guid? UsbId { get; set; }
+        public int? UsbId { get; set; }
 
         [Required(ErrorMessage = "Quota plan is required.")]
         [Display(Name = "Quota Plan")]
-        public Guid QuotaId { get; set; }
+        public int QuotaId { get; set; }
 
         [Required(ErrorMessage = "Action is required.")]
         [Display(Name = "Device Action")]
-        public Guid ActionId { get; set; }
+        public int ActionId { get; set; }
 
         [Required(ErrorMessage = "Start date is required.")]
         [DataType(DataType.Date)]
@@ -84,25 +84,25 @@ namespace Sim_Card_Managment.ViewModels.Subscription
     public class SubscriptionEditVM
     {
         [Required]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
-        public Guid? EmpId { get; set; }
-        public Guid? NonEmployeeId { get; set; }
+        public int? EmpId { get; set; }
+        public int? NonEmployeeId { get; set; }
 
         [Required(ErrorMessage = "SIM card is required.")]
         [Display(Name = "SIM Card")]
-        public Guid SimId { get; set; }
+        public int SimId { get; set; }
 
         [Display(Name = "USB Device")]
-        public Guid? UsbId { get; set; }
+        public int? UsbId { get; set; }
 
         [Required(ErrorMessage = "Quota plan is required.")]
         [Display(Name = "Quota Plan")]
-        public Guid QuotaId { get; set; }
+        public int QuotaId { get; set; }
 
         [Required(ErrorMessage = "Action is required.")]
         [Display(Name = "Device Action")]
-        public Guid ActionId { get; set; }
+        public int ActionId { get; set; }
 
         [Required(ErrorMessage = "Start date is required.")]
         [DataType(DataType.Date)]
@@ -135,25 +135,25 @@ namespace Sim_Card_Managment.ViewModels.Subscription
     // ─────────────────────────────────────────────
     public class SubscriptionDetailsVM
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         // Subscriber
         public string SubscriberName { get; set; } = string.Empty;
         public string SubscriberType { get; set; } = string.Empty;
-        public Guid? EmpId { get; set; }
-        public Guid? NonEmployeeId { get; set; }
+        public int? EmpId { get; set; }
+        public int? NonEmployeeId { get; set; }
 
         // Devices
         public string SimNumber { get; set; } = string.Empty;
-        public Guid SimId { get; set; }
+        public int SimId { get; set; }
         public string? UsbSerialNumber { get; set; }
-        public Guid? UsbId { get; set; }
+        public int? UsbId { get; set; }
 
         // Plan / Action
         public string QuotaName { get; set; } = string.Empty;
-        public Guid QuotaId { get; set; }
+        public int QuotaId { get; set; }
         public string ActionName { get; set; } = string.Empty;
-        public Guid ActionId { get; set; }
+        public int ActionId { get; set; }
 
         // Dates & Status
         public DateTime StartDate { get; set; }
@@ -179,7 +179,7 @@ namespace Sim_Card_Managment.ViewModels.Subscription
     // ─────────────────────────────────────────────
     public class SubscriptionDeleteVM
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string SubscriberName { get; set; } = string.Empty;
         public string SimNumber { get; set; } = string.Empty;
         public string ActionName { get; set; } = string.Empty;
@@ -193,7 +193,7 @@ namespace Sim_Card_Managment.ViewModels.Subscription
     // ─────────────────────────────────────────────
     public class DropDownItem
     {
-        public Guid Value { get; set; }
+        public int Value { get; set; }
         public string Text { get; set; } = string.Empty;
     }
 }

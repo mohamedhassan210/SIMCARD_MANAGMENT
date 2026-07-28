@@ -6,7 +6,7 @@ namespace Sim_Card_Managment.Models
     public class Quota
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Column(TypeName = "decimal(10,2)")]
         public decimal BaseAmount { get; set; }  // GB per month
@@ -17,7 +17,7 @@ namespace Sim_Card_Managment.Models
         public decimal Fees { get; set; } 
 
         public bool IsActive { get; set; }
-        public Guid ServiceProviderId { get; set; }
+        public int ServiceProviderId { get; set; }
         public virtual ServiceProvider ServiceProvider { get; set; }
         // Navigation properties
         public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();

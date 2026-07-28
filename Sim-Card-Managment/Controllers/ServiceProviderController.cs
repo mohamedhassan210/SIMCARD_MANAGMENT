@@ -38,7 +38,7 @@ namespace Sim_Card_Managment.Controllers
             {
                 var provider = new Models.ServiceProvider
                 {
-                    Id = Guid.NewGuid(),
+                    //Id = int.Newint(),
                     Name = model.Name,
                     DisplayName = model.DisplayName,
                     IsActive = model.IsActive

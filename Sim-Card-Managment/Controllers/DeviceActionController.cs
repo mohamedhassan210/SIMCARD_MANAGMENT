@@ -30,7 +30,7 @@ namespace Sim_Card_Managment.Controllers
         {
             if (ModelState.IsValid)
             {
-                deviceAction.Id = Guid.NewGuid();
+                //deviceAction.Id = int.Newint();
                 _repo.AddDeviceAction(deviceAction);
                 return RedirectToAction(nameof(Index));
             }

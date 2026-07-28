@@ -16,7 +16,7 @@ public class GroupController : Controller
         => View(await _groups.GetAllAsync());
 
     [HttpGet]
-    public async Task<IActionResult> AssignPermissions(Guid id)
+    public async Task<IActionResult> AssignPermissions(int id)
     {
         var group = await _groups.GetByIdWithPermissionsAsync(id);
         if (group == null) return NotFound();
@@ -42,9 +42,9 @@ public class GroupController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> AssignPermissions(Guid groupId, List<Guid>? selectedPermissions)
+    public async Task<IActionResult> AssignPermissions(int groupId, List<int>? selectedPermissions)
     {
-        await _groups.AssignPermissionsAsync(groupId, selectedPermissions ?? new List<Guid>());
+        await _groups.AssignPermissionsAsync(groupId, selectedPermissions ?? new List<int>());
         TempData["Success"] = "Permissions updated.";
         return RedirectToAction(nameof(Index));
     }

@@ -41,7 +41,7 @@ namespace Sim_Card_Managment.Repos
                 .ToList();
         }
 
-        public Sim? GetById(Guid id)
+        public Sim? GetById(int id)
         {
             return _context.Sims
                 .Include(s => s.ServiceProvider)
@@ -66,7 +66,7 @@ namespace Sim_Card_Managment.Repos
             _context.SaveChanges();
         }
 
-        public void Delete(Guid id)
+        public void Delete(int id)
         {
             var sim = GetById(id);
             if (sim != null)
