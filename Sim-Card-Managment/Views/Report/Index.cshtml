@@ -1,0 +1,484 @@
+﻿@model IEnumerable<Sim_Card_Managment.Models.Subscription>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #f4f5f6;
+            --brand-orange: #e55026;
+            --brand-orange-hover: #d1421c;
+            --text-dark: #111111;
+            --text-muted: #6b7280;
+            --excel-green: #157347;
+            --border-color: #e5e7eb;
+            --line-orange: #ebc0b0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            padding: 2rem 0;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .pill-nav-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            margin-right: 150px;
+        }
+
+        .pill-nav {
+            background-color: #e5e7eb;
+            border-radius: 50px;
+            padding: 4px;
+            display: inline-flex;
+            gap: 4px;
+        }
+
+            .pill-nav a {
+                color: #4b5563;
+                text-decoration: none;
+                padding: 8px 24px;
+                border-radius: 50px;
+                font-weight: 500;
+                font-size: 0.95rem;
+                transition: all 0.2s;
+            }
+
+                .pill-nav a.active {
+                    background-color: var(--brand-orange);
+                    color: white;
+                    box-shadow: 0 2px 4px rgba(229, 80, 38, 0.3);
+                }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #4b5563;
+            max-width: 350px;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 2.5rem;
+        }
+
+        .report-card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            border: none;
+            padding: 1.75rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+            .report-card.bg-orange {
+                background-color: var(--brand-orange);
+                color: white;
+            }
+
+        .icon-box {
+            width: 36px;
+            height: 36px;
+            background-color: #fbeae5;
+            color: var(--brand-orange);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .report-card .card-title {
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .report-card .card-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .report-card.bg-orange .card-text {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn-view-online {
+            background-color: var(--brand-orange);
+            color: white;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+            .btn-view-online:hover {
+                background-color: var(--brand-orange-hover);
+                color: white;
+            }
+
+        .btn-icon-outline {
+            border: 1px solid var(--brand-orange);
+            color: var(--brand-orange);
+            background: transparent;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+            .btn-icon-outline:hover {
+                background-color: #fbeae5;
+                color: var(--brand-orange);
+            }
+
+        .btn-export-light {
+            background-color: white;
+            color: var(--text-dark);
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            text-decoration: none;
+        }
+
+            .btn-export-light:hover {
+                background-color: #f8f9fa;
+                color: var(--text-dark);
+            }
+
+        .btn-excel {
+            background-color: var(--excel-green);
+            color: white;
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+            .btn-excel:hover {
+                background-color: #115e3a;
+                color: white;
+            }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .filter-input {
+            background-color: transparent;
+            border: 1px solid #d1d5db;
+            border-radius: 50px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .date-input-wrapper {
+            position: relative;
+            width: 260px;
+        }
+
+            .date-input-wrapper i {
+                position: absolute;
+                right: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #9ca3af;
+            }
+
+        .status-select {
+            width: 140px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234b5563' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 12px;
+        }
+
+        .custom-table {
+            width: 100%;
+            margin-top: 1rem;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+            .custom-table th {
+                color: #4b5563;
+                font-weight: 600;
+                padding: 1rem 0;
+                border-bottom: 2px solid var(--line-orange);
+                font-size: 1.05rem;
+            }
+
+            .custom-table td {
+                padding: 1.5rem 0;
+                vertical-align: middle;
+                color: #374151;
+                font-size: 0.95rem;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+        .status-badge {
+            display: inline-block;
+            border: 1px solid #10b981;
+            color: #10b981;
+            border-radius: 50px;
+            padding: 0.25rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header-nav">
+            <div class="brand-logos d-flex align-items-center gap-2">
+                <span style="color:var(--brand-orange); font-weight:800; font-size:1.4rem; letter-spacing:-0.5px;">
+                    <i class="bi bi-box-fill"></i> FATHALLA
+                </span>
+                <span style="color:var(--line-orange); font-size:1.5rem; font-weight:400;">Sim<span style="font-size: 1.1rem">.me</span></span>
+            </div>
+
+            <div class="pill-nav-container">
+                <nav class="pill-nav">
+                    <a asp-controller="Home" asp-action="Index">Home</a>
+                    <a asp-controller="Sim" asp-action="Index">Sim</a>
+                    <a asp-controller="Usb" asp-action="Index">Usb</a>
+                    <a asp-controller="Employee" asp-action="Index" class="active">Employees</a>
+                </nav>
+            </div>
+        </header>
+
+        <div class="mb-5">
+            <h1 class="page-title">Reports</h1>
+            <p class="page-subtitle">Monitor enterprise asset performance and usage metrics in real-time.</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="report-card">
+                    <div class="icon-box">
+                        <i class="bi bi-device-hdd-fill"></i>
+                    </div>
+                    <h3 class="card-title">Subscriptions Report</h3>
+                    <p class="card-text">Real-time status monitoring of all active and historical subscriptions across departments.</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <a asp-controller="Report" asp-action="ViewSubscriptionsOnline" target="_blank" class="btn-view-online">
+                            View online <i class="bi bi-eye"></i>
+                        </a>
+                        <a asp-controller="Report" asp-action="ExportSubscriptionsExcel" class="btn-icon-outline" title="Download Excel">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="report-card">
+                    <div class="icon-box">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <h3 class="card-title">All Employees Report</h3>
+                    <p class="card-text">Detailed breakdown of all employees, assigned SIM cards, and USB devices count.</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <a asp-controller="Report" asp-action="ViewEmployeesOnline" target="_blank" class="btn-view-online">
+                            View online <i class="bi bi-eye"></i>
+                        </a>
+                        <a asp-controller="Report" asp-action="ExportEmployeesExcel" class="btn-icon-outline" title="Download Excel">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="report-card bg-orange">
+                    <h3 class="card-title mb-2">Bulk export</h3>
+                    <p class="card-text">Download all system reports for the current fiscal period in Excel format.</p>
+                    <div class="mt-auto">
+                        <a asp-controller="Report" asp-action="ExportSubscriptionsExcel" class="btn-export-light">
+                            Export Subscriptions <i class="bi bi-file-earmark-spreadsheet text-dark"></i>
+                        </a>
+                        <a asp-controller="Report" asp-action="ExportEmployeesExcel" class="btn-export-light mb-0">
+                            Export Employees <i class="bi bi-file-earmark-spreadsheet text-dark"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+<h2 class="section-title">Subscription reports</h2>
+
+<div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+    <div class="d-flex gap-4 flex-wrap">
+        <div>
+            <label class="filter-label">Date</label>
+            <div class="date-input-wrapper">
+                <input type="text" class="form-control filter-input" value="May 1, 2026 - Jul 2, 2026" readonly>
+                <i class="bi bi-calendar3"></i>
+            </div>
+        </div>
+        <div>
+            <label class="filter-label">Status</label>
+            <select class="form-control filter-input status-select">
+                <option>Active</option>
+            </select>
+        </div>
+    </div>
+
+    <a asp-controller="Report" asp-action="ExportSubscriptionsExcel" class="btn-excel">
+        <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Subscriptions Excel
+    </a>
+</div>
+
+<div class="table-responsive mb-5">
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>Subscriber</th>
+                <th>Device</th>
+                <th>Quota</th>
+                <th>Monthly fees</th>
+                <th>Status</th>
+                <th>Start date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var sub in Model)
+                {
+                    bool isActive = sub.EndDate == null || sub.EndDate > DateTime.Now;
+                    string subscriberName = sub.Employee?.Name ?? sub.NonEmployee?.Name ?? "Unassigned";
+
+                    <tr>
+                        <td class="fw-medium">@subscriberName</td>
+                        <td>
+                            <div class="device-info d-flex align-items-center gap-2">
+                                @if (sub.Sim != null)
+                                {
+                                    <i class="bi bi-sim fs-5"></i>
+                                    <div>SIM<br>#@(sub.Sim.PhoneNumber ?? sub.Sim.Id.ToString().Substring(0, 5))</div>
+                                }
+                                else if (sub.Usb != null)
+                                {
+                                    <i class="bi bi-usb-drive fs-5"></i>
+                                    <div>USB<br>#@(sub.Usb.SerialNumber ?? sub.Usb.Id.ToString().Substring(0, 5))</div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </div>
+                        </td>
+                        <td class="quota-text">@(sub.Quota?.BaseAmount+sub.Quota?.ExtraAmount ?? 0)</td>
+                        <td>Monthly fees</td>
+                        <td>
+                            <span class="status-badge" style="border-color: @(isActive ? "#10b981" : "#ef4444"); color: @(isActive ? "#10b981" : "#ef4444");">
+                                @(isActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td class="text-muted" style="line-height: 1.3">
+                            @sub.StartDate.ToString("MMM dd")<br>@sub.StartDate.ToString("yyyy")
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">No subscriptions found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+        <h2 class="section-title">Employees</h2>
+
+        <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+            <div class="d-flex gap-4 flex-wrap">
+                <div>
+                    <label class="filter-label">Date</label>
+                    <div class="date-input-wrapper">
+                        <input type="text" class="form-control filter-input" value="May 1, 2026 - Jul 2, 2026" readonly>
+                        <i class="bi bi-calendar3"></i>
+                    </div>
+                </div>
+                <div>
+                    <label class="filter-label">Status</label>
+                    <select class="form-control filter-input status-select">
+                        <option>Active</option>
+                    </select>
+                </div>
+            </div>
+
+            <a asp-controller="Report" asp-action="ExportEmployeesExcel" class="btn-excel">
+                <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Employees Excel
+            </a>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

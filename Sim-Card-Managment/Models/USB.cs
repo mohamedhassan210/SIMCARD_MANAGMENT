@@ -9,7 +9,7 @@ namespace Sim_Card_Managment.Models
 
         [Required]
         [StringLength(100)]
-        public string SerialNumber { get; set; } = string.Empty;
+        public string SerialNumber { get; set; } = string.Empty;   
 
         [StringLength(200)]
         public string? Model { get; set; }

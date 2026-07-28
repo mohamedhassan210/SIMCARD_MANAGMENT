@@ -1,0 +1,142 @@
+﻿@model IEnumerable<Sim_Card_Managment.Models.Subscription>
+@{
+    var allSubscriptions = ViewBag.AllSubscriptions as IEnumerable<Sim_Card_Managment.Models.Subscription> ?? new List<Sim_Card_Managment.Models.Subscription>();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+            color: #191c1e;
+        }
+
+        .font-mono-data {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .full {
+            width: 1650px !important;
+        }
+
+        .hover-bg:hover {
+            background-color: #f7f9fb;
+            transition: background-color 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="vh-100 overflow-hidden  d-flex">
+    <main class="flex-grow-1 d-flex flex-column h-100 position-relative full min-w-0" style="margin-top: 80px">
+        <div class="flex-grow-1 overflow-auto p-4 w-100 mw-100">
+            <div class="d-flex justify-content-between align-items-center mb-4 w-100">
+                <div>
+                    <h2 class="h3 fw-bold text-dark mb-1" style="font-size: 32px; letter-spacing: -0.02em;">Hardware Lifecycle Report</h2>
+                    <p class="text-secondary mb-0" style="font-size: 14px;">Track current active assignments, SIM/USB serials, and historical holders.</p>
+                </div>
+                <div class="d-flex gap-3">
+                    <a asp-action="Index" class="d-flex align-items-center gap-2 px-3 py-2 text-decoration-none rounded text-dark bg-secondary bg-opacity-10 border shadow-sm fw-semibold" style="font-size: 12px; border-color: #E2E8F0 !important;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+                        Back to Documents
+                    </a>
+                    <a asp-action="ExportInventoryToExcel" class="d-flex align-items-center gap-2 px-3 py-2 text-decoration-none rounded text-white shadow-sm fw-semibold" style="font-size: 12px; background-color: #e24d17;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                        Export Hardware Lifecycle
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded border p-4 mb-4 shadow-sm w-100" style="border-color: #E2E8F0 !important;">
+                <form asp-action="InventoryReport" method="get" class="row g-3 align-items-end w-100">
+                    <div class="col-md">
+                        <label class="form-label fw-semibold text-muted mb-1" style="font-size: 12px;">Search (Holder Name / Phone / Serial)</label>
+                        <div class="position-relative w-100">
+                            <span class="material-symbols-outlined position-absolute text-secondary" style="left: 12px; top: 10px; font-size: 20px;">search</span>
+                            <input name="searchTerm" value="@Context.Request.Query["searchTerm"]" class="form-control ps-5 py-2 bg-light border" placeholder="Search by holder, phone number, SIM or USB serial..." type="text" style="font-size: 14px; border-color: #E2E8F0 !important;">
+                        </div>
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="submit" class="btn btn-light border d-flex align-items-center justify-content-center gap-2 px-4 py-2 w-100 fw-semibold text-dark shadow-sm" style="font-size: 12px; border-color: #E2E8F0 !important;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">filter_list</span>
+                            Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded border overflow-hidden shadow-sm d-flex flex-column min-vh-50 w-100" style="border-color: #E2E8F0 !important; min-height: 400px;">
+                <div class="row g-0 p-3 bg-light border-bottom align-items-center fw-semibold text-muted" style="font-size: 12px; border-color: #E2E8F0 !important; background-color: #f2f4f6 !important;">
+                    <div class="col">Current Holder</div>
+                    <div class="col">Account Type</div>
+                    <div class="col">Phone Number</div>
+                    <div class="col">SIM Serial</div>
+                    <div class="col">USB Serial</div>
+                    <div class="col">Previous Holder</div>
+                    <div class="col">Notes</div>
+                </div>
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="w-100">
+                        @foreach (var sub in Model)
+                        {
+                            var currentHolder = sub.Employee != null ? sub.Employee.Name : (sub.NonEmployee != null ? sub.NonEmployee.Name : "Unassigned");
+                            var accountType = sub.Employee != null ? "Internal Employee" : $"External ({sub.NonEmployee?.Type ?? "Contractor"})";
+
+                            // Dynamic check for previous holder
+                            var historicalRecord = allSubscriptions.FirstOrDefault(h => h.SimId == sub.SimId && h.Id != sub.Id && h.EndDate != null);
+                            var previousHolder = historicalRecord != null
+                            ? (historicalRecord.Employee != null ? historicalRecord.Employee.Name : (historicalRecord.NonEmployee?.Name ?? "None (First Owner)"))
+                            : "None (First Owner)";
+
+                            <div class="row g-0 p-3 align-items-center border-bottom w-100 m-0 hover-bg" style="border-color: #E2E8F0 !important;">
+                                <div class="col text-dark text-truncate" title="@currentHolder" style="font-size: 14px;">
+                                    @currentHolder
+                                </div>
+                                <div class="col text-secondary" style="font-size: 14px;">
+                                    @accountType
+                                </div>
+                                <div class="col font-mono-data text-dark" style="font-size: 14px;">
+                                    @(sub.Sim?.PhoneNumber ?? "N/A")
+                                </div>
+                                <div class="col font-mono-data text-dark text-truncate" style="font-size: 14px;">
+                                    @(sub.Sim?.SerialNumber ?? "N/A")
+                                </div>
+                                <div class="col font-mono-data text-dark text-truncate" style="font-size: 14px;">
+                                    @(sub.Usb?.SerialNumber ?? "N/A")
+                                </div>
+                                <div class="col text-secondary text-truncate" title="@previousHolder" style="font-size: 14px;">
+                                    @previousHolder
+                                </div>
+                                <div class="col text-secondary text-truncate" title="@sub.Notes" style="font-size: 14px;">
+                                    @(string.IsNullOrEmpty(sub.Notes) ? "-" : sub.Notes)
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center p-5 text-center bg-light w-100 my-auto" style="min-height: 400px; background-color: #f7f9fb !important;">
+                        <div class="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                            <span class="material-symbols-outlined text-secondary fs-2">devices</span>
+                        </div>
+                        <h3 class="h5 fw-bold text-dark mb-2" style="font-size: 20px;">No hardware assignments found</h3>
+                        <p class="text-secondary text-muted" style="font-size: 14px; max-width: 400px;">
+                            No active hardware deployments match the current filter terms. Try adjusting your search query.
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

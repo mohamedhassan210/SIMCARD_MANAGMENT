@@ -22,25 +22,7 @@
                     <label asp-for="ExtraAmount" class="form-label">Extra Amount (GB)</label>
                     <input asp-for="ExtraAmount" class="form-control" type="number" step="0.01" />
                     <span asp-validation-for="ExtraAmount" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-3">
-                    <label asp-for="Period" class="form-label">Period</label>
-                    <input asp-for="Period" class="form-control" required placeholder="e.g., Monthly, Yearly" />
-                    <span asp-validation-for="Period" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-3">
-                    <label asp-for="ValidFrom" class="form-label">Valid From</label>
-                    <input asp-for="ValidFrom" class="form-control" type="date" required />
-                    <span asp-validation-for="ValidFrom" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-3">
-                    <label asp-for="ValidTo" class="form-label">Valid To</label>
-                    <input asp-for="ValidTo" class="form-control" type="date" required />
-                    <span asp-validation-for="ValidTo" class="text-danger"></span>
-                </div>
+                </div>  
 
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-success w-100">Save</button>

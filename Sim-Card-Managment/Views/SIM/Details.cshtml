@@ -1,0 +1,221 @@
+﻿@model Sim_Card_Managment.Models.Sim
+
+@{
+    ViewData["Title"] = "SIM Card Details";
+    var activeSubscription = Model.Subscriptions?.FirstOrDefault(s => s.EndDate == null || s.EndDate > DateTime.Now);
+    string assignedName = activeSubscription?.Employee?.Name ?? activeSubscription?.NonEmployee?.Name ?? "Unassigned";
+    string assignedType = activeSubscription?.Employee != null ? "Employee" : activeSubscription?.NonEmployee != null ? "Non-Employee" : "None";
+}
+
+<style>
+    :root {
+        --brand-orange: #DF531B;
+        --brand-orange-light: #FFF8F6;
+        --brand-purple: #5B2D90;
+        --bg-canvas: #F4F5F8;
+        --text-dark: #1E293B;
+        --text-muted: #64748B;
+        --card-border: #E2E8F0;
+    }
+
+    body {
+        background-color: var(--bg-canvas);
+    }
+
+    /* Top padding added specifically to clear fixed floating navbar in _Layout.cshtml */
+    .page-header {
+        background: #FFFFFF;
+        border-bottom: 1px solid var(--card-border);
+        padding-top: 110px;
+        padding-bottom: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    }
+
+    .device-title {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        letter-spacing: -0.02em;
+    }
+
+    .info-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid var(--card-border);
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .badge-status {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 13px;
+        display: inline-block;
+    }
+
+    .badge-active {
+        background-color: #DEF7EC;
+        color: #03543F;
+    }
+
+    .badge-inactive {
+        background-color: #FDE8E8;
+        color: #9B1C1C;
+    }
+
+    .action-btn-outline {
+        border: 1px solid var(--card-border);
+        background: #FFFFFF;
+        color: var(--text-dark);
+        font-weight: 600;
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        transition: all 0.2s ease;
+    }
+
+        .action-btn-outline:hover {
+            background: #F8FAFC;
+            border-color: #CBD5E1;
+            color: var(--text-dark);
+        }
+
+    .action-btn-danger {
+        border: 1px solid #FCA5A5;
+        background: #FEF2F2;
+        color: #DC2626;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        transition: all 0.2s ease;
+    }
+
+        .action-btn-danger:hover {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+</style>
+
+<header class="page-header">
+    <div class="container-fluid px-4 px-lg-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div>
+                <a asp-controller="SIM" asp-action="Index" asp-route-type="sim" class="text-decoration-none text-muted mb-2 d-inline-block fw-semibold">
+                    &larr; Back to Device Directory
+                </a>
+                <h1 class="device-title mb-1">SIM Card: @Model.PhoneNumber</h1>
+                <p class="text-muted mb-0">ICCID / Serial: @Model.SerialNumber</p>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <a asp-controller="SIM" asp-action="Edit" asp-route-id="@Model.Id" class="action-btn-outline text-decoration-none">
+                    <i class="fa-solid fa-pen-to-square me-2"></i>Edit Details
+                </a>
+
+                <button type="button" class="action-btn-danger" onclick="confirmDelete()">
+                    <i class="fa-solid fa-trash me-2"></i>Delete
+                </button>
+
+                <form id="deleteForm" asp-controller="SIM" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-none">
+                    @Html.AntiForgeryToken()
+                </form>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container-fluid px-4 px-lg-5 pb-5">
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="info-card h-100">
+                <h4 class="fw-bold mb-4" style="color: var(--brand-orange);">
+                    <i class="fa-solid fa-sim-card me-2"></i>Device Information
+                </h4>
+
+                <div class="row g-4">
+                    <div class="col-6">
+                        <small class="text-muted d-block mb-1">Phone Number</small>
+                        <strong class="fs-6 text-dark">@Model.PhoneNumber</strong>
+                    </div>
+
+                    <div class="col-6">
+                        <small class="text-muted d-block mb-1">Serial Number (ICCID)</small>
+                        <strong class="fs-6 text-dark">@Model.SerialNumber</strong>
+                    </div>
+
+                    <div class="col-6">
+                        <small class="text-muted d-block mb-1">Service Provider</small>
+                        <strong class="fs-6 text-dark">@(Model.ServiceProvider?.Name ?? "N/A")</strong>
+                    </div>
+
+                    <div class="col-6">
+                        <small class="text-muted d-block mb-1">Network Type</small>
+                        <strong class="fs-6 text-dark">@(Model.NetworkType ?? "N/A")</strong>
+                    </div>
+
+                    <div class="col-6">
+                        <small class="text-muted d-block mb-1">Status</small>
+                        <span class="badge-status @(Model.Status?.ToLower() == "active" ? "badge-active" : "badge-inactive")">
+                            @Model.Status
+                        </span>
+                    </div>
+
+                    <div class="col-6">
+                        <small class="text-muted d-block mb-1">Registered At</small>
+                        <span class="text-dark fw-semibold">@Model.RegisteredAt.ToString("dd MMM yyyy")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="info-card h-100">
+                <h4 class="fw-bold mb-4" style="color: var(--brand-orange);">
+                    <i class="fa-solid fa-user-check me-2"></i>Assignment Details
+                </h4>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-1">Currently Assigned To</small>
+                    <strong class="fs-5 text-dark">@assignedName</strong>
+                    @if (assignedType != "None")
+                    {
+                        <span class="badge bg-secondary ms-2">@assignedType</span>
+                    }
+                </div>
+
+                @if (activeSubscription != null)
+                {
+                    <div class="mt-4 p-3 rounded-3" style="background-color: var(--brand-orange-light);">
+                        <small class="text-muted d-block mb-1">Subscription Start Date</small>
+                        <span class="fw-semibold text-dark">@activeSubscription.StartDate.ToString("dd MMM yyyy")</span>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted fst-italic mt-3 mb-0">This SIM card is currently unassigned.</p>
+                }
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmDelete() {
+        Swal.fire({
+            title: 'Delete SIM Card?',
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#DC2626',
+            cancelButtonColor: '#64748B',
+            confirmButtonText: 'Yes, Delete',
+            customClass: { popup: 'rounded-4' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteForm').submit();
+            }
+        });
+    }
+</script>

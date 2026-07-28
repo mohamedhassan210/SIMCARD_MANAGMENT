@@ -12,7 +12,17 @@ namespace Sim_Card_Managment.Repos
         {
             _context = context;
         }
-
+        public async Task<IEnumerable<Subscription>> GetAllSubscriptionsWithDetailsAsync()
+        {
+            return await _context.Subscriptions
+                .Include(s => s.Employee)
+                .Include(s => s.NonEmployee)
+                .Include(s => s.Sim)
+                .Include(s => s.Usb)
+                .Include(s => s.Quota)
+                .AsNoTracking()
+                .ToListAsync();
+        }
         public IEnumerable<Subscription> GetAll()
         {
             return _context.Subscriptions

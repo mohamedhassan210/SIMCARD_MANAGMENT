@@ -10,15 +10,15 @@ namespace Sim_Card_Managment.Models
 
         public Guid? EmpId { get; set; }          // nullable if assigned to NonEmployee
 
-        public Guid? NonEmployeeId { get; set; }  // nullable if assigned to Employee
+        public Guid? NonEmployeeId { get; set; }  //nullable if assigned to Employee
 
         [Required]
-        public Guid SimId { get; set; }
+        public Guid? SimId { get; set; }
 
         public Guid? UsbId { get; set; }
 
         [Required]
-        public Guid QuotaId { get; set; }
+        public Guid? QuotaId { get; set; }
             
         [Required]
         public Guid ActionId { get; set; }
@@ -34,7 +34,7 @@ namespace Sim_Card_Managment.Models
         public DateTime? EndDate { get; set; }  // null = open ended
 
         [Column(TypeName = "decimal(10,2)")]
-        public decimal? Fees { get; set; }
+        public decimal? Fees { get; set; } = 0;
 
         [StringLength(500)]
         public string? Notes { get; set; }
@@ -47,13 +47,13 @@ namespace Sim_Card_Managment.Models
         public virtual NonEmployee? NonEmployee { get; set; }
 
         [ForeignKey(nameof(SimId))]
-        public virtual Sim Sim { get; set; } = null!;
+        public virtual Sim? Sim { get; set; } = null!;
 
         [ForeignKey(nameof(UsbId))]
         public virtual Usb? Usb { get; set; }
 
         [ForeignKey(nameof(QuotaId))]
-        public virtual Quota Quota { get; set; } = null!;
+        public virtual Quota? Quota { get; set; } = null!;
 
         [ForeignKey(nameof(ActionId))]
         public virtual DeviceAction Action { get; set; } = null!;

@@ -13,18 +13,14 @@ namespace Sim_Card_Managment.Models
 
         [Column(TypeName = "decimal(10,2)")]
         public decimal ExtraAmount { get; set; } = 0;  // Extra GB granted
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal Fees { get; set; } 
 
-        [StringLength(20)]
-        public string? Period { get; set; }  // Monthly / Quarterly
-
-        public DateTime? ValidFrom { get; set; }
-
-        public DateTime? ValidTo { get; set; }
-        public decimal Total { get; set; }
         public bool IsActive { get; set; }
         public Guid ServiceProviderId { get; set; }
         public virtual ServiceProvider ServiceProvider { get; set; }
         // Navigation properties
         public virtual ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
+       
     }
 }

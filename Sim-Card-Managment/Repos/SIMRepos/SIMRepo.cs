@@ -12,22 +12,46 @@ namespace Sim_Card_Managment.Repos
         {
             _context = context;
         }
+
         public async Task<IEnumerable<Sim>> GetAvailableSimsAsync()
         {
             return await _context.Sims
-                // بتعدل الـ Where دي بناءً على الـ Business Logic بتاعك (مثلاً الشريحة مش مربوطة بسيريال)
                 .Where(s => !_context.Serials.Any(ser => ser.SimId == s.Id))
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Sim>> GetAvailableSimsAsync(string query)
+        {
+            return await _context.Sims
+                .Include(s => s.ServiceProvider)
+                .Where(s => s.Status == "Active" &&
+                            (string.IsNullOrEmpty(query) || s.PhoneNumber.Contains(query) || s.SerialNumber.Contains(query)))
+                .Take(6)
                 .ToListAsync();
         }
 
         public IEnumerable<Sim> GetAll()
         {
-            return _context.Sims.ToList();
+            return _context.Sims
+                .Include(s => s.ServiceProvider)
+                .Include(s => s.Subscriptions!)
+                    .ThenInclude(sub => sub.Employee)
+                .Include(s => s.Subscriptions!)
+                    .ThenInclude(sub => sub.NonEmployee)
+                .ToList();
         }
 
         public Sim? GetById(Guid id)
         {
-            return _context.Sims.Find(id);
+            return _context.Sims
+                .Include(s => s.ServiceProvider)
+                .Include(s => s.Subscriptions!)
+                    .ThenInclude(sub => sub.Employee)
+                .Include(s => s.Subscriptions!)
+                    .ThenInclude(sub => sub.NonEmployee)
+                .Include(s => s.Subscriptions!)
+                    .ThenInclude(sub => sub.Quota)
+                .FirstOrDefault(s => s.Id == id);
         }
 
         public void Add(Sim sim)
@@ -45,7 +69,6 @@ namespace Sim_Card_Managment.Repos
         public void Delete(Guid id)
         {
             var sim = GetById(id);
-
             if (sim != null)
             {
                 _context.Sims.Remove(sim);

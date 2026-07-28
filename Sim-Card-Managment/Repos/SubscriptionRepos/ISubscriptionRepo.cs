@@ -4,6 +4,7 @@ namespace Sim_Card_Managment.Repos
 {
     public interface ISubscriptionRepo
     {
+        Task<IEnumerable<Subscription>> GetAllSubscriptionsWithDetailsAsync();
         IEnumerable<Subscription> GetAll();
         Subscription? GetById(Guid id);
         void Add(Subscription subscription);   

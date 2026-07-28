@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sim_Card_Managment.Repos
 {
@@ -12,21 +16,43 @@ namespace Sim_Card_Managment.Repos
         {
             _context = context;
         }
+
         public async Task<IEnumerable<Usb>> GetAvailableUsbsAsync()
         {
             return await _context.Usbs
-                // بتعدل الـ Where دي برضه عشان تجيب الأجهزة الفاضية بس
                 .Where(u => !_context.Serials.Any(ser => ser.UsbId == u.Id))
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Usb>> GetAvailableUsbsAsync(string query)
+        {
+            return await _context.Usbs
+                .Include(u => u.ServiceProvider)
+                .Where(u => u.Status == "Active" &&
+                            (string.IsNullOrEmpty(query) || u.SerialNumber.Contains(query) || (u.Model != null && u.Model.Contains(query))))
+                .Take(6)
+                .ToListAsync();
+        }
+
         public IEnumerable<Usb> GetAll()
         {
-            return _context.Usbs.ToList();
+            return _context.Usbs
+                .Include(u => u.ServiceProvider)
+                .Include(u => u.Subscriptions)
+                .ToList();
         }
 
         public Usb? GetById(Guid id)
         {
-            return _context.Usbs.Find(id);
+            return _context.Usbs
+                .Include(u => u.ServiceProvider)
+                .Include(u => u.Subscriptions!)
+                    .ThenInclude(s => s.Employee)
+                .Include(u => u.Subscriptions!)
+                    .ThenInclude(s => s.NonEmployee)
+                .Include(u => u.Subscriptions!)
+                    .ThenInclude(s => s.Quota)
+                .FirstOrDefault(u => u.Id == id);
         }
 
         public void Add(Usb usb)
@@ -43,8 +69,7 @@ namespace Sim_Card_Managment.Repos
 
         public void Delete(Guid id)
         {
-            var usb = GetById(id);
-
+            var usb = _context.Usbs.Find(id);
             if (usb != null)
             {
                 _context.Usbs.Remove(usb);

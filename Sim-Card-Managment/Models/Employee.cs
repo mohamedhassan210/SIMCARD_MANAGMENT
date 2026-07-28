@@ -22,7 +22,7 @@ namespace Sim_Card_Managment.Models
         public Guid? UserId { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-
+        public string EmpCode { get; set; }
         public bool IsActive { get; set; } = true; 
 
         // Navigation properties

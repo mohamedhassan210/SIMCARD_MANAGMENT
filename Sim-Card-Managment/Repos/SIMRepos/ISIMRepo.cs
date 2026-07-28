@@ -6,6 +6,8 @@ namespace Sim_Card_Managment.Repos
     public interface ISIMRepo
     {
         Task<IEnumerable<Sim>> GetAvailableSimsAsync();
+        Task<IEnumerable<Sim>> GetAvailableSimsAsync(string query);
+
         IEnumerable<Sim> GetAll();
         Sim? GetById(Guid id);
         void Add(Sim sim);

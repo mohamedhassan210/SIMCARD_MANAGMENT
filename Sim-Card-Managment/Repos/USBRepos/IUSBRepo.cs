@@ -4,6 +4,7 @@ namespace Sim_Card_Managment.Repos
 {
     public interface IUSBRepo
     {
+        Task<IEnumerable<Usb>> GetAvailableUsbsAsync(string query);
         Task<IEnumerable<Usb>> GetAvailableUsbsAsync();
         IEnumerable<Usb> GetAll();
         Usb? GetById(Guid id);

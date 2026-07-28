@@ -1,0 +1,198 @@
+﻿@model Sim_Card_Managment.Models.NonEmployee
+
+@{
+    ViewData["Title"] = "Edit Non-Employee";
+    var typeOptions = ViewBag.TypeOptions as List<string> ?? new List<string>();
+    bool isCustomType = !string.IsNullOrEmpty(Model.Type) && !typeOptions.Contains(Model.Type);
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+<style>
+    body {
+        background-color: #E24D17;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+    }
+
+    .edit-card {
+        background-color: #ffffff;
+        border-radius: 30px;
+        max-width: 750px;
+        width: 100%;
+        padding: 3rem 4rem;
+    }
+
+    .title-header {
+        font-weight: 700;
+        font-size: 32px;
+        color: #000;
+        margin-bottom: 2.5rem;
+    }
+
+    .custom-label {
+        font-weight: 500;
+        color: #000;
+        margin-bottom: 8px;
+        font-size: 14px;
+        display: block;
+    }
+
+    .custom-input, .custom-select {
+        background-color: #d8d8d8;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 18px;
+        color: #333;
+        width: 100%;
+        font-size: 14px;
+        transition: box-shadow 0.2s ease-in-out;
+    }
+
+        .custom-input:focus, .custom-select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #E24D17;
+        }
+
+    .custom-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.2em;
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        border: 1px solid #E24D17;
+        background-color: #ffffff;
+        color: #000;
+        border-radius: 30px;
+        padding: 10px 45px;
+        font-weight: 700;
+        font-size: 15px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+        .btn-cancel:hover {
+            background-color: #fffaf8;
+            color: #E24D17;
+        }
+
+    .btn-save {
+        background-color: #E24D17;
+        border: 1px solid #E24D17;
+        color: #fff;
+        border-radius: 30px;
+        padding: 10px 45px;
+        font-weight: 700;
+        font-size: 15px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-save:hover {
+            background-color: #c84111;
+            border-color: #c84111;
+            color: #fff;
+        }
+
+    .field-validation-error {
+        color: #dc3545;
+        font-size: 0.8rem;
+        margin-top: 4px;
+        display: block;
+    }
+</style>
+
+<body>
+
+    <div class="edit-card shadow">
+        <h2 class="title-header">Edit Non-Employee</h2>
+
+        <form asp-controller="NonEmployee" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <label class="custom-label" asp-for="Name">Full Name</label>
+                    <input asp-for="Name" class="custom-input" placeholder="Enter full name" />
+                    <span asp-validation-for="Name"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="custom-label" asp-for="ContactInfo">Contact Info</label>
+                    <input asp-for="ContactInfo" class="custom-input" placeholder="Enter contact info / phone" />
+                    <span asp-validation-for="ContactInfo"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="custom-label" asp-for="Type">Category Type</label>
+                    <select id="nonEmpType" name="Type" class="custom-select">
+                        <option value="">-- Select Type --</option>
+                        @foreach (var typeItem in typeOptions)
+                        {
+                            if (!isCustomType && Model.Type == typeItem)
+                            {
+                                <option value="@typeItem" selected>@typeItem</option>
+                            }
+                            else
+                            {
+                                <option value="@typeItem">@typeItem</option>
+                            }
+                        }
+                        @if (isCustomType)
+                        {
+                            <option value="SomethingElse" selected>Something Else</option>
+                        }
+                        else
+                        {
+                            <option value="SomethingElse">Something Else</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Type"></span>
+                </div>
+
+                <div class="col-md-6" id="customTypeContainer" style="display: @(isCustomType ? "block" : "none");">
+                    <label class="custom-label">Specify Custom Type</label>
+                    <input type="text" id="CustomType" name="CustomType" class="custom-input"
+                           value="@(isCustomType? Model.Type: "")" placeholder="Enter new category type" />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3 mt-4">
+                <a class="btn btn-cancel" asp-controller="NonEmployee" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+                <button type="submit" class="btn btn-save">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const selectType = document.getElementById("nonEmpType");
+            const customContainer = document.getElementById("customTypeContainer");
+            const customInput = document.getElementById("CustomType");
+
+            selectType.addEventListener("change", function () {
+                if (this.value === "SomethingElse") {
+                    customContainer.style.display = "block";
+                    customInput.focus();
+                } else {
+                    customContainer.style.display = "none";
+                    customInput.value = "";
+                }
+            });
+        });
+    </script>
+
+</body>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

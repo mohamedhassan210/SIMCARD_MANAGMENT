@@ -10,20 +10,20 @@ namespace Sim_Card_Managment.Models
 
         [Required]
         [StringLength(100)]
-        public string SerialNumber { get; set; } = string.Empty;  // ICCID
+        public string SerialNumber { get; set; } = string.Empty;  // ICCID    //////textbox
 
         [Required]
         [StringLength(50)]
-        public string PhoneNumber { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;     //////textbox
 
         [StringLength(10)]
-        public string? NetworkType { get; set; }  // 4G / 5G
+        public string? NetworkType { get; set; }  // 4G / 5G    //////drop
 
-
+           
 
         [Required]
         [StringLength(20)]
-        public string Status { get; set; } = "Active";  // Active / Lost / Replaced / Returned
+        public string Status { get; set; } = "Active";  // Active / Lost / Replaced / Returned   //////drop
 
         public DateTime RegisteredAt { get; set; } = DateTime.Now;
 
@@ -36,6 +36,6 @@ namespace Sim_Card_Managment.Models
 
 
         public Guid ServiceProviderId { get; set; }
-        public virtual ServiceProvider ServiceProvider { get; set; }
+        public virtual ServiceProvider ServiceProvider { get; set; }      //////drop
     }
 }
