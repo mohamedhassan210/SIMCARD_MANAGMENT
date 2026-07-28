@@ -56,67 +56,43 @@ namespace Sim_Card_Managment.Controllers
                 .FirstOrDefault(sp => sp.Name.ToLower() == targetProviderName.ToLower());
         }
 
-        // GET: /SIM or /SIM/Index?status=all&type=all
+        // GET: /SIM or /SIM/Index
         public IActionResult Index(string status = "all", string type = "all")
         {
             ViewBag.CurrentStatus = status.ToLower();
             ViewBag.CurrentType = type.ToLower();
 
-            var simsList = Enumerable.Empty<DeviceDirectoryViewModel>();
-            var usbsList = Enumerable.Empty<DeviceDirectoryViewModel>();
-
-            // 1. Fetch SIM Cards
-            if (type == "all" || type == "sim")
+            // 1. Fetch ALL SIM Cards (Do not pre-filter on server so client-side JS gets all 48 records)
+            var simsList = _simRepo.GetAll().Select(s => new DeviceDirectoryViewModel
             {
-                var query = _simRepo.GetAll();
+                Id = s.Id,
+                SerialNumber = s.SerialNumber,
+                Identifier = s.PhoneNumber,
+                DeviceType = "SIM Card",
+                ServiceProvider = s.ServiceProvider?.Name ?? "N/A",
+                Status = s.Status,
+                RegisteredAt = s.RegisteredAt,
+                AssignedTo = s.Subscriptions?
+                    .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
+                    .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
+                    .FirstOrDefault() ?? "Unassigned"
+            });
 
-                if (status != "all")
-                {
-                    query = query.Where(s => s.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
-                }
-
-                simsList = query.Select(s => new DeviceDirectoryViewModel
-                {
-                    Id = s.Id,
-                    SerialNumber = s.SerialNumber,
-                    Identifier = s.PhoneNumber,
-                    DeviceType = "SIM Card",
-                    ServiceProvider = s.ServiceProvider?.Name ?? "N/A",
-                    Status = s.Status,
-                    RegisteredAt = s.RegisteredAt,
-                    AssignedTo = s.Subscriptions?
-                        .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
-                        .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
-                        .FirstOrDefault() ?? "Unassigned"
-                });
-            }
-
-            // 2. Fetch USB Modems
-            if (type == "all" || type == "usb")
+            // 2. Fetch ALL USB Modems
+            var usbsList = _usbRepo.GetAll().Select(u => new DeviceDirectoryViewModel
             {
-                var query = _usbRepo.GetAll();
-
-                if (status != "all")
-                {
-                    query = query.Where(u => u.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
-                }
-
-                usbsList = query.Select(u => new DeviceDirectoryViewModel
-                {
-                    Id = u.Id,
-                    SerialNumber = u.SerialNumber,
-                    Identifier = "N/A",
-                    ExtraInfo = u.Model,
-                    DeviceType = "USB Modem",
-                    ServiceProvider = u.ServiceProvider?.Name ?? "N/A",
-                    Status = u.Status,
-                    RegisteredAt = u.RegisteredAt,
-                    AssignedTo = u.Subscriptions?
-                        .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
-                        .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
-                        .FirstOrDefault() ?? "Unassigned"
-                });
-            }
+                Id = u.Id,
+                SerialNumber = u.SerialNumber,
+                Identifier = "N/A",
+                DeviceType = "USB Modem",
+                ServiceProvider = u.ServiceProvider?.Name ?? "N/A",
+                Status = u.Status,
+                RegisteredAt = u.RegisteredAt,
+                AssignedTo = u.Subscriptions?
+                    .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
+                    .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
+                    .FirstOrDefault() ?? "Unassigned"
+            });
 
             var combinedDirectory = simsList.Concat(usbsList)
                                             .OrderByDescending(d => d.RegisteredAt)
