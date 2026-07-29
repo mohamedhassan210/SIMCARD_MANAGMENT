@@ -1,26 +1,35 @@
 ﻿@model Sim_Card_Managment.Viewmodel.LoginViewmodel
-@{
-     Layout = null; 
-}
+
 @{
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
 }
 
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/all.min.css" />
-   
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+</head>
+<style>
 
 
 
 
-<section class="login-section position-relative vh-100 vw-100 overflow-hidden d-flex align-items-center justify-content-center">
+</style>
 
-    <div class="login-card bg-white d-flex flex-column align-items-center px-4 py-5 shadow-lg position-relative z-2">
+<!-- 🔐 LOGIN PAGE SECTION -->
+<section class="lp-page-section position-relative vh-100 vw-100 overflow-hidden d-flex align-items-center justify-content-center">
 
-        <h2 class="login-title text-center fw-bolder text-dark mb-4">Login</h2>
+    <div class="lp-card bg-white d-flex flex-column align-items-center px-4 py-5 shadow-lg position-relative z-2">
+
+        <h2 class="lp-title text-center fw-bolder text-dark mb-4">Login</h2>
 
         <form asp-controller="Account" asp-action="Login" method="post" class="d-flex flex-column align-items-center w-100 px-2">
             @Html.AntiForgeryToken()
@@ -29,33 +38,28 @@
 
             <div class="w-100 mb-3">
                 <input asp-for="Username" type="text" placeholder="Username"
-                       class="login-input form-control bg-light rounded-pill px-4 py-3 text-dark w-100">
+                       class="lp-input form-control bg-light rounded-pill px-4 py-3 text-dark w-100">
                 <span asp-validation-for="Username" class="text-danger small d-block mt-1 ms-3"></span>
             </div>
 
             <div class="w-100 mb-3">
                 <input asp-for="Password" type="password" placeholder="Password"
-                       class="login-input form-control bg-light rounded-pill px-4 py-3 text-dark w-100">
+                       class="lp-input form-control bg-light rounded-pill px-4 py-3 text-dark w-100">
                 <span asp-validation-for="Password" class="text-danger small d-block mt-1 ms-3"></span>
             </div>
 
             <div class="form-check mb-4 align-self-start ms-3">
-                <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="RememberMe" />
+                <input asp-for="RememberMe" class="form-check-input lp-checkbox" type="checkbox" id="RememberMe" />
                 <label asp-for="RememberMe" class="form-check-label text-dark small" for="RememberMe">Remember Me</label>
             </div>
 
-            
-            <span class="mb-3"  >
-                Forgot your password? <a asp-action="ForgotPassword" class="forgot-password-link text-decoration-none mb-4 text-center reset-text">Reset It?</a>
-
+            <span class="mb-3">
+                Forgot your password? <a asp-action="ForgotPassword" class="lp-forgot-link text-decoration-none mb-4 text-center lp-reset-text">Reset It?</a>
             </span>
 
-
-            <button type="submit" class="btn login-btn rounded-pill px-5 py-2 w-100fw-bold">Login</button>
+            <button type="submit" class="btn lp-btn-submit rounded-pill px-5 py-2 w-100 fw-bold">Login</button>
         </form>
     </div>
-
-    
 </section>
 
 <script src="~/js/bootstrap.bundle.min.js"></script>

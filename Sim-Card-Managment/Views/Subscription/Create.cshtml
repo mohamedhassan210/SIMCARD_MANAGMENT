@@ -10,6 +10,7 @@
         height: 32px;
         font-weight: 600;
         font-size: 14px;
+        transition: all 0.3s ease;
     }
 
     .step-text {
@@ -20,6 +21,11 @@
     .step-active .step-circle {
         background-color: #e65319;
         color: #ffffff;
+    }
+
+    .step-completed .step-circle {
+        background-color: #198754 !important;
+        color: #ffffff !important;
     }
 
     .step-inactive .step-circle {
@@ -236,6 +242,28 @@
             color: #6c757d;
             border: 1px solid #dee2e6;
         }
+
+    .feez-box {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 16px;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    /* Locked Section Styles */
+    .section-disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .locked-notice {
+        font-size: 0.8rem;
+        color: #dc3545;
+        font-weight: 500;
+    }
+
+    
 </style>
 
 <header>
@@ -264,18 +292,15 @@
 <section class="container-fluid px-4 mt-4">
     <div class="row">
         <div class="col-12 col-md-3 col-lg-2">
-            <div class="d-flex align-items-center mb-4 step-active">
-                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">1</div>
-                <div class="step-text fw-bold">Recipient</div>
+            <div class="d-flex align-items-center mb-4 step-active" id="sidebarStep1">
+                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle1">1</div>
+                <div class="step-text fw-bold" id="stepText1">Recipient</div>
             </div>
-            <div class="d-flex align-items-center mb-4 step-inactive">
-                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">2</div>
-                <div class="step-text">Devices</div>
+            <div class="d-flex align-items-center mb-4 step-inactive" id="sidebarStep2">
+                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle2">2</div>
+                <div class="step-text" id="stepText2">Devices</div>
             </div>
-            <div class="d-flex align-items-center step-inactive">
-                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3">3</div>
-                <div class="step-text">Schedule</div>
-            </div>
+           
         </div>
 
         <div class="col-12 col-md-9 col-lg-10">
@@ -286,11 +311,12 @@
                     <input type="hidden" asp-for="SelectedSimId" id="SelectedSimId" />
                     <input type="hidden" asp-for="SelectedUsbId" id="SelectedUsbId" />
                     <input type="hidden" asp-for="SelectedQuotaId" id="SelectedQuotaId" />
+                    <input type="hidden" asp-for="Fees" id="Feez" />
                     <input type="hidden" asp-for="IsNonEmployee" id="IsNonEmployee" value="false" />
 
-                    <div class="mb-5">
+                    <div class="mb-5" id="recipientSection">
                         <h2 class="section-title">
-                            <i class="fas fa-user"></i> Select Recipient
+                            <i class="fas fa-user"></i> 1. Select Recipient
                         </h2>
 
                         <div class="mb-3 d-flex gap-2 toggle-btn-group">
@@ -318,14 +344,15 @@
                         </div>
                     </div>
 
-                    <div class="mb-5">
+                    <div class="mb-5 section-disabled" id="devicesSection">
                         <h2 class="section-title">
-                            <i class="fas fa-laptop-house"></i> Select Devices
+                            <i class="fas fa-laptop-house"></i> 2. Select Devices
+                            <span class="locked-notice ms-auto" id="devicesLockedNotice"><i class="fas fa-lock me-1"></i> Select recipient first</span>
                         </h2>
 
                         <div class="device-subsection">
                             <div class="subsection-header">
-                                <i class="fas fa-sim-card text-danger"></i> 1. SIM Card <span class="text-danger">*</span>
+                                <i class="fas fa-sim-card text-danger"></i> SIM Card <span class="text-danger">*</span>
                             </div>
                             <div class="row g-4 mb-3">
                                 <div class="col-md-6">
@@ -341,7 +368,7 @@
 
                         <div class="device-subsection">
                             <div class="subsection-header">
-                                <i class="fas fa-usb text-secondary"></i> 2. USB Modem (Optional)
+                                <i class="fas fa-usb text-secondary"></i> USB Modem (Optional)
                             </div>
                             <div class="row g-4 mb-3">
                                 <div class="col-md-6">
@@ -356,37 +383,30 @@
                         </div>
                     </div>
 
-                    <div class="mb-5" id="quotaAreaSection">
+                    <div class="mb-5 section-disabled" id="quotaAreaSection">
                         <h2 class="section-title">
                             <i class="fas fa-tachometer-alt"></i> Quota
+                            <span class="locked-notice ms-auto" id="quotaLockedNotice"><i class="fas fa-lock me-1"></i> Select SIM card first</span>
                         </h2>
                         <p class="text-muted small" id="quotaInstruction">Select a SIM card above to view provider quotas.</p>
+
                         <div class="row g-4" id="quotaCardsContainer"></div>
+
+                        <div class="mt-4 feez-box" id="feezContainer" style="display: none;">
+                            <label class="custom-form-label">
+                                <i class="fas fa-tag text-primary"></i> Feez Amount
+                            </label>
+                            <div class="col-md-6 px-0">
+                                <input type="number" step="0.01" min="0" id="feezInput" class="form-control custom-form-control" placeholder="Enter feez amount...">
+                            </div>
+                        </div>
+
                         <div class="status-text mt-3" id="quotaStatusText" style="display: none;">
                             <i class="fas fa-info-circle"></i> <span id="quotaStatusVal">None</span> selected
                         </div>
                     </div>
 
-                    <div class="mb-5">
-                        <h2 class="section-title">
-                            <i class="far fa-clock"></i> Schedule
-                        </h2>
-
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label class="custom-form-label">Activation date</label>
-                                <input type="date" asp-for="StartDate" class="form-control custom-form-control" />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="custom-form-label">Contract duration</label>
-                                <select asp-for="ContractDurationYears" class="form-select custom-form-select">
-                                    <option value="1">1 year</option>
-                                    <option value="2">2 years</option>
-                                    <option value="3">3 years</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                    
 
                     <div class="form-check mb-5 d-flex align-items-start gap-2">
                         <input class="form-check-input mt-1" type="checkbox" asp-for="AgreedToTerms" id="termsCheck">
@@ -412,6 +432,7 @@
 @section Scripts {
     <script>
         let isNonEmployeeMode = false;
+        let selectedQuotaDisplay = '';
 
         function getProviderLogo(providerName) {
             const name = (providerName || '').toLowerCase();
@@ -420,6 +441,66 @@
             if (name.includes('we')) return '/img/we.png';
             if (name.includes('etisalat')) return '/img/etisalat-logo.png';
             return '';
+        }
+
+        // --- Sidebar Progress Tracker ---
+        function updateSidebarProgress() {
+            const hasRecipient = $('#SelectedEmployeeId').val() !== '';
+            const hasSim = $('#SelectedSimId').val() !== '';
+            const hasStartDate = $('#startDateInput').val() !== '';
+
+            // Step 1: Recipient
+            if (hasRecipient) {
+                $('#sidebarStep1').addClass('step-completed').removeClass('step-active step-inactive');
+                $('#stepCircle1').html('<i class="fas fa-check"></i>');
+
+                // Unlock Section 2 (Devices)
+                $('#devicesSection').removeClass('section-disabled');
+                $('#devicesLockedNotice').hide();
+                $('#sidebarStep2').addClass('step-active').removeClass('step-inactive');
+            } else {
+                $('#sidebarStep1').addClass('step-active').removeClass('step-completed step-inactive');
+                $('#stepCircle1').text('1');
+
+                // Lock Section 2 (Devices) & Section 3 (Quotas)
+                $('#devicesSection').addClass('section-disabled');
+                $('#devicesLockedNotice').show();
+                $('#sidebarStep2').removeClass('step-active step-completed').addClass('step-inactive');
+            }
+
+            // Step 2: Devices & Quota
+            if (hasSim) {
+                $('#sidebarStep2').addClass('step-completed').removeClass('step-active step-inactive');
+                $('#stepCircle2').html('<i class="fas fa-check"></i>');
+
+                // Unlock Quota Section
+                $('#quotaAreaSection').removeClass('section-disabled');
+                $('#quotaLockedNotice').hide();
+                $('#sidebarStep3').addClass('step-active').removeClass('step-inactive');
+            } else {
+                if (hasRecipient) {
+                    $('#sidebarStep2').addClass('step-active').removeClass('step-completed step-inactive');
+                } else {
+                    $('#sidebarStep2').addClass('step-inactive').removeClass('step-active step-completed');
+                }
+                $('#stepCircle2').text('2');
+
+                // Lock Quota Section
+                $('#quotaAreaSection').addClass('section-disabled');
+                $('#quotaLockedNotice').show();
+            }
+
+            // Step 3: Schedule
+            if (hasStartDate) {
+                $('#sidebarStep3').addClass('step-completed').removeClass('step-active step-inactive');
+                $('#stepCircle3').html('<i class="fas fa-check"></i>');
+            } else if (hasSim) {
+                $('#sidebarStep3').addClass('step-active').removeClass('step-completed step-inactive');
+                $('#stepCircle3').text('3');
+            } else {
+                $('#sidebarStep3').addClass('step-inactive').removeClass('step-active step-completed');
+                $('#stepCircle3').text('3');
+            }
         }
 
         // Toggle Employee / Non-Employee Mode
@@ -444,6 +525,8 @@
                 $('#searchLabel').text('Employee Search');
                 $('#empSearchInput').attr('placeholder', 'Search by name or employee ID...');
             }
+
+            updateSidebarProgress();
         }
 
         // Live Recipient Search
@@ -487,6 +570,7 @@
                 $('#empStatusName').text(name);
                 $('#empStatusText').show();
             }
+            updateSidebarProgress();
         }
 
         // SIM Search
@@ -527,16 +611,20 @@
         }
 
         function selectSim(simId, phoneNumber, providerId, cardEl) {
+            // Guard clause: ensure recipient is selected
+            if (!$('#SelectedEmployeeId').val()) {
+                alert('Please select a recipient before picking a SIM card.');
+                return;
+            }
+
             if ($(cardEl).hasClass('active')) {
                 $(cardEl).removeClass('active');
                 $('#SelectedSimId').val('');
                 $('#simStatusText').hide();
 
-                // Clear quota selections when SIM is deselected
-                $('#SelectedQuotaId').val('');
+                resetQuotaSelection();
                 $('#quotaCardsContainer').empty();
                 $('#quotaInstruction').show();
-                $('#quotaStatusText').hide();
             } else {
                 $('#simCardsContainer .selection-card').removeClass('active');
                 $(cardEl).addClass('active');
@@ -546,6 +634,7 @@
 
                 loadQuotasForProvider(providerId);
             }
+            updateSidebarProgress();
         }
 
         // USB Search
@@ -581,6 +670,11 @@
         }
 
         function selectUsb(usbId, serialNumber, cardEl) {
+            if (!$('#SelectedEmployeeId').val()) {
+                alert('Please select a recipient before picking a USB device.');
+                return;
+            }
+
             if ($(cardEl).hasClass('active')) {
                 $(cardEl).removeClass('active');
                 $('#SelectedUsbId').val('');
@@ -619,20 +713,58 @@
         }
 
         function selectQuota(quotaId, displayVal, cardEl) {
+            if (!$('#SelectedSimId').val()) {
+                alert('Please select a SIM card before picking a Quota.');
+                return;
+            }
+
             if ($(cardEl).hasClass('active')) {
                 $(cardEl).removeClass('active');
-                $('#SelectedQuotaId').val('');
-                $('#quotaStatusText').hide();
+                resetQuotaSelection();
             } else {
                 $('#quotaCardsContainer .selection-card').removeClass('active');
                 $(cardEl).addClass('active');
                 $('#SelectedQuotaId').val(quotaId);
-                $('#quotaStatusVal').text(displayVal);
-                $('#quotaStatusText').show();
+
+                selectedQuotaDisplay = displayVal;
+                updateQuotaStatusText();
+
+                $('#feezContainer').slideDown();
             }
         }
 
-        // Client-side Validation on Submit
+        function resetQuotaSelection() {
+            $('#SelectedQuotaId').val('');
+            $('#Feez').val('');
+            $('#feezInput').val('');
+            $('#feezContainer').slideUp();
+            $('#quotaStatusText').hide();
+            selectedQuotaDisplay = '';
+        }
+
+        $('#feezInput').on('input', function () {
+            const val = $(this).val();
+            $('#Feez').val(val);
+            updateQuotaStatusText();
+        });
+
+        function updateQuotaStatusText() {
+            const feezVal = $('#feezInput').val();
+            let statusString = selectedQuotaDisplay;
+
+            if (feezVal) {
+                statusString += ` (Feez: ${feezVal})`;
+            }
+
+            $('#quotaStatusVal').text(statusString);
+            $('#quotaStatusText').show();
+        }
+
+        $('#startDateInput').on('change', function () {
+            updateSidebarProgress();
+        });
+
+        // Form Submit Validation
         $('#createSubscriptionForm').on('submit', function (e) {
             const selectedSim = $('#SelectedSimId').val();
             const selectedRecipient = $('#SelectedEmployeeId').val();
@@ -650,10 +782,10 @@
             }
         });
 
-        // Initial Load
         $(document).ready(function () {
             loadSims('');
             loadUsbs('');
+            updateSidebarProgress();
         });
     </script>
 }
