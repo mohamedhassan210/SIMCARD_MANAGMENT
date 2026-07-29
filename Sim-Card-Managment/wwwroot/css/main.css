@@ -3,23 +3,27 @@
     background-color: #fe6a35 !important;
     color: #fff !important;
 }
+
 ::-moz-selection {
     background-color: #fe6a35 !important;
     color: #ffffff !important;
 }
+
 @font-face {
     font-family: 'Roboto';
     src: url(../Fonts/Roboto-VariableFont_wdth,wght.ttf) format("truetype");
 }
+
 html, body {
-    -ms-overflow-style: none; 
-    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
     html::-webkit-scrollbar,
     body::-webkit-scrollbar {
         display: none;
     }
+
 .p-100 {
     padding-top: 100px !important;
 }
@@ -28,11 +32,22 @@ body {
     font-family: "Roboto", sans-serif;
     background-color: #EEEDED;
 }
+
 .bg-blur {
     background: linear-gradient(135deg,rgba(255,255,255,0.2),rgba(255,255,255,0.2)) !important;
     backdrop-filter: blur(90%) !important;
     -webkit-backdrop-filter: blur(90%) !important;
 }
+/* ===== Shared Form Control Styles ===== */
+.form-control {
+    border: 2px solid transparent !important;
+}
+
+    .form-control:focus {
+        box-shadow: none !important;
+        border: 2px solid var(--primary-color) !important;
+    }
+
 /*End global CSS*/
 
 
@@ -41,15 +56,15 @@ body {
 /*---------------------- Layout-----------------------*/
 /*-------------- Start Of NavBar ----------------------*/
 
-.logo
-{
+.logo {
     width: 80% !important;
 }
 /* active Link */
 
-.navbar-nav .nav-link.active, .navbar-nav .nav-link.show{ color: #fff !important;
-background-color: #E24D17 !important;
-border-radius: 20px !important;
+.navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
+    color: #fff !important;
+    background-color: #E24D17 !important;
+    border-radius: 20px !important;
 }
 
 .btn-custom-outline {
@@ -67,7 +82,7 @@ border-radius: 20px !important;
 .navbar {
     z-index: 999;
     background-color: #E24D17;
-    border-bottom:2px solid rgba(255, 255, 255, 0.7);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.7);
 }
 
 /*-------------- End Of NavBar ----------------------*/
@@ -129,9 +144,9 @@ border-radius: 20px !important;
     overflow: hidden;
 }
 
-.sidebar-accordion .accordion-item + .accordion-item {
-    margin-top: 0.5rem;
-}
+    .sidebar-accordion .accordion-item + .accordion-item {
+        margin-top: 0.5rem;
+    }
 
 /* Border only on the small triangle dropdown icon */
 .sidebar-accordion .triangle-box {
@@ -174,110 +189,10 @@ border-radius: 20px !important;
 /*-------------- End Of Side Bar ----------------------*/
 /*==========================================================*/
 /*---------------------- End of Layout-----------------------*/
-/* --- OTP Input Boxes --- */
-.otp-input {
-    width: 75px;
-    height: 75px;
-    border-radius: 12px;
-    background-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: white;
-    font-size: 36px;
-    font-weight: bold;
-    text-align: center;
-    outline: none;
-    transition: all 0.2s ease-in-out;
-}
-
-    /* The small underscore placeholder */
-    .otp-input::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-        font-weight: 300;
-    }
-
-    /* The filled/active state */
-    .otp-input.active-otp {
-        background-color: #E24D17;
-        border-color: #E24D17;
-        color: white;
-    }
-
-    /* When the user clicks on an empty box to type */
-    .otp-input:focus {
-        border-color: #E24D17;
-        box-shadow: 0 0 10px rgba(226, 77, 23, 0.4);
-    }
 
 
 
 
-/*-------------------------------------------------- Start Login Page --------------------------------------  */
-
-.login-section {
-    background-color: #E24D17;
-}
-
-.login-card {
-    border-radius: 24px;
-    width: 100%;
-    max-width: 500px;
-    min-height: 500px;
-}
-
-.login-title {
-    font-size: 32px;
-}
-
-.login-input {
-    font-size: 0.9rem;
-    box-shadow: none;
-}
-
-.login-btn {
-    background-color: #E24D17;
-    color: white;
-    font-size: 1rem;
-    border: 2px solid #E24D17;
-    transition: all 0.2s ease-in-out;
-}
-
-    .login-btn:hover {
-        background-color: #c74213;
-        border-color: #c74213;
-        color: #ffffff;
-    }
-
-.forgot-password-link {
-    font-size: 0.85rem;
-    color: #555555;
-}
-
-.reset-text {
-    color: #E24D17;
-    font-weight: bold;
-}
-
-.form-control {
-    border: 2px solid transparent !important;
-}
-
-    .form-control:focus {
-        box-shadow: none !important;
-        border: 2px solid #E24D17 !important;
-    }
-
-.form-check-input:checked {
-    background-color: #e24d17 !important;
-    border-color: #e24d17 !important;
-}
-
-.form-check-input:focus {
-    border-color: #e24d17 !important;
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-/*End Login Page*/
 
 /*Start of Home Page */
 .hero_bg {
@@ -291,7 +206,6 @@ border-radius: 20px !important;
 
 .maxW_Hero {
     max-width: 800px;
-
 }
 
 .bg-light-gray {
@@ -439,6 +353,7 @@ border-radius: 20px !important;
     height: 45px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
 .icon {
     background-color: #E24D17;
 }
@@ -447,3 +362,857 @@ border-radius: 20px !important;
 
 
 
+/*-------------------------------------------Account Controller---------------------------------------*/
+
+/* ===== Variables ===== */
+:root {
+    --primary-color: #E24D17;
+    --primary-hover: #c74213;
+    --primary-dark: #c94b1f;
+    --white: #ffffff;
+    --black: #1a1a1a;
+    --gray-soft: #f8f9fa;
+    --gray-light: #d8d8d8;
+    --gray-medium: #555555;
+    --danger: #D41212;
+    --success: #28a745;
+    --shadow-light: 0 20px 40px rgba(0,0,0,0.08);
+    --shadow-heavy: 0 8px 20px rgba(0,0,0,0.7);
+    --shadow-soft: 0 4px 15px rgba(0,0,0,0.05);
+    --radius-card: 24px;
+    --radius-pill: 50px;
+    --transition: all 0.2s ease-in-out;
+}
+
+/* ===== Access Denied Page ===== */
+.ad-access-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--white);
+    border-radius: 40px;
+    box-shadow: var(--shadow-light), var(--shadow-heavy);
+    padding: 40px 28px 35px;
+}
+
+.ad-lock-icon svg {
+    width: 86px;
+    height: 86px;
+}
+
+.ad-password-dots {
+    letter-spacing: 8px;
+    font-size: 1.8rem;
+    color: var(--black);
+}
+
+.ad-keypad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 280px;
+    margin: 0 auto 30px;
+    justify-items: center;
+}
+
+.ad-key-btn {
+    font-size: 1.7rem;
+    padding: 10px 0;
+    color: var(--black);
+    cursor: not-allowed;
+}
+
+.ad-btn-home {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 12px 38px;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    transition: var(--transition);
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    margin-inline: auto;
+}
+
+    .ad-btn-home:hover {
+        background-color: var(--primary-dark);
+        color: var(--white);
+    }
+
+.ad-divider-light {
+    height: 2px;
+    background-color: #FBECE6;
+    margin: 0 0 28px 0;
+}
+
+/* ===== Forgot Password Page ===== */
+.fp-page-section {
+    background-color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.fp-card {
+    border-radius: var(--radius-card);
+    width: 500px;
+    min-height: 500px;
+}
+
+.fp-title {
+    font-size: 32px;
+}
+
+.fp-btn-submit {
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-size: 1rem;
+    border: 2px solid var(--primary-color);
+    transition: var(--transition);
+}
+
+    .fp-btn-submit:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        color: var(--white);
+    }
+
+.fp-form-control {
+    border: 2px solid transparent !important;
+}
+
+    .fp-form-control:focus {
+        box-shadow: none !important;
+        border: 2px solid var(--primary-color) !important;
+    }
+
+/* ===== Login Page ===== */
+.lp-page-section {
+    background-color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.lp-card {
+    border-radius: var(--radius-card);
+    width: 500px;
+    min-height: 500px;
+}
+
+.lp-title {
+    font-size: 32px;
+}
+
+.lp-input {
+    font-size: 0.9rem;
+    box-shadow: none;
+}
+
+.lp-btn-submit {
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-size: 1rem;
+    border: 2px solid var(--primary-color);
+    transition: var(--transition);
+}
+
+    .lp-btn-submit:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        color: var(--white);
+    }
+
+.lp-forgot-link {
+    font-size: 0.85rem;
+    color: var(--gray-medium);
+}
+
+.lp-reset-text {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.lp-form-control {
+    border: 2px solid transparent !important;
+}
+
+    .lp-form-control:focus {
+        box-shadow: none !important;
+        border: 2px solid var(--primary-color) !important;
+    }
+
+.lp-checkbox:checked {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.lp-checkbox:focus {
+    border-color: var(--primary-color) !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* ===== Manage User Page ===== */
+.sp-body {
+    background-color: var(--gray-soft);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sp-card {
+    background: var(--white);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+}
+
+.sp-icon {
+    font-size: 4rem;
+    color: var(--success);
+    margin-bottom: 1rem;
+}
+
+.sp-btn-home {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-radius: 25px;
+    padding: 10px 30px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 1.5rem;
+    transition: var(--transition);
+}
+
+    .sp-btn-home:hover {
+        background-color: var(--primary-hover);
+        color: var(--white);
+    }
+
+/* ===== Register Page ===== */
+.rp-page-section {
+    background-color: var(--primary-color);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.rp-card {
+    background-color: var(--white);
+    border-radius: 30px;
+    max-width: 750px;
+    width: 100%;
+    padding: 3rem 4rem;
+}
+
+.rp-title {
+    font-weight: 700;
+    font-size: 32px;
+    color: #000;
+    margin-bottom: 2.5rem;
+}
+
+.rp-label {
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.rp-input,
+.rp-select {
+    background-color: var(--gray-light);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    color: #333;
+    width: 100%;
+    font-size: 14px;
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+    .rp-input:focus,
+    .rp-select:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--primary-color);
+    }
+
+.rp-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+    cursor: pointer;
+}
+
+.rp-btn-cancel {
+    border: 1px solid var(--primary-color);
+    background-color: var(--white);
+    color: #000;
+    border-radius: 30px;
+    padding: 10px 45px;
+    font-weight: 700;
+    font-size: 15px;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+    .rp-btn-cancel:hover {
+        background-color: #fffaf8;
+        color: var(--primary-color);
+    }
+
+.rp-btn-create {
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    color: var(--white);
+    border-radius: 30px;
+    padding: 10px 45px;
+    font-weight: 700;
+    font-size: 15px;
+    transition: var(--transition);
+}
+
+    .rp-btn-create:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        color: var(--white);
+    }
+
+.rp-text-danger {
+    color: var(--danger) !important;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+    padding-left: 5px;
+}
+
+/* ===== Reset Password Page ===== */
+.rpw-page-section {
+    background-color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.rpw-card {
+    border-radius: var(--radius-card);
+    width: 100%;
+    max-width: 500px;
+    min-height: 500px;
+}
+
+.rpw-title {
+    font-size: 32px;
+}
+
+.rpw-input {
+    font-size: 0.9rem;
+    box-shadow: none;
+}
+
+.rpw-input-readonly {
+    font-size: 1rem;
+    font-weight: 600;
+    background-color: #e9ecef !important;
+    cursor: not-allowed;
+}
+
+.rpw-btn-submit {
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-size: 1rem;
+    border: 2px solid var(--primary-color);
+    transition: var(--transition);
+}
+
+    .rpw-btn-submit:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        color: var(--white);
+    }
+
+.rpw-form-control {
+    border: 2px solid transparent !important;
+}
+
+    .rpw-form-control:focus {
+        box-shadow: none !important;
+        border: 2px solid var(--primary-color) !important;
+    }
+
+/* ===== Verify OTP Page ===== */
+.votp-page-section {
+    background-color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.votp-card {
+    border-radius: var(--radius-card);
+    width: 100%;
+    max-width: 500px;
+    min-height: 500px;
+}
+
+.votp-title {
+    font-size: 32px;
+}
+
+.votp-input {
+    font-size: 1.1rem;
+    letter-spacing: 4px;
+    font-weight: bold;
+    box-shadow: none;
+}
+
+.votp-btn-submit {
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-size: 1rem;
+    border: 2px solid var(--primary-color);
+    transition: var(--transition);
+}
+
+    .votp-btn-submit:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        color: var(--white);
+    }
+
+.votp-form-control {
+    border: 2px solid transparent !important;
+}
+
+    .votp-form-control:focus {
+        box-shadow: none !important;
+        border: 2px solid var(--primary-color) !important;
+    }
+
+.votp-resend-link {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* ============================================================ */
+/* ===== MEDIA QUERIES - Mobile Responsive ===== */
+/* ============================================================ */
+
+/* Small devices (phones, 576px and down) */
+@media (max-width: 576px) {
+    /* Variables override for mobile */
+    :root {
+        --card-max-width: 400px;
+        --card-max-width-mobile: 400px;
+    }
+
+    /* ===== All Cards ===== */
+    .ad-access-card,
+    .fp-card,
+    .lp-card,
+    .sp-card,
+    .rpw-card,
+    .votp-card {
+        max-width: var(--card-max-width-mobile);
+        min-height: auto;
+        padding: 30px 20px;
+    }
+
+    /* ===== Register Page ===== */
+    .rp-card {
+        max-width: var(--card-max-width-mobile);
+        padding: 2rem 1.5rem;
+        margin: 0 15px;
+    }
+
+    /* ===== Titles ===== */
+    .fp-title,
+    .lp-title,
+    .rpw-title,
+    .votp-title,
+    .rp-title {
+        font-size: 24px;
+        text-align: center;
+    }
+
+    /* ===== Buttons ===== */
+    .ad-btn-home,
+    .fp-btn-submit,
+    .lp-btn-submit,
+    .rpw-btn-submit,
+    .votp-btn-submit {
+        padding: 12px 30px;
+        font-size: 0.95rem;
+        width: 100%;
+    }
+
+    .rp-btn-cancel,
+    .rp-btn-create {
+        padding: 10px 30px;
+        font-size: 14px;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    /* ===== Form Controls ===== */
+    .lp-input,
+    .rp-input,
+    .rp-select,
+    .rpw-input,
+    .votp-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px 15px;
+    }
+
+    /* ===== Access Denied ===== */
+    .ad-access-card {
+        padding: 30px 20px 25px;
+    }
+
+    .ad-keypad-grid {
+        max-width: 240px;
+        gap: 10px;
+    }
+
+    .ad-key-btn {
+        font-size: 1.4rem;
+        padding: 8px 0;
+    }
+
+    .ad-password-dots {
+        font-size: 1.4rem;
+        letter-spacing: 6px;
+    }
+
+    .ad-lock-icon svg {
+        width: 66px;
+        height: 66px;
+    }
+
+    /* ===== Button groups ===== */
+    .rp-card .d-flex {
+        flex-direction: column;
+        gap: 10px !important;
+    }
+
+        .rp-card .d-flex .rp-btn-cancel,
+        .rp-card .d-flex .rp-btn-create {
+            width: 100%;
+            text-align: center;
+        }
+
+    /* ===== Spacing ===== */
+    .ad-divider-light {
+        margin: 0 0 20px 0;
+    }
+
+    /* ===== Manage User ===== */
+    .sp-card {
+        padding: 2rem 1.5rem;
+        margin: 0 15px;
+    }
+
+    .sp-icon {
+        font-size: 3rem;
+    }
+
+    /* ===== Padding for sections ===== */
+    .fp-page-section,
+    .lp-page-section,
+    .rpw-page-section,
+    .votp-page-section,
+    .rp-page-section {
+        padding: 15px;
+    }
+
+    /* ===== OTP specific ===== */
+    .votp-input {
+        letter-spacing: 3px;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    /* ===== Links ===== */
+    .lp-forgot-link {
+        font-size: 0.8rem;
+    }
+
+    .votp-resend-link {
+        font-size: 0.9rem;
+    }
+
+    /* ===== Checkbox ===== */
+    .lp-checkbox {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* Extra small devices (phones, 400px and down) */
+
+
+/* Landscape phones and tablets */
+@media (min-width: 577px) and (max-width: 768px) {
+    /* ===== Cards ===== */
+    .ad-access-card,
+    .fp-card,
+    .lp-card,
+    .sp-card,
+    .rpw-card,
+    .votp-card {
+        max-width: 420px;
+    }
+
+    .rp-card {
+        max-width: 550px;
+        padding: 2.5rem 3rem;
+    }
+}
+
+/* Tablets and small laptops */
+@media (min-width: 769px) and (max-width: 992px) {
+    .fp-card,
+    .lp-card,
+    .rpw-card,
+    .votp-card {
+        max-width: 450px;
+    }
+
+    .rp-card {
+        max-width: 650px;
+        padding: 3rem;
+    }
+}
+
+
+/*-------------------------------------------Document Controller---------------------------------------*/
+/*Start of create Document page */
+
+.cd-step-circle {
+    width: 32px;
+    height: 32px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.cd-step-text {
+    font-size: 16px;
+    color: #333333;
+}
+
+.cd-step-active .cd-step-circle {
+    background-color: #e65319;
+    color: #ffffff;
+}
+
+.cd-step-completed .cd-step-circle {
+    background-color: #198754 !important;
+    color: #ffffff !important;
+}
+
+.cd-step-inactive .cd-step-circle {
+    background-color: #e8e8e8;
+    color: #a0a0a0;
+}
+
+.cd-form-container {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 850px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin: 0 auto;
+}
+
+.cd-section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #212529;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+    .cd-section-title i {
+        color: #e65319;
+        font-size: 1.2rem;
+    }
+
+.cd-form-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cd-form-control,
+.cd-form-select {
+    border-radius: 50px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    border: 2px solid #dee2e6 !important;
+}
+
+    .cd-form-control:focus,
+    .cd-form-select:focus {
+        border-color: #e65319 !important;
+        box-shadow: none;
+        outline: none;
+    }
+
+    .cd-form-control.is-invalid {
+        border-color: #dc3545 !important;
+    }
+
+    .cd-form-select:disabled {
+        background-color: #e9ecef;
+        cursor: not-allowed;
+    }
+
+.cd-status-text {
+    font-size: 0.75rem;
+    color: #e65319;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cd-btn-action {
+    border-radius: 50px;
+    padding: 10px 24px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    min-width: 120px;
+}
+
+.cd-btn-outline-back {
+    border: 1px solid #ced4da;
+    color: #6c757d;
+    background-color: #ffffff;
+}
+
+.cd-btn-draft {
+    background-color: #a0a0a0;
+    color: #ffffff;
+    border: none;
+}
+
+.cd-btn-activate {
+    background-color: #e65319;
+    color: #ffffff;
+    border: none;
+}
+
+    .cd-btn-activate:hover {
+        background-color: #d44a15;
+    }
+
+.cd-details-row {
+    margin-bottom: 16px;
+}
+
+    .cd-details-row .col-md-4,
+    .cd-details-row .col-md-3 {
+        margin-bottom: 12px;
+    }
+
+.cd-btn-add {
+    background-color: #e65319;
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 30px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    width: 100%;
+    margin-top: 6px;
+}
+
+    .cd-btn-add:hover {
+        background-color: #d44a15;
+        color: #ffffff;
+    }
+
+.cd-quantity-input {
+    max-width: 120px;
+}
+
+.cd-added-item-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+
+.cd-item-inputs-box {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #ebebeb;
+}
+
+.cd-btn-item-save {
+    background-color: #198754;
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+    .cd-btn-item-save:hover {
+        background-color: #146c43;
+        color: #ffffff;
+    }
+
+#cd-quantity-container,
+#cd-add-button-container {
+    display: none;
+}
+
+.cd-disabled-hint {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.cd-current-item-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+
+
+/*End of create Document page */

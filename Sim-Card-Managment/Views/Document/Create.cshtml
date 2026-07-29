@@ -1,237 +1,396 @@
 ﻿@{
-    Layout = null;
-    ViewData["Title"] = "Create Document";
-
+    ViewData["Title"] = "create";
 }
 
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
-<link rel="stylesheet" href="~/css/all.min.css" />
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Document</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
 
-<style>
-        body {
-            background-color: #E24D17;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-        }
-
-        .create-card {
-            background-color: #ffffff;
-            border-radius: 30px;
-            max-width: 750px;
-            width: 100%;
-            padding: 3rem 4rem;
-        }
-
-        .title-header {
-            font-weight: 700;
-            font-size: 32px;
-            color: #000;
-            margin-bottom: 2.5rem;
-        }
-
-        .custom-label {
-            font-weight: 500;
-            color: #000;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .custom-input {
-            background-color: #d8d8d8;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 18px;
-            color: #555;
-            width: 100%;
-            font-size: 14px;
-            transition: box-shadow 0.2s ease-in-out;
-        }
-
-            .custom-input:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px #E24D17;
-            }
-
-        .custom-select {
-            background-color: #d8d8d8;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 18px;
-            color: #555;
-            width: 100%;
-            font-size: 14px;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1.2em;
-            cursor: pointer;
-        }
-
-            .custom-select:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px #E24D17;
-            }
-
-        .btn-cancel {
-            border: 1px solid #E24D17;
-            background-color: #ffffff;
-            color: #000;
-            border-radius: 30px;
-            padding: 10px 45px;
-            font-weight: 700;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-            .btn-cancel:hover {
-                background-color: #fffaf8;
-                color: #E24D17;
-            }
-
-        .btn-create {
-            background-color: #E24D17;
-            border: 1px solid #E24D17;
-            color: #fff;
-            border-radius: 30px;
-            padding: 10px 45px;
-            font-weight: 700;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-            .btn-create:hover {
-                background-color: #c84111;
-                border-color: #c84111;
-                color: #fff;
-            }
-
-        .custom-input.is-invalid {
-            box-shadow: 0 0 0 2px #D41212;
-            background-color: #ffe6e6;
-        }
-
-        .error-msg {
-            color: #D41212;
-            font-size: 12px;
-            margin-top: 5px;
-            margin-left: 10px;
-            display: none;
-        }
-
-        .custom-input.is-invalid ~ .error-msg {
-            display: block;
-        }
-    </style>
+</head>
 
 
-<body>
-
-    <div class="create-card shadow p-100">
-        <h2 class="title-header">Create new Document</h2>
-
-        <form id="employeeForm" asp-controller="Employee" asp-action="Create" method="post">
-
-            <div class="row g-4 mb-5">
-                <div class="col-md-12">
-                    <label class="custom-label">Document number</label>
-                    <input type="text" id="empName" class="custom-input" placeholder="Adham amr mohamed">
-                    <span class="error-msg">Document number is required.</span>
-                </div>
-
-                <div class="col-md-12">
-                    <label class="custom-label">Document Type</label>
-                    <select id="empDept" class="custom-select">
-                        <option selected>IT</option>
-                        <option>HR</option>
-                        <option>Marketing</option>
-                        <option>Sales</option>
-                    </select>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="custom-label">SIM Count</label>
-                    <input type="text" id="empPhone" class="custom-input" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <span class="error-msg">Please enter a valid 11-digit phone number.</span>
-                </div>
-                <div class="col-md-4">
-                    <label class="custom-label">USB Count</label>
-                    <input type="text" id="empPhone" class="custom-input" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <span class="error-msg">Please enter a valid 11-digit phone number.</span>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="custom-label">Server Provider</label>
-                    <select id="empDept" class="custom-select">
-                        <option selected>IT</option>
-                        <option>HR</option>
-                        <option>Marketing</option>
-                        <option>Sales</option>
-                    </select>
-                </div>
 
 
-                <div class="col-md-12">
-                    <label class="custom-label">Notes</label>
-                    <textarea type="text" id="empName" class="custom-input" ></textarea>
-                    <span class="error-msg">Document number is required.</span>
-                </div>
+    <section class="container-fluid px-4 mt-4">
 
+        <header>
+            <div class="p-100 w-100 mx-4">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-4" style="font-size: 0.8rem; font-weight: 500;">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Document" asp-action="Index" class="text-decoration-none text-muted">Document</a>
+                        </li>
+                        <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">
+                            Create new Document
+                        </li>
+                    </ol>
+                </nav>
 
-                
+                <h1 class="fw-bold text-dark mb-3" style="font-size: 32px; letter-spacing: -0.5px;">
+                    Setup New Document
+                </h1>
+
+                <p class="mb-0" style="color: #6c757d; font-size: 15px; line-height: 1.5; max-width: 480px;">
+                    Complete the following steps to assign system to create documents
+                </p>
             </div>
+        </header>
 
-            <div class="d-flex justify-content-end gap-3 mt-4">
-                <a class="btn btn-cancel" asp-controller="Document" asp-action="Index">Cancel</a>
-                <button type="submit" class="btn btn-create">Create</button>
+        <div class="row mt-4">
+            <aside class="col-12 col-md-3 col-lg-2">
+                <div class="d-flex align-items-center mb-4 cd-step-active" id="cd-step1-indicator">
+                    <div class="cd-step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="cd-step1-circle">1</div>
+                    <div class="cd-step-text fw-bold">Document Info</div>
+                </div>
+                <div class="d-flex align-items-center mb-4 cd-step-active" id="cd-step2-indicator">
+                    <div class="cd-step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="cd-step2-circle">2</div>
+                    <div class="cd-step-text fw-bold">Details</div>
+                </div>
+            </aside>
+
+            <div class="col-12 col-md-9 col-lg-10">
+                <form asp-action="Create" method="post" id="cd-create-form">
+                    <div class="cd-form-container">
+
+                        <!-- ========================================== -->
+                        <!-- 📄 SECTION 1: DOCUMENT INFORMATION          -->
+                        <!-- ========================================== -->
+                        <div class="mb-5">
+                            <h2 class="cd-section-title">
+                                <i class="fas fa-file-alt"></i> Document Information
+                            </h2>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="cd-form-label">
+                                        <i class="fas fa-file"></i> Document Type <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="cd-document-type" class="form-select cd-form-select">
+                                        <option value="">-- Select Document Type --</option>
+                                        <option value="1">National ID</option>
+                                        <option value="2">Passport</option>
+                                        <option value="3">Driver's License</option>
+                                        <option value="4">Residence Permit</option>
+                                        <option value="5">Company ID</option>
+                                        <option value="6">Visa</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="cd-form-label">
+                                        <i class="fas fa-building"></i> Service Provider <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="cd-service-provider" class="form-select cd-form-select">
+                                        <option value="">-- Select Service Provider --</option>
+                                        <option value="1">Orange</option>
+                                        <option value="2">Vodafone</option>
+                                        <option value="3">WE</option>
+                                        <option value="4">Etisalat</option>
+                                        <option value="5">STC</option>
+                                        <option value="6">Zain</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="cd-status-text mt-2" id="cd-doc-status" style="display: none;">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span id="cd-doc-status-message">Document information selected</span>
+                            </div>
+                        </div>
+
+                        <!-- ========================================== -->
+                        <!-- 📄 SECTION 2: DETAILS                      -->
+                        <!-- ========================================== -->
+                        <div class="mb-5">
+                            <h2 class="cd-section-title">
+                                <i class="fas fa-list"></i> Details
+                            </h2>
+
+                            <div class="row cd-details-row align-items-end">
+                                <div class="col-md-4">
+                                    <label class="cd-form-label">
+                                        <i class="fas fa-microchip"></i> Device <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="cd-device-select" class="form-select cd-form-select" disabled>
+                                        <option value="">-- Select Device --</option>
+                                        <option value="1">SIM Card - Orange</option>
+                                        <option value="2">SIM Card - Vodafone</option>
+                                        <option value="3">SIM Card - WE</option>
+                                        <option value="4">USB Modem - Huawei</option>
+                                        <option value="5">USB Modem - ZTE</option>
+                                        <option value="6">Router - TP-Link</option>
+                                        <option value="7">Router - D-Link</option>
+                                    </select>
+                                    <small class="cd-disabled-hint" id="cd-device-hint">
+                                        Please complete Document Information first.
+                                    </small>
+                                </div>
+
+                                <div class="col-md-3" id="cd-quantity-container">
+                                    <label class="cd-form-label">
+                                        <i class="fas fa-hashtag"></i> Quantity <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" id="cd-quantity-input" class="form-control cd-form-control cd-quantity-input"
+                                           placeholder="Qty" min="1" value="1">
+                                </div>
+
+                                <div class="col-md-3" id="cd-add-button-container">
+                                    <button type="button" id="cd-add-device-btn" class="cd-btn-add">
+                                        <i class="fas fa-plus me-2"></i> Add Device
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="cd-added-devices-container" class="mt-4"></div>
+
+                            <div class="d-flex justify-content-between align-items-center pt-4 mt-4 border-top">
+                                <a asp-action="Index" class="btn cd-btn-action cd-btn-outline-back text-center text-decoration-none">Back</a>
+                                <div class="d-flex gap-3">
+                                    <button type="button" class="btn cd-btn-action cd-btn-draft">Save Draft</button>
+                                    <button type="submit" class="btn cd-btn-action cd-btn-activate">Activate Subscription</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
             </div>
-
-        </form>
-    </div>
-
+        </div>
+    </section>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script>
-        document.getElementById('employeeForm').addEventListener('submit', function (event) {
-            let isValid = true;
+        $(document).ready(function () {
 
+            // ====================================================
+            // 📄 DOCUMENT INFO VALIDATION & UNLOCK DEVICE DROPDOWN
+            // ====================================================
+            $('#cd-document-type, #cd-service-provider').on('change', function () {
+                const docType = $('#cd-document-type').val();
+                const serviceProvider = $('#cd-service-provider').val();
 
-            document.querySelectorAll('.is-invalid').forEach(function(el) {
-                el.classList.remove('is-invalid');
+                if (docType && serviceProvider) {
+                    $('#cd-doc-status').show();
+                    $('#cd-doc-status-message').text(
+                        'Document Type: ' + $('#cd-document-type option:selected').text() +
+                        ' | Service Provider: ' + $('#cd-service-provider option:selected').text()
+                    );
+
+                    // Step 1 checkmark
+                    $('#cd-step1-indicator').removeClass('cd-step-active').addClass('cd-step-completed');
+                    $('#cd-step1-circle').html('<i class="fas fa-check"></i>');
+
+                    // Unlock Device dropdown
+                    $('#cd-device-select').prop('disabled', false);
+                    $('#cd-device-hint').hide();
+                } else {
+                    $('#cd-doc-status').hide();
+
+                    // Revert Step 1 indicator
+                    $('#cd-step1-indicator').removeClass('cd-step-completed').addClass('cd-step-active');
+                    $('#cd-step1-circle').html('1');
+
+                    // Lock Device dropdown & Reset Details
+                    $('#cd-device-select').val('').prop('disabled', true);
+                    $('#cd-device-hint').show();
+                    $('#cd-quantity-container').fadeOut();
+                    $('#cd-add-button-container').fadeOut();
+                }
             });
 
-            const name = document.getElementById('empName');
-            if (name.value.trim() === '') {
-                name.classList.add('is-invalid');
-                isValid = false;
+            // ====================================================
+            // 📄 DEVICE DROPDOWN TOGGLE
+            // ====================================================
+            $('#cd-device-select').on('change', function () {
+                const selectedValue = $(this).val();
+
+                if (selectedValue !== "") {
+                    $('#cd-quantity-container').fadeIn();
+                    $('#cd-add-button-container').fadeIn();
+                } else {
+                    $('#cd-quantity-container').fadeOut();
+                    $('#cd-add-button-container').fadeOut();
+                    $('#cd-quantity-input').val(1);
+                }
+            });
+
+            // ====================================================
+            // 📄 GENERATE DYNAMIC CARD WITH SAVE & VALIDATION
+            // ====================================================
+            let cardCounter = 0;
+
+            $('#cd-add-device-btn').on('click', function () {
+                const deviceName = $('#cd-device-select option:selected').text();
+                const deviceValue = $('#cd-device-select').val();
+                const qty = parseInt($('#cd-quantity-input').val());
+
+                if (!deviceValue) {
+                    alert('Please select a device.');
+                    return;
+                }
+
+                if (isNaN(qty) || qty < 1) {
+                    alert('Please enter a valid quantity.');
+                    return;
+                }
+
+                cardCounter++;
+                const cardId = `cd-card_${cardCounter}`;
+
+                // Options list based on quantity
+                let selectOptions = '';
+                for (let i = 1; i <= qty; i++) {
+                    selectOptions += `<option value="${i}">Item #${i}</option>`;
+                }
+
+                // Dynamic HTML Block
+                const dynamicCardHtml = `
+                        <div class="cd-added-item-card" id="${cardId}" data-total="${qty}">
+                            <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
+                                <div>
+                                    <span class="fw-bold text-dark me-2" style="font-size: 1.05rem;">${deviceName}</span>
+                                    <span class="badge bg-secondary">Total: ${qty}</span>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle cd-remove-card-btn">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+
+                            <div class="row g-3 align-items-start">
+                                <div class="col-md-4">
+                                    <label class="cd-form-label"><i class="fas fa-list-ol"></i> Select Item Number</label>
+                                    <select class="form-select cd-form-select cd-item-number-select">
+                                        ${selectOptions}
+                                    </select>
+                                </div>
+
+                                <div class="col-md-8">
+                                    <div class="cd-item-inputs-box">
+                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                            <span class="fw-bold cd-current-item-label">
+                                                Item #1 Details
+                                            </span>
+                                            <button type="button" class="cd-btn-item-save cd-save-item-btn">
+                                                <i class="fas fa-check me-1"></i> Save Item
+                                            </button>
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <label class="cd-form-label">Serial Number (S/N) <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control cd-form-control cd-input-sn"
+                                                       name="Devices[${cardCounter}][1][SN]" placeholder="Enter S/N">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="cd-form-label">IP Address <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control cd-form-control cd-input-ip"
+                                                       name="Devices[${cardCounter}][1][IP]" placeholder="192.168.x.x">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="cd-form-label">SIM Card No. <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control cd-form-control cd-input-sim"
+                                                       name="Devices[${cardCounter}][1][SIM]" placeholder="Enter SIM No.">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                $('#cd-added-devices-container').append(dynamicCardHtml);
+                checkStep2Completion();
+            });
+
+            // ====================================================
+            // 📄 DYNAMIC HEADER & ITEM SWITCHING LOGIC
+            // ====================================================
+            $(document).on('change', '.cd-item-number-select', function () {
+                const selectedIndex = $(this).val();
+                const $card = $(this).closest('.cd-added-item-card');
+                const cardIndex = $card.attr('id');
+
+                // 1. DYNAMIC HEADER UPDATE
+                $card.find('.cd-current-item-label').text(`Item #${selectedIndex} Details`);
+
+                // 2. Update field name attributes for backend submission
+                $card.find('.cd-input-sn').attr('name', `Devices[${cardIndex}][${selectedIndex}][SN]`);
+                $card.find('.cd-input-ip').attr('name', `Devices[${cardIndex}][${selectedIndex}][IP]`);
+                $card.find('.cd-input-sim').attr('name', `Devices[${cardIndex}][${selectedIndex}][SIM]`);
+
+                // Clear previous validation styling when changing item index
+                $card.find('.cd-form-control').removeClass('is-invalid');
+            });
+
+            // Remove red border when typing
+            $(document).on('input', '.cd-form-control', function () {
+                $(this).removeClass('is-invalid');
+            });
+
+            // ====================================================
+            // 📄 SAVE BUTTON WITH VALIDATION & CHECKMARK
+            // ====================================================
+            $(document).on('click', '.cd-save-item-btn', function () {
+                const $card = $(this).closest('.cd-added-item-card');
+                const $select = $card.find('.cd-item-number-select');
+                const currentIndex = parseInt($select.val());
+                const totalQty = parseInt($card.data('total'));
+
+                const $sn = $card.find('.cd-input-sn');
+                const $ip = $card.find('.cd-input-ip');
+                const $sim = $card.find('.cd-input-sim');
+
+                // VALIDATION CHECK
+                let isValid = true;
+
+                if (!$sn.val().trim()) { $sn.addClass('is-invalid');
+                    isValid = false; }
+                if (!$ip.val().trim()) { $ip.addClass('is-invalid');
+                    isValid = false; }
+                if (!$sim.val().trim()) { $sim.addClass('is-invalid');
+                    isValid = false; }
+
+                if (!isValid) {
+                    return;
+                }
+
+                // 1. ADD CHECKMARK TO SELECTED OPTION
+                const $selectedOption = $select.find(`option[value="${currentIndex}"]`);
+                if (!$selectedOption.text().includes('✓')) {
+                    $selectedOption.text(`Item #${currentIndex} ✓`);
+                }
+
+                // 2. AUTO-ADVANCE TO NEXT ITEM OR SHOW COMPLETION MESSAGE
+                if (currentIndex < totalQty) {
+                    const nextIndex = currentIndex + 1;
+                    $select.val(nextIndex).trigger('change');
+
+                    // Reset input values for the next item
+                    $sn.val('');
+                    $ip.val('');
+                    $sim.val('');
+                }
+            });
+
+            // ====================================================
+            // 📄 REMOVE CARD & CHECK STEP 2
+            // ====================================================
+            $(document).on('click', '.cd-remove-card-btn', function () {
+                $(this).closest('.cd-added-item-card').remove();
+                checkStep2Completion();
+            });
+
+            function checkStep2Completion() {
+                if ($('#cd-added-devices-container').children().length > 0) {
+                    $('#cd-step2-indicator').removeClass('cd-step-active').addClass('cd-step-completed');
+                    $('#cd-step2-circle').html('<i class="fas fa-check"></i>');
+                } else {
+                    $('#cd-step2-indicator').removeClass('cd-step-completed').addClass('cd-step-active');
+                    $('#cd-step2-circle').html('2');
+                }
             }
 
-            const nid = document.getElementById('empNid');
-            if (nid.value.trim().length !== 14) {
-                nid.classList.add('is-invalid');
-                isValid = false;
-            }
-
-            const phone = document.getElementById('empPhone');
-            if (phone.value.trim().length !== 11) {
-                phone.classList.add('is-invalid');
-                isValid = false;
-            }
-
-            const position = document.getElementById('empPosition');
-            if (position.value.trim() === '') {
-                position.classList.add('is-invalid');
-                isValid = false;
-            }
-
-            if (!isValid) {
-                event.preventDefault();
-            }
         });
     </script>
-    <script src="~/js/bootstrap.bundle.min.js"></script>
-</body>
-

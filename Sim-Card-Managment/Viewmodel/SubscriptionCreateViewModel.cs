@@ -16,6 +16,7 @@ namespace Sim_Card_Managment.Viewmodel
         public int? SelectedSimId { get; set; }
         public int? SelectedQuotaId { get; set; }
         public int? SelectedUsbId { get; set; }
+        public decimal Fees { get; set; }
 
         public DateTime StartDate { get; set; } = DateTime.Today;
         public int ContractDurationYears { get; set; } = 1;
