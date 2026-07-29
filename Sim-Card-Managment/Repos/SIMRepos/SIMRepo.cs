@@ -59,7 +59,17 @@ namespace Sim_Card_Managment.Repos
             _context.Sims.Add(sim);
             _context.SaveChanges();
         }
+        public async Task AddAsync(Sim sim)
+        {
+            await _context.Sims.AddAsync(sim);
+            await _context.SaveChangesAsync();
+        }
 
+        public async Task<Sim?> GetBySerialNumberAsync(string serialNumber)
+        {
+            return await _context.Sims
+                .FirstOrDefaultAsync(s => s.SerialNumber == serialNumber);
+        }
         public void Update(Sim sim)
         {
             _context.Sims.Update(sim);

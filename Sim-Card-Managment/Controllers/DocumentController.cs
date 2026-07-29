@@ -1,46 +1,59 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using Sim_Card_Management.Models;
+using Sim_Card_Management.Repos.DocumentDetailsRepos;
+using Sim_Card_Management.Repos.ItemTypeRepos;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Viewmodel;
 using Sim_Card_Managment.ViewModels;
-using ClosedXML.Excel;
-using System.IO;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
 using System.Drawing;
+using System.IO;
+using System.Security.Claims;
 namespace Sim_Card_Managment.Controllers
 {
     public class DocumentController : Controller
     {
         private readonly IDocumentRepo _documentRepo;
-        private readonly IDocumentTypeRepo _typeRepo;
-        private readonly ISerialRepo _serialRepo;
-        // نفترض وجود هذه المستودعات لجلب القوائم
+        private readonly IDocumentTypeRepo _documentTypeRepo;
+        private readonly IServiceProviderRepository _serviceProviderRepo;
+        private readonly IItemTypeRepo _itemTypeRepo;
+        private readonly IDocumentDetailsRepo _documentDetailsRepo;
         private readonly ISIMRepo _simRepo;
         private readonly IUSBRepo _usbRepo;
+        private readonly ISerialRepo _serialRepo;
         private readonly ISubscriptionRepo _subscriptionRepo;
 
         public DocumentController(
             IDocumentRepo documentRepo,
-            IDocumentTypeRepo typeRepo,
-            ISerialRepo serialRepo,
+            IDocumentTypeRepo documentTypeRepo,
+            IServiceProviderRepository serviceProviderRepo,
+            IItemTypeRepo itemTypeRepo,
+            IDocumentDetailsRepo documentDetailsRepo,
             ISIMRepo simRepo,
             IUSBRepo usbRepo,
+            ISerialRepo serialRepo,
             ISubscriptionRepo subscriptionRepo)
         {
             _documentRepo = documentRepo;
-            _typeRepo = typeRepo;
-            _serialRepo = serialRepo;
+            _documentTypeRepo = documentTypeRepo;
+            _serviceProviderRepo = serviceProviderRepo;
+            _itemTypeRepo = itemTypeRepo;
+            _documentDetailsRepo = documentDetailsRepo;
             _simRepo = simRepo;
             _usbRepo = usbRepo;
+            _serialRepo = serialRepo;
             _subscriptionRepo = subscriptionRepo;
         }
 
         public async Task<IActionResult> Index(string? searchTerm, int? documentTypeId)
         {
             var documents = await _documentRepo.GetAllAsync(searchTerm, documentTypeId);
-            ViewBag.DocumentTypes = new SelectList(await _typeRepo.GetAllAsync(), "Id", "DisplayName");
+            ViewBag.DocumentTypes = new SelectList(await _documentTypeRepo.GetAllAsync(), "Id", "DisplayName");
             return View(documents);
         }
         public async Task<IActionResult> InventoryReport(string? searchTerm)
@@ -62,6 +75,10 @@ namespace Sim_Card_Managment.Controllers
 
             ViewBag.AllSubscriptions = subscriptions; // Passed to trace historical users
             return View(activeSubscriptions.ToList());
+        }
+        public IActionResult Details(int id)
+        {
+            return View();
         }
         #region First Report
         [HttpGet]
@@ -199,95 +216,177 @@ namespace Sim_Card_Managment.Controllers
             }
         }
         #endregion
+        // GET: Document/Create
         public async Task<IActionResult> Create()
         {
-            var viewModel = new DocumentCreateViewModel
-            {
-                // تعبئة القوائم من المستودعات لعرضها في الـ View
-                DocumentTypes = new SelectList(await _typeRepo.GetAllAsync(), "Id", "DisplayName"),
-                Sims = new SelectList(await _simRepo.GetAvailableSimsAsync(), "Id", "PhoneNumber"), // أو SerialNumber
-                Usbs = new SelectList(await _usbRepo.GetAvailableUsbsAsync(), "Id", "SerialNumber")
-            };
-
+            var viewModel = new DocumentCreateViewModel();
+            await PopulateDropdownsAsync(viewModel);
             return View(viewModel);
         }
 
+        // POST: Document/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(DocumentCreateViewModel model)
+        public async Task<IActionResult> Create(DocumentCreateViewModel viewModel)
         {
-            // جلب معرّف المستخدم الحالي (يتم استبداله بنظام الـ Auth الفعلي لديك)
-            var currentUserId = int.Parse("00000000-0000-0000-0000-000000000001");
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // 1. تحليل السيريالات المدخلة وتنظيفها
-                var separators = new[] { ',', '\r', '\n' };
-                var serialNumbers = model.DocumentNumber
-                    .Split(separators, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(s => s.Trim())
-                    .Distinct()
-                    .ToList();
+                await PopulateDropdownsAsync(viewModel);
+                return View(viewModel);
+            }
 
-                // 2. التحقق من عدم تكرار السيريالات في النظام
-                foreach (var sn in serialNumbers)
+            try
+            {
+                var userId = GetCurrentUserId();
+
+                // 1. Create main Document entity via Document Repository
+                var document = new Document
                 {
-                    if (await _serialRepo.ExistsAsync(sn))
+                    DocumenttypeId = viewModel.DocumentTypeId,
+                    ServiceProviderId = viewModel.ServiceProviderId!.Value,
+                    ActionDate = viewModel.ActionDate,
+                    Notes = viewModel.Notes,
+                    SignatureType = viewModel.SignatureType,
+                    SignatureData = viewModel.SignatureData,
+                    DocumentNumber = viewModel.DocumentNumber,
+                    CreatedAt = DateTime.Now,
+                    UserId = userId
+                };
+
+                await _documentRepo.AddAsync(document);
+
+                // 2. Fetch or create SIM ItemType
+                var simItemType = await _itemTypeRepo.GetByNameAsync("SIM");
+                if (simItemType == null)
+                {
+                    simItemType = new ItemType { Name = "SIM" };
+                    await _itemTypeRepo.AddAsync(simItemType);
+                }
+
+                // 3. Fetch or create USB ItemType
+                var usbItemType = await _itemTypeRepo.GetByNameAsync("USB");
+                if (usbItemType == null)
+                {
+                    usbItemType = new ItemType { Name = "USB" };
+                    await _itemTypeRepo.AddAsync(usbItemType);
+                }
+
+                // 4. Process SIM entries
+                if (viewModel.Sims != null && viewModel.Sims.Any())
+                {
+                    var simDocumentDetails = new DocumentDetails
                     {
-                        ModelState.AddModelError("DocumentNumber", $"السيريال رقم ({sn}) موجود مسبقاً في النظام!");
-                        await PopulateLookupListsAsync(model);
-                        return View(model);
+                        DocumentId = document.Id,
+                        ItemTypeId = simItemType.Id,
+                        Quantity = viewModel.Sims.Count
+                    };
+                    await _documentDetailsRepo.AddAsync(simDocumentDetails);
+
+                    foreach (var simDto in viewModel.Sims)
+                    {
+                        var sim = new Sim
+                        {
+                            SerialNumber = simDto.SerialNumber,
+                            PhoneNumber = simDto.PhoneNumber,
+                            NetworkType = simDto.NetworkType,
+                            Status = "Active",
+                            RegisteredAt = DateTime.Now,
+                            ServiceProviderId = viewModel.ServiceProviderId.Value
+                        };
+                        await _simRepo.AddAsync(sim);
+
+                        var serial = new Serial
+                        {
+                            SerialNumber = simDto.SerialNumber,
+                            DocumentDetailsId = simDocumentDetails.Id,
+                            SimId = sim.Id,
+                            CreatedDate = DateTime.Now,
+                            UserId = userId
+                        };
+                        await _serialRepo.AddAsync(serial);
                     }
                 }
 
-                // 3. نقوم بعمل Mapping من الـ ViewModel إلى الـ Domain Model (Document)
-                var document = new Document
+                // 5. Process USB entries
+                if (viewModel.Usbs != null && viewModel.Usbs.Any())
                 {
-                    //Id = int.Newint(),
-                    DocumenttypeId = model.DocumentTypeId,
-                    ActionDate = model.ActionDate,
-                    Notes = model.Notes ?? string.Empty,
-                    SignatureType = model.SignatureType ?? string.Empty,
-                    SignatureData = model.SignatureData ?? string.Empty,
-                    CreatedAt = DateTime.UtcNow,
-                    UserId = currentUserId,
-                    DocumentNumber = model.DocumentNumber
-                };
+                    var usbDocumentDetails = new DocumentDetails
+                    {
+                        DocumentId = document.Id,
+                        ItemTypeId = usbItemType.Id,
+                        Quantity = viewModel.Usbs.Count
+                    };
+                    await _documentDetailsRepo.AddAsync(usbDocumentDetails);
 
-                //// 4. بناء كائنات الـ Serial وإضافتها للمستند مع الحقول المطلوبة (Id, DocumentId, UserId)
-                //foreach (var sn in serialNumbers)
-                //{
-                //    document.Serials.Add(new Serial
-                //    {
-                //        //Id = int.Newint(),
-                //        SerialNumber = sn,
-                //        UserId = currentUserId,
-                //        CreatedDate = DateTime.UtcNow,
-                //        DocumentId = document.Id,
-                //        SimId = model.SelectedSimId, // ربط الـ SIM المختار من القائمة
-                //        UsbId = model.SelectedUsbId  // ربط الـ USB المختار من القائمة
-                //    });
-                //}
+                    foreach (var usbDto in viewModel.Usbs)
+                    {
+                        var usb = new Usb
+                        {
+                            SerialNumber = usbDto.SerialNumber,
+                            Model = usbDto.Model,
+                            Status = "Active",
+                            RegisteredAt = DateTime.Now,
+                            ServiceProviderId = viewModel.ServiceProviderId.Value
+                        };
+                        await _usbRepo.AddAsync(usb);
 
-                // 5. الحفظ النهائي في قاعدة البيانات
-                await _documentRepo.AddAsync(document);
-                await _documentRepo.SaveChangesAsync();
+                        var serial = new Serial
+                        {
+                            SerialNumber = usbDto.SerialNumber,
+                            DocumentDetailsId = usbDocumentDetails.Id,
+                            UsbId = usb.Id,
+                            CreatedDate = DateTime.Now,
+                            UserId = userId
+                        };
+                        await _serialRepo.AddAsync(serial);
+                    }
+                }
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = document.Id });
             }
-
-            // في حال فشل الـ Validation يتم إعادة بناء القوائم المنسدلة وإرجاع الفيو
-            await PopulateLookupListsAsync(model);
-            return View(model);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"حدث خطأ أثناء حفظ المستند: {ex.Message}");
+                await PopulateDropdownsAsync(viewModel);
+                return View(viewModel);
+            }
         }
 
-        // ميثود مساعدة لإعادة تعبئة القوائم في حال حدوث خطأ لمنع الـ NullReferenceException
-        private async Task PopulateLookupListsAsync(DocumentCreateViewModel model)
+        #region Helper Methods
+
+        /// <summary>
+        /// Populates DocumentTypes and ServiceProviders dropdown lists via Repositories.
+        /// </summary>
+        private async Task PopulateDropdownsAsync(DocumentCreateViewModel viewModel)
         {
-            model.DocumentTypes = new SelectList(await _typeRepo.GetAllAsync(), "Id", "DisplayName", model.DocumentTypeId);
-            model.Sims = new SelectList(await _simRepo.GetAvailableSimsAsync(), "Id", "PhoneNumber", model.SelectedSimId);
-            model.Usbs = new SelectList(await _usbRepo.GetAvailableUsbsAsync(), "Id", "SerialNumber", model.SelectedUsbId);
+            var documentTypes = await _documentTypeRepo.GetAllAsync();
+            viewModel.DocumentTypes = documentTypes.Select(dt => new SelectListItem
+            {
+                Value = dt.Id.ToString(),
+                Text = dt.DisplayName ?? dt.Name
+            }).ToList();
+
+            var serviceProviders = await _serviceProviderRepo.GetAllAsync();
+            viewModel.ServiceProviders = serviceProviders
+                .Where(sp => sp.IsActive)
+                .Select(sp => new SelectListItem
+                {
+                    Value = sp.Id.ToString(),
+                    Text = sp.DisplayName ?? sp.Name
+                }).ToList();
         }
+
+        /// <summary>
+        /// Extracts the logged-in user ID from Claims.
+        /// </summary>
+        private int GetCurrentUserId()
+        {
+            var claimValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(claimValue, out var userId) ? userId : 1;
+        }
+
+        #endregion
+    
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

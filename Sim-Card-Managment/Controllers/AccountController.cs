@@ -304,11 +304,11 @@ namespace Sim_Card_Managment.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ProfileDetails(Guid id)
+        public async Task<IActionResult> ProfileDetails(int id)
         {
             var currentUserIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (string.IsNullOrEmpty(currentUserIdClaim) || !Guid.TryParse(currentUserIdClaim, out Guid loggedInUserId))
+            if (string.IsNullOrEmpty(currentUserIdClaim) || !int.TryParse(currentUserIdClaim, out int loggedInUserId))
             {
                 return ForceLogoutAndRedirect();
             }
@@ -346,7 +346,7 @@ namespace Sim_Card_Managment.Controllers
 
         [HttpGet]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> ManageUsers(string? search, Guid? groupId, bool? isActive)
+        public async Task<IActionResult> ManageUsers(string? search, int? groupId, bool? isActive)
         {
             var users = await _accountRepo.GetAllUsersAsync(search, groupId, isActive);
 
@@ -359,7 +359,7 @@ namespace Sim_Card_Managment.Controllers
 
         [HttpGet]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> EditUser(Guid id)
+        public async Task<IActionResult> EditUser(int id)
         {
             var model = await _accountRepo.GetUserForEditAsync(id);
             if (model == null)
@@ -391,7 +391,7 @@ namespace Sim_Card_Managment.Controllers
         [HttpPost]
         // [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToggleActive(Guid id)
+        public async Task<IActionResult> ToggleActive(int id)
         {
             var result = await _accountRepo.ToggleUserActiveAsync(id);
             if (!result)
@@ -408,7 +408,7 @@ namespace Sim_Card_Managment.Controllers
         [HttpPost]
         // [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SoftDelete(Guid id)
+        public async Task<IActionResult> SoftDelete(int id)
         {
             var result = await _accountRepo.SoftDeleteUserAsync(id);
             if (!result)

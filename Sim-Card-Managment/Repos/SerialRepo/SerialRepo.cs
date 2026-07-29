@@ -49,11 +49,13 @@ namespace Sim_Card_Managment.Repos
         public async Task<bool> ExistsAsync(string serialNumber)
         {
             return await _context.Serials.AnyAsync(s => s.SerialNumber == serialNumber);
+
         }
 
         public async Task AddAsync(Serial serial)
         {
             await _context.Serials.AddAsync(serial);
+            await _context.SaveChangesAsync();
         }
 
         public async Task AddRangeAsync(IEnumerable<Serial> serials)

@@ -7,7 +7,8 @@ namespace Sim_Card_Managment.Repos
     {
         Task<IEnumerable<Sim>> GetAvailableSimsAsync();
         Task<IEnumerable<Sim>> GetAvailableSimsAsync(string query);
-
+        Task AddAsync(Sim sim);
+        Task<Sim?> GetBySerialNumberAsync(string serialNumber);
         IEnumerable<Sim> GetAll();
         Sim? GetById(int id);
         void Add(Sim sim);

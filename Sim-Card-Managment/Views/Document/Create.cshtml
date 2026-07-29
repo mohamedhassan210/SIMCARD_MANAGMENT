@@ -1,237 +1,330 @@
-﻿@{
-    Layout = null;
-    ViewData["Title"] = "Create Document";
-
+﻿@model DocumentCreateViewModel
+@{
+    ViewData["Title"] = "إنشاء مستند جديد";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
-<link rel="stylesheet" href="~/css/all.min.css" />
+<div class="container mt-4" dir="rtl">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">@ViewData["Title"]</h2>
 
-<style>
-        body {
-            background-color: #E24D17;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-        }
+            <form id="documentForm" method="post" asp-action="Create" asp-controller="Document" novalidate>
+                @Html.AntiForgeryToken()
 
-        .create-card {
-            background-color: #ffffff;
-            border-radius: 30px;
-            max-width: 750px;
-            width: 100%;
-            padding: 3rem 4rem;
-        }
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">اختيار المستند ومزود الخدمة</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DocumentTypeId" class="form-label">نوع المستند</label>
+                                <select asp-for="DocumentTypeId" asp-items="Model.DocumentTypes" class="form-select" required>
+                                    <option value="">-- اختر نوع المستند --</option>
+                                </select>
+                                <span asp-validation-for="DocumentTypeId" class="text-danger"></span>
+                            </div>
 
-        .title-header {
-            font-weight: 700;
-            font-size: 32px;
-            color: #000;
-            margin-bottom: 2.5rem;
-        }
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ServiceProviderId" class="form-label">مزود الخدمة</label>
+                                <select asp-for="ServiceProviderId" asp-items="Model.ServiceProviders" class="form-select" required>
+                                    <option value="">-- اختر مزود الخدمة --</option>
+                                </select>
+                                <span asp-validation-for="ServiceProviderId" class="text-danger"></span>
+                            </div>
+                        </div>
 
-        .custom-label {
-            font-weight: 500;
-            color: #000;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ActionDate" class="form-label">تاريخ الإجراء</label>
+                                <input asp-for="ActionDate" type="datetime-local" class="form-control" required>
+                                <span asp-validation-for="ActionDate" class="text-danger"></span>
+                            </div>
 
-        .custom-input {
-            background-color: #d8d8d8;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 18px;
-            color: #555;
-            width: 100%;
-            font-size: 14px;
-            transition: box-shadow 0.2s ease-in-out;
-        }
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DocumentNumber" class="form-label">رقم المستند</label>
+                                <input asp-for="DocumentNumber" type="text" class="form-control" required>
+                                <span asp-validation-for="DocumentNumber" class="text-danger"></span>
+                            </div>
+                        </div>
 
-            .custom-input:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px #E24D17;
-            }
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Notes" class="form-label">ملاحظات</label>
+                                <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="Notes" class="text-danger"></span>
+                            </div>
+                        </div>
 
-        .custom-select {
-            background-color: #d8d8d8;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 18px;
-            color: #555;
-            width: 100%;
-            font-size: 14px;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1.2em;
-            cursor: pointer;
-        }
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SignatureType" class="form-label">نوع التوقيع</label>
+                                <input asp-for="SignatureType" type="text" class="form-control" placeholder="مثل: توقيع رقمي">
+                                <span asp-validation-for="SignatureType" class="text-danger"></span>
+                            </div>
 
-            .custom-select:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px #E24D17;
-            }
-
-        .btn-cancel {
-            border: 1px solid #E24D17;
-            background-color: #ffffff;
-            color: #000;
-            border-radius: 30px;
-            padding: 10px 45px;
-            font-weight: 700;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-            .btn-cancel:hover {
-                background-color: #fffaf8;
-                color: #E24D17;
-            }
-
-        .btn-create {
-            background-color: #E24D17;
-            border: 1px solid #E24D17;
-            color: #fff;
-            border-radius: 30px;
-            padding: 10px 45px;
-            font-weight: 700;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-            .btn-create:hover {
-                background-color: #c84111;
-                border-color: #c84111;
-                color: #fff;
-            }
-
-        .custom-input.is-invalid {
-            box-shadow: 0 0 0 2px #D41212;
-            background-color: #ffe6e6;
-        }
-
-        .error-msg {
-            color: #D41212;
-            font-size: 12px;
-            margin-top: 5px;
-            margin-left: 10px;
-            display: none;
-        }
-
-        .custom-input.is-invalid ~ .error-msg {
-            display: block;
-        }
-    </style>
-
-
-<body>
-
-    <div class="create-card shadow p-100">
-        <h2 class="title-header">Create new Document</h2>
-
-        <form id="employeeForm" asp-controller="Employee" asp-action="Create" method="post">
-
-            <div class="row g-4 mb-5">
-                <div class="col-md-12">
-                    <label class="custom-label">Document number</label>
-                    <input type="text" id="empName" class="custom-input" placeholder="Adham amr mohamed">
-                    <span class="error-msg">Document number is required.</span>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SignatureData" class="form-label">بيانات التوقيع</label>
+                                <input asp-for="SignatureData" type="text" class="form-control">
+                                <span asp-validation-for="SignatureData" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-md-12">
-                    <label class="custom-label">Document Type</label>
-                    <select id="empDept" class="custom-select">
-                        <option selected>IT</option>
-                        <option>HR</option>
-                        <option>Marketing</option>
-                        <option>Sales</option>
-                    </select>
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">إضافة الأجهزة</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-end">
+                            <div class="col-md-4 mb-3">
+                                <label for="deviceTypeSelect" class="form-label">نوع الجهاز</label>
+                                <select id="deviceTypeSelect" class="form-select">
+                                    <option value="">-- اختر نوع الجهاز --</option>
+                                    <option value="SIM">شريحة SIM</option>
+                                    <option value="USB">جهاز USB</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="quantityInput" class="form-label">الكمية</label>
+                                <input id="quantityInput" type="number" class="form-control" min="1" value="1">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <button type="button" id="addDeviceBtn" class="btn btn-success w-100">
+                                    <i class="bi bi-plus"></i> إضافة
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="custom-label">SIM Count</label>
-                    <input type="text" id="empPhone" class="custom-input" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <span class="error-msg">Please enter a valid 11-digit phone number.</span>
-                </div>
-                <div class="col-md-4">
-                    <label class="custom-label">USB Count</label>
-                    <input type="text" id="empPhone" class="custom-input" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                    <span class="error-msg">Please enter a valid 11-digit phone number.</span>
-                </div>
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">بيانات الأجهزة</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="simSection" class="mb-5">
+                            <h6 class="text-primary mb-3">بيانات شرائح SIM</h6>
+                            <div id="simContainer" class="row">
+                            </div>
+                        </div>
 
-                <div class="col-md-6">
-                    <label class="custom-label">Server Provider</label>
-                    <select id="empDept" class="custom-select">
-                        <option selected>IT</option>
-                        <option>HR</option>
-                        <option>Marketing</option>
-                        <option>Sales</option>
-                    </select>
+                        <div id="usbSection" class="mb-5">
+                            <h6 class="text-success mb-3">بيانات أجهزة USB</h6>
+                            <div id="usbContainer" class="row">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-                <div class="col-md-12">
-                    <label class="custom-label">Notes</label>
-                    <textarea type="text" id="empName" class="custom-input" ></textarea>
-                    <span class="error-msg">Document number is required.</span>
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-save"></i> حفظ المستند
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary btn-lg w-100 mt-2">الرجوع</a>
+                    </div>
                 </div>
-
-
-                
-            </div>
-
-            <div class="d-flex justify-content-end gap-3 mt-4">
-                <a class="btn btn-cancel" asp-controller="Document" asp-action="Index">Cancel</a>
-                <button type="submit" class="btn btn-create">Create</button>
-            </div>
-
-        </form>
+            </form>
+        </div>
     </div>
+</div>
 
+@section Scripts {
     <script>
-        document.getElementById('employeeForm').addEventListener('submit', function (event) {
-            let isValid = true;
+        // Track row counts
+        let simRowCount = 0;
+        let usbRowCount = 0;
 
+        // Add Device button handler
+        document.getElementById('addDeviceBtn').addEventListener('click', function () {
+            const deviceType = document.getElementById('deviceTypeSelect').value;
+            const quantity = parseInt(document.getElementById('quantityInput').value) || 0;
 
-            document.querySelectorAll('.is-invalid').forEach(function(el) {
-                el.classList.remove('is-invalid');
+            if (!deviceType) {
+                alert('يرجى اختيار نوع الجهاز');
+                return;
+            }
+
+            if (quantity < 1) {
+                alert('يرجى إدخال كمية صحيحة');
+                return;
+            }
+
+            if (deviceType === 'SIM') {
+                addSimRows(quantity);
+            } else if (deviceType === 'USB') {
+                addUsbRows(quantity);
+            }
+
+            // Reset selection input
+            document.getElementById('deviceTypeSelect').value = '';
+            document.getElementById('quantityInput').value = '1';
+        });
+
+        // Add SIM Rows
+        function addSimRows(quantity) {
+            const container = document.getElementById('simContainer');
+
+            for (let i = 0; i < quantity; i++) {
+                const rowHtml = `
+                    <div class="col-md-6 mb-4 sim-row" data-index="${simRowCount}">
+                        <div class="card border-info">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>شريحة SIM #${simRowCount + 1}</span>
+                                <button type="button" class="btn btn-sm btn-danger btn-close-row" onclick="removeRow('sim', ${simRowCount})">
+                                    <i class="bi bi-trash"></i> إزالة
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">السيريال (ICCID)</label>
+                                    <input type="text" name="Sims[${simRowCount}].SerialNumber" class="form-control" required placeholder="أدخل رقم السيريال">
+                                    <div class="invalid-feedback">السيريال مطلوب</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">رقم الهاتف</label>
+                                    <input type="text" name="Sims[${simRowCount}].PhoneNumber" class="form-control" required placeholder="أدخل رقم الهاتف">
+                                    <div class="invalid-feedback">رقم الهاتف مطلوب</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">نوع الشبكة</label>
+                                    <select name="Sims[${simRowCount}].NetworkType" class="form-select" required>
+                                        <option value="">-- اختر نوع الشبكة --</option>
+                                        <option value="4G">4G</option>
+                                        <option value="5G">5G</option>
+                                    </select>
+                                    <div class="invalid-feedback">نوع الشبكة مطلوب</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', rowHtml);
+                simRowCount++;
+            }
+        }
+
+        // Add USB Rows
+        function addUsbRows(quantity) {
+            const container = document.getElementById('usbContainer');
+
+            for (let i = 0; i < quantity; i++) {
+                const rowHtml = `
+                    <div class="col-md-6 mb-4 usb-row" data-index="${usbRowCount}">
+                        <div class="card border-success">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>جهاز USB #${usbRowCount + 1}</span>
+                                <button type="button" class="btn btn-sm btn-danger btn-close-row" onclick="removeRow('usb', ${usbRowCount})">
+                                    <i class="bi bi-trash"></i> إزالة
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">السيريال</label>
+                                    <input type="text" name="Usbs[${usbRowCount}].SerialNumber" class="form-control" required placeholder="أدخل رقم السيريال">
+                                    <div class="invalid-feedback">السيريال مطلوب</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">الموديل</label>
+                                    <input type="text" name="Usbs[${usbRowCount}].Model" class="form-control" required placeholder="أدخل موديل الجهاز">
+                                    <div class="invalid-feedback">الموديل مطلوب</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', rowHtml);
+                usbRowCount++;
+            }
+        }
+
+        // Remove Row Functionality
+        function removeRow(type, index) {
+            const rowElement = document.querySelector(`.${type}-row[data-index="${index}"]`);
+            if (rowElement) {
+                rowElement.remove();
+            }
+            reindexRows();
+        }
+
+        // Re-index row input names for correct Model Binding post-deletion
+        function reindexRows() {
+            // Re-index SIM rows
+            document.querySelectorAll('.sim-row').forEach((row, index) => {
+                row.setAttribute('data-index', index);
+                const titleSpan = row.querySelector('.card-header span');
+                if (titleSpan) titleSpan.textContent = `شريحة SIM #${index + 1}`;
+
+                const closeBtn = row.querySelector('.btn-close-row');
+                if (closeBtn) closeBtn.setAttribute('onclick', `removeRow('sim', ${index})`);
+
+                row.querySelectorAll('input, select').forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name && name.includes('.')) {
+                        const fieldName = name.split('.')[1];
+                        input.setAttribute('name', `Sims[${index}].${fieldName}`);
+                    }
+                });
             });
+            simRowCount = document.querySelectorAll('.sim-row').length;
 
-            const name = document.getElementById('empName');
-            if (name.value.trim() === '') {
-                name.classList.add('is-invalid');
-                isValid = false;
-            }
+            // Re-index USB rows
+            document.querySelectorAll('.usb-row').forEach((row, index) => {
+                row.setAttribute('data-index', index);
+                const titleSpan = row.querySelector('.card-header span');
+                if (titleSpan) titleSpan.textContent = `جهاز USB #${index + 1}`;
 
-            const nid = document.getElementById('empNid');
-            if (nid.value.trim().length !== 14) {
-                nid.classList.add('is-invalid');
-                isValid = false;
-            }
+                const closeBtn = row.querySelector('.btn-close-row');
+                if (closeBtn) closeBtn.setAttribute('onclick', `removeRow('usb', ${index})`);
 
-            const phone = document.getElementById('empPhone');
-            if (phone.value.trim().length !== 11) {
-                phone.classList.add('is-invalid');
-                isValid = false;
-            }
+                row.querySelectorAll('input, select').forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name && name.includes('.')) {
+                        const fieldName = name.split('.')[1];
+                        input.setAttribute('name', `Usbs[${index}].${fieldName}`);
+                    }
+                });
+            });
+            usbRowCount = document.querySelectorAll('.usb-row').length;
+        }
 
-            const position = document.getElementById('empPosition');
-            if (position.value.trim() === '') {
-                position.classList.add('is-invalid');
-                isValid = false;
-            }
-
-            if (!isValid) {
+        // Form Submission & HTML5 Validation
+        document.getElementById('documentForm').addEventListener('submit', function (event) {
+            // Check HTML5 validity
+            if (!this.checkValidity()) {
                 event.preventDefault();
+                event.stopPropagation();
+            }
+
+            // Ensure at least one device is added
+            const simRows = document.querySelectorAll('.sim-row').length;
+            const usbRows = document.querySelectorAll('.usb-row').length;
+
+            if (simRows === 0 && usbRows === 0) {
+                event.preventDefault();
+                event.stopPropagation();
+                alert('يجب إضافة جهاز واحد على الأقل (SIM أو USB)');
+                return false;
+            }
+
+            this.classList.add('was-validated');
+        });
+
+        // Allow pressing Enter in quantity input to add devices
+        document.getElementById('quantityInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('addDeviceBtn').click();
             }
         });
     </script>
-    <script src="~/js/bootstrap.bundle.min.js"></script>
-</body>
 
+    <partial name="_ValidationScriptsPartial" />
+}

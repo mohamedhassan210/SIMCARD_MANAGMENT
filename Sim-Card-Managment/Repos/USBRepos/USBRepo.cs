@@ -54,7 +54,17 @@ namespace Sim_Card_Managment.Repos
                     .ThenInclude(s => s.Quota)
                 .FirstOrDefault(u => u.Id == id);
         }
+        public async Task AddAsync(Usb usb)
+        {
+            await _context.Usbs.AddAsync(usb);
+            await _context.SaveChangesAsync();
+        }
 
+        public async Task<Usb?> GetBySerialNumberAsync(string serialNumber)
+        {
+            return await _context.Usbs
+                .FirstOrDefaultAsync(u => u.SerialNumber == serialNumber);
+        }
         public void Add(Usb usb)
         {
             _context.Usbs.Add(usb);

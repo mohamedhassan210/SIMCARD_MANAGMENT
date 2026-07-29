@@ -46,7 +46,7 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
                     Name = e.Name,
                     ExtraInfo = e.Position,
                     PersonType = "Employee",
-                    Identifier = e.NationalID,
+                    Identifier = e.EmpCode,
                     IsActive = e.IsActive, // Ensure IsActive is mapped to the view model
                     ActiveSimOnlyCount = e.Subscriptions.Count(s => s.SimId != null && (s.EndDate == null || s.EndDate >= now)),
                     ActiveUsbCount = e.Subscriptions.Count(s => s.UsbId != null && (s.EndDate == null || s.EndDate >= now)),

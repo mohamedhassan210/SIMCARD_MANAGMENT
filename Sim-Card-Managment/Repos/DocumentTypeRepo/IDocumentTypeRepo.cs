@@ -9,5 +9,6 @@ namespace Sim_Card_Managment.Repos
         Task UpdateAsync(DocumentType documentType);
         Task DeleteAsync(int id);
         Task<bool> SaveChangesAsync();
+        
     }
 }

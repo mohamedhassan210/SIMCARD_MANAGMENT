@@ -132,6 +132,11 @@
                     <input type="text" asp-for="NationalID" id="empNid" class="custom-input" placeholder="30906070123456" maxlength="14" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     <span asp-validation-for="NationalID" class="error-msg"></span>
                 </div>
+                <div class="col-md-6">
+                    <label class="custom-label" asp-for="EmpCode">Employee Code</label>
+                    <input type="text" asp-for="EmpCode" id="empNid" class="custom-input" placeholder="EMP001">
+                    <span asp-validation-for="EmpCode" class="error-msg"></span>
+                </div>
 
                 <div class="col-md-6">
                     <label class="custom-label" asp-for="Position">Position</label>
