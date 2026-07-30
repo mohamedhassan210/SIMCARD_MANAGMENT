@@ -109,9 +109,18 @@
             </div>
 
             <div class="d-flex align-items-center gap-2">
-                <a asp-controller="DeviceTransfer" asp-action="create" asp-route-id="@Model.Id" class="action-btn-outline text-decoration-none">
-                    <i class="fa-solid fa-arrow-right-arrow-left"></i> Device Transfare
-                </a>
+                @* Allow Device Transfer if status is Occupied or an active subscription exists *@
+                @* ✅ CORRECT: Only show Device Transfer if an active subscription object exists *@
+                @if (activeSubscription != null)
+                {
+                    <a asp-controller="DeviceTransfer"
+                       asp-action="Create"
+                       asp-route-simId="@Model.Id"
+                       class="action-btn-outline text-decoration-none">
+                        <i class="fa-solid fa-arrow-right-arrow-left me-1"></i> Device Transfer
+                    </a>
+                }
+
                 <a asp-controller="SIM" asp-action="Edit" asp-route-id="@Model.Id" class="action-btn-outline text-decoration-none">
                     <i class="fa-solid fa-pen-to-square me-2"></i>Edit Details
                 </a>
@@ -159,7 +168,7 @@
 
                     <div class="col-6">
                         <small class="text-muted d-block mb-1">Status</small>
-                        <span class="badge-status @(Model.Status?.ToLower() == "active" ? "badge-active" : "badge-inactive")">
+                        <span class="badge-status @(string.Equals(Model.Status, "Occupied", StringComparison.OrdinalIgnoreCase) || string.Equals(Model.Status, "Active", StringComparison.OrdinalIgnoreCase) ? "badge-active" : "badge-inactive")">
                             @Model.Status
                         </span>
                     </div>

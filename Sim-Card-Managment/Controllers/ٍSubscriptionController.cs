@@ -67,7 +67,7 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(SubscriptionCreateViewModel model)
         {
-            // 1. Validation: Enforce SIM selection (Mandatory)
+            // 1. Validation: Enforce SIM selection
             if (!model.SelectedSimId.HasValue || model.SelectedSimId.Value == 0)
             {
                 ModelState.AddModelError("SelectedSimId", "A SIM card is required to create a subscription.");
@@ -79,12 +79,18 @@ namespace Sim_Card_Managment.Controllers
                 ModelState.AddModelError("SelectedEmployeeId", "A valid recipient must be selected.");
             }
 
+            // 3. Validation: Enforce Quota selection
+            if (!model.SelectedQuotaId.HasValue || model.SelectedQuotaId.Value == 0)
+            {
+                ModelState.AddModelError("SelectedQuotaId", "A Quota must be selected.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            // 3. Authentication Check
+            // 4. Authentication Check
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdClaim, out int currentUserId))
             {
@@ -100,34 +106,48 @@ namespace Sim_Card_Managment.Controllers
                 }
             }
 
-            // 4. Fetch Action
+            // 5. Fetch Action
             var createAction = _actionRepo.GetAllDeviceActions().FirstOrDefault(a => a.Name == "CreateSubscription")
-                              ?? _actionRepo.GetAllDeviceActions().FirstOrDefault();
+                          ?? _actionRepo.GetAllDeviceActions().FirstOrDefault();
             var actionId = createAction != null ? createAction.Id : 0;
 
-            // 5. Create Subscription Entity
+            // 6. Create Subscription Entity
             var subscription = new Subscription
             {
-                //Id = int.Newint(),
-
-                // Assign to EmpId OR NonEmployeeId depending on the toggle state
                 EmpId = !model.IsNonEmployee ? model.SelectedEmployeeId : null,
                 NonEmployeeId = model.IsNonEmployee ? model.SelectedEmployeeId : null,
 
-                // Directly map SIM, Quota, and USB
                 SimId = model.SelectedSimId.Value,
-                //QuotaId = model.SelectedQuotaId ?? int.Empty,
+                QuotaId = model.SelectedQuotaId.Value, // <-- Set QuotaId here
                 UsbId = model.SelectedUsbId,
 
                 ActionId = actionId,
                 CreatedBy = currentUserId,
                 StartDate = model.StartDate,
                 EndDate = model.StartDate.AddYears(model.ContractDurationYears > 0 ? model.ContractDurationYears : 1),
-                CreatedDate = DateTime.Now
+                CreatedDate = DateTime.Now,
+                Fees = model.Fees
             };
 
-            // 6. Save Entity
+            // 7. Save Entity
             _subscriptionRepo.Add(subscription);
+            var sim =   _simRepo.GetById(model.SelectedSimId.Value);
+            if (sim != null)
+            {
+                sim.Status = "Occupied";
+                 _simRepo.Update(sim); // Or _context.SaveChanges() depending on your repo design
+            }
+
+            // 8. Update USB Status to "Occupied" (if selected)
+            if (model.SelectedUsbId.HasValue && model.SelectedUsbId.Value > 0)
+            {
+                var usb =  _usbRepo.GetById(model.SelectedUsbId.Value);
+                if (usb != null)
+                {
+                    usb.Status = "Occupied";
+                     _usbRepo.Update(usb);
+                }
+            }
 
             return RedirectToAction(nameof(Index));
         }

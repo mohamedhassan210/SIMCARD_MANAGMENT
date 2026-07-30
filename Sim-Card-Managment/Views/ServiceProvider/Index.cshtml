@@ -1,9 +1,8 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.ServiceProviderViewModel>
 
+@{
+    ViewData["Title"] = "Service Providers";
+}
 
 <style>
     /* ---------- Title ---------- */
@@ -180,20 +179,6 @@
         background-color: #fcfcfc;
     }
 
-    .asset-cell {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        line-height: 1.3;
-    }
-
-        .asset-cell svg {
-            width: 14px;
-            height: 14px;
-            color: #1a1a1a;
-            flex-shrink: 0;
-        }
-
     .badge-type {
         display: inline-block;
         font-size: 10px;
@@ -209,52 +194,20 @@
     }
 
     .badge-non-employee {
-        background: #feefc3;
-        color: #b06000;
+        background: #fce8e6;
+        color: #c5221f;
     }
-
-    .view-btn {
-        display: inline-block;
-        border: 1.5px solid #e8552b;
-        color: #e8552b;
-        background: transparent;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 6px 18px;
-        border-radius: 16px;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-        .view-btn:hover {
-            background: #e8552b;
-            color: #fff;
-        }
 
     th:nth-child(1), td:nth-child(1) {
-        width: 22%;
+        width: 35%;
     }
 
     th:nth-child(2), td:nth-child(2) {
-        width: 14%;
+        width: 45%;
     }
 
     th:nth-child(3), td:nth-child(3) {
-        width: 18%;
-    }
-
-    th:nth-child(4), td:nth-child(4) {
         width: 20%;
-    }
-
-    th:nth-child(5), td:nth-child(5) {
-        width: 14%;
-    }
-
-    th:nth-child(6), td:nth-child(6) {
-        width: 12%;
-        text-align: right;
     }
 
     /* ---------- Footer ---------- */
@@ -292,9 +245,14 @@
             transition: all 0.2s ease;
         }
 
-            .pagination button:hover {
+            .pagination button:hover:not(:disabled) {
                 border-color: #e8552b;
                 color: #e8552b;
+            }
+
+            .pagination button:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
             }
 
             .pagination button.page-num {
@@ -318,7 +276,7 @@
 <div class="page p-100 container-fluid px-4">
 
     <div class="title-section">
-        <h1><span class="num">0</span> ServiceProvider</h1>
+        <h1><span class="num" id="totalCountHeader">0</span> ServiceProvider</h1>
         <p>Manage all assigned ServiceProvider in one central place.</p>
 
         <div class="create-btn-group">
@@ -331,14 +289,14 @@
             <div class="filter-group">
                 <label for="status-filter">Status</label>
                 <select id="status-filter" class="status-select">
-                  
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
                 </select>
             </div>
 
-            
-
             <div class="filter-group" style="flex: 1;">
-                <label for="search-input">Search </label>
+                <label for="search-input">Search</label>
                 <div class="search-box">
                     <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
@@ -357,11 +315,38 @@
                     <th>Name</th>
                     <th>Display Name</th>
                     <th>Status</th>
-
                 </tr>
             </thead>
-            <tbody>
-
+            <tbody id="spTableBody">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr class="person-row sp-row @(item.IsActive ? "" : "inactive-row")"
+                            data-name="@(item.Name ?? "")"
+                            data-displayname="@(item.DisplayName ?? "")"
+                            data-status="@(item.IsActive ? "active" : "inactive")">
+                            <td><strong>@item.Name</strong></td>
+                            <td>@(item.DisplayName ?? "N/A")</td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge-type badge-employee">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-type badge-non-employee">Inactive</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr id="emptyRow">
+                        <td colspan="3" style="text-align: center; color: #888; padding: 24px 0;">No service providers found.</td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
@@ -373,3 +358,114 @@
 
 </div>
 
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const rows = Array.from(document.querySelectorAll('.sp-row'));
+            const searchInput = document.getElementById('search-input');
+            const statusFilter = document.getElementById('status-filter');
+            const totalCountHeader = document.getElementById('totalCountHeader');
+            const showingText = document.getElementById('showingText');
+            const paginationContainer = document.getElementById('paginationContainer');
+
+            const pageSize = 7;
+            let currentPage = 1;
+
+            function updateTable() {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                const selectedStatus = statusFilter.value;
+
+                // 1. Filter rows based on search input and status dropdown
+                const filteredRows = rows.filter(row => {
+                    const name = (row.getAttribute('data-name') || '').toLowerCase();
+                    const displayName = (row.getAttribute('data-displayname') || '').toLowerCase();
+                    const status = row.getAttribute('data-status') || '';
+
+                    const matchesSearch = name.includes(searchTerm) || displayName.includes(searchTerm);
+                    const matchesStatus = (selectedStatus === 'all') || (status === selectedStatus);
+
+                    return matchesSearch && matchesStatus;
+                });
+
+                const totalFiltered = filteredRows.length;
+                totalCountHeader.textContent = totalFiltered;
+
+                // 2. Calculate pages
+                const totalPages = Math.ceil(totalFiltered / pageSize) || 1;
+                if (currentPage > totalPages) currentPage = totalPages;
+                if (currentPage < 1) currentPage = 1;
+
+                const startIndex = (currentPage - 1) * pageSize;
+                const endIndex = startIndex + pageSize;
+
+                // 3. Hide all rows, then display only current page subset
+                rows.forEach(r => r.style.display = 'none');
+                filteredRows.slice(startIndex, endIndex).forEach(r => r.style.display = '');
+
+                // 4. Update Footer Info
+                const startShow = totalFiltered === 0 ? 0 : startIndex + 1;
+                const endShow = Math.min(endIndex, totalFiltered);
+                showingText.textContent = `Showing ${startShow} to ${endShow} of ${totalFiltered} records`;
+
+                // 5. Build Pagination Buttons
+                renderPagination(totalPages);
+            }
+
+            function renderPagination(totalPages) {
+                paginationContainer.innerHTML = '';
+
+                if (totalPages <= 1) return;
+
+                // Previous Button (<)
+                const prevBtn = document.createElement('button');
+                prevBtn.innerHTML = '&#8249;';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        updateTable();
+                    }
+                });
+                paginationContainer.appendChild(prevBtn);
+
+                // Page Number Buttons
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `page-num ${i === currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = i;
+                    pageBtn.addEventListener('click', () => {
+                        currentPage = i;
+                        updateTable();
+                    });
+                    paginationContainer.appendChild(pageBtn);
+                }
+
+                // Next Button (>)
+                const nextBtn = document.createElement('button');
+                nextBtn.innerHTML = '&#8250;';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        updateTable();
+                    }
+                });
+                paginationContainer.appendChild(nextBtn);
+            }
+
+            // Event Listeners
+            searchInput.addEventListener('input', () => {
+                currentPage = 1;
+                updateTable();
+            });
+
+            statusFilter.addEventListener('change', () => {
+                currentPage = 1;
+                updateTable();
+            });
+
+            // Initial Execution
+            updateTable();
+        });
+    </script>
+}
