@@ -9,8 +9,8 @@ namespace Sim_Card_Management.Models
         [Key]
         public int Id { get; set; }
         public int SimId { get; set; }
-        public int OldSerialNumber { get; set; }
-        public int NewSerialNumber { get; set; }
+        public string OldSerialNumber { get; set; }
+        public string NewSerialNumber { get; set; }
         public bool NetworkTypeChange { get; set; } = false;
         [ForeignKey(nameof(SimId))]
         public virtual Sim SIM { get; set; }
