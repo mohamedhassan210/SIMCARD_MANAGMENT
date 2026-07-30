@@ -24,20 +24,15 @@
             <path d="M20.991,10H19.42a1.039,1.039,0,0,1-.951-.674l-.005-.013a1.04,1.04,0,0,1,.2-1.146l1.11-1.11a1.01,1.01,0,0,0,0-1.428l-1.4-1.4a1.01,1.01,0,0,0-1.428,0l-1.11,1.11a1.04,1.04,0,0,1-1.146.2l-.013,0A1.04,1.04,0,0,1,14,4.579V3.009A1.009,1.009,0,0,0,12.991,2H11.009A1.009,1.009,0,0,0,10,3.009v1.57a1.04,1.04,0,0,1-.674.952l-.013,0a1.04,1.04,0,0,1-1.146-.2l-1.11-1.11a1.01,1.01,0,0,0-1.428,0l-1.4,1.4a1.01,1.01,0,0,0,0,1.428l1.11,1.11a1.04,1.04,0,0,1,.2,1.146l0,.013A1.039,1.039,0,0,1,4.58,10H3.009A1.009,1.009,0,0,0,2,11.009v1.982A1.009,1.009,0,0,0,3.009,14H4.58a1.039,1.039,0,0,1,.951.674l0,.013a1.04,1.04,0,0,1-.2,1.146l-1.11,1.11a1.01,1.01,0,0,0,0,1.428l1.4,1.4a1.01,1.01,0,0,0,1.428,0l1.11-1.11a1.04,1.04,0,0,1,1.146-.2l.013.005A1.039,1.039,0,0,1,10,19.42v1.571A1.009,1.009,0,0,0,11.009,22h1.982A1.009,1.009,0,0,0,14,20.991V19.42a1.039,1.039,0,0,1,.674-.951l.013-.005a1.04,1.04,0,0,1,1.146.2l1.11,1.11a1.01,1.01,0,0,0,1.428,0l1.4-1.4a1.01,1.01,0,0,0,0-1.428l-1.11-1.11a1.04,1.04,0,0,1-.2-1.146l.005-.013A1.039,1.039,0,0,1,19.42,14h1.571A1.009,1.009,0,0,0,22,12.991V11.009A1.009,1.009,0,0,0,20.991,10ZM12,15a3,3,0,1,1,3-3A3,3,0,0,1,12,15Z" />
         </svg>
     </div>
-    <aside class="offcanvas offcanvas-start bg-black bg-opacity-25  border-end border-secondary glass-box d-flex flex-column" tabindex="-1" id="leftSidebar" aria-labelledby="leftSidebarLabel" data-bs-theme="dark" style="border-radius: 0px 30px 30px 0px">
+    <aside class="offcanvas offcanvas-start bg-black bg-opacity-25 border-end border-secondary glass-box d-flex flex-column" tabindex="-1" id="leftSidebar" aria-labelledby="leftSidebarLabel" data-bs-theme="dark" style="border-radius: 0px 30px 30px 0px">
 
-        
-
-        <div class="offcanvas-header ">
-
-            <button type="button" class="btn-close bg-white d-flex justify-content-center align-items-center " data-bs-dismiss="offcanvas" aria-label="Close">
-
-                <i class="fa-solid fa-x "></i>
-
+        <div class="offcanvas-header">
+            <button type="button" class="btn-close bg-white d-flex justify-content-center align-items-center" data-bs-dismiss="offcanvas" aria-label="Close">
+                <i class="fa-solid fa-x"></i>
             </button>
         </div>
 
-        <div class="accordion sidebar-accordion mx-auto g-5 flex-grow-1 overflow-auto p-3" id="sidebarMenu" style="max-width: 400px ;width: 100%;">
+        <div class="accordion sidebar-accordion mx-auto g-5 flex-grow-1 overflow-auto p-3" id="sidebarMenu" style="max-width: 400px; width: 100%;">
 
             <div class="accordion-item mb-2">
                 <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseUser" aria-expanded="true" style="cursor: pointer;">
@@ -58,7 +53,7 @@
                     <div class="accordion-body p-0 pt-3 pb-3 ms-2">
                         <a asp-controller="Account" asp-action="Register" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
                             <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <i class="fa-solid fa-plus "></i>
+                                <i class="fa-solid fa-plus"></i>
                             </div>
                             <span class="sub-item-text">Create new user</span>
                         </a>
@@ -79,11 +74,9 @@
             </div>
 
             <div class="accordion-item mb-2">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse"
-                     data-bs-target="#collapseSim" aria-expanded="true" style="cursor: pointer;">
+                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseSim" aria-expanded="true" style="cursor: pointer;">
                     <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2">
+                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 6l-6 10h12z" />
                         </svg>
                     </div>
@@ -109,17 +102,14 @@
                             </div>
                             <span class="sub-item-text">View All Sims</span>
                         </a>
-
                     </div>
                 </div>
             </div>
 
             <div class="accordion-item mb-2">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse"
-                     data-bs-target="#collapseUsb" aria-expanded="true" style="cursor: pointer;">
+                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseUsb" aria-expanded="true" style="cursor: pointer;">
                     <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2">
+                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 6l-6 10h12z" />
                         </svg>
                     </div>
@@ -143,17 +133,76 @@
                             </div>
                             <span class="sub-item-text">View All USBs</span>
                         </a>
-
                     </div>
                 </div>
             </div>
 
-            <div class="accordion-item">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse"
-                     data-bs-target="#collapseReport" aria-expanded="true" style="cursor: pointer;">
+            <div class="accordion-item mb-2">
+                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseDocument" aria-expanded="true" style="cursor: pointer;">
                     <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2">
+                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 6l-6 10h12z" />
+                        </svg>
+                    </div>
+                    <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <span class="text-white fs-6">Document</span>
+                </div>
+
+                <div id="collapseDocument" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
+                    <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                        <a asp-controller="Document" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </div>
+                            <span class="sub-item-text">View Documents</span>
+                        </a>
+                        <a asp-controller="Document" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                            <span class="sub-item-text">Create new Document</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mb-2">
+                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseServiceProvider" aria-expanded="true" style="cursor: pointer;">
+                    <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 6l-6 10h12z" />
+                        </svg>
+                    </div>
+                    <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                        <i class="fa-solid fa-tower-cell"></i>
+                    </div>
+                    <span class="text-white fs-6">ServiceProvider</span>
+                </div>
+
+                <div id="collapseServiceProvider" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
+                    <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                        <a asp-controller="ServiceProvider" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                <i class="fa-solid fa-list-check"></i>
+                            </div>
+                            <span class="sub-item-text">View ServiceProviders</span>
+                        </a>
+                        <a asp-controller="ServiceProvider" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                <i class="fa-solid fa-plus"></i>
+                            </div>
+                            <span class="sub-item-text">Create new ServiceProvider</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item mb-2">
+                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseReport" aria-expanded="true" style="cursor: pointer;">
+                    <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 6l-6 10h12z" />
                         </svg>
                     </div>
@@ -175,12 +224,10 @@
                 </div>
             </div>
 
-            <div class="accordion-item mt-2">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse"
-                     data-bs-target="#collapseSubscription" aria-expanded="true" style="cursor: pointer;">
+            <div class="accordion-item mb-2">
+                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseSubscription" aria-expanded="true" style="cursor: pointer;">
                     <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2">
+                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 6l-6 10h12z" />
                         </svg>
                     </div>
@@ -220,7 +267,7 @@
         </div>
 
     </aside>
-    <nav class="position-fixed top-0 navbar navbar-expand-lg w-100 ">
+    <nav class="position-fixed top-0 navbar navbar-expand-lg w-100 border-bottom border-2 border-dark">
         <div class="container-fluid">
             <a class="navbar-brand text-white fw-bold" asp-controller="home" asp-action="home">
                 <img src="~/images/Logo.svg" alt="LOGO" class="logo" />
@@ -230,23 +277,23 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-                <ul class="navbar-nav border border-1 border-white rounded-pill p-2 text-white bg-blur">
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar  p-2 text-white ">
 
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "/" && currentAction == "home" ? "active" : "")"
+                        <a class="nav-link fw-bold px-4 text-white @(currentController == "Home" && currentAction == "home" ? "active" : "")"
                            asp-controller="/Home" asp-action="home">HOME</a>
                            
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "SIM" && currentAction == "Index" ? "active" : "")"
+                        <a class="nav-link fw-bold px-4 text-white @(currentController == "SIM" && currentAction == "Index" ? "active" : "")"
                            asp-controller="SIM" asp-action="Index">DEVICES</a>
                     </li>
 
                    
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-black @(currentController == "Employee" ? "active" : "")"
+                        <a class="nav-link fw-bold px-4 text-white @(currentController == "Employee" ? "active" : "")"
                            asp-controller="Employee" asp-action="Index">USERS</a>
                     </li>
 
