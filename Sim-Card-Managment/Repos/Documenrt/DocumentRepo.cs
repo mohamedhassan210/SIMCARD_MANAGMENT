@@ -40,13 +40,11 @@ namespace Sim_Card_Managment.Repos
                 .Include(d => d.CreatedBy)
                 .Include(d => d.DocumentDetails)
                 .ThenInclude(d=>d.Serials)
+                .Include(d=>d.ServiceProvider)
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
 
-        public async Task AddAsync(Document document)
-        {
-            await _context.Documents.AddAsync(document);
-        }
+        
 
         public async Task UpdateAsync(Document document)
         {
@@ -62,7 +60,25 @@ namespace Sim_Card_Managment.Repos
                 _context.Documents.Remove(document);
             }
         }
+        
+        
 
+
+            public async Task AddAsync(Document document)
+            {
+                await _context.Documents.AddAsync(document);
+                await _context.SaveChangesAsync();
+            }
+
+            
+
+            public async Task<IEnumerable<Document>> GetAllAsync()
+            {
+                return await _context.Documents
+                    .AsNoTracking()
+                    .ToListAsync();
+            }
+        
 
 
         public async Task<IEnumerable<Document>> GetFilteredDocumentsAsync(string searchTerm, int? documentTypeId)

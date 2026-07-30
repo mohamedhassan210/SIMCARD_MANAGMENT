@@ -1,3 +1,5 @@
+using DocumentFormat.OpenXml.Vml.Spreadsheet;
+using Sim_Card_Management.Models;
 using System.ComponentModel.DataAnnotations;
 
 using System.ComponentModel.DataAnnotations.Schema;
@@ -81,7 +83,7 @@ namespace Sim_Card_Managment.Models
         public virtual ICollection<ReceiverSignature> Signatures { get; set; } = new List<ReceiverSignature>();
         public virtual ICollection<Serial> Serials { get; set; } = new List<Serial>();
         public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
-
+        public virtual ICollection<DeviceSerialOperation> DeviceSerialOperations { get; set; } = new List<DeviceSerialOperation>();
     }
 
 }

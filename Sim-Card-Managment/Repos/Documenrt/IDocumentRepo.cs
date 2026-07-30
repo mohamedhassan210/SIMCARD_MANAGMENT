@@ -4,6 +4,7 @@ namespace Sim_Card_Managment.Repos
     public interface IDocumentRepo
     {
         Task<IEnumerable<Document>> GetAllAsync(string? searchTerm = null, int? documentTypeId = null);
+        Task<IEnumerable<Document>> GetAllAsync();
         Task<Document?> GetByIdAsync(int id);
         Task AddAsync(Document document);
         Task UpdateAsync(Document document);

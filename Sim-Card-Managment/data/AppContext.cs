@@ -18,6 +18,7 @@ namespace Sim_Card_Managment.data
         public DbSet<Quota> Quotas { get; set; }
         public DbSet<DeviceAction> Actions { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<DeviceSerialOperation> DeviceSerialOperations { get; set; }
 
         // ── Tracking tables ──────────────────────────────────────────
         public DbSet<ReceiverSignature> ReceiverSignatures { get; set; }
@@ -74,6 +75,7 @@ namespace Sim_Card_Managment.data
 
             modelBuilder.Entity<Group>()
                 .HasIndex(g => g.Name).IsUnique();
+            
 
             // ── DeviceTransfer: two FKs to Subscription ───────────────
             modelBuilder.Entity<DeviceTransfer>()
@@ -265,6 +267,20 @@ namespace Sim_Card_Managment.data
                 .HasOne(s => s.ServiceProvider)
                 .WithMany(s => s.Quotas)
                 .HasForeignKey(s => s.ServiceProviderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── DeviceSerialOperation: Sim ──────────────────────────────
+            modelBuilder.Entity<DeviceSerialOperation>()
+                .HasOne(s => s.SIM)
+                .WithMany(s => s.DeviceSerialOperations)
+                .HasForeignKey(s => s.SimId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── DeviceSerialOperation: User ──────────────────────────────
+            modelBuilder.Entity<DeviceSerialOperation>()
+                .HasOne(s => s.CreatedBy)
+                .WithMany(s => s.DeviceSerialOperations)
+                .HasForeignKey(s => s.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
         }

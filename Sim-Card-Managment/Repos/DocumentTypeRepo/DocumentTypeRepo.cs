@@ -15,12 +15,15 @@ namespace Sim_Card_Managment.Repos
 
         public async Task<IEnumerable<DocumentType>> GetAllAsync()
         {
-            return await _context.DocumentTypes.OrderBy(dt => dt.DisplayName).ToListAsync();
+            return await _context.DocumentTypes
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<DocumentType?> GetByIdAsync(int id)
         {
-            return await _context.DocumentTypes.FirstOrDefaultAsync(dt => dt.Id == id);
+            return await _context.DocumentTypes
+                .FirstOrDefaultAsync(dt => dt.Id == id);
         }
 
         public async Task AddAsync(DocumentType documentType)
