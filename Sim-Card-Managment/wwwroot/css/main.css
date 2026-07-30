@@ -8,7 +8,16 @@
     background-color: #fe6a35 !important;
     color: #ffffff !important;
 }
+/* Hide scrollbar for Chrome, Safari and Opera */
+#sidebarMenu::-webkit-scrollbar {
+    display: none;
+}
 
+/* Hide scrollbar for IE, Edge and Firefox */
+#sidebarMenu {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
 @font-face {
     font-family: 'Roboto';
     src: url(../Fonts/Roboto-VariableFont_wdth,wght.ttf) format("truetype");
@@ -60,7 +69,11 @@ body {
     width: 80% !important;
 }
 /* active Link */
-
+.active {
+    color: #000 !important;
+    background-color: #fff !important;
+    border-radius: 10px !important;
+}
 .navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
     color: #fff !important;
     background-color: #E24D17 !important;
@@ -82,7 +95,12 @@ body {
 .navbar {
     z-index: 999;
     background-color: #E24D17;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.7);
+}
+::marker {
+    display: none;
+    list-style-type: none;
+    list-style: none; 
+    color: transparent
 }
 
 /*-------------- End Of NavBar ----------------------*/
