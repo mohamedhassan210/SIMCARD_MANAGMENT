@@ -109,6 +109,9 @@
             </div>
 
             <div class="d-flex align-items-center gap-2">
+                <a asp-controller="DeviceTransfer" asp-action="create" asp-route-id="@Model.Id" class="action-btn-outline text-decoration-none">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i> Device Transfare
+                </a>
                 <a asp-controller="SIM" asp-action="Edit" asp-route-id="@Model.Id" class="action-btn-outline text-decoration-none">
                     <i class="fa-solid fa-pen-to-square me-2"></i>Edit Details
                 </a>

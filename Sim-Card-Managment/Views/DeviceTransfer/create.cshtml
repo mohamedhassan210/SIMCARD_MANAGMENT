@@ -1,0 +1,347 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<style>
+    .step-circle {
+        width: 32px;
+        height: 32px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .step-text {
+        font-size: 16px;
+        color: #333333;
+    }
+
+    .step-active .step-circle {
+        background-color: #e65319;
+        color: #ffffff;
+    }
+
+    .step-completed .step-circle {
+        background-color: #198754 !important;
+        color: #ffffff !important;
+    }
+
+    .step-inactive .step-circle {
+        background-color: #e8e8e8;
+        color: #a0a0a0;
+    }
+
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 850px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin: 0 auto;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #212529;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+        .section-title i {
+            color: #e65319;
+            font-size: 1.2rem;
+        }
+
+    .custom-form-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .custom-form-control,
+    .custom-form-select {
+        border-radius: 50px;
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+        border: 2px solid #dee2e6 !important;
+    }
+
+        .custom-form-control:focus,
+        .custom-form-select:focus {
+            border-color: #e65319 !important;
+            box-shadow: none;
+            outline: none;
+        }
+
+    .selection-card {
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        height: 100%;
+        background-color: #ffffff;
+    }
+
+        .selection-card:hover {
+            border-color: #babbbc;
+        }
+
+        .selection-card.active {
+            border: 1.5px solid #e65319;
+        }
+
+    .card-title-text {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        color: #212529;
+    }
+
+    .card-subtitle-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .check-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #e65319;
+        font-size: 1.6rem;
+        display: none;
+    }
+
+    .selection-card.active .check-icon {
+        display: block;
+    }
+
+    .status-text {
+        font-size: 0.75rem;
+        color: #e65319;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-action {
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        min-width: 120px;
+    }
+
+    .btn-outline-back {
+        border: 1px solid #ced4da;
+        color: #6c757d;
+        background-color: #ffffff;
+    }
+
+    .btn-draft {
+        background-color: #a0a0a0;
+        color: #ffffff;
+        border: none;
+    }
+
+    .btn-activate {
+        background-color: #e65319;
+        color: #ffffff;
+        border: none;
+    }
+
+        .btn-activate:hover {
+            background-color: #d44a15;
+        }
+
+    .from-employee-card {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-left: 4px solid #e65319;
+        border-radius: 12px;
+        padding: 16px 20px;
+    }
+</style>
+
+<header>
+    <div class="p-100 w-100 mx-4">
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-4" style="font-size: 0.8rem; font-weight: 500;">
+                <li class="breadcrumb-item">
+                    <a asp-controller="sim" asp-action="details" class="text-decoration-none text-muted">details</a>
+                </li>
+                <li class="breadcrumb-item text-dark fw-medium" aria-current="page">
+                    Create Transfer Device
+                </li>
+            </ol>
+        </nav>
+
+        <h1 class="fw-bold text-dark mb-3" style="font-size: 32px; letter-spacing: -0.5px;">
+            Device Transfer Setup
+        </h1>
+
+        <p class="mb-0" style="color: #6c757d; font-size: 15px; line-height: 1.5; max-width: 480px;">
+            Transfer Devices ownership between employees step by step.
+        </p>
+    </div>
+</header>
+
+<section class="container-fluid px-4 mt-4">
+    <div class="row">
+        <div class="col-12 col-md-3 col-lg-2">
+            <div class="d-flex align-items-center mb-4 step-completed" id="sidebarStep1">
+                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle1">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="step-text fw-bold" id="stepText1">From</div>
+            </div>
+            <div class="d-flex align-items-center mb-4 step-active" id="sidebarStep2">
+                <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle2">2</div>
+                <div class="step-text" id="stepText2">To Employee</div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-9 col-lg-10">
+            <form asp-action="Create" method="post" id="createSubscriptionForm">
+                <div class="form-container">
+
+                    <input type="hidden" id="FromEmployeeId" name="FromEmployeeId" value="CURRENT_EMP_ID" />
+                    <input type="hidden" id="ToEmployeeId" name="ToEmployeeId" />
+
+                    <div class="mb-5" id="fromSection">
+                        <h2 class="section-title">
+                            <i class="fas fa-user-check"></i> 1. From
+                        </h2>
+
+                        <div class="from-employee-card d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-1 text-dark" id="fromEmpName">John Doe</h6>
+                                <p class="card-subtitle-text mb-0">ID: <span id="fromEmpId">EMP-10293</span> | Dept: <span id="fromEmpDept">IT Operations</span></p>
+                            </div>
+                            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-semibold" style="font-size: 0.75rem;">
+                                Active Sender
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-5" id="toEmployeeSection">
+                        <h2 class="section-title">
+                            <i class="fas fa-user-plus"></i> 2. To Employee
+                        </h2>
+
+                        <div class="mb-4">
+                            <label class="custom-form-label">Search Employee</label>
+                            <input type="text" id="toEmpSearchInput" class="form-control custom-form-control" placeholder="Search by target employee name or ID...">
+                        </div>
+
+                        <div class="row g-4" id="toEmployeeCardsContainer">
+                            <div class="col-12 text-muted small fst-italic">
+                                Search above to display selection cards.
+                            </div>
+                        </div>
+
+                        <div class="status-text mt-3" id="toEmpStatusText" style="display: none;">
+                            <i class="fas fa-info-circle"></i> <span id="toEmpStatusName">None</span> selected as recipient
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-action btn-outline-back text-center text-decoration-none">Back</a>
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-action btn-draft">Save Draft</button>
+                            <button type="submit" class="btn btn-action btn-activate">Activate Transfer</button>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Real-time Employee Search function
+        $('#toEmpSearchInput').on('input', function () {
+            const query = $(this).val().trim();
+
+            if (!query) {
+                $('#toEmployeeCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to display selection cards.</div>');
+                return;
+            }
+
+            // Perform AJAX search request
+            $.get('/Subscription/SearchRecipients', { query: query, isNonEmployee: false }, function (data) {
+                let html = '';
+                if (!data || data.length === 0) {
+                    html = '<div class="col-12 text-muted small">No target employees found matching your query.</div>';
+                } else {
+                    data.forEach(item => {
+                        const isSelected = $('#ToEmployeeId').val() === item.id;
+                        html += `
+                            <div class="col-md-6">
+                                <div class="selection-card ${isSelected ? 'active' : ''}" onclick="selectToEmployee('${item.id}', '${item.name}', this)">
+                                    <div class="card-title-text">${item.name}</div>
+                                    <p class="card-subtitle-text">${item.details}</p>
+                                    <i class="fas fa-check-circle check-icon"></i>
+                                </div>
+                            </div>`;
+                    });
+                }
+                $('#toEmployeeCardsContainer').html(html);
+            });
+        });
+
+        // Select target recipient employee
+        function selectToEmployee(id, name, cardEl) {
+            if ($(cardEl).hasClass('active')) {
+                $(cardEl).removeClass('active');
+                $('#ToEmployeeId').val('');
+                $('#toEmpStatusText').hide();
+            } else {
+                $('#toEmployeeCardsContainer .selection-card').removeClass('active');
+                $(cardEl).addClass('active');
+                $('#ToEmployeeId').val(id);
+                $('#toEmpStatusName').text(name);
+                $('#toEmpStatusText').show();
+            }
+
+            updateSidebarProgress();
+        }
+
+        // Update sidebar status dynamically
+        function updateSidebarProgress() {
+            const hasToEmp = $('#ToEmployeeId').val() !== '';
+
+            if (hasToEmp) {
+                $('#sidebarStep2').addClass('step-completed').removeClass('step-active');
+                $('#stepCircle2').html('<i class="fas fa-check"></i>');
+            } else {
+                $('#sidebarStep2').addClass('step-active').removeClass('step-completed');
+                $('#stepCircle2').text('2');
+            }
+        }
+
+        // Form Validation on Submit
+        $('#createSubscriptionForm').on('submit', function (e) {
+            if (!$('#ToEmployeeId').val()) {
+                e.preventDefault();
+                alert('Please select a target recipient employee.');
+                return false;
+            }
+        });
+    </script>
+}
