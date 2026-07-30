@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Sim_Card_Management.Repos.DeviceSerialOperationsRepos;
 using Sim_Card_Management.Repos.DocumentDetailsRepos;
 using Sim_Card_Management.Repos.ItemTypeRepos;
 using Sim_Card_Managment.data;
@@ -59,6 +60,7 @@ builder.Services.AddScoped<IDocumentTypeRepo, DocumentTypeRepo>();
 builder.Services.AddScoped<ISerialRepo,SerialRepo>();
 builder.Services.AddScoped<IDocumentDetailsRepo, DocumentDetailsRepo>();
 builder.Services.AddScoped<IItemTypeRepo, ItemTypeRepo>();
+builder.Services.AddScoped<IDeviceSerialOperationsRepo, DeviceSerialOperationsRepo>();
 builder.Services.AddSession();
 var app = builder.Build();
 

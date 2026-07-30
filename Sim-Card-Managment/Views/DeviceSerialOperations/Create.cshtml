@@ -1,0 +1,725 @@
+﻿@model Sim_Card_Managment.Viewmodel.DeviceSerialOperationViewModel
+
+@{
+    ViewData["Title"] = "Transfer SIM";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer SIM</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<style>
+    /* ============================================
+                       📱 TRANSFER SIM PAGE STYLES
+                       All classes use "ts-" prefix to avoid conflicts
+                       ============================================ */
+
+    /* ----- STEP INDICATORS ----- */
+    .ts-step-circle {
+        width: 32px;
+        height: 32px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .ts-step-text {
+        font-size: 16px;
+        color: #333333;
+    }
+
+    .ts-step-active .ts-step-circle {
+        background-color: #e65319;
+        color: #ffffff;
+    }
+
+    .ts-step-completed .ts-step-circle {
+        background-color: #198754 !important;
+        color: #ffffff !important;
+    }
+
+    .ts-step-inactive .ts-step-circle {
+        background-color: #e8e8e8;
+        color: #a0a0a0;
+    }
+
+    /* ----- FORM CONTAINER ----- */
+    .ts-form-container {
+        background-color: #ffffff;
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 850px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin: 0 auto;
+    }
+
+    .ts-section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #212529;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+        .ts-section-title i {
+            color: #e65319;
+            font-size: 1.2rem;
+        }
+
+    .ts-form-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .ts-form-control,
+    .ts-form-select {
+        border-radius: 50px;
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+        border: 2px solid #dee2e6 !important;
+    }
+
+        .ts-form-control:focus,
+        .ts-form-select:focus {
+            border-color: #e65319 !important;
+            box-shadow: none;
+            outline: none;
+        }
+
+        .ts-form-control.is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .ts-form-control:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+    .ts-status-text {
+        font-size: 0.75rem;
+        color: #e65319;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .ts-btn-action {
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        min-width: 120px;
+    }
+
+    .ts-btn-outline-back {
+        border: 1px solid #ced4da;
+        color: #6c757d;
+        background-color: #ffffff;
+    }
+
+    .ts-btn-transfer {
+        background-color: #e65319;
+        color: #ffffff;
+        border: none;
+    }
+
+        .ts-btn-transfer:hover {
+            background-color: #d44a15;
+        }
+
+    /* ----- SEARCH SECTION ----- */
+    .ts-search-container {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #ebebeb;
+    }
+
+    .ts-search-result-card {
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 15px 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background-color: #ffffff;
+        position: relative;
+    }
+
+        .ts-search-result-card:hover {
+            border-color: #babbbc;
+        }
+
+        .ts-search-result-card.selected {
+            border: 2px solid #e65319;
+            background-color: #fff8f5;
+        }
+
+        .ts-search-result-card .ts-check-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #e65319;
+            font-size: 1.4rem;
+            display: none;
+        }
+
+        .ts-search-result-card.selected .ts-check-icon {
+            display: block;
+        }
+
+    .ts-result-serial {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .ts-result-details {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .ts-result-provider {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .ts-badge-status {
+        font-size: 0.6rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 12px;
+    }
+
+    .ts-badge-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .ts-badge-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .ts-badge-transferred {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    /* ----- DETAILS SECTION ----- */
+    .ts-details-container {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #ebebeb;
+        margin-top: 20px;
+    }
+
+    .ts-details-row {
+        margin-bottom: 16px;
+    }
+
+        .ts-details-row label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+    .ts-details-value {
+        font-size: 0.9rem;
+        color: #333333;
+        padding: 8px 12px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+    .ts-empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+    }
+
+        .ts-empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+    /* ----- CHECKBOX STYLING ----- */
+    .ts-checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .ts-checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #e65319;
+        }
+
+        .ts-checkbox-wrapper label {
+            margin-bottom: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+    /* ----- LOADING INDICATOR ----- */
+    .ts-loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #e65319;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0%{
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
+    }
+</style>
+
+<body>
+    <section class="py-5" style="background-color: #f8f9fa; min-height: 100vh;">
+        <div class="container">
+            <div class="ts-form-container">
+
+                <!-- STEP INDICATORS -->
+                <div class="d-flex justify-content-between mb-5" style="max-width: 600px;">
+                    <div class="d-flex align-items-center gap-3 ts-step-active" id="ts-step1-indicator">
+                        <div class="ts-step-circle rounded-circle d-flex align-items-center justify-content-center" id="ts-step1-circle">1</div>
+                        <span class="ts-step-text">Select SIM</span>
+                    </div>
+                    <div class="flex-grow-1 d-flex align-items-center" style="height: 2px; background-color: #dee2e6; margin: 0 10px;"></div>
+                    <div class="d-flex align-items-center gap-3 ts-step-inactive" id="ts-step2-indicator">
+                        <div class="ts-step-circle rounded-circle d-flex align-items-center justify-content-center">2</div>
+                        <span class="ts-step-text">Update Serial</span>
+                    </div>
+                </div>
+
+                <!-- SUCCESS MESSAGE -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <!-- SEARCH SECTION -->
+                <div>
+                    <div class="ts-section-title">
+                        <i class="fas fa-magnifying-glass"></i>
+                        Step 1: Find SIM Card
+                    </div>
+
+                    <div class="ts-search-container">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-9">
+                                <input type="text"
+                                       id="ts-sim-search"
+                                       class="form-control ts-form-control"
+                                       placeholder="Enter phone number or serial number..."
+                                       autocomplete="off" />
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button"
+                                        id="ts-search-btn"
+                                        class="btn ts-btn-action ts-btn-transfer w-100">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="ts-search-results">
+                            <div class="ts-empty-state">
+                                <i class="fas fa-sim-card"></i>
+                                Enter a search term above to find SIM cards.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DETAILS & OPERATION SECTION -->
+                <form id="ts-transfer-form" asp-action="Create" asp-controller="DeviceSerialOperations" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div id="ts-details-section" style="display: none;">
+
+                        <!-- STEP 2 TITLE -->
+                        <div class="ts-section-title mt-5">
+                            <i class="fas fa-edit"></i>
+                            Step 2: Update Serial Number
+                        </div>
+
+                        <!-- SIM DETAILS (READ-ONLY) -->
+                        <div class="ts-details-container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="ts-details-row">
+                                        <label>Phone Number</label>
+                                        <div class="ts-details-value" id="ts-sim-phone">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="ts-details-row">
+                                        <label>Current Serial Number</label>
+                                        <div class="ts-details-value" id="ts-sim-serial">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="ts-details-row">
+                                        <label>Network Type</label>
+                                        <div class="ts-details-value" id="ts-sim-network">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="ts-details-row">
+                                        <label>Status</label>
+                                        <div class="ts-details-value" id="ts-sim-status-badge">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="ts-details-row">
+                                        <label>Service Provider</label>
+                                        <div class="ts-details-value" id="ts-sim-provider">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="ts-sim-status" style="display: none;" class="ts-status-text">
+                                <i class="fas fa-info-circle"></i>
+                                <span id="ts-sim-status-message"></span>
+                            </div>
+                        </div>
+
+                        <!-- HIDDEN INPUT FOR SimId -->
+                        <input type="hidden"
+                               id="ts-sim-id-input"
+                               asp-for="SimId" />
+
+                        <!-- EDITABLE FIELDS -->
+                        <div class="ts-details-container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="ts-details-row">
+                                        <label asp-for="NewSerialNumber" class="ts-form-label">
+                                            <i class="fas fa-asterisk" style="font-size: 0.6rem; color: #dc3545;"></i>
+                                            New Serial Number
+                                        </label>
+                                        <input type="text"
+                                               asp-for="NewSerialNumber"
+                                               id="ts-new-serial"
+                                               class="form-control ts-form-control"
+                                               placeholder="Enter new serial number"
+                                               disabled />
+                                        <span asp-validation-for="NewSerialNumber" class="text-danger" style="font-size: 0.8rem;"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="ts-details-row">
+                                        <div class="ts-checkbox-wrapper">
+                                            <input type="checkbox"
+                                                   id="ts-network-change"
+                                                   asp-for="NetworkTypeChange"
+                                                   disabled />
+                                            <label for="ts-network-change" asp-for="NetworkTypeChange">
+                                                Network Type Change
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FORM BUTTONS -->
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <button type="reset"
+                                    id="ts-reset-btn"
+                                    class="btn ts-btn-action ts-btn-outline-back">
+                                <i class="fas fa-arrow-left"></i> Clear
+                            </button>
+                            <button type="submit"
+                                    id="ts-transfer-btn"
+                                    class="btn ts-btn-action ts-btn-transfer"
+                                    disabled>
+                                <i class="fas fa-check"></i> Confirm & Save
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+        $(document).ready(function () {
+
+            // ====================================================
+            // 📱 SIM SEARCH FUNCTIONALITY WITH REAL API
+            // ====================================================
+            let selectedSim = null;
+
+            function getStatusBadge(status) {
+                const classes = {
+                    'Active': 'ts-badge-active',
+                    'Inactive': 'ts-badge-inactive',
+                    'Transferred': 'ts-badge-transferred'
+                };
+                return `<span class="ts-badge-status ${classes[status] || 'ts-badge-inactive'}">${status || 'Unknown'}</span>`;
+            }
+
+            function renderSearchResults(results) {
+                const container = $('#ts-search-results');
+
+                if (!results || results.length === 0) {
+                    container.html(`
+                        <div class="ts-empty-state">
+                            <i class="fas fa-search"></i>
+                            No SIM cards found matching your search.
+                        </div>
+                    `);
+                    return;
+                }
+
+                let html = '<div class="row g-3">';
+                results.forEach(sim => {
+                    const isSelected = selectedSim && selectedSim.id === sim.id;
+                    html += `
+                        <div class="col-md-6">
+                            <div class="ts-search-result-card ${isSelected ? 'selected' : ''}"
+                                 data-id="${sim.id}" onclick="selectSim(${sim.id})">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="ts-result-serial">${sim.phone}</div>
+                                        <p class="ts-result-details">Serial: ${sim.serial}</p>
+                                        <p class="ts-result-provider">${sim.provider}</p>
+                                        <p class="ts-result-provider">${sim.NetworkType}</p>
+                                    </div>
+                                    <div>
+                                        ${getStatusBadge(sim.status)}
+                                    </div>
+                                </div>
+                                <i class="fas fa-check-circle ts-check-icon"></i>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.html(html);
+            }
+
+            // Search button click with Fetch API
+            $('#ts-search-btn').on('click', function () {
+                const query = $('#ts-sim-search').val().trim();
+                if (!query) {
+                    $('#ts-search-results').html(`
+                        <div class="ts-empty-state">
+                            <i class="fas fa-info-circle"></i>
+                            Please enter a search term.
+                        </div>
+                    `);
+                    return;
+                }
+
+                // Show loading state
+                $('#ts-search-results').html(`
+                    <div class="ts-empty-state">
+                        <div class="ts-loading" style="display: inline-block;"></div>
+                        <p style="margin-top: 10px;">Searching...</p>
+                    </div>
+                `);
+
+                // Fetch from real API endpoint
+                fetch(`/api/device-serial-operation/search-sim?searchTerm=${encodeURIComponent(query)}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Search failed');
+                        return response.json();
+                    })
+                    .then(data => {
+                        renderSearchResults(data);
+
+                        // Auto-select if only one result
+                        if (data.length === 1) {
+                            selectSim(data[0].id);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        $('#ts-search-results').html(`
+                            <div class="ts-empty-state" style="color: #dc3545;">
+                                <i class="fas fa-exclamation-circle"></i>
+                                An error occurred while searching. Please try again.
+                            </div>
+                        `);
+                    });
+            });
+
+            // Enter key support
+            $('#ts-sim-search').on('keypress', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $('#ts-search-btn').click();
+                }
+            });
+
+            // ====================================================
+            // 📱 SELECT SIM FUNCTION
+            // ====================================================
+            window.selectSim = function (id) {
+                // Find the clicked sim in the rendered results
+                const card = $(`.ts-search-result-card[data-id="${id}"]`);
+                if (card.length === 0) return;
+
+                selectedSim = {
+                    id: id,
+                    phone: card.find('.ts-result-serial').text(),
+                    serial: card.find('.ts-result-details').text().replace('Serial: ', ''),
+                    provider: card.find('.ts-result-provider').text(),
+                    status: card.find('.ts-badge-status').text().trim()
+                };
+
+                // Extract network type from badge or data attribute
+                const networkText = card.find('.ts-badge-status').next().text() || '-';
+                selectedSim.networkType = networkText || '-';
+
+                // Update UI
+                $('.ts-search-result-card').removeClass('selected');
+                card.addClass('selected');
+
+                // Update Step 2
+                $('#ts-step2-indicator').removeClass('ts-step-inactive').addClass('ts-step-active');
+
+                // Show details section
+                $('#ts-details-section').fadeIn(300);
+
+                // Update SIM info (read-only display)
+                $('#ts-sim-phone').text(selectedSim.phone);
+                $('#ts-sim-serial').text(selectedSim.serial);
+                $('#ts-sim-network').text(selectedSim.networkType);
+                $('#ts-sim-provider').text(selectedSim.provider);
+                $('#ts-sim-status-badge').html(getStatusBadge(selectedSim.status));
+
+                // Show status message
+                $('#ts-sim-status').show();
+                $('#ts-sim-status-message').text(`Selected: ${selectedSim.phone} (${selectedSim.provider})`);
+
+                // Store SimId in hidden input
+                $('#ts-sim-id-input').val(id);
+
+                // Enable edit fields
+                $('#ts-new-serial').prop('disabled', false);
+                $('#ts-network-change').prop('disabled', false);
+
+                // Enable transfer button
+                $('#ts-transfer-btn').prop('disabled', false);
+
+                // Step 1 completed
+                $('#ts-step1-indicator').removeClass('ts-step-active').addClass('ts-step-completed');
+                $('#ts-step1-circle').html('<i class="fas fa-check"></i>');
+
+                // Focus on new serial input
+                $('#ts-new-serial').focus();
+            };
+
+            // ====================================================
+            // 📱 VALIDATION ON SUBMIT
+            // ====================================================
+            $('#ts-transfer-form').on('submit', function (e) {
+                const newSerial = $('#ts-new-serial').val().trim();
+
+                if (!selectedSim) {
+                    e.preventDefault();
+                    alert('Please select a SIM card.');
+                    return false;
+                }
+
+                if (!newSerial) {
+                    e.preventDefault();
+                    alert('Please enter the new serial number.');
+                    $('#ts-new-serial').addClass('is-invalid');
+                    $('#ts-new-serial').focus();
+                    return false;
+                }
+
+                // Confirm operation
+                const networkChangeText = $('#ts-network-change').is(':checked') ? ' with Network Type change' : '';
+                return confirm(`Confirm SIM serial update:\n\nPhone: ${selectedSim.phone}\nOld Serial: ${selectedSim.serial}\nNew Serial: ${newSerial}${networkChangeText}`);
+            });
+
+            // ====================================================
+            // 📱 REMOVE INVALID CLASS ON TYPING
+            // ====================================================
+            $(document).on('input', '.ts-form-control', function () {
+                $(this).removeClass('is-invalid');
+            });
+
+            // ====================================================
+            // 📱 RESET BUTTON
+            // ====================================================
+            $('#ts-reset-btn').on('click', function () {
+                selectedSim = null;
+                $('#ts-sim-search').val('');
+                $('#ts-search-results').html(`
+                    <div class="ts-empty-state">
+                        <i class="fas fa-sim-card"></i>
+                        Enter a search term above to find SIM cards.
+                    </div>
+                `);
+                $('#ts-details-section').fadeOut(300);
+                $('#ts-sim-status').hide();
+                $('#ts-transfer-btn').prop('disabled', true);
+                $('#ts-new-serial').val('').prop('disabled', true);
+                $('#ts-network-change').prop('checked', false).prop('disabled', true);
+                $('#ts-new-serial').removeClass('is-invalid');
+                $('#ts-sim-id-input').val('');
+
+                // Reset step indicators
+                $('#ts-step1-indicator').removeClass('ts-step-completed').addClass('ts-step-active');
+                $('#ts-step1-circle').html('1');
+                $('#ts-step2-indicator').removeClass('ts-step-active').addClass('ts-step-inactive');
+            });
+
+        });
+    </script>
+</body>
+</html>

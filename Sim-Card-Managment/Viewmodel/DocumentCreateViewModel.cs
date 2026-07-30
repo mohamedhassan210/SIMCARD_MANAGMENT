@@ -1,69 +1,68 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿// DocumentCreateViewModel.cs
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Sim_Card_Managment.Viewmodel
 {
     public class DocumentCreateViewModel
     {
         [Display(Name = "نوع المستند")]
-        [Required(ErrorMessage = "يجب اختيار نوع المستند")]
-        public int? DocumentTypeId { get; set; }
+        public int DocumentTypeId { get; set; }
 
         [Display(Name = "مزود الخدمة")]
-        [Required(ErrorMessage = "يجب اختيار مزود الخدمة")]
         public int? ServiceProviderId { get; set; }
 
-        [Display(Name = "تاريخ الإجراء")]
-        [Required(ErrorMessage = "يجب إدخال تاريخ الإجراء")]
+        [DataType(DataType.DateTime)]
         public DateTime ActionDate { get; set; } = DateTime.Now;
 
-        [Display(Name = "ملاحظات")]
         [MaxLength(500)]
-        public string Notes { get; set; }
+        [Display(Name = "ملاحظات")]
+        public string? Notes { get; set; }
 
+        [MaxLength(50)]
         [Display(Name = "نوع التوقيع")]
-        [MaxLength(50)]
-        public string SignatureType { get; set; }
+        public string? SignatureType { get; set; }
 
-        [Display(Name = "بيانات التوقيع")]
         [MaxLength(50)]
-        public string SignatureData { get; set; }
+        [Display(Name = "بيانات التوقيع")]
+        public string? SignatureData { get; set; }
 
         [Display(Name = "رقم المستند")]
-        [Required(ErrorMessage = "يجب إدخال سيريال واحد على الأقل")]
-        [MaxLength(100)]
-        public string DocumentNumber { get; set; }
+        public string? DocumentNumber { get; set; }
 
-        // Collections for dynamic rows
-        public List<SimCreateDto> Sims { get; set; } = new List<SimCreateDto>();
-        public List<UsbCreateDto> Usbs { get; set; } = new List<UsbCreateDto>();
+        public List<SimItemViewModel> Sims { get; set; } = new();
+        public List<UsbItemViewModel> Usbs { get; set; } = new();
 
-        // For dropdown population
-        public List<SelectListItem> DocumentTypes { get; set; } = new List<SelectListItem>();
-        public List<SelectListItem> ServiceProviders { get; set; } = new List<SelectListItem>();
+        public List<SelectListItem> DocumentTypes { get; set; } = new();
+        public List<SelectListItem> ServiceProviders { get; set; } = new();
     }
 
-    public class SimCreateDto
+    public class SimItemViewModel
     {
-        [Required(ErrorMessage = "السيريال مطلوب")]
-        [StringLength(100)]
+        [Required]
+        [MaxLength(100)]
+        [Display(Name = "رقم السيريال (ICCID)")]
         public string SerialNumber { get; set; }
 
-        [Required(ErrorMessage = "رقم الهاتف مطلوب")]
-        [StringLength(50)]
+        [Required]
+        [MaxLength(50)]
+        [Display(Name = "رقم الهاتف")]
         public string PhoneNumber { get; set; }
 
-        [StringLength(10)]
-        public string NetworkType { get; set; }
+        [MaxLength(10)]
+        [Display(Name = "نوع الشبكة")]
+        public string? NetworkType { get; set; }
     }
 
-    public class UsbCreateDto
+    public class UsbItemViewModel
     {
-        [Required(ErrorMessage = "السيريال مطلوب")]
-        [StringLength(100)]
+        [Required]
+        [MaxLength(100)]
+        [Display(Name = "رقم السيريال")]
         public string SerialNumber { get; set; }
 
-        [StringLength(200)]
-        public string Model { get; set; }
+        [MaxLength(200)]
+        [Display(Name = "الموديل")]
+        public string? Model { get; set; }
     }
 }
