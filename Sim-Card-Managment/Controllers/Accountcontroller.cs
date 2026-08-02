@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Sim_Card_Managment.Controllers
 {
+    //[RequirePermission]
     public class AccountController : Controller
     {
         private readonly IAccountRepo _accountRepo;

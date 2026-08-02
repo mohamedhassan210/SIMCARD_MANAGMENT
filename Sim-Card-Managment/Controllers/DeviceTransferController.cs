@@ -5,6 +5,7 @@ using System.Security.Claims;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class DeviceTransferController : Controller
     {
         private readonly IDeviceTransferRepo _repo;

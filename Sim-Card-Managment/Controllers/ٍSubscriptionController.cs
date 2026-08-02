@@ -11,6 +11,7 @@ using System.Security.Claims;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class SubscriptionController : Controller
     {
         private readonly ISubscriptionRepo _subscriptionRepo;

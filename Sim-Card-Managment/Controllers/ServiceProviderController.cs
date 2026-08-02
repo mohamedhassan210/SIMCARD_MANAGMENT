@@ -7,6 +7,7 @@ using Sim_Card_Managment.Viewmodel;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class ServiceProviderController : Controller
     {
         private readonly IServiceProviderRepository _repo;

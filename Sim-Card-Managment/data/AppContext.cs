@@ -283,6 +283,13 @@ namespace Sim_Card_Managment.data
                 .HasForeignKey(s => s.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // ── User: Group ──────────────────────────────
+            modelBuilder.Entity<User>()
+                .HasMany(u=>u.UserCreatedGroups)
+                .WithOne(g=> g.CreatedBy)
+                .HasForeignKey(g=>g.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

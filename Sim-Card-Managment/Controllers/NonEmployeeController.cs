@@ -6,6 +6,7 @@ using System;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class NonEmployeeController : Controller
     {
         private readonly INonEmployeeRepo _nonEmployeeRepo;

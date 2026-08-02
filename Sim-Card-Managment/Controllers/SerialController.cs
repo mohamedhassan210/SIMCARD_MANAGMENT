@@ -7,6 +7,7 @@ using Sim_Card_Managment.ViewModels;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class SerialController : Controller
     {
         private readonly ISerialRepo _serialRepo;

@@ -42,7 +42,7 @@ namespace Sim_Card_Managment.Services
             // Load existing keys in one query to avoid N+1 inside the loop
             var existing = db.Permissions
                 .Select(p => p.ControllerName + "|" + p.ActionName)
-                .ToHashSet();
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
             foreach (var item in discovered)
             {

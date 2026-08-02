@@ -4,6 +4,7 @@ using Sim_Card_Managment.Repos;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class DeviceActionController : Controller
     {
         private readonly IDeviceActionRepo _repo;

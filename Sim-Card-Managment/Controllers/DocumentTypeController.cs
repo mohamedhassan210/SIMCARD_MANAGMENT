@@ -6,6 +6,7 @@ using Sim_Card_Managment.ViewModels;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class DocumentTypeController : Controller
     {
         private readonly IDocumentTypeRepo _repo;

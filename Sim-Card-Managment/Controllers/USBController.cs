@@ -9,6 +9,7 @@ using System.Linq;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class USBController : Controller
     {
         private readonly IUSBRepo _usbRepo;
