@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sim_Card_Managment.ViewModels
+namespace Sim_Card_Managment.Viewmodel
 {
     public class ServiceProviderViewModel
     {

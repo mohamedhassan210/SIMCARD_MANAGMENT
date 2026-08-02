@@ -29,7 +29,17 @@ namespace Sim_Card_Managment.Repos
                 .Take(6)
                 .ToListAsync();
         }
-
+        public async Task UpdateAsync(Sim sim)
+        {
+            _context.Sims.Update(sim);
+            await _context.SaveChangesAsync();
+        }
+        public async Task<Sim?> GetByIdAsync(int id)
+        {
+            return await _context.Sims
+                .Include(s => s.ServiceProvider)
+                .FirstOrDefaultAsync(s => s.Id == id);
+        }
         public IEnumerable<Sim> GetAll()
         {
             return _context.Sims
@@ -68,7 +78,19 @@ namespace Sim_Card_Managment.Repos
         public async Task<Sim?> GetBySerialNumberAsync(string serialNumber)
         {
             return await _context.Sims
+                .Include (s => s.ServiceProvider)
                 .FirstOrDefaultAsync(s => s.SerialNumber == serialNumber);
+        }
+        public async Task<IEnumerable<Sim>> SearchAsync(string searchTerm)
+        {
+            var searchLower = searchTerm.ToLower().Trim();
+
+            return await _context.Sims
+                .Include(s => s.ServiceProvider)
+                .Where(s => (s.PhoneNumber != null && s.PhoneNumber.Contains(searchTerm))
+                         || (s.SerialNumber != null && s.SerialNumber.ToLower().Contains(searchLower)))
+                .AsNoTracking()
+                .ToListAsync();
         }
         public void Update(Sim sim)
         {

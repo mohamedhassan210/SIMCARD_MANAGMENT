@@ -1,4 +1,5 @@
-﻿using Sim_Card_Managment.data;
+﻿using Microsoft.EntityFrameworkCore;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 
 namespace Sim_Card_Managment.Repos
@@ -15,6 +16,26 @@ namespace Sim_Card_Managment.Repos
         public IEnumerable<DeviceTransfer> GetAllDeviceTransfers()
         {
             return _context.DeviceTransfers.ToList();
+        }
+        public Subscription? GetActiveSubscriptionBySimId(int simId)
+        {
+            if (simId <= 0) return null;
+
+            return _context.Subscriptions
+                .Include(s => s.Employee)
+                .Include(s => s.NonEmployee) // Eager load NonEmployee
+                .Include(s => s.Sim)
+                .Where(s => s.SimId == simId && (s.EndDate == null || s.EndDate > DateTime.Now))
+                .OrderByDescending(s => s.StartDate)
+                .FirstOrDefault();
+        }
+
+        public Subscription? GetActiveSubscriptionByUsbId(int usbId)
+        {
+            return _context.Subscriptions
+                .Include(s => s.Employee)
+                .Include(s => s.Usb)
+                .FirstOrDefault(s => s.UsbId == usbId && s.EndDate == null);
         }
 
         public DeviceTransfer? GetDeviceTransferbyId(int id)

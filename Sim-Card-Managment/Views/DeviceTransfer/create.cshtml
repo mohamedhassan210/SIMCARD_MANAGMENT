@@ -1,7 +1,7 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model Sim_Card_Managment.Models.DeviceTransfer
+
 @{
+    ViewData["Title"] = "Create Device Transfer";
 }
 
 <style>
@@ -151,12 +151,6 @@
         background-color: #ffffff;
     }
 
-    .btn-draft {
-        background-color: #a0a0a0;
-        color: #ffffff;
-        border: none;
-    }
-
     .btn-activate {
         background-color: #e65319;
         color: #ffffff;
@@ -181,7 +175,7 @@
         <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
             <ol class="breadcrumb mb-4" style="font-size: 0.8rem; font-weight: 500;">
                 <li class="breadcrumb-item">
-                    <a asp-controller="sim" asp-action="details" class="text-decoration-none text-muted">details</a>
+                    <a asp-controller="sim" asp-action="index" class="text-decoration-none text-muted">SIM Cards</a>
                 </li>
                 <li class="breadcrumb-item text-dark fw-medium" aria-current="page">
                     Create Transfer Device
@@ -194,7 +188,7 @@
         </h1>
 
         <p class="mb-0" style="color: #6c757d; font-size: 15px; line-height: 1.5; max-width: 480px;">
-            Transfer Devices ownership between employees step by step.
+            Transfer device ownership between employees step by step.
         </p>
     </div>
 </header>
@@ -215,24 +209,39 @@
         </div>
 
         <div class="col-12 col-md-9 col-lg-10">
-            <form asp-action="Create" method="post" id="createSubscriptionForm">
-                <div class="form-container">
+            <form asp-action="Create" method="post" id="createTransferForm">
+                @Html.AntiForgeryToken()
 
-                    <input type="hidden" id="FromEmployeeId" name="FromEmployeeId" value="CURRENT_EMP_ID" />
-                    <input type="hidden" id="ToEmployeeId" name="ToEmployeeId" />
+                <div asp-validation-summary="All" class="alert alert-danger mb-4" style="border-radius: 12px;"></div>
+
+                <input type="hidden" asp-for="FromSubscriptionId" />
+                <input type="hidden" asp-for="SimId" />
+                <input type="hidden" asp-for="UsbId" />
+                <input type="hidden" asp-for="TransferDate" />
+                <input type="hidden" asp-for="ToEmpId" id="ToEmpId" />
+
+                <div class="form-container">
 
                     <div class="mb-5" id="fromSection">
                         <h2 class="section-title">
-                            <i class="fas fa-user-check"></i> 1. From
+                            <i class="fas fa-user-check"></i> 1. From (Current Owner)
                         </h2>
 
                         <div class="from-employee-card d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="fw-bold mb-1 text-dark" id="fromEmpName">John Doe</h6>
-                                <p class="card-subtitle-text mb-0">ID: <span id="fromEmpId">EMP-10293</span> | Dept: <span id="fromEmpDept">IT Operations</span></p>
+                                <h6 class="fw-bold mb-1 text-dark">
+                                    @(Model.FromSubscription?.Employee?.Name ?? "Occupied Employee")
+                                </h6>
+                                <p class="card-subtitle-text mb-0">
+                                    National ID: @(Model.FromSubscription?.Employee?.NationalID ?? "N/A")
+                                    @if (Model.FromSubscription?.Sim != null)
+                                    {
+                                        <span> | SIM: @Model.FromSubscription.Sim.PhoneNumber</span>
+                                    }
+                                </p>
                             </div>
                             <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-semibold" style="font-size: 0.75rem;">
-                                Active Sender
+                                Active Sender (Occupied)
                             </span>
                         </div>
                     </div>
@@ -244,12 +253,12 @@
 
                         <div class="mb-4">
                             <label class="custom-form-label">Search Employee</label>
-                            <input type="text" id="toEmpSearchInput" class="form-control custom-form-control" placeholder="Search by target employee name or ID...">
+                            <input type="text" id="toEmpSearchInput" class="form-control custom-form-control" placeholder="Search target employee by name or ID...">
                         </div>
 
                         <div class="row g-4" id="toEmployeeCardsContainer">
                             <div class="col-12 text-muted small fst-italic">
-                                Search above to display selection cards.
+                                Search above to display recipient employee selection cards.
                             </div>
                         </div>
 
@@ -261,7 +270,6 @@
                     <div class="d-flex justify-content-between align-items-center pt-3 border-top">
                         <a asp-action="Index" class="btn btn-action btn-outline-back text-center text-decoration-none">Back</a>
                         <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-action btn-draft">Save Draft</button>
                             <button type="submit" class="btn btn-action btn-activate">Activate Transfer</button>
                         </div>
                     </div>
@@ -283,19 +291,23 @@
                 return;
             }
 
-            // Perform AJAX search request
+            // Perform AJAX search request to Subscription search controller
             $.get('/Subscription/SearchRecipients', { query: query, isNonEmployee: false }, function (data) {
                 let html = '';
                 if (!data || data.length === 0) {
                     html = '<div class="col-12 text-muted small">No target employees found matching your query.</div>';
                 } else {
                     data.forEach(item => {
-                        const isSelected = $('#ToEmployeeId').val() === item.id;
+                        const itemId = item.id ?? item.Id;
+                        const itemName = item.name ?? item.Name;
+                        const itemDetails = item.details ?? item.Details ?? '';
+
+                        const isSelected = $('#ToEmpId').val() == itemId;
                         html += `
                             <div class="col-md-6">
-                                <div class="selection-card ${isSelected ? 'active' : ''}" onclick="selectToEmployee('${item.id}', '${item.name}', this)">
-                                    <div class="card-title-text">${item.name}</div>
-                                    <p class="card-subtitle-text">${item.details}</p>
+                                <div class="selection-card ${isSelected ? 'active' : ''}" onclick="selectToEmployee('${itemId}', '${itemName.replace(/'/g, "\\'")}', this)">
+                                    <div class="card-title-text">${itemName}</div>
+                                    <p class="card-subtitle-text">${itemDetails}</p>
                                     <i class="fas fa-check-circle check-icon"></i>
                                 </div>
                             </div>`;
@@ -309,12 +321,12 @@
         function selectToEmployee(id, name, cardEl) {
             if ($(cardEl).hasClass('active')) {
                 $(cardEl).removeClass('active');
-                $('#ToEmployeeId').val('');
+                $('#ToEmpId').val('');
                 $('#toEmpStatusText').hide();
             } else {
                 $('#toEmployeeCardsContainer .selection-card').removeClass('active');
                 $(cardEl).addClass('active');
-                $('#ToEmployeeId').val(id);
+                $('#ToEmpId').val(id);
                 $('#toEmpStatusName').text(name);
                 $('#toEmpStatusText').show();
             }
@@ -322,9 +334,9 @@
             updateSidebarProgress();
         }
 
-        // Update sidebar status dynamically
+        // Update sidebar status indicator
         function updateSidebarProgress() {
-            const hasToEmp = $('#ToEmployeeId').val() !== '';
+            const hasToEmp = $('#ToEmpId').val() !== '';
 
             if (hasToEmp) {
                 $('#sidebarStep2').addClass('step-completed').removeClass('step-active');
@@ -335,11 +347,11 @@
             }
         }
 
-        // Form Validation on Submit
-        $('#createSubscriptionForm').on('submit', function (e) {
-            if (!$('#ToEmployeeId').val()) {
+        // Form Submit Validation
+        $('#createTransferForm').on('submit', function (e) {
+            if (!$('#ToEmpId').val()) {
                 e.preventDefault();
-                alert('Please select a target recipient employee.');
+                alert('Please search and select a target recipient employee.');
                 return false;
             }
         });

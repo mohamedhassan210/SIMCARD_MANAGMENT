@@ -1,9 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
+﻿@model Sim_Card_Managment.Viewmodel.ServiceProviderViewModel
 
 
 <!DOCTYPE html>
@@ -132,13 +127,15 @@
 
             <div class="row g-4 mb-5">
                 <div class="col-md-6">
-                    <label class="custom-label">Name</label>
-                    <input type="text" id="Name" class="custom-input" placeholder="orange">
+                    <label class="custom-label" asp-for="Name">Serial Number</label>
+                    <input type="text" class="custom-input" asp-for="Name" placeholder="Enter Service Provider Name" required />
+                    <span asp-validation-for="Name" class="field-error"></span>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label" >Display Name</label>
-                    <input type="text" id="displayName" class="custom-input" placeholder="org">
+                    <label class="custom-label" asp-for="DisplayName">Serial Number</label>
+                    <input type="text" class="custom-input" asp-for="DisplayName" placeholder="Enter Display Name" required />
+                    <span asp-validation-for="DisplayName" class="field-error"></span>
                 </div>
 
               

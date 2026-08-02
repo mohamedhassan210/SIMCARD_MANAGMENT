@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Sim_Card_Management.Models;
@@ -86,12 +87,20 @@ namespace Sim_Card_Managment.Controllers
         {
             ExcelPackage.License.SetNonCommercialPersonal("MyName");
 
-            // Fetch documents using your repository pattern
-            var allDocuments = await _documentRepo.GetAllAsync(); // Or your custom method that includes relations like GetDocumentsWithDetailsAsync()
+            // Fetch documents and document types
+            var allDocuments = await _documentRepo.GetAllAsync(null,null);
+            var allDocTypes = await _documentTypeRepo.GetAllAsync();
+
+            // Get ItemTypes for SIM and USB
+            var simItemType = await _itemTypeRepo.GetByNameAsync("SIM") ?? await _itemTypeRepo.GetByNameAsync("Sim");
+            var usbItemType = await _itemTypeRepo.GetByNameAsync("USB") ?? await _itemTypeRepo.GetByNameAsync("Usb");
+
+            // Lookup dictionary for document types fallback
+            var docTypeDict = allDocTypes.ToDictionary(dt => dt.Id, dt => dt.DisplayName ?? dt.Name);
 
             var query = allDocuments.AsQueryable();
 
-            // Apply filters in-memory/on query
+            // Apply filters
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 query = query.Where(d => d.DocumentNumber.Contains(searchTerm) || (d.Notes != null && d.Notes.Contains(searchTerm)));
@@ -108,7 +117,7 @@ namespace Sim_Card_Managment.Controllers
             {
                 var worksheet = package.Workbook.Worksheets.Add("Documents Summary");
 
-                // Set English Header Titles
+                // Set Header Titles
                 worksheet.Cells[1, 1].Value = "Document Serial";
                 worksheet.Cells[1, 2].Value = "Transaction Type";
                 worksheet.Cells[1, 3].Value = "Action Date";
@@ -128,12 +137,40 @@ namespace Sim_Card_Managment.Controllers
                 int row = 2;
                 foreach (var doc in documents)
                 {
+                    // 1. Transaction Type Resolution
+                    string transactionType = doc.DocumentType?.DisplayName
+                        ?? doc.DocumentType?.Name
+                        ?? (doc.DocumenttypeId.HasValue && docTypeDict.TryGetValue(doc.DocumenttypeId.Value, out var typeName) ? typeName : "N/A");
+
+                    // 2. SIM Count Resolution (using stored Quantity & ItemTypeId matching)
+                    int simCount = 0;
+                    if (doc.DocumentDetails != null && doc.DocumentDetails.Any())
+                    {
+                        simCount = doc.DocumentDetails
+                            .Where(d => (simItemType != null && d.ItemTypeId == simItemType.Id) ||
+                                        (d.ItemType != null && string.Equals(d.ItemType.Name, "SIM", StringComparison.OrdinalIgnoreCase)) ||
+                                        (d.ItemType != null && string.Equals(d.ItemType.Name, "Sim", StringComparison.OrdinalIgnoreCase)))
+                            .Sum(d => d.Quantity > 0 ? d.Quantity : (d.Serials?.Count ?? 0));
+                    }
+
+                    // 3. USB Count Resolution (using stored Quantity & ItemTypeId matching)
+                    int usbCount = 0;
+                    if (doc.DocumentDetails != null && doc.DocumentDetails.Any())
+                    {
+                        usbCount = doc.DocumentDetails
+                            .Where(d => (usbItemType != null && d.ItemTypeId == usbItemType.Id) ||
+                                        (d.ItemType != null && string.Equals(d.ItemType.Name, "USB", StringComparison.OrdinalIgnoreCase)) ||
+                                        (d.ItemType != null && string.Equals(d.ItemType.Name, "Usb", StringComparison.OrdinalIgnoreCase)))
+                            .Sum(d => d.Quantity > 0 ? d.Quantity : (d.Serials?.Count ?? 0));
+                    }
+
                     worksheet.Cells[row, 1].Value = doc.DocumentNumber;
-                    worksheet.Cells[row, 2].Value = doc.DocumentType?.DisplayName ?? "N/A";
+                    worksheet.Cells[row, 2].Value = transactionType;
                     worksheet.Cells[row, 3].Value = doc.ActionDate.ToString("yyyy-MM-dd");
-                    worksheet.Cells[row, 4].Value = (doc.DocumentDetails.Where(d=>d.ItemType.Name == "Sim").FirstOrDefault()).Serials?.Count(s => s.SimId != null) ?? 0;
-                    worksheet.Cells[row, 5].Value = (doc.DocumentDetails.Where(d => d.ItemType.Name == "Usb").FirstOrDefault()).Serials?.Count(s => s.UsbId != null) ?? 0;
+                    worksheet.Cells[row, 4].Value = simCount;
+                    worksheet.Cells[row, 5].Value = usbCount;
                     worksheet.Cells[row, 6].Value = doc.Notes ?? "";
+
                     row++;
                 }
 
@@ -216,7 +253,11 @@ namespace Sim_Card_Managment.Controllers
             }
         }
         #endregion
-        // GET: Document/Create
+        #region Create Document
+        /// <summary>
+        /// GET: Document/Create
+        /// Initializes the wizard view with empty ViewModel and populated dropdowns.
+        /// </summary>
         public async Task<IActionResult> Create()
         {
             var viewModel = new DocumentCreateViewModel();
@@ -224,54 +265,51 @@ namespace Sim_Card_Managment.Controllers
             return View(viewModel);
         }
 
-        // POST: Document/Create
+        /// <summary>
+        /// POST: Document/Create
+        /// Processes the multi-step form submission and persists Document, DocumentDetails, and Serial records.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(DocumentCreateViewModel viewModel)
         {
-            if (!ModelState.IsValid)
-            {
-                await PopulateDropdownsAsync(viewModel);
-                return View(viewModel);
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    await PopulateDropdownsAsync(viewModel);
+            //    return View(viewModel);
+            //}
 
             try
             {
                 var userId = GetCurrentUserId();
 
-                // 1. Create main Document entity via Document Repository
+                // Background generation of Document Number (yyyyMMddHHmmss)
+                var documentNumber = DateTime.Now.ToString("yyyyMMddHHmmss");
+                var actionDate = DateTime.Now;
+
                 var document = new Document
                 {
                     DocumenttypeId = viewModel.DocumentTypeId,
                     ServiceProviderId = viewModel.ServiceProviderId!.Value,
-                    ActionDate = viewModel.ActionDate,
-                    Notes = viewModel.Notes,
-                    SignatureType = viewModel.SignatureType,
-                    SignatureData = viewModel.SignatureData,
-                    DocumentNumber = viewModel.DocumentNumber,
+                    ActionDate = actionDate,
+                    Notes = viewModel.Notes ?? "None",
+                    SignatureType = viewModel.SignatureType ?? "None",
+                    SignatureData = viewModel.SignatureData ?? "None",
+                    DocumentNumber = documentNumber,
                     CreatedAt = DateTime.Now,
                     UserId = userId
                 };
 
                 await _documentRepo.AddAsync(document);
 
-                // 2. Fetch or create SIM ItemType
-                var simItemType = await _itemTypeRepo.GetByNameAsync("SIM");
-                if (simItemType == null)
-                {
-                    simItemType = new ItemType { Name = "SIM" };
-                    await _itemTypeRepo.AddAsync(simItemType);
-                }
+                // Ensure ItemType records exist
+                var simItemType = await _itemTypeRepo.GetByNameAsync("SIM") ?? new ItemType { Name = "SIM" };
+                if (simItemType.Id == 0) await _itemTypeRepo.AddAsync(simItemType);
 
-                // 3. Fetch or create USB ItemType
-                var usbItemType = await _itemTypeRepo.GetByNameAsync("USB");
-                if (usbItemType == null)
-                {
-                    usbItemType = new ItemType { Name = "USB" };
-                    await _itemTypeRepo.AddAsync(usbItemType);
-                }
+                var usbItemType = await _itemTypeRepo.GetByNameAsync("USB") ?? new ItemType { Name = "USB" };
+                if (usbItemType.Id == 0) await _itemTypeRepo.AddAsync(usbItemType);
 
-                // 4. Process SIM entries
+                // Process SIM items
                 if (viewModel.Sims != null && viewModel.Sims.Any())
                 {
                     var simDocumentDetails = new DocumentDetails
@@ -307,7 +345,7 @@ namespace Sim_Card_Managment.Controllers
                     }
                 }
 
-                // 5. Process USB entries
+                // Process USB items
                 if (viewModel.Usbs != null && viewModel.Usbs.Any())
                 {
                     var usbDocumentDetails = new DocumentDetails
@@ -342,7 +380,7 @@ namespace Sim_Card_Managment.Controllers
                     }
                 }
 
-                return RedirectToAction(nameof(Details), new { id = document.Id });
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
@@ -352,6 +390,34 @@ namespace Sim_Card_Managment.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: Document/CheckSerialNumber
+        /// AJAX endpoint for real-time serial number uniqueness validation.
+        /// Returns JSON { exists: bool, type: "SIM|USB|UNKNOWN" }
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> CheckSerialNumber(string serialNumber)
+        {
+            if (string.IsNullOrWhiteSpace(serialNumber))
+            {
+                return Json(new { exists = false, type = "UNKNOWN" });
+            }
+
+            var simExists = await _simRepo.GetBySerialNumberAsync(serialNumber);
+            if (simExists != null)
+            {
+                return Json(new { exists = true, type = "SIM" });
+            }
+
+            var usbExists = await _usbRepo.GetBySerialNumberAsync(serialNumber);
+            if (usbExists != null)
+            {
+                return Json(new { exists = true, type = "USB" });
+            }
+
+            return Json(new { exists = false, type = "UNKNOWN" });
+        }
+        #endregion
         #region Helper Methods
 
         /// <summary>
@@ -360,11 +426,13 @@ namespace Sim_Card_Managment.Controllers
         private async Task PopulateDropdownsAsync(DocumentCreateViewModel viewModel)
         {
             var documentTypes = await _documentTypeRepo.GetAllAsync();
-            viewModel.DocumentTypes = documentTypes.Select(dt => new SelectListItem
-            {
-                Value = dt.Id.ToString(),
-                Text = dt.DisplayName ?? dt.Name
-            }).ToList();
+            viewModel.DocumentTypes = documentTypes
+                .Select(dt => new SelectListItem
+                {
+                    Value = dt.Id.ToString(),
+                    Text = dt.DisplayName ?? dt.Name
+                })
+                .ToList();
 
             var serviceProviders = await _serviceProviderRepo.GetAllAsync();
             viewModel.ServiceProviders = serviceProviders
@@ -373,7 +441,8 @@ namespace Sim_Card_Managment.Controllers
                 {
                     Value = sp.Id.ToString(),
                     Text = sp.DisplayName ?? sp.Name
-                }).ToList();
+                })
+                .ToList();
         }
 
         /// <summary>
@@ -386,7 +455,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         #endregion
-    
+
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

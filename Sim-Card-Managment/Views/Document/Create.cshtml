@@ -1,404 +1,6 @@
-﻿@* @{
-    ViewData["Title"] = "create";
-}
-
-<!DOCTYPE html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Document</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
-
-</head>
-
-
-
-
-    <section class="container-fluid px-4 mt-4">
-
-        <header>
-            <div class="p-100 w-100 mx-4">
-                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-4" style="font-size: 0.8rem; font-weight: 500;">
-                        <li class="breadcrumb-item">
-                            <a asp-controller="Document" asp-action="Index" class="text-decoration-none text-muted">Document</a>
-                        </li>
-                        <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">
-                            Create new Document
-                        </li>
-                    </ol>
-                </nav>
-
-                <h1 class="fw-bold text-dark mb-3" style="font-size: 32px; letter-spacing: -0.5px;">
-                    Setup New Document
-                </h1>
-
-                <p class="mb-0" style="color: #6c757d; font-size: 15px; line-height: 1.5; max-width: 480px;">
-                    Complete the following steps to assign system to create documents
-                </p>
-            </div>
-        </header>
-
-        <div class="row mt-4">
-            <aside class="col-12 col-md-3 col-lg-2">
-                <div class="d-flex align-items-center mb-4 cd-step-active" id="cd-step1-indicator">
-                    <div class="cd-step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="cd-step1-circle">1</div>
-                    <div class="cd-step-text fw-bold">Document Info</div>
-                </div>
-                <div class="d-flex align-items-center mb-4 cd-step-active" id="cd-step2-indicator">
-                    <div class="cd-step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="cd-step2-circle">2</div>
-                    <div class="cd-step-text fw-bold">Details</div>
-                </div>
-            </aside>
-
-            <div class="col-12 col-md-9 col-lg-10">
-                <form asp-action="Create" method="post" id="cd-create-form">
-                    <div class="cd-form-container">
-
-                        <!-- ========================================== -->
-                        <!-- 📄 SECTION 1: DOCUMENT INFORMATION          -->
-                        <!-- ========================================== -->
-                        <div class="mb-5">
-                            <h2 class="cd-section-title">
-                                <i class="fas fa-file-alt"></i> Document Information
-                            </h2>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="cd-form-label">
-                                        <i class="fas fa-file"></i> Document Type <span class="text-danger">*</span>
-                                    </label>
-                                    <select id="cd-document-type" class="form-select cd-form-select">
-                                        <option value="">-- Select Document Type --</option>
-                                        <option value="1">National ID</option>
-                                        <option value="2">Passport</option>
-                                        <option value="3">Driver's License</option>
-                                        <option value="4">Residence Permit</option>
-                                        <option value="5">Company ID</option>
-                                        <option value="6">Visa</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="cd-form-label">
-                                        <i class="fas fa-building"></i> Service Provider <span class="text-danger">*</span>
-                                    </label>
-                                    <select id="cd-service-provider" class="form-select cd-form-select">
-                                        <option value="">-- Select Service Provider --</option>
-                                        <option value="1">Orange</option>
-                                        <option value="2">Vodafone</option>
-                                        <option value="3">WE</option>
-                                        <option value="4">Etisalat</option>
-                                        <option value="5">STC</option>
-                                        <option value="6">Zain</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="cd-status-text mt-2" id="cd-doc-status" style="display: none;">
-                                <i class="fas fa-check-circle text-success"></i>
-                                <span id="cd-doc-status-message">Document information selected</span>
-                            </div>
-                        </div>
-
-                        <!-- ========================================== -->
-                        <!-- 📄 SECTION 2: DETAILS                      -->
-                        <!-- ========================================== -->
-                        <div class="mb-5">
-                            <h2 class="cd-section-title">
-                                <i class="fas fa-list"></i> Details
-                            </h2>
-
-                            <div class="row cd-details-row align-items-end">
-                                <div class="col-md-4">
-                                    <label class="cd-form-label">
-                                        <i class="fas fa-microchip"></i> Device <span class="text-danger">*</span>
-                                    </label>
-                                    <select id="cd-device-select" class="form-select cd-form-select" disabled>
-                                        <option value="">-- Select Device --</option>
-                                        <option value="1">SIM Card - Orange</option>
-                                        <option value="2">SIM Card - Vodafone</option>
-                                        <option value="3">SIM Card - WE</option>
-                                        <option value="4">USB Modem - Huawei</option>
-                                        <option value="5">USB Modem - ZTE</option>
-                                        <option value="6">Router - TP-Link</option>
-                                        <option value="7">Router - D-Link</option>
-                                    </select>
-                                    <small class="cd-disabled-hint" id="cd-device-hint">
-                                        Please complete Document Information first.
-                                    </small>
-                                </div>
-
-                                <div class="col-md-3" id="cd-quantity-container">
-                                    <label class="cd-form-label">
-                                        <i class="fas fa-hashtag"></i> Quantity <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="number" id="cd-quantity-input" class="form-control cd-form-control cd-quantity-input"
-                                           placeholder="Qty" min="1" value="1">
-                                </div>
-
-                                <div class="col-md-3" id="cd-add-button-container">
-                                    <button type="button" id="cd-add-device-btn" class="cd-btn-add">
-                                        <i class="fas fa-plus me-2"></i> Add Device
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div id="cd-added-devices-container" class="mt-4"></div>
-
-                            <div class="d-flex justify-content-between align-items-center pt-4 mt-4 border-top">
-                                <a asp-action="Index" class="btn cd-btn-action cd-btn-outline-back text-center text-decoration-none">Back</a>
-                                <div class="d-flex gap-3">
-                                    <button type="button" class="btn cd-btn-action cd-btn-draft">Save Draft</button>
-                                    <button type="submit" class="btn cd-btn-action cd-btn-activate">Activate Subscription</button>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script>
-        $(document).ready(function () {
-
-            // ====================================================
-            // 📄 DOCUMENT INFO VALIDATION & UNLOCK DEVICE DROPDOWN
-            // ====================================================
-            $('#cd-document-type, #cd-service-provider').on('change', function () {
-                const docType = $('#cd-document-type').val();
-                const serviceProvider = $('#cd-service-provider').val();
-
-                if (docType && serviceProvider) {
-                    $('#cd-doc-status').show();
-                    $('#cd-doc-status-message').text(
-                        'Document Type: ' + $('#cd-document-type option:selected').text() +
-                        ' | Service Provider: ' + $('#cd-service-provider option:selected').text()
-                    );
-
-                    // Step 1 checkmark
-                    $('#cd-step1-indicator').removeClass('cd-step-active').addClass('cd-step-completed');
-                    $('#cd-step1-circle').html('<i class="fas fa-check"></i>');
-
-                    // Unlock Device dropdown
-                    $('#cd-device-select').prop('disabled', false);
-                    $('#cd-device-hint').hide();
-                } else {
-                    $('#cd-doc-status').hide();
-
-                    // Revert Step 1 indicator
-                    $('#cd-step1-indicator').removeClass('cd-step-completed').addClass('cd-step-active');
-                    $('#cd-step1-circle').html('1');
-
-                    // Lock Device dropdown & Reset Details
-                    $('#cd-device-select').val('').prop('disabled', true);
-                    $('#cd-device-hint').show();
-                    $('#cd-quantity-container').fadeOut();
-                    $('#cd-add-button-container').fadeOut();
-                }
-            });
-
-            // ====================================================
-            // 📄 DEVICE DROPDOWN TOGGLE
-            // ====================================================
-            $('#cd-device-select').on('change', function () {
-                const selectedValue = $(this).val();
-
-                if (selectedValue !== "") {
-                    $('#cd-quantity-container').fadeIn();
-                    $('#cd-add-button-container').fadeIn();
-                } else {
-                    $('#cd-quantity-container').fadeOut();
-                    $('#cd-add-button-container').fadeOut();
-                    $('#cd-quantity-input').val(1);
-                }
-            });
-
-            // ====================================================
-            // 📄 GENERATE DYNAMIC CARD WITH SAVE & VALIDATION
-            // ====================================================
-            let cardCounter = 0;
-
-            $('#cd-add-device-btn').on('click', function () {
-                const deviceName = $('#cd-device-select option:selected').text();
-                const deviceValue = $('#cd-device-select').val();
-                const qty = parseInt($('#cd-quantity-input').val());
-
-                if (!deviceValue) {
-                    alert('Please select a device.');
-                    return;
-                }
-
-                if (isNaN(qty) || qty < 1) {
-                    alert('Please enter a valid quantity.');
-                    return;
-                }
-
-                cardCounter++;
-                const cardId = `cd-card_${cardCounter}`;
-
-                // Options list based on quantity
-                let selectOptions = '';
-                for (let i = 1; i <= qty; i++) {
-                    selectOptions += `<option value="${i}">Item #${i}</option>`;
-                }
-
-                // Dynamic HTML Block
-                const dynamicCardHtml = `
-                        <div class="cd-added-item-card" id="${cardId}" data-total="${qty}">
-                            <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
-                                <div>
-                                    <span class="fw-bold text-dark me-2" style="font-size: 1.05rem;">${deviceName}</span>
-                                    <span class="badge bg-secondary">Total: ${qty}</span>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-outline-danger rounded-circle cd-remove-card-btn">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-
-                            <div class="row g-3 align-items-start">
-                                <div class="col-md-4">
-                                    <label class="cd-form-label"><i class="fas fa-list-ol"></i> Select Item Number</label>
-                                    <select class="form-select cd-form-select cd-item-number-select">
-                                        ${selectOptions}
-                                    </select>
-                                </div>
-
-                                <div class="col-md-8">
-                                    <div class="cd-item-inputs-box">
-                                        <div class="d-flex align-items-center justify-content-between mb-3">
-                                            <span class="fw-bold cd-current-item-label">
-                                                Item #1 Details
-                                            </span>
-                                            <button type="button" class="cd-btn-item-save cd-save-item-btn">
-                                                <i class="fas fa-check me-1"></i> Save Item
-                                            </button>
-                                        </div>
-                                        <div class="row g-2">
-                                            <div class="col-md-4">
-                                                <label class="cd-form-label">Serial Number (S/N) <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control cd-form-control cd-input-sn"
-                                                       name="Devices[${cardCounter}][1][SN]" placeholder="Enter S/N">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="cd-form-label">IP Address <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control cd-form-control cd-input-ip"
-                                                       name="Devices[${cardCounter}][1][IP]" placeholder="192.168.x.x">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="cd-form-label">SIM Card No. <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control cd-form-control cd-input-sim"
-                                                       name="Devices[${cardCounter}][1][SIM]" placeholder="Enter SIM No.">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                $('#cd-added-devices-container').append(dynamicCardHtml);
-                checkStep2Completion();
-            });
-
-            // ====================================================
-            // 📄 DYNAMIC HEADER & ITEM SWITCHING LOGIC
-            // ====================================================
-            $(document).on('change', '.cd-item-number-select', function () {
-                const selectedIndex = $(this).val();
-                const $card = $(this).closest('.cd-added-item-card');
-                const cardIndex = $card.attr('id');
-
-                // 1. DYNAMIC HEADER UPDATE
-                $card.find('.cd-current-item-label').text(`Item #${selectedIndex} Details`);
-
-                // 2. Update field name attributes for backend submission
-                $card.find('.cd-input-sn').attr('name', `Devices[${cardIndex}][${selectedIndex}][SN]`);
-                $card.find('.cd-input-ip').attr('name', `Devices[${cardIndex}][${selectedIndex}][IP]`);
-                $card.find('.cd-input-sim').attr('name', `Devices[${cardIndex}][${selectedIndex}][SIM]`);
-
-                // Clear previous validation styling when changing item index
-                $card.find('.cd-form-control').removeClass('is-invalid');
-            });
-
-            // Remove red border when typing
-            $(document).on('input', '.cd-form-control', function () {
-                $(this).removeClass('is-invalid');
-            });
-
-            // ====================================================
-            // 📄 SAVE BUTTON WITH VALIDATION & CHECKMARK
-            // ====================================================
-            $(document).on('click', '.cd-save-item-btn', function () {
-                const $card = $(this).closest('.cd-added-item-card');
-                const $select = $card.find('.cd-item-number-select');
-                const currentIndex = parseInt($select.val());
-                const totalQty = parseInt($card.data('total'));
-
-                const $sn = $card.find('.cd-input-sn');
-                const $ip = $card.find('.cd-input-ip');
-                const $sim = $card.find('.cd-input-sim');
-
-                // VALIDATION CHECK
-                let isValid = true;
-
-                if (!$sn.val().trim()) { $sn.addClass('is-invalid');
-                    isValid = false; }
-                if (!$ip.val().trim()) { $ip.addClass('is-invalid');
-                    isValid = false; }
-                if (!$sim.val().trim()) { $sim.addClass('is-invalid');
-                    isValid = false; }
-
-                if (!isValid) {
-                    return;
-                }
-
-                // 1. ADD CHECKMARK TO SELECTED OPTION
-                const $selectedOption = $select.find(`option[value="${currentIndex}"]`);
-                if (!$selectedOption.text().includes('✓')) {
-                    $selectedOption.text(`Item #${currentIndex} ✓`);
-                }
-
-                // 2. AUTO-ADVANCE TO NEXT ITEM OR SHOW COMPLETION MESSAGE
-                if (currentIndex < totalQty) {
-                    const nextIndex = currentIndex + 1;
-                    $select.val(nextIndex).trigger('change');
-
-                    // Reset input values for the next item
-                    $sn.val('');
-                    $ip.val('');
-                    $sim.val('');
-                }
-            });
-
-            // ====================================================
-            // 📄 REMOVE CARD & CHECK STEP 2
-            // ====================================================
-            $(document).on('click', '.cd-remove-card-btn', function () {
-                $(this).closest('.cd-added-item-card').remove();
-                checkStep2Completion();
-            });
-
-            function checkStep2Completion() {
-                if ($('#cd-added-devices-container').children().length > 0) {
-                    $('#cd-step2-indicator').removeClass('cd-step-active').addClass('cd-step-completed');
-                    $('#cd-step2-circle').html('<i class="fas fa-check"></i>');
-                } else {
-                    $('#cd-step2-indicator').removeClass('cd-step-completed').addClass('cd-step-active');
-                    $('#cd-step2-circle').html('2');
-                }
-            }
-
-        });
-    </script> *@
-
-
-
+﻿@model Sim_Card_Managment.Viewmodel.DocumentCreateViewModel
 @{
-    ViewData["Title"] = "Transfer SIM";
+    ViewData["Title"] = "Create New Document";
 }
 
 <!DOCTYPE html>
@@ -406,454 +8,398 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transfer SIM</title>
+    <title>Create Document</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
-<style>
-    /* ============================================
-               📱 TRANSFER SIM PAGE STYLES
-               All classes use "ts-" prefix to avoid conflicts
-               ============================================ */
-
-    /* ----- STEP INDICATORS ----- */
-    .ts-step-circle {
-        width: 32px;
-        height: 32px;
-        font-weight: 600;
-        font-size: 14px;
-        transition: all 0.3s ease;
-    }
-
-    .ts-step-text {
-        font-size: 16px;
-        color: #333333;
-    }
-
-    .ts-step-active .ts-step-circle {
-        background-color: #e65319;
-        color: #ffffff;
-    }
-
-    .ts-step-completed .ts-step-circle {
-        background-color: #198754 !important;
-        color: #ffffff !important;
-    }
-
-    .ts-step-inactive .ts-step-circle {
-        background-color: #e8e8e8;
-        color: #a0a0a0;
-    }
-
-    /* ----- FORM CONTAINER ----- */
-    .ts-form-container {
-        background-color: #ffffff;
-        border-radius: 16px;
-        padding: 40px;
-        max-width: 850px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        margin: 0 auto;
-    }
-
-    .ts-section-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #212529;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
-    }
-
-        .ts-section-title i {
-            color: #e65319;
-            font-size: 1.2rem;
-        }
-
-    .ts-form-label {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #212529;
-        margin-bottom: 0.4rem;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .ts-form-control,
-    .ts-form-select {
-        border-radius: 50px;
-        padding: 0.6rem 1.25rem;
-        font-size: 0.9rem;
-        border: 2px solid #dee2e6 !important;
-    }
-
-        .ts-form-control:focus,
-        .ts-form-select:focus {
-            border-color: #e65319 !important;
-            box-shadow: none;
-            outline: none;
-        }
-
-        .ts-form-control.is-invalid {
-            border-color: #dc3545 !important;
-        }
-
-        .ts-form-control:disabled {
-            background-color: #e9ecef;
-            cursor: not-allowed;
-        }
-
-    .ts-status-text {
-        font-size: 0.75rem;
-        color: #e65319;
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .ts-btn-action {
-        border-radius: 50px;
-        padding: 10px 24px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        min-width: 120px;
-    }
-
-    .ts-btn-outline-back {
-        border: 1px solid #ced4da;
-        color: #6c757d;
-        background-color: #ffffff;
-    }
-
-    .ts-btn-transfer {
-        background-color: #e65319;
-        color: #ffffff;
-        border: none;
-    }
-
-        .ts-btn-transfer:hover {
-            background-color: #d44a15;
-        }
-
-    /* ----- SEARCH SECTION ----- */
-    .ts-search-container {
-        background-color: #f8f9fa;
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid #ebebeb;
-    }
-
-    .ts-search-result-card {
-        border: 1px solid #dee2e6;
-        border-radius: 12px;
-        padding: 15px 20px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        background-color: #ffffff;
-        position: relative;
-    }
-
-        .ts-search-result-card:hover {
-            border-color: #babbbc;
-        }
-
-        .ts-search-result-card.selected {
-            border: 2px solid #e65319;
-            background-color: #fff8f5;
-        }
-
-        .ts-search-result-card .ts-check-icon {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #e65319;
-            font-size: 1.4rem;
-            display: none;
-        }
-
-        .ts-search-result-card.selected .ts-check-icon {
-            display: block;
-        }
-
-    .ts-result-serial {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #212529;
-    }
-
-    .ts-result-details {
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin: 0;
-    }
-
-    .ts-result-provider {
-        font-size: 0.75rem;
-        color: #6c757d;
-    }
-
-    .ts-badge-status {
-        font-size: 0.6rem;
-        font-weight: 700;
-        padding: 3px 10px;
-        border-radius: 12px;
-    }
-
-    .ts-badge-active {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
-    .ts-badge-inactive {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-
-    .ts-badge-transferred {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-
-    /* ----- DETAILS SECTION ----- */
-    .ts-details-container {
-        background-color: #f8f9fa;
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid #ebebeb;
-        margin-top: 20px;
-    }
-
-    .ts-details-row {
-        margin-bottom: 16px;
-    }
-
-        .ts-details-row .col-md-6 {
-            margin-bottom: 12px;
-        }
-
-    .ts-selected-sim-info {
-        background-color: #ffffff;
-        border-radius: 12px;
-        padding: 15px 20px;
-        border: 1px solid #dee2e6;
-    }
-
-    .ts-info-label {
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        color: #6c757d;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-    }
-
-    .ts-info-value {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #212529;
-        margin: 0;
-    }
-
-    .ts-new-serial-input {
-        max-width: 100%;
-    }
-
-    /* ----- EMPTY STATE ----- */
-    .ts-empty-state {
-        text-align: center;
-        padding: 30px 0;
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-
-        .ts-empty-state i {
-            font-size: 2.5rem;
-            display: block;
-            margin-bottom: 10px;
-            color: #dee2e6;
-        }
-
-    .ts-disabled-hint {
-        font-size: 0.75rem;
-        color: #6c757d;
-    }
-
-    /* ============================================
-               📱 END OF TRANSFER SIM STYLES
-               ============================================ */
-</style>
-
 <body>
+    <style>
+        /* ===================================================
+                   📱 EXACT STYLING DERIVED FROM Create.cshtml
+                   =================================================== */
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .step-text {
+            font-size: 16px;
+            color: #333333;
+        }
+
+        .step-active .step-circle {
+            background-color: #e65319;
+            color: #ffffff;
+        }
+
+        .step-completed .step-circle {
+            background-color: #198754 !important;
+            color: #ffffff !important;
+        }
+
+        .step-inactive .step-circle {
+            background-color: #e8e8e8;
+            color: #a0a0a0;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 850px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #212529;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+            .section-title i {
+                color: #e65319;
+                font-size: 1.2rem;
+            }
+
+        .custom-form-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .custom-form-control,
+        .custom-form-select {
+            border-radius: 50px;
+            padding: 0.6rem 1.25rem;
+            font-size: 0.9rem;
+            border: 2px solid #dee2e6 !important;
+        }
+
+            .custom-form-control:focus,
+            .custom-form-select:focus {
+                border-color: #e65319 !important;
+                box-shadow: none;
+                outline: none;
+            }
+
+        .selection-card {
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            height: 100%;
+            background-color: #ffffff;
+        }
+
+            .selection-card:hover {
+                border-color: #babbbc;
+            }
+
+            .selection-card.active {
+                border: 1.5px solid #e65319;
+            }
+
+        .btn-action {
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            min-width: 120px;
+        }
+
+        .btn-outline-back {
+            border: 1px solid #ced4da;
+            color: #6c757d;
+            background-color: #ffffff;
+        }
+
+            .btn-outline-back:hover {
+                background-color: #f8f9fa;
+                color: #333;
+            }
+
+        .btn-activate {
+            background-color: #e65319;
+            color: #ffffff;
+            border: none;
+        }
+
+            .btn-activate:hover {
+                background-color: #d44a15;
+                color: #ffffff;
+            }
+
+        .btn-success-custom {
+            background-color: #198754;
+            color: #ffffff;
+            border: none;
+        }
+
+            .btn-success-custom:hover {
+                background-color: #146c43;
+                color: #ffffff;
+            }
+
+        .device-subsection {
+            background-color: #fdfdfd;
+            border: 1px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .subsection-header {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .added-item-card {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+            .added-item-card:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            }
+
+        .serial-warning {
+            color: #dc3545;
+            font-size: 0.78rem;
+            margin-top: 4px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+            background-color: #fff5f5;
+        }
+
+        .status-text {
+            font-size: 0.8rem;
+            color: #e65319;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+
+    <header>
+        <div class="p-100 w-100 mx-4">
+            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                <ol class="breadcrumb mb-4" style="font-size: 0.8rem; font-weight: 500;">
+                    <li class="breadcrumb-item">
+                        <a asp-controller="Document" asp-action="Index" class="text-decoration-none text-muted">Document</a>
+                    </li>
+                    <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">
+                        Create new document
+                    </li>
+                </ol>
+            </nav>
+
+            <h1 class="fw-bold text-dark mb-3" style="font-size: 32px; letter-spacing: -0.5px;">
+                Setup New Document
+            </h1>
+
+            <p class="mb-0" style="color: #6c757d; font-size: 15px; line-height: 1.5; max-width: 480px;">
+                Complete the following steps to create a new document and register hardware assets.
+            </p>
+        </div>
+    </header>
+
     <section class="container-fluid px-4 mt-4">
+        <div class="row">
+            <div class="col-12 col-md-3 col-lg-2">
+                <div class="d-flex align-items-center mb-4 step-active" id="sidebarStep1">
+                    <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle1">1</div>
+                    <div class="step-text fw-bold" id="stepText1">Document Info</div>
+                </div>
 
-        <header>
-            <div class="p-100 w-100 mx-4">
-                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-4" style="font-size: 0.8rem; font-weight: 500;">
-                        <li class="breadcrumb-item">
-                            <a asp-controller="SIM" asp-action="Index" class="text-decoration-none text-muted">SIM Management</a>
-                        </li>
-                        <li class="breadcrumb-item active text-dark fw-medium" aria-current="page">
-                            Transfer SIM
-                        </li>
-                    </ol>
-                </nav>
+                <div class="d-flex align-items-center mb-4 step-inactive" id="sidebarStep2">
+                    <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle2">2</div>
+                    <div class="step-text" id="stepText2">Device Quantity</div>
+                </div>
 
-                <h1 class="fw-bold text-dark mb-3" style="font-size: 32px; letter-spacing: -0.5px;">
-                    Transfer SIM Card
-                </h1>
-
-                <p class="mb-0" style="color: #6c757d; font-size: 15px; line-height: 1.5; max-width: 480px;">
-                    Search for a SIM card to transfer ownership or update serial number details.
-                </p>
+                <div class="d-flex align-items-center mb-4 step-inactive" id="sidebarStep3">
+                    <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle3">3</div>
+                    <div class="step-text" id="stepText3">Item Details</div>
+                </div>
             </div>
-        </header>
-
-        <div class="row mt-4">
-            <aside class="col-12 col-md-3 col-lg-2">
-                <div class="d-flex align-items-center mb-4 ts-step-active" id="ts-step1-indicator">
-                    <div class="ts-step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="ts-step1-circle">1</div>
-                    <div class="ts-step-text fw-bold">Search SIM</div>
-                </div>
-                <div class="d-flex align-items-center mb-4 ts-step-inactive" id="ts-step2-indicator">
-                    <div class="ts-step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="ts-step2-circle">2</div>
-                    <div class="ts-step-text">Details</div>
-                </div>
-            </aside>
 
             <div class="col-12 col-md-9 col-lg-10">
-                <form asp-action="Transfer" method="post" id="ts-transfer-form">
-                    <div class="ts-form-container">
+                <form asp-controller="Document" asp-action="Create" method="post" id="documentCreateForm" novalidate="novalidate">
+                    @Html.AntiForgeryToken()
 
-                        <!-- ========================================== -->
-                        <!-- 📱 SECTION 1: SEARCH SIM                   -->
-                        <!-- ========================================== -->
-                        <div class="mb-5">
-                            <h2 class="ts-section-title">
-                                <i class="fas fa-search"></i> Search SIM Card
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>@ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <div class="form-container">
+
+                        <div id="hiddenInputsContainer"></div>
+                        <input type="hidden" asp-for="DocumentNumber" id="DocumentNumber" />
+                        <input type="hidden" asp-for="ActionDate" id="ActionDate" />
+                        <input type="hidden" asp-for="SignatureType" id="SignatureType" />
+                        <input type="hidden" asp-for="SignatureData" id="SignatureData" />
+
+                        <div id="step1Section">
+                            <h2 class="section-title">
+                                <i class="fas fa-file-alt"></i> 1. Document Information
                             </h2>
 
-                            <div class="ts-search-container">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <label class="ts-form-label">
-                                            <i class="fas fa-sim-card"></i> SIM Search <span class="text-danger">*</span>
-                                        </label>
-                                        <input type="text" id="ts-sim-search" class="form-control ts-form-control"
-                                               placeholder="Search by phone number, serial number, or provider...">
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="custom-form-label">
+                                        <i class="fas fa-file-invoice text-muted"></i> Document Type <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="DocumentTypeId" asp-items="Model.DocumentTypes" id="DocumentTypeId" class="form-select custom-form-select">
+                                        <option value="">-- Select Document Type --</option>
+                                    </select>
+                                    <span asp-validation-for="DocumentTypeId" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="custom-form-label">
+                                        <i class="fas fa-building text-muted"></i> Service Provider <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="ServiceProviderId" asp-items="Model.ServiceProviders" id="ServiceProviderId" class="form-select custom-form-select">
+                                        <option value="">-- Select Service Provider --</option>
+                                    </select>
+                                    <span asp-validation-for="ServiceProviderId" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="row g-4 mb-4">
+                                <div class="col-12">
+                                    <label class="custom-form-label">
+                                        <i class="fas fa-comment-dots text-muted"></i> Document Notes
+                                    </label>
+                                    <textarea asp-for="Notes" id="Notes" class="form-control custom-form-control" rows="3" placeholder="Enter optional notes..." style="border-radius: 16px;"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-4">
+                                <button type="button" id="step1NextBtn" class="btn btn-action btn-activate" disabled>
+                                    Continue to Quantity <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="step2Section" style="display: none;">
+                            <h2 class="section-title">
+                                <i class="fas fa-layer-group"></i> 2. Device Selection & Quantity
+                            </h2>
+
+                            <div class="device-subsection">
+                                <div class="subsection-header">
+                                    <i class="fas fa-plus-circle text-danger"></i> Add Device Batch
+                                </div>
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-5">
+                                        <label class="custom-form-label">Device Type <span class="text-danger">*</span></label>
+                                        <select id="deviceTypeSelect" class="form-select custom-form-select">
+                                            <option value="">-- Select Device Type --</option>
+                                            <option value="SIM">SIM Card</option>
+                                            <option value="USB">USB Modem</option>
+                                        </select>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="ts-form-label">&nbsp;</label>
-                                        <button type="button" id="ts-search-btn" class="btn ts-btn-transfer w-100">
-                                            <i class="fas fa-search me-2"></i> Search
+                                        <label class="custom-form-label">Quantity <span class="text-danger">*</span></label>
+                                        <input type="number" id="deviceQtyInput" class="form-control custom-form-control" min="1" value="1" placeholder="Qty">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="button" id="addDeviceBatchBtn" class="btn btn-action btn-activate w-100">
+                                            <i class="fas fa-plus me-1"></i> Add
                                         </button>
                                     </div>
                                 </div>
-
-                                <!-- Search Results -->
-                                <div id="ts-search-results" class="mt-3">
-                                    <div class="ts-empty-state">
-                                        <i class="fas fa-sim-card"></i>
-                                        Enter a search term above to find SIM cards.
-                                    </div>
-                                </div>
                             </div>
 
-                            <!-- Selected SIM Status -->
-                            <div class="ts-status-text mt-2" id="ts-sim-status" style="display: none;">
-                                <i class="fas fa-check-circle text-success"></i>
-                                <span id="ts-sim-status-message">SIM selected</span>
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-list-check me-2 text-muted"></i>Batch Summary</h6>
+                                <div id="batchSummaryContainer" class="text-muted small fst-italic">No device batches added yet.</div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" id="step2BackBtn" class="btn btn-action btn-outline-back">
+                                    <i class="fas fa-arrow-left me-2"></i> Back
+                                </button>
+                                <button type="button" id="step2NextBtn" class="btn btn-action btn-activate" disabled>
+                                    Continue to Items <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
                             </div>
                         </div>
 
-                        <!-- ========================================== -->
-                        <!-- 📱 SECTION 2: DETAILS                     -->
-                        <!-- ========================================== -->
-                        <div class="mb-5" id="ts-details-section" style="display: none;">
-                            <h2 class="ts-section-title">
-                                <i class="fas fa-edit"></i> Details & New Serial Number
+                        <div id="step3Section" style="display: none;">
+                            <h2 class="section-title">
+                                <i class="fas fa-microchip"></i> 3. Item Details Entry
                             </h2>
 
-                            <div class="ts-details-container">
-                                <!-- Current SIM Information -->
-                                <div class="ts-selected-sim-info mb-4">
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="ts-info-label">Phone Number</div>
-                                            <p class="ts-info-value" id="ts-sim-phone">-</p>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="ts-info-label">Serial Number</div>
-                                            <p class="ts-info-value" id="ts-sim-serial">-</p>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="ts-info-label">Provider</div>
-                                            <p class="ts-info-value" id="ts-sim-provider">-</p>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="ts-info-label">Status</div>
-                                            <p class="ts-info-value" id="ts-sim-status-badge">-</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- New Serial Number Input -->
-                                <div class="row ts-details-row">
-                                    <div class="col-md-6">
-                                        <label class="ts-form-label">
-                                            <i class="fas fa-hashtag"></i> New Serial Number <span class="text-danger">*</span>
-                                        </label>
-                                        <input type="text" id="ts-new-serial" class="form-control ts-form-control ts-new-serial-input"
-                                               placeholder="Enter new serial number..." maxlength="20">
-                                        <small class="text-muted" style="font-size: 0.75rem;">
-                                            <i class="fas fa-info-circle"></i> Enter the new SIM card serial number
-                                        </small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="ts-form-label">
-                                            <i class="fas fa-calendar-alt"></i> Transfer Date
-                                        </label>
-                                        <input type="date" id="ts-transfer-date" class="form-control ts-form-control"
-                                               value="@DateTime.Now.ToString("yyyy-MM-dd")">
-                                    </div>
-                                </div>
-
-                                <div class="row ts-details-row">
-                                    <div class="col-md-6">
-                                        <label class="ts-form-label">
-                                            <i class="fas fa-user"></i> Transfer To (User)
-                                        </label>
-                                        <input type="text" id="ts-transfer-to" class="form-control ts-form-control"
-                                               placeholder="Enter username or ID...">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="ts-form-label">
-                                            <i class="fas fa-sticky-note"></i> Notes
-                                        </label>
-                                        <input type="text" id="ts-transfer-notes" class="form-control ts-form-control"
-                                               placeholder="Optional notes...">
-                                    </div>
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="custom-form-label">
+                                        <i class="fas fa-tasks text-muted"></i> Select Item to Edit <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="itemSelector" class="form-select custom-form-select">
+                                        <option value="">-- Select Item --</option>
+                                    </select>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- ========================================== -->
-                        <!-- 📱 ACTION BUTTONS                         -->
-                        <!-- ========================================== -->
-                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                            <a asp-action="Index" class="btn ts-btn-action ts-btn-outline-back text-center text-decoration-none">Back</a>
-                            <div class="d-flex gap-3">
-                                <button type="button" class="btn ts-btn-action ts-btn-outline-back" id="ts-reset-btn">
-                                    <i class="fas fa-undo me-1"></i> Reset
+                            <div class="device-subsection" id="dynamicFieldsPanel" style="display: none;">
+                                <div class="subsection-header" id="dynamicFormHeader">
+                                    <i class="fas fa-edit text-danger"></i> Configure Item Details
+                                </div>
+                                <div id="dynamicFieldsContainer"></div>
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button type="button" id="saveItemDataBtn" class="btn btn-action btn-activate">
+                                        <i class="fas fa-check me-2"></i> Save Item Details
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-boxes-stacked me-2 text-muted"></i>Configured Hardware Items</h6>
+                                <div id="addedItemsCardsContainer"></div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" id="step3BackBtn" class="btn btn-action btn-outline-back">
+                                    <i class="fas fa-arrow-left me-2"></i> Back
                                 </button>
-                                <button type="submit" class="btn ts-btn-action ts-btn-transfer" id="ts-transfer-btn" disabled>
-                                    <i class="fas fa-exchange-alt me-2"></i> Transfer SIM
+                                <button type="submit" id="submitDocumentBtn" class="btn btn-action btn-success-custom">
+                                    <i class="fas fa-check me-2"></i> Save Document
                                 </button>
                             </div>
                         </div>
@@ -864,226 +410,410 @@
         </div>
     </section>
 
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function () {
+            'use strict';
 
-            // ====================================================
-            // 📱 SIM SEARCH FUNCTIONALITY
-            // ====================================================
-            let selectedSim = null;
+            const checkSerialUrl = '@Url.Action("CheckSerialNumber", "Document")';
+            let debounceTimer = null;
 
-            // Mock data for demonstration
-            const mockSims = [
-                { id: 1, phone: '+201001234567', serial: 'SIM-2024-001', provider: 'Orange', status: 'Active' },
-                { id: 2, phone: '+201001234568', serial: 'SIM-2024-002', provider: 'Vodafone', status: 'Active' },
-                { id: 3, phone: '+201001234569', serial: 'SIM-2024-003', provider: 'WE', status: 'Transferred' },
-                { id: 4, phone: '+201001234570', serial: 'SIM-2024-004', provider: 'Etisalat', status: 'Active' },
-                { id: 5, phone: '+201001234571', serial: 'SIM-2024-005', provider: 'Orange', status: 'Inactive' },
-            ];
-
-            function getStatusBadge(status) {
-                const classes = {
-                    'Active': 'ts-badge-active',
-                    'Inactive': 'ts-badge-inactive',
-                    'Transferred': 'ts-badge-transferred'
-                };
-                return `<span class="ts-badge-status ${classes[status] || 'ts-badge-inactive'}">${status || 'Unknown'}</span>`;
-            }
-
-            function performSearch(query) {
-                const results = mockSims.filter(sim =>
-                    sim.phone.includes(query) ||
-                    sim.serial.toLowerCase().includes(query.toLowerCase()) ||
-                    sim.provider.toLowerCase().includes(query.toLowerCase())
-                );
-                return results;
-            }
-
-            function renderSearchResults(results) {
-                const container = $('#ts-search-results');
-
-                if (!results || results.length === 0) {
-                    container.html(`
-                            <div class="ts-empty-state">
-                                <i class="fas fa-search"></i>
-                                No SIM cards found matching your search.
-                            </div>
-                        `);
-                    return;
-                }
-
-                let html = '<div class="row g-3">';
-                results.forEach(sim => {
-                    const isSelected = selectedSim && selectedSim.id === sim.id;
-                    html += `
-                            <div class="col-md-6">
-                                <div class="ts-search-result-card ${isSelected ? 'selected' : ''}"
-                                     data-id="${sim.id}" onclick="selectSim(${sim.id})">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <div class="ts-result-serial">${sim.phone}</div>
-                                            <p class="ts-result-details">Serial: ${sim.serial}</p>
-                                            <p class="ts-result-provider">${sim.provider}</p>
-                                        </div>
-                                        <div>
-                                            ${getStatusBadge(sim.status)}
-                                        </div>
-                                    </div>
-                                    <i class="fas fa-check-circle ts-check-icon"></i>
-                                </div>
-                            </div>
-                        `;
-                });
-                html += '</div>';
-                container.html(html);
-            }
-
-            // Search button click
-            $('#ts-search-btn').on('click', function () {
-                const query = $('#ts-sim-search').val().trim();
-                if (!query) {
-                    $('#ts-search-results').html(`
-                            <div class="ts-empty-state">
-                                <i class="fas fa-info-circle"></i>
-                                Please enter a search term.
-                            </div>
-                        `);
-                    return;
-                }
-
-                const results = performSearch(query);
-                renderSearchResults(results);
-
-                // Auto-select if only one result
-                if (results.length === 1) {
-                    selectSim(results[0].id);
-                }
-            });
-
-            // Enter key support
-            $('#ts-sim-search').on('keypress', function (e) {
-                if (e.which === 13) {
-                    e.preventDefault();
-                    $('#ts-search-btn').click();
-                }
-            });
-
-            // ====================================================
-            // 📱 SELECT SIM FUNCTION
-            // ====================================================
-            window.selectSim = function (id) {
-                const results = mockSims.filter(s => s.id === id);
-                if (results.length === 0) return;
-
-                selectedSim = results[0];
-
-                // Update UI
-                $('.ts-search-result-card').removeClass('selected');
-                $(`.ts-search-result-card[data-id="${id}"]`).addClass('selected');
-
-                // Update Step 2
-                $('#ts-step2-indicator').removeClass('ts-step-inactive').addClass('ts-step-active');
-
-                // Show details section
-                $('#ts-details-section').fadeIn(300);
-
-                // Update SIM info
-                $('#ts-sim-phone').text(selectedSim.phone);
-                $('#ts-sim-serial').text(selectedSim.serial);
-                $('#ts-sim-provider').text(selectedSim.provider);
-                $('#ts-sim-status-badge').html(getStatusBadge(selectedSim.status));
-
-                // Show status message
-                $('#ts-sim-status').show();
-                $('#ts-sim-status-message').text(`Selected: ${selectedSim.phone} (${selectedSim.provider})`);
-
-                // Enable transfer button
-                $('#ts-transfer-btn').prop('disabled', false);
-
-                // Step 1 completed
-                $('#ts-step1-indicator').removeClass('ts-step-active').addClass('ts-step-completed');
-                $('#ts-step1-circle').html('<i class="fas fa-check"></i>');
-
-                // Focus on new serial input
-                $('#ts-new-serial').focus();
+            // Application State
+            const state = {
+                currentStep: 1,
+                items: [], // { id, type, label, serialNumber, phoneNumber, networkType, model, saved }
+                selectedItemIndex: -1
             };
 
-            // ====================================================
-            // 📱 VALIDATION ON SUBMIT
-            // ====================================================
-            $('#ts-transfer-form').on('submit', function (e) {
-                const newSerial = $('#ts-new-serial').val().trim();
-                const transferDate = $('#ts-transfer-date').val();
-                const transferTo = $('#ts-transfer-to').val().trim();
+            // ==========================================
+            // STEP 1 VALIDATION & NAVIGATION
+            // ==========================================
+            function checkStep1Valid() {
+                const docType = $('#DocumentTypeId').val();
+                const provider = $('#ServiceProviderId').val();
+                const isValid = docType !== '' && provider !== '';
+                $('#step1NextBtn').prop('disabled', !isValid);
+                return isValid;
+            }
 
-                if (!selectedSim) {
-                    e.preventDefault();
-                    alert('Please select a SIM card to transfer.');
-                    return false;
+            $('#DocumentTypeId, #ServiceProviderId').on('change', checkStep1Valid);
+
+            $('#step1NextBtn').on('click', function () {
+                if (checkStep1Valid()) {
+                    goToStep(2);
                 }
-
-                if (!newSerial) {
-                    e.preventDefault();
-                    alert('Please enter the new serial number.');
-                    $('#ts-new-serial').addClass('is-invalid');
-                    $('#ts-new-serial').focus();
-                    return false;
-                }
-
-                if (!transferDate) {
-                    e.preventDefault();
-                    alert('Please select a transfer date.');
-                    return false;
-                }
-
-                if (!transferTo) {
-                    e.preventDefault();
-                    alert('Please enter the recipient user.');
-                    $('#ts-transfer-to').addClass('is-invalid');
-                    $('#ts-transfer-to').focus();
-                    return false;
-                }
-
-                // Confirm transfer
-                return confirm(`Are you sure you want to transfer SIM ${selectedSim.phone} to ${transferTo}?\n\nNew Serial: ${newSerial}`);
             });
 
-            // ====================================================
-            // 📱 REMOVE INVALID CLASS ON TYPING
-            // ====================================================
-            $(document).on('input', '.ts-form-control', function () {
-                $(this).removeClass('is-invalid');
+            // ==========================================
+            // STEP 2 BATCH ADDITION
+            // ==========================================
+            $('#addDeviceBatchBtn').on('click', function () {
+                const type = $('#deviceTypeSelect').val();
+                const qty = parseInt($('#deviceQtyInput').val());
+
+                if (!type) {
+                    alert('Please select a device type.');
+                    return;
+                }
+                if (isNaN(qty) || qty < 1) {
+                    alert('Quantity must be at least 1.');
+                    return;
+                }
+
+                const existingTypeCount = state.items.filter(i => i.type === type).length;
+
+                for (let i = 1; i <= qty; i++) {
+                    const itemNum = existingTypeCount + i;
+                    const itemLabel = (type === 'SIM' ? 'SIM Card' : 'USB Modem') + ' #' + itemNum;
+                    state.items.push({
+                        id: Date.now() + Math.random(),
+                        type: type,
+                        label: itemLabel,
+                        serialNumber: '',
+                        phoneNumber: '',
+                        networkType: '4G',
+                        model: '',
+                        saved: false
+                    });
+                }
+
+                $('#deviceTypeSelect').val('');
+                $('#deviceQtyInput').val('1');
+
+                renderBatchSummary();
+                checkStep2Valid();
             });
 
-            // ====================================================
-            // 📱 RESET BUTTON
-            // ====================================================
-            $('#ts-reset-btn').on('click', function () {
-                
-                    selectedSim = null;
-                    $('#ts-sim-search').val('');
-                    $('#ts-search-results').html(`
-                            <div class="ts-empty-state">
-                                <i class="fas fa-sim-card"></i>
-                                Enter a search term above to find SIM cards.
+            function renderBatchSummary() {
+                if (state.items.length === 0) {
+                    $('#batchSummaryContainer').html('<div class="text-muted small fst-italic">No device batches added yet.</div>');
+                    return;
+                }
+
+                const simCount = state.items.filter(i => i.type === 'SIM').length;
+                const usbCount = state.items.filter(i => i.type === 'USB').length;
+
+                let html = '<div class="d-flex gap-3">';
+                if (simCount > 0) {
+                    html += `<div class="badge bg-light text-dark border p-2"><i class="fas fa-sim-card text-danger me-2"></i>SIM Cards: <strong>${simCount}</strong></div>`;
+                }
+                if (usbCount > 0) {
+                    html += `<div class="badge bg-light text-dark border p-2"><i class="fas fa-usb text-secondary me-2"></i>USB Modems: <strong>${usbCount}</strong></div>`;
+                }
+                html += '</div>';
+
+                $('#batchSummaryContainer').html(html);
+            }
+
+            function checkStep2Valid() {
+                const isValid = state.items.length > 0;
+                $('#step2NextBtn').prop('disabled', !isValid);
+                return isValid;
+            }
+
+            $('#step2BackBtn').on('click', function () {
+                goToStep(1);
+            });
+
+            $('#step2NextBtn').on('click', function () {
+                if (checkStep2Valid()) {
+                    populateItemSelector();
+                    goToStep(3);
+                }
+            });
+
+            // ==========================================
+            // STEP 3 ITEM DETAILS ENTRY
+            // ==========================================
+            function populateItemSelector() {
+                const $select = $('#itemSelector');
+                $select.empty();
+                $select.append('<option value="">-- Select Item --</option>');
+
+                state.items.forEach((item, index) => {
+                    const statusIcon = item.saved ? ' ✓' : '';
+                    $select.append(`<option value="${index}">${item.label}${statusIcon}</option>`);
+                });
+
+                if (state.items.length > 0) {
+                    const firstUnsavedIndex = state.items.findIndex(i => !i.saved);
+                    const targetIndex = firstUnsavedIndex !== -1 ? firstUnsavedIndex : 0;
+                    $select.val(targetIndex).trigger('change');
+                } else {
+                    $('#dynamicFieldsPanel').hide();
+                }
+            }
+
+            $('#itemSelector').on('change', function () {
+                const index = parseInt($(this).val());
+                if (isNaN(index) || index < 0 || index >= state.items.length) {
+                    state.selectedItemIndex = -1;
+                    $('#dynamicFieldsPanel').hide();
+                    return;
+                }
+
+                state.selectedItemIndex = index;
+                renderDynamicForm(state.items[index]);
+            });
+
+            function renderDynamicForm(item) {
+                $('#dynamicFormHeader').html(`<i class="fas fa-edit text-danger"></i> Details for ${item.label}`);
+                let fieldsHtml = '';
+
+                if (item.type === 'SIM') {
+                    fieldsHtml = `
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="custom-form-label">Serial Number (S/N) <span class="text-danger">*</span></label>
+                                <input type="text" id="inputSN" class="form-control custom-form-control" value="${item.serialNumber}" placeholder="Enter SIM Serial No.">
+                                <div class="serial-warning" id="snWarning"></div>
                             </div>
-                        `);
-                    $('#ts-details-section').fadeOut(300);
-                    $('#ts-sim-status').hide();
-                    $('#ts-transfer-btn').prop('disabled', true);
-                    $('#ts-new-serial').val('');
-                    $('#ts-transfer-to').val('');
-                    $('#ts-transfer-notes').val('');
-                    $('#ts-new-serial').removeClass('is-invalid');
-                    $('#ts-transfer-to').removeClass('is-invalid');
+                            <div class="col-md-4">
+                                <label class="custom-form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="text" id="inputPhone" class="form-control custom-form-control" value="${item.phoneNumber}" placeholder="010xxxxxxxx">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="custom-form-label">Network Type <span class="text-danger">*</span></label>
+                                <select id="inputNetwork" class="form-select custom-form-select">
+                                    <option value="4G" ${item.networkType === '4G' ? 'selected' : ''}>4G</option>
+                                    <option value="5G" ${item.networkType === '5G' ? 'selected' : ''}>5G</option>
+                                    <option value="3G" ${item.networkType === '3G' ? 'selected' : ''}>3G</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    fieldsHtml = `
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="custom-form-label">Serial Number (S/N) <span class="text-danger">*</span></label>
+                                <input type="text" id="inputSN" class="form-control custom-form-control" value="${item.serialNumber}" placeholder="Enter USB Serial No.">
+                                <div class="serial-warning" id="snWarning"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="custom-form-label">Model Name <span class="text-danger">*</span></label>
+                                <input type="text" id="inputModel" class="form-control custom-form-control" value="${item.model}" placeholder="e.g. Huawei E3372">
+                            </div>
+                        </div>
+                    `;
+                }
 
-                    // Reset step indicators
-                    $('#ts-step1-indicator').removeClass('ts-step-completed').addClass('ts-step-active');
-                    $('#ts-step1-circle').html('1');
-                    $('#ts-step2-indicator').removeClass('ts-step-active').addClass('ts-step-inactive');
-                
+                $('#dynamicFieldsContainer').html(fieldsHtml);
+                $('#dynamicFieldsPanel').show();
+
+                // Attach debounced Serial check
+                $('#inputSN').on('input', function () {
+                    const val = $(this).val().trim();
+                    clearTimeout(debounceTimer);
+                    if (!val) {
+                        $('#snWarning').hide();
+                        $(this).removeClass('is-invalid');
+                        return;
+                    }
+                    debounceTimer = setTimeout(() => {
+                        checkSerialNumberUniqueness(val, $(this), $('#snWarning'));
+                    }, 400);
+                });
+            }
+
+            function checkSerialNumberUniqueness(serial, $input, $warning) {
+                $.getJSON(checkSerialUrl, { serialNumber: serial }, function (res) {
+                    if (res && res.exists) {
+                        $input.addClass('is-invalid');
+                        $warning.text(`Serial number already exists as ${res.type}`).show();
+                    } else {
+                        $input.removeClass('is-invalid');
+                        $warning.hide();
+                    }
+                });
+            }
+
+            $('#saveItemDataBtn').on('click', function () {
+                const idx = state.selectedItemIndex;
+                if (idx < 0 || idx >= state.items.length) return;
+
+                const item = state.items[idx];
+                const $snInput = $('#inputSN');
+
+                if ($snInput.hasClass('is-invalid')) {
+                    alert('Please resolve the serial number validation warning before saving.');
+                    return;
+                }
+
+                const sn = $snInput.val().trim();
+                if (!sn) {
+                    alert('Serial Number is required.');
+                    return;
+                }
+
+                if (item.type === 'SIM') {
+                    const phone = $('#inputPhone').val().trim();
+                    if (!phone) {
+                        alert('Phone Number is required.');
+                        return;
+                    }
+                    item.serialNumber = sn;
+                    item.phoneNumber = phone;
+                    item.networkType = $('#inputNetwork').val();
+                } else {
+                    const model = $('#inputModel').val().trim();
+                    if (!model) {
+                        alert('Model is required.');
+                        return;
+                    }
+                    item.serialNumber = sn;
+                    item.model = model;
+                }
+
+                item.saved = true;
+
+                // Auto advance to next unsaved item or re-populate
+                populateItemSelector();
+                renderCardsList();
             });
 
+            function renderCardsList() {
+                const $container = $('#addedItemsCardsContainer');
+                if (state.items.length === 0) {
+                    $container.html('');
+                    return;
+                }
+
+                let html = '';
+                state.items.forEach((item, index) => {
+                    const icon = item.type === 'SIM' ? 'fa-sim-card text-danger' : 'fa-usb text-secondary';
+                    const detail = item.type === 'SIM'
+                        ? `Phone: <strong>${item.phoneNumber || 'N/A'}</strong> | Network: <strong>${item.networkType}</strong>`
+                        : `Model: <strong>${item.model || 'N/A'}</strong>`;
+                    const statusBadge = item.saved
+                        ? '<span class="badge bg-success"><i class="fas fa-check me-1"></i>Saved</span>'
+                        : '<span class="badge bg-warning text-dark">Pending Details</span>';
+
+                    html += `
+                        <div class="added-item-card d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="fas ${icon} fa-2x"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-1">${item.label} ${statusBadge}</h6>
+                                    <div class="small text-muted">
+                                        S/N: <strong>${item.serialNumber || 'N/A'}</strong> | ${detail}
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger border-0 remove-item-btn" data-index="${index}">
+                                <i class="fas fa-trash-can fa-lg"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+
+                $container.html(html);
+            }
+
+            $(document).on('click', '.remove-item-btn', function () {
+                const idx = parseInt($(this).data('index'));
+                if (!isNaN(idx)) {
+                    state.items.splice(idx, 1);
+                    renderBatchSummary();
+                    checkStep2Valid();
+                    populateItemSelector();
+                    renderCardsList();
+                }
+            });
+
+            $('#step3BackBtn').on('click', function () {
+                goToStep(2);
+            });
+
+            // ==========================================
+            // STEP SWITCHING UI LOGIC
+            // ==========================================
+            function goToStep(stepNum) {
+                state.currentStep = stepNum;
+
+                $('#step1Section').toggle(stepNum === 1);
+                $('#step2Section').toggle(stepNum === 2);
+                $('#step3Section').toggle(stepNum === 3);
+
+                // Update Step 1 Indicator
+                if (stepNum > 1 || checkStep1Valid()) {
+                    $('#sidebarStep1').addClass('step-completed').removeClass('step-active step-inactive');
+                    $('#stepCircle1').html('<i class="fas fa-check"></i>');
+                } else {
+                    $('#sidebarStep1').addClass('step-active').removeClass('step-completed step-inactive');
+                    $('#stepCircle1').text('1');
+                }
+
+                // Update Step 2 Indicator
+                if (stepNum === 2) {
+                    $('#sidebarStep2').addClass('step-active').removeClass('step-completed step-inactive');
+                    $('#stepCircle2').text('2');
+                } else if (stepNum > 2) {
+                    $('#sidebarStep2').addClass('step-completed').removeClass('step-active step-inactive');
+                    $('#stepCircle2').html('<i class="fas fa-check"></i>');
+                } else {
+                    $('#sidebarStep2').addClass('step-inactive').removeClass('step-active step-completed');
+                    $('#stepCircle2').text('2');
+                }
+
+                // Update Step 3 Indicator
+                if (stepNum === 3) {
+                    $('#sidebarStep3').addClass('step-active').removeClass('step-completed step-inactive');
+                    $('#stepCircle3').text('3');
+                } else {
+                    $('#sidebarStep3').addClass('step-inactive').removeClass('step-active step-completed');
+                    $('#stepCircle3').text('3');
+                }
+            }
+
+            // ==========================================
+            // FORM SUBMISSION & MODEL BINDING MAPPER
+            // ==========================================
+            $('#documentCreateForm').on('submit', function (e) {
+                if (!checkStep1Valid()) {
+                    e.preventDefault();
+                    alert('Please select both Document Type and Service Provider.');
+                    goToStep(1);
+                    return false;
+                }
+
+                if (state.items.length === 0) {
+                    e.preventDefault();
+                    alert('Please add at least one device item.');
+                    goToStep(2);
+                    return false;
+                }
+
+                const unsavedItems = state.items.filter(i => !i.saved);
+                if (unsavedItems.length > 0) {
+                    e.preventDefault();
+                    alert(`Please complete and save details for all items. (${unsavedItems.length} item(s) pending)`);
+                    goToStep(3);
+                    return false;
+                }
+
+                // Generate Hidden Inputs mapping directly to DocumentCreateViewModel (Sims & Usbs lists)
+                const $container = $('#hiddenInputsContainer');
+                $container.empty();
+
+                let simIdx = 0;
+                let usbIdx = 0;
+
+                state.items.forEach(item => {
+                    if (item.type === 'SIM') {
+                        $container.append(`<input type="hidden" name="Sims[${simIdx}].SerialNumber" value="${item.serialNumber}" />`);
+                        $container.append(`<input type="hidden" name="Sims[${simIdx}].PhoneNumber" value="${item.phoneNumber}" />`);
+                        $container.append(`<input type="hidden" name="Sims[${simIdx}].NetworkType" value="${item.networkType}" />`);
+                        simIdx++;
+                    } else if (item.type === 'USB') {
+                        $container.append(`<input type="hidden" name="Usbs[${usbIdx}].SerialNumber" value="${item.serialNumber}" />`);
+                        $container.append(`<input type="hidden" name="Usbs[${usbIdx}].Model" value="${item.model}" />`);
+                        usbIdx++;
+                    }
+                });
+
+                return true;
+            });
         });
     </script>
 </body>

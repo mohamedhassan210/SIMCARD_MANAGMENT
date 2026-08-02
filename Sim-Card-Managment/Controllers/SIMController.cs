@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Sim_Card_Managment.Authorization;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
-using Sim_Card_Managment.Authorization;
 using Sim_Card_Managment.Viewmodel;
-using Sim_Card_Managment.data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -101,11 +102,17 @@ namespace Sim_Card_Managment.Controllers
             return View(combinedDirectory);
         }
 
-        // GET: /SIM/Details/{id}
-        [HttpGet]
+        // SIMController.cs
         public IActionResult Details(int id)
         {
-            var sim = _simRepo.GetById(id);
+            var sim = _context.Sims
+                .Include(s => s.ServiceProvider)
+                .Include(s => s.Subscriptions)
+                    .ThenInclude(sub => sub.Employee)
+                .Include(s => s.Subscriptions)
+                    .ThenInclude(sub => sub.NonEmployee)
+                .FirstOrDefault(s => s.Id == id);
+
             if (sim == null) return NotFound();
 
             return View(sim);

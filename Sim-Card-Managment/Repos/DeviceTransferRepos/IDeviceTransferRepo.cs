@@ -10,5 +10,7 @@ namespace Sim_Card_Managment.Repos
         Subscription? GetSubscriptionById(int id);
         void AddSubscription(Subscription subscription);
         void CompleteTransaction();
+        Subscription? GetActiveSubscriptionBySimId(int simId);
+        Subscription? GetActiveSubscriptionByUsbId(int usbId);
     }
 }

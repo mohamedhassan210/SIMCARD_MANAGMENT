@@ -17,20 +17,23 @@ namespace Sim_Card_Managment.Repos
         {
             var query = _context.Documents
                 .Include(d => d.DocumentType)
-                .Include(d => d.CreatedBy)
+                .Include(d => d.DocumentDetails)
+                    .ThenInclude(dd => dd.ItemType)
+                .Include(d => d.DocumentDetails)
+                    .ThenInclude(dd => dd.Serials)
                 .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(d => d.DocumentNumber.Contains(searchTerm) || (d.Notes != null && d.Notes.Contains(searchTerm)));
+            }
 
             if (documentTypeId.HasValue)
             {
                 query = query.Where(d => d.DocumenttypeId == documentTypeId.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                query = query.Where(d => d.DocumentNumber.Contains(searchTerm) || d.Notes.Contains(searchTerm));
-            }
-
-            return await query.OrderByDescending(d => d.CreatedAt).ToListAsync();
+            return await query.ToListAsync();
         }
 
         public async Task<Document?> GetByIdAsync(int id)
