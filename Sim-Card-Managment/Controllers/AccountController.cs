@@ -310,9 +310,13 @@ namespace Sim_Card_Managment.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
+            // 1. Sign out cookie scheme
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // 2. Perform backend cleanup (clear tokens, log activity, etc.)
             await _accountRepo.Logout();
 
+            // 3. Provide feedback and redirect
             TempData["Success"] = "You have been logged out securely.";
             return RedirectToAction("Login", "Account");
         }
