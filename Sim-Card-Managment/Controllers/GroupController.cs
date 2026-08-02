@@ -40,7 +40,10 @@ public class GroupController : Controller
 
         return View(vm);
     }
-
+    public IActionResult Create()
+    {
+        return View();
+    }
     [HttpPost]
     public async Task<IActionResult> AssignPermissions(int groupId, List<int>? selectedPermissions)
     {
