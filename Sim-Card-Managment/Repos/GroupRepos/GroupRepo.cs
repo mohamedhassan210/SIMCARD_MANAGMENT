@@ -1,39 +1,93 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
-using Sim_Card_Managment.Repos.GroupRepos;
 
-public class GroupRepo : IGroupRepo
+namespace Sim_Card_Managment.Repos.GroupRepos
 {
-    private readonly AppDbContext _db;
-    public GroupRepo(AppDbContext db) => _db = db;
-
-    public async Task<IEnumerable<Group>> GetAllAsync()
+    public class GroupRepo : IGroupRepo
     {
-        var list = await _db.Groups.ToListAsync();
-        return list.OrderBy(g => g.Name);
-    }
+        private readonly AppDbContext _context;
 
-    public async Task<Group?> GetByIdWithPermissionsAsync(int id)
-        => await _db.Groups
-            .Include(g => g.GroupPermissions)
-                .ThenInclude(gp => gp.Permission)
-            .FirstOrDefaultAsync(g => g.Id == id);
-
-    public async Task AssignPermissionsAsync(int groupId, IEnumerable<int> permissionIds)
-    {
-        var existing = _db.GroupPermissions.Where(gp => gp.GroupId == groupId);
-        _db.GroupPermissions.RemoveRange(existing);
-
-        foreach (var permId in permissionIds)
+        public GroupRepo(AppDbContext context)
         {
-            _db.GroupPermissions.Add(new GroupPermission
-            {
-                GroupId = groupId,
-                PermissionId = permId
-            });
+            _context = context;
         }
 
-        await _db.SaveChangesAsync();
+        public async Task<IEnumerable<Group>> GetAllAsync()
+        {
+            return await _context.Groups
+                .Include(g => g.CreatedBy)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<Group?> GetByIdAsync(int id)
+        {
+            return await _context.Groups
+                .FirstOrDefaultAsync(g => g.Id == id);
+        }
+
+        public async Task<Group?> GetByIdWithPermissionsAsync(int id)
+        {
+            return await _context.Groups
+                .Include(g => g.GroupPermissions)
+                    .ThenInclude(gp => gp.Permission)
+                .FirstOrDefaultAsync(g => g.Id == id);
+        }
+
+        /// <summary>
+        /// Adds a new Group entity to the database asynchronously.
+        /// </summary>
+        public async Task AddAsync(Group group)
+        {
+            await _context.Groups.AddAsync(group);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Group group)
+        {
+            _context.Groups.Update(group);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var group = await _context.Groups.FindAsync(id);
+            if (group != null)
+            {
+                _context.Groups.Remove(group);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Replaces existing group permissions with the new list of permission IDs.
+        /// </summary>
+        public async Task AssignPermissionsAsync(int groupId, List<int> selectedPermissionIds)
+        {
+            // Fetch existing permissions assigned to this group
+            var existingPermissions = await _context.GroupPermissions
+                .Where(gp => gp.GroupId == groupId)
+                .ToListAsync();
+
+            // Remove existing assignments
+            _context.GroupPermissions.RemoveRange(existingPermissions);
+
+            // Add new assignments
+            if (selectedPermissionIds != null && selectedPermissionIds.Any())
+            {
+                var newGroupPermissions = selectedPermissionIds.Select(permissionId => new GroupPermission
+                {
+                    GroupId = groupId,
+                    PermissionId = permissionId
+                });
+
+                await _context.GroupPermissions.AddRangeAsync(newGroupPermissions);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        
     }
 }

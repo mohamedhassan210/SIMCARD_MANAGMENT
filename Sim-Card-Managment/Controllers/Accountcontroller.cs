@@ -1,17 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos.Account;
+using Sim_Card_Managment.Services;
 using Sim_Card_Managment.Viewmodel;
 using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using System.Net.Mail;
-using System.Net;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -19,10 +20,13 @@ namespace Sim_Card_Managment.Controllers
     public class AccountController : Controller
     {
         private readonly IAccountRepo _accountRepo;
+        private readonly IEmailService _emailService;
 
-        public AccountController(IAccountRepo accountRepo)
+
+        public AccountController(IAccountRepo accountRepo, IEmailService emailService)
         {
             _accountRepo = accountRepo;
+            _emailService = emailService;
         }
 
         #region 1. Authentication (Login & Force Password Reset)
@@ -119,27 +123,13 @@ namespace Sim_Card_Managment.Controllers
 
             try
             {
-                using (var smtpClient = new SmtpClient("smtp.gmail.com"))
-                {
-                    smtpClient.Port = 587;
-                    smtpClient.Credentials = new NetworkCredential("YoussefElsayedAhmedJ5@gmail.com", "iifymjwqhvuziecx");
-                    smtpClient.EnableSsl = true;
-
-                    var mailMessage = new MailMessage
-                    {
-                        From = new MailAddress("YoussefElsayedAhmedJ5@gmail.com", "SIM & USB Management System"),
-                        Subject = "Your Secure Login OTP Code",
-                        Body = $@"
-                        <h3>Hello {user.Username},</h3>
-                        <p>You requested a secure login access link via your email address.</p>
-                        <p>Your active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></p>
-                        <p>This code is temporary. Please use it before it expires.</p>",
-                        IsBodyHtml = true
-                    };
-
-                    mailMessage.To.Add(model.Email);
-                    await smtpClient.SendMailAsync(mailMessage);
-                }
+                await _emailService.SendEmailAsync(
+                    model.Email,
+                    "Your Secure Login OTP Code",
+                    $@"<h3>Hello {user.Username},</h3>
+           <p>You requested a secure login access link via your email address.</p>
+           <p>Your active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></p>
+           <p>This code is temporary. Please use it before it expires.</p>");
             }
             catch
             {
@@ -228,24 +218,10 @@ namespace Sim_Card_Managment.Controllers
 
             try
             {
-                using (var smtpClient = new SmtpClient("smtp.gmail.com"))
-                {
-                    smtpClient.Port = 587;
-                    smtpClient.UseDefaultCredentials = false;
-                    smtpClient.Credentials = new NetworkCredential("YoussefElsayedAhmedJ5@gmail.com", "iifymjwqhvuziecx");
-                    smtpClient.EnableSsl = true;
-
-                    var mailMessage = new MailMessage
-                    {
-                        From = new MailAddress("YoussefElsayedAhmedJ5@gmail.com", "SIM & USB Management System"),
-                        Subject = "Your New Secure Login OTP Code",
-                        Body = $"<h3>Your new active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></h3>",
-                        IsBodyHtml = true
-                    };
-
-                    mailMessage.To.Add(email);
-                    await smtpClient.SendMailAsync(mailMessage);
-                }
+                await _emailService.SendEmailAsync(
+                    email,
+                    "Your New Secure Login OTP Code",
+                    $"<h3>Your new active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></h3>");
 
                 TempData["SuccessMessage"] = $"A new code has been sent! (Resend request {currentResends}/10)";
             }
@@ -334,9 +310,13 @@ namespace Sim_Card_Managment.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
+            // 1. Sign out cookie scheme
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // 2. Perform backend cleanup (clear tokens, log activity, etc.)
             await _accountRepo.Logout();
 
+            // 3. Provide feedback and redirect
             TempData["Success"] = "You have been logged out securely.";
             return RedirectToAction("Login", "Account");
         }

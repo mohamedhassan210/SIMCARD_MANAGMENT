@@ -12,6 +12,7 @@ using Moq;
 using NUnit.Framework;
 using Sim_Card_Managment.Controllers;
 using Sim_Card_Managment.Repos.Account;
+using Sim_Card_Managment.Services; // Ensure IEmailService namespace is imported
 using Sim_Card_Managment.Viewmodel;
 
 namespace Sim_Card_Managment.Tests.Controllers
@@ -20,6 +21,7 @@ namespace Sim_Card_Managment.Tests.Controllers
     public class AccountControllerLoginTests
     {
         private Mock<IAccountRepo> _mockRepo;
+        private Mock<IEmailService> _mockEmailService; // 1. Added mock for IEmailService
         private AccountController _controller;
         private DefaultHttpContext _httpContext;
 
@@ -27,10 +29,12 @@ namespace Sim_Card_Managment.Tests.Controllers
         public void SetUp()
         {
             _mockRepo = new Mock<IAccountRepo>(MockBehavior.Strict);
+            _mockEmailService = new Mock<IEmailService>(); // 2. Instantiate email service mock
 
             _httpContext = new DefaultHttpContext();
 
-            _controller = new AccountController(_mockRepo.Object)
+            // 3. Pass both _mockRepo.Object and _mockEmailService.Object
+            _controller = new AccountController(_mockRepo.Object, _mockEmailService.Object)
             {
                 ControllerContext = new ControllerContext
                 {
