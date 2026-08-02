@@ -1,0 +1,334 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Permissions</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .permissions-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 35px;
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        /* Controller Group Card */
+        .controller-group {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .controller-group:hover {
+                border-color: #ced4da;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            }
+
+        /* Controller Header */
+        .controller-header {
+            background-color: #f8f9fa;
+            padding: 14px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .controller-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #212529;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .controller-title i {
+                color: #e65319;
+            }
+
+        /* Actions Body */
+        .actions-body {
+            padding: 20px;
+            background-color: #ffffff;
+        }
+
+        /* Custom Checkbox Container */
+        .permission-checkbox-card {
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            background-color: #fafafa;
+            transition: all 0.2s ease;
+            height: 100%;
+        }
+
+            .permission-checkbox-card:hover {
+                background-color: #ffffff;
+                border-color: #d0d5dd;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            }
+
+        .form-check-input:checked {
+            background-color: #e65319;
+            border-color: #e65319;
+        }
+
+        .action-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #212529;
+            cursor: pointer;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Action Description Text */
+        .action-desc {
+            font-size: 0.78rem;
+            color: #6c757d;
+            margin: 0;
+            line-height: 1.35;
+        }
+
+        .btn-submit {
+            background-color: #e65319;
+            color: #ffffff;
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-weight: 600;
+            border: none;
+        }
+
+            .btn-submit:hover {
+                background-color: #d44a15;
+                color: #ffffff;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="container p-100">
+        <div class="permissions-card">
+
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1">Group Permissions</h3>
+                    <p class="text-muted small mb-0">Select actions and review permission descriptions per controller module.</p>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" id="selectAllGlobal">
+                    Toggle All Permissions
+                </button>
+            </div>
+
+            <form id="permissionsForm">
+
+                <div class="controller-group">
+                    <div class="controller-header">
+                        <h5 class="controller-title">
+                            <i class="fas fa-users"></i> Employees Controller
+                        </h5>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input controller-toggle" type="checkbox" id="toggle_Employees" onchange="toggleControllerGroup(this, 'group_Employees')">
+                            <label class="form-check-label small fw-bold text-muted" for="toggle_Employees">Select All</label>
+                        </div>
+                    </div>
+                    <div class="actions-body" id="group_Employees">
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="permission-checkbox-card">
+                                    <div class="form-check">
+                                        <input class="form-check-input action-check" type="checkbox" name="permissions" value="Employees.View" id="emp_view">
+                                        <label class="form-check-label action-title" for="emp_view">View / Index</label>
+                                        <p class="action-desc">Allows viewing the employee list and details.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="permission-checkbox-card">
+                                    <div class="form-check">
+                                        <input class="form-check-input action-check" type="checkbox" name="permissions" value="Employees.Create" id="emp_create">
+                                        <label class="form-check-label action-title" for="emp_create">Create</label>
+                                        <p class="action-desc">Allows adding new employees to the system.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="permission-checkbox-card">
+                                    <div class="form-check">
+                                        <input class="form-check-input action-check" type="checkbox" name="permissions" value="Employees.Edit" id="emp_edit">
+                                        <label class="form-check-label action-title" for="emp_edit">Edit / Update</label>
+                                        <p class="action-desc">Allows updating existing employee profile information.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="permission-checkbox-card">
+                                    <div class="form-check">
+                                        <input class="form-check-input action-check" type="checkbox" name="permissions" value="Employees.Delete" id="emp_delete">
+                                        <label class="form-check-label action-title" for="emp_delete">Delete</label>
+                                        <p class="action-desc">Allows removing or archiving employee records.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controller-group">
+                    <div class="controller-header">
+                        <div class="controller-title">
+                            <i class="fas fa-file-invoice"></i> Subscriptions Controller
+                        </div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input controller-toggle" type="checkbox" id="toggle_Subscriptions" onchange="toggleControllerGroup(this, 'group_Subscriptions')">
+                            <label class="form-check-label small fw-bold text-muted" for="toggle_Subscriptions">Select All</label>
+                        </div>
+                    </div>
+                    <div class="actions-body" id="group_Subscriptions">
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="permission-checkbox-card">
+                                    <div class="form-check">
+                                        <input class="form-check-input action-check" type="checkbox" name="permissions" value="Subscriptions.View" id="sub_view">
+                                        <label class="form-check-label action-title" for="sub_view">View List</label>
+                                        <p class="action-desc">Allows viewing all active subscriptions and history.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="permission-checkbox-card">
+                                    <div class="form-check">
+                                        <input class="form-check-input action-check" type="checkbox" name="permissions" value="Subscriptions.Create" id="sub_create">
+                                        <label class="form-check-label action-title" for="sub_create">Create New</label>
+                                        <p class="action-desc">Allows setting up new subscriptions for recipients.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="permission-checkbox-card">
+                                    <div class="form-check">
+                                        <input class="form-check-input action-check" type="checkbox" name="permissions" value="Subscriptions.Transfer" id="sub_transfer">
+                                        <label class="form-check-label action-title" for="sub_transfer">Transfer Device</label>
+                                        <p class="action-desc">Allows reassigning devices to another employee.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-3">
+                                <div class="permission-checkbox-card">
+                                    <div class="form-check">
+                                        <input class="form-check-input action-check" type="checkbox" name="permissions" value="Subscriptions.Cancel" id="sub_cancel">
+                                        <label class="form-check-label action-title" for="sub_cancel">Cancel</label>
+                                        <p class="action-desc">Allows terminating active subscriptions.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controller-group">
+                    <div class="controller-header">
+                        <div class="controller-title">
+                            <i class="fas fa-cog"></i> Settings Controller
+                        </div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input controller-toggle" type="checkbox" id="toggle_Settings" onchange="toggleControllerGroup(this, 'group_Settings')">
+                            <label class="form-check-label small fw-bold text-muted" for="toggle_Settings">Select All</label>
+                        </div>
+                    </div>
+                    <div class="actions-body" id="group_Settings">
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <div class="permission-checkbox-card">
+                                    <div class="form-check">
+                                        <input class="form-check-input action-check" type="checkbox" name="permissions" value="Settings.Read" id="set_read">
+                                        <label class="form-check-label action-title" for="set_read">Read Settings</label>
+                                        <p class="action-desc">Allows viewing system configurations and settings.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <div class="permission-checkbox-card">
+                                    <div class="form-check">
+                                        <input class="form-check-input action-check" type="checkbox" name="permissions" value="Settings.Update" id="set_update">
+                                        <label class="form-check-label action-title" for="set_update">Update Settings</label>
+                                        <p class="action-desc">Allows modifying system-wide configurations.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold">Cancel</button>
+                    <button type="submit" class="btn btn-submit shadow-sm">Save Permissions</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Toggle all action checkboxes inside a specific Controller block
+        function toggleControllerGroup(toggleMaster, containerId) {
+            const isChecked = $(toggleMaster).is(':checked');
+            $(`#${containerId}`).find('.action-check').prop('checked', isChecked);
+        }
+
+        // Auto-update Controller "Select All" switch if actions change individually
+        $('.action-check').on('change', function () {
+            const $container = $(this).closest('.actions-body');
+            const containerId = $container.attr('id');
+            const total = $container.find('.action-check').length;
+            const checkedCount = $container.find('.action-check:checked').length;
+
+            const $controllerToggle = $(`[onchange="toggleControllerGroup(this, '${containerId}')"]`);
+            $controllerToggle.prop('checked', total === checkedCount);
+        });
+
+        // Toggle ALL permissions across ALL controllers at once
+        let allSelectedState = false;
+        $('#selectAllGlobal').on('click', function () {
+            allSelectedState = !allSelectedState;
+            $('input[type="checkbox"]').prop('checked', allSelectedState);
+            $(this).text(allSelectedState ? 'Deselect All Permissions' : 'Toggle All Permissions');
+        });
+
+        // Form Submission
+        $('#permissionsForm').on('submit', function (e) {
+            e.preventDefault();
+
+            const selectedPermissions = [];
+            $('.action-check:checked').each(function () {
+                selectedPermissions.push($(this).val());
+            });
+
+            console.log('Selected Permissions:', selectedPermissions);
+            alert('Permissions saved successfully!');
+        });
+    </script>
+
+</body>
+</html>
