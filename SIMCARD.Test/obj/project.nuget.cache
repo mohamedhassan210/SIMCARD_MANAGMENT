@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ipOZpbrcpW0=",
+  "dgSpecHash": "eQF6eb46Bic=",
   "success": true,
-  "projectFilePath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+  "projectFilePath": "C:\\Users\\sd\\Documents\\EsimY\\SIMCARD.Test\\SIMCARD.Test.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\sd\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\sd\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
