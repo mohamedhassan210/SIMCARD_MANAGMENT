@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class DeviceSerialOperationsController : Controller
     {
         private readonly IDeviceSerialOperationsRepo _deviceSerialOperationsRepo;

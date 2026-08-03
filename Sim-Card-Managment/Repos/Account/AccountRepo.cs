@@ -42,7 +42,9 @@ namespace Sim_Card_Managment.Repos.Account
         public async Task<UserOtp?> GetValidOtpByEmailAsync(string email)
         {
             return await _context.UserOtps
-                .FirstOrDefaultAsync(o => o.Email == email && o.ExpireDate > DateTime.Now && !o.IsUsed);
+                .Where(o => o.Email == email && o.ExpireDate > DateTime.Now && !o.IsUsed)
+                .OrderByDescending(o => o.Id)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<User?> GetUserByEmailAsync(string email)

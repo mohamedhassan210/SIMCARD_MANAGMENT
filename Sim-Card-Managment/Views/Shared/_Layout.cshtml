@@ -258,12 +258,19 @@
         </div>
 
         <div class="sidebar-logout-wrapper">
-            <button type="button" class="sidebar-logout-btn" id="sidebarLogoutBtn">
+            <a href="javascript:void(0);"
+               class="sidebar-logout-btn"
+               id="sidebarLogoutBtn"
+               onclick="document.getElementById('hiddenLogoutForm').submit();">
                 <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </div>
                 <span class="sub-item-text">Logout</span>
-            </button>
+            </a>
+
+            <form asp-controller="Account" asp-action="Logout" method="post" id="hiddenLogoutForm" class="d-none">
+                @Html.AntiForgeryToken()
+            </form>
         </div>
 
     </aside>

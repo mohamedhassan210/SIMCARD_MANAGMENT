@@ -17,6 +17,7 @@ using System.IO;
 using System.Security.Claims;
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class DocumentController : Controller
     {
         private readonly IDocumentRepo _documentRepo;

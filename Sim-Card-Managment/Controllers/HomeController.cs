@@ -4,6 +4,7 @@ using Sim_Card_Managment.Repos;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class HomeController : Controller
     {
         private readonly IDashboardRepo _repo;

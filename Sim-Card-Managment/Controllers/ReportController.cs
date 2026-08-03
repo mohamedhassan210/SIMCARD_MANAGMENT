@@ -13,6 +13,7 @@ using Sim_Card_Managment.Repos.EmployeeRepos;
 
 namespace Sim_Card_Management.Controllers
 {
+    [RequirePermission]
     public class ReportController : Controller
     {
         private readonly IEmployeeRepo _employeeRepo;

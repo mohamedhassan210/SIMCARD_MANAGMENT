@@ -1,9 +1,16 @@
-﻿namespace Sim_Card_Managment.Repos.GroupRepos
+﻿using Sim_Card_Managment.Models;
+namespace Sim_Card_Managment.Repos.GroupRepos
 {
     public interface IGroupRepo
     {
         Task<IEnumerable<Models.Group>> GetAllAsync();
         Task<Models.Group?> GetByIdWithPermissionsAsync(int id);
-        Task AssignPermissionsAsync(int groupId, IEnumerable<int> permissionIds);
+        Task<Group?> GetByIdAsync(int id);
+        Task AddAsync(Group group);
+
+        Task UpdateAsync(Group group);
+        Task DeleteAsync(int id);
+        Task AssignPermissionsAsync(int groupId, List<int> selectedPermissionIds);
+
     }
 }

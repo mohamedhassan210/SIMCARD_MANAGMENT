@@ -4,6 +4,7 @@ using Sim_Card_Managment.Repos.QuoteRepo;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class QuotaController : Controller
     {
         private readonly IQuotaRepo _quotaRepo;

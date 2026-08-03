@@ -1,12 +1,7 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-@model Sim_Card_Managment.Models.Group
+﻿@model Sim_Card_Managment.Models.Group
 
 @{
-
+    ViewData["Title"] = "Create New Group";
 }
 
 <!DOCTYPE html>
@@ -133,7 +128,7 @@
                 </div>
 
                 <div class="col-12">
-                    <label class="custom-label" asp-for="Description">Description</label>
+                    <label class="custom-label" asp-for="Description">Description (Optional)</label>
                     <textarea asp-for="Description" id="groupDescription" class="custom-textarea" rows="4" placeholder="Enter group details or purpose..."></textarea>
                     <span asp-validation-for="Description" class="error-msg"></span>
                 </div>
@@ -147,26 +142,23 @@
         </form>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
+
     <script>
         document.getElementById('groupForm').addEventListener('submit', function (event) {
             let isValid = true;
 
-            // Clear previous errors
+            // Clear previous error styles
             document.querySelectorAll('.is-invalid').forEach(function(el) {
                 el.classList.remove('is-invalid');
             });
 
-            // Validate Name
+            // Validate Name (Required)
             const name = document.getElementById('groupName');
             if (!name.value || name.value.trim() === '') {
                 name.classList.add('is-invalid');
-                isValid = false;
-            }
-
-            // Validate Description (optional if you want it required, remove if optional)
-            const description = document.getElementById('groupDescription');
-            if (!description.value || description.value.trim() === '') {
-                description.classList.add('is-invalid');
                 isValid = false;
             }
 
