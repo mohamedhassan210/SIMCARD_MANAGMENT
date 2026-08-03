@@ -190,6 +190,7 @@ namespace Sim_Card_Managment.Repos.Account
                 Email = u.Email ?? "No Email",
                 IsActive = u.IsActive,
                 CreatedAt = u.CreatedAt,
+                GroupName = u.Group != null ? u.Group.Name : "N/A",
                 Role = u.Username.ToLower() == "manager" ? "Manager" : "Employee"
             }).ToListAsync();
         }

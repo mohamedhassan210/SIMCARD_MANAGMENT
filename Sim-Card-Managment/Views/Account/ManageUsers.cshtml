@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.UserListItemViewModel>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -297,11 +299,11 @@
     <div class="page p-100 container-fluid px-4">
 
         <div class="title-section">
-            <h1><span class="num">3</span> System Users</h1>
+            <h1><span class="num">@(Model?.Count() ?? 0)</span> System Users</h1>
             <p>Manage registered user accounts, assigned permission groups, and active statuses.</p>
 
             <div class="create-btn-group">
-                <a href="#" class="create-btn"><span>+</span> New User</a>
+                <a asp-controller="Account" asp-action="Register" class="create-btn"><span>+</span> New User</a>
             </div>
         </div>
 
@@ -341,51 +343,32 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr class="user-row" data-status="active">
-                        <td class="col-name">
-                            <strong>John Doe</strong>
-                        </td>
-                        <td>john.doe@example.com</td>
-                        <td>
-                            <span class="badge-group">Administrators</span>
-                        </td>
-                        <td>
-                            <span class="badge-status badge-active">Active</span>
-                        </td>
-                        <td style="text-align: right;">
-                            <a href="#" class="view-btn">VIEW</a>
-                        </td>
-                    </tr>
-                    <tr class="user-row" data-status="active">
-                        <td class="col-name">
-                            <strong>Sarah Smith</strong>
-                        </td>
-                        <td>sarah.smith@example.com</td>
-                        <td>
-                            <span class="badge-group">HR Managers</span>
-                        </td>
-                        <td>
-                            <span class="badge-status badge-active">Active</span>
-                        </td>
-                        <td style="text-align: right;">
-                            <a href="#" class="view-btn">VIEW</a>
-                        </td>
-                    </tr>
-                    <tr class="user-row inactive-row" data-status="inactive">
-                        <td class="col-name">
-                            <strong>Michael Brown</strong>
-                        </td>
-                        <td>michael.brown@example.com</td>
-                        <td>
-                            <span class="badge-group">Support Team</span>
-                        </td>
-                        <td>
-                            <span class="badge-status badge-inactive">Inactive</span>
-                        </td>
-                        <td style="text-align: right;">
-                            <a href="#" class="view-btn">VIEW</a>
-                        </td>
-                    </tr>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            var statusValue = item.IsActive ? "active" : "inactive";
+                            var rowClass = item.IsActive ? "user-row" : "user-row inactive-row";
+
+                            <tr class="@rowClass" data-status="@statusValue">
+                                <td class="col-name">
+                                    <strong>@item.Username</strong>
+                                </td>
+                                <td>@item.Email</td>
+                                <td>
+                                    <span class="badge-group">@item.GroupName</span>
+                                </td>
+                                <td>
+                                    <span class="badge-status @(item.IsActive ? "badge-active" : "badge-inactive")">
+                                        @(item.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <a asp-controller="Account" asp-action="ProfileDetails" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                                </td>
+                            </tr>
+                        }
+                    }
                     <tr id="noResultsRow" style="display: none;">
                         <td colspan="5" style="text-align: center; padding: 32px; color: #888;">
                             No matching users found.
@@ -458,10 +441,8 @@
                 visibleRows = allRows.filter(row => {
                     const text = row.innerText.toLowerCase();
                     const matchesSearch = text.includes(query);
-
                     const rowStatus = (row.getAttribute("data-status") || "active").toLowerCase();
                     const matchesStatus = (selectedStatus === "all" || rowStatus === selectedStatus);
-
                     return matchesSearch && matchesStatus;
                 });
 

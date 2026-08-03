@@ -286,19 +286,15 @@ namespace Sim_Card_Managment.Controllers
             var currentUserIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(currentUserIdClaim) || !int.TryParse(currentUserIdClaim, out int loggedInUserId))
-            {
                 return ForceLogoutAndRedirect();
-            }
 
             if (loggedInUserId != id && !User.IsInRole("Manager"))
-            {
                 return RedirectToAction("AccessDenied");
-            }
 
             var userProfile = await _accountRepo.GetProfileByIdAsync(id);
             if (userProfile == null) return NotFound();
 
-            return View(userProfile);
+            return View(userProfile); // View will be created by frontend team later
         }
 
         #endregion
