@@ -351,6 +351,11 @@ namespace Sim_Card_Managment.Controllers
             return View(model);
         }
 
+        public IActionResult details()
+        {
+            return View();
+        }
+
         [HttpPost]
         // [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
