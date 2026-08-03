@@ -17,6 +17,7 @@ namespace Sim_Card_Managment.Repos.GroupRepos
         {
             return await _context.Groups
                 .Include(g => g.CreatedBy)
+                .Include(g => g.Users)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -88,6 +89,29 @@ namespace Sim_Card_Managment.Repos.GroupRepos
             await _context.SaveChangesAsync();
         }
 
-        
+        public async Task<Group?> GetByIdWithDetailsAsync(int id)
+        {
+            return await _context.Groups
+                .Include(g => g.CreatedBy)
+                .Include(g => g.Users)
+                .Include(g => g.GroupPermissions)
+                    .ThenInclude(gp => gp.Permission)
+                .FirstOrDefaultAsync(g => g.Id == id);
+        }
+
+        /// <summary>
+        /// Soft delete: flips IsActive to false instead of removing the row.
+        /// </summary>
+        public async Task SoftDeleteAsync(int id)
+        {
+            var group = await _context.Groups.FindAsync(id);
+            if (group != null)
+            {
+                group.IsActive = false;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+
     }
 }

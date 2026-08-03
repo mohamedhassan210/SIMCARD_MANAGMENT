@@ -5996,7 +5996,7 @@
       "projectName": "SIMCARD.Test",
       "projectPath": "C:\\Users\\sd\\Documents\\EsimY\\SIMCARD.Test\\SIMCARD.Test.csproj",
       "packagesPath": "C:\\Users\\sd\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\sd\\Documents\\ESimY\\SIMCARD.Test\\obj\\",
+      "outputPath": "C:\\Users\\sd\\Documents\\EsimY\\SIMCARD.Test\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

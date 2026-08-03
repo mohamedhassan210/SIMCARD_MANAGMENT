@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.GroupListItemViewModel>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -302,11 +303,11 @@
     <div class="page p-100 container-fluid px-4">
 
         <div class="title-section">
-            <h1><span class="num">3</span> System Groups</h1>
+            <h1><span class="num">@Model.Count()</span> System Groups</h1>
             <p>Manage user permission groups, role descriptions, and track employee assignments.</p>
 
             <div class="create-btn-group">
-                <a href="#" class="create-btn"><span>+</span> New Group</a>
+                <a asp-controller="Group" asp-action="Create" class="create-btn"><span>+</span> New Group</a>
             </div>
         </div>
 
@@ -347,54 +348,32 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr class="group-row" data-status="active">
-                        <td class="col-name">
-                            <strong>Administrators</strong>
-                        </td>
-                        <td>Full access privileges across all modules and configuration settings.</td>
-                        <td>Jan 15, 2026</td>
-                        <td>
-                            <span class="badge-status badge-active">Active</span>
-                        </td>
-                        <td style="text-align: center;">
-                            <span class="badge-count">5</span>
-                        </td>
-                        <td style="text-align: right;">
-                            <a href="#" class="view-btn">VIEW</a>
-                        </td>
-                    </tr>
-                    <tr class="group-row" data-status="active">
-                        <td class="col-name">
-                            <strong>HR Managers</strong>
-                        </td>
-                        <td>Manages employee assignments, non-employee directory, and SIM inventory.</td>
-                        <td>Feb 01, 2026</td>
-                        <td>
-                            <span class="badge-status badge-active">Active</span>
-                        </td>
-                        <td style="text-align: center;">
-                            <span class="badge-count">12</span>
-                        </td>
-                        <td style="text-align: right;">
-                            <a href="#" class="view-btn">VIEW</a>
-                        </td>
-                    </tr>
-                    <tr class="group-row inactive-row" data-status="inactive">
-                        <td class="col-name">
-                            <strong>Support Team</strong>
-                        </td>
-                        <td>Read-only access to customer SIM card requests and support logs.</td>
-                        <td>Mar 10, 2026</td>
-                        <td>
-                            <span class="badge-status badge-inactive">Inactive</span>
-                        </td>
-                        <td style="text-align: center;">
-                            <span class="badge-count">0</span>
-                        </td>
-                        <td style="text-align: right;">
-                            <a href="#" class="view-btn">VIEW</a>
-                        </td>
-                    </tr>
+                    @foreach (var group in Model)
+                    {
+                        <tr class="group-row @(!group.IsActive ? "inactive-row" : "")" data-status="@(group.IsActive ? "active" : "inactive")">
+                            <td class="col-name">
+                                <strong>@group.Name</strong>
+                            </td>
+                            <td>@(string.IsNullOrEmpty(group.Description) ? "No description provided." : group.Description)</td>
+                            <td>@group.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                @if (group.IsActive)
+                                {
+                                    <span class="badge-status badge-active">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-status badge-inactive">Inactive</span>
+                                }
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="badge-count">@group.EmployeeCount</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <a asp-controller="Group" asp-action="Details" asp-route-id="@group.Id" class="view-btn">VIEW</a>
+                            </td>
+                        </tr>
+                    }
                     <tr id="noResultsRow" style="display: none;">
                         <td colspan="6" style="text-align: center; padding: 32px; color: #888;">
                             No matching groups found.

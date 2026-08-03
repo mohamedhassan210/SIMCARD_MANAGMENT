@@ -17,10 +17,23 @@ namespace Sim_Card_Managment.Controllers
             _permissions = permissions;
         }
 
+        // GET: Group/Index
         public async Task<IActionResult> Index()
-            => View(await _groups.GetAllAsync());
+        {
+            var groups = await _groups.GetAllAsync();
 
+            var viewModel = groups.Select(g => new GroupListItemViewModel
+            {
+                Id = g.Id,
+                Name = g.Name,
+                Description = g.Description,
+                CreatedAt = g.CreatedAt,
+                IsActive = g.IsActive,
+                EmployeeCount = g.Users?.Count ?? 0
+            }).ToList();
 
+            return View(viewModel);
+        }
 
         // GET: Group/Create
         [HttpGet]
@@ -34,12 +47,10 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Group group)
         {
-            // Clear navigation properties and auto-set fields from ModelState validation
             ModelState.Remove(nameof(group.CreatedBy));
             ModelState.Remove(nameof(group.Users));
             ModelState.Remove(nameof(group.GroupPermissions));
 
-            // Set logged-in User ID (Adjust key if storing User ID differently)
             if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int currentUserId))
             {
                 group.CreatedById = currentUserId;
@@ -53,16 +64,78 @@ namespace Sim_Card_Managment.Controllers
             {
                 group.CreatedAt = DateTime.Now;
                 group.IsActive = true;
-
-                await _groups.AddAsync(group); // Or _groups.CreateAsync(group) based on your repository method name
-
+                await _groups.AddAsync(group);
                 TempData["Success"] = "Group created successfully.";
                 return RedirectToAction(nameof(Index));
             }
+            return View(group);
+        }
+
+        // GET: Group/Details/{id}
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var group = await _groups.GetByIdWithDetailsAsync(id);
+            if (group == null) return NotFound();
 
             return View(group);
         }
 
+        // GET: Group/Edit/{id}
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var group = await _groups.GetByIdAsync(id);
+            if (group == null) return NotFound();
 
+            return View(group);
+        }
+
+        // POST: Group/Edit/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Group group)
+        {
+            ModelState.Remove(nameof(group.CreatedBy));
+            ModelState.Remove(nameof(group.Users));
+            ModelState.Remove(nameof(group.GroupPermissions));
+
+            if (!ModelState.IsValid)
+            {
+                return View(group);
+            }
+
+            var existing = await _groups.GetByIdAsync(group.Id);
+            if (existing == null) return NotFound();
+
+            // Only update editable fields — CreatedById/CreatedAt stay untouched
+            existing.Name = group.Name;
+            existing.Description = group.Description;
+            existing.IsActive = group.IsActive;
+
+            await _groups.UpdateAsync(existing);
+            TempData["Success"] = "Group updated successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Group/Delete/{id}
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var group = await _groups.GetByIdAsync(id);
+            if (group == null) return NotFound();
+
+            return View(group);
+        }
+
+        // POST: Group/Delete/{id}  (soft delete: IsActive -> false)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _groups.SoftDeleteAsync(id);
+            TempData["Success"] = "Group deactivated successfully.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
