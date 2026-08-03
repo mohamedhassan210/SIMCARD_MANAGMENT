@@ -1,8 +1,5 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model Sim_Card_Managment.Viewmodel.UserProfileViewModel
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +26,6 @@
             font-family: system-ui, -apple-system, sans-serif;
         }
 
-        /* Page Header */
         .page-header {
             background: #FFFFFF;
             border-bottom: 1px solid var(--card-border);
@@ -79,7 +75,6 @@
             letter-spacing: 0.03em;
         }
 
-        /* Buttons */
         .btn-custom {
             height: 48px;
             padding: 0 24px;
@@ -121,7 +116,6 @@
                 box-shadow: 0 6px 16px rgba(220, 38, 38, 0.2);
             }
 
-        /* Info Card */
         .main-info-card {
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
@@ -182,24 +176,36 @@
 
                 <div>
                     <div class="d-flex align-items-center gap-3 flex-wrap">
-                        <h1 class="user-title m-0">John Doe</h1>
-                        <span class="user-badge-active">
-                            <i class="fa-solid fa-circle-check me-1"></i> Active User
-                        </span>
+                        <h1 class="user-title m-0">@Model.FullName</h1>
+                        @if (Model.IsActive)
+                        {
+                            <span class="user-badge-active">
+                                <i class="fa-solid fa-circle-check me-1"></i> Active User
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="user-badge-inactive">
+                                <i class="fa-solid fa-circle-xmark me-1"></i> Inactive User
+                            </span>
+                        }
                     </div>
                     <div class="mt-2">
                         <span class="user-id-chip">
-                            <i class="fa-regular fa-envelope me-2"></i> john.doe@example.com
+                            <i class="fa-regular fa-envelope me-2"></i> @Model.Email
                         </span>
                     </div>
                 </div>
 
                 <div class="d-flex flex-wrap gap-3">
-                    <a href="#" class="btn btn-custom btn-primary-orange">
+                    <a asp-controller="Account" asp-action="EditUser" asp-route-id="@Model.Id"
+                       class="btn btn-custom btn-primary-orange">
                         <i class="fa-solid fa-pen-to-square"></i> Edit User
                     </a>
 
-                    <form id="deleteForm" style="display:inline;">
+                    <form asp-controller="Account" asp-action="SoftDelete" asp-route-id="@Model.Id"
+                          method="post" id="deleteForm" style="display:inline;">
+                        @Html.AntiForgeryToken()
                         <button type="button" class="btn btn-custom btn-danger-soft" onclick="confirmDelete()">
                             <i class="fa-solid fa-trash-can"></i> Delete
                         </button>
@@ -227,25 +233,32 @@
                 <div class="row g-4">
                     <div class="col-12 col-sm-6 col-md-3">
                         <div class="info-grid-label">Full Name</div>
-                        <div class="info-grid-value">John Doe</div>
+                        <div class="info-grid-value">@Model.FullName</div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-3">
                         <div class="info-grid-label">Email Address</div>
-                        <div class="info-grid-value">john.doe@example.com</div>
+                        <div class="info-grid-value">@Model.Email</div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-3">
                         <div class="info-grid-label">Group Name</div>
                         <div class="info-grid-value">
-                            <span class="group-chip">Administrators</span>
+                            <span class="group-chip">@Model.GroupName</span>
                         </div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-3">
                         <div class="info-grid-label">Account Status</div>
                         <div class="info-grid-value">
-                            <span class="text-success fw-bold">Active</span>
+                            @if (Model.IsActive)
+                            {
+                                <span class="text-success fw-bold">Active</span>
+                            }
+                            else
+                            {
+                                <span class="text-danger fw-bold">Inactive</span>
+                            }
                         </div>
                     </div>
                 </div>
@@ -269,12 +282,7 @@
                 customClass: { popup: 'rounded-4' }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Deleted!',
-                        text: 'User profile has been removed.',
-                        icon: 'success',
-                        customClass: { popup: 'rounded-4' }
-                    });
+                    document.getElementById('deleteForm').submit();  // ← actually submits
                 }
             });
         }
