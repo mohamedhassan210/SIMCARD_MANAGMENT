@@ -22,8 +22,6 @@ namespace Sim_Card_Managment.Viewmodel
 
         public bool IsActive { get; set; }
 
-        public bool IsDeleted { get; set; } // Advanced: عشان الـ Soft Delete
-
         public DateTime? LastLogin { get; set; } // Advanced: لتتبع آخر ظهور للموظف
 
         public DateTime CreatedAt { get; set; }

@@ -1,37 +1,496 @@
-﻿@{
-    ViewData["Title"] = "Success";
-    Layout = null;
-}
-<!DOCTYPE html>
-
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Success Login</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <title>Users Directory</title>
     <style>
+        /* ---------- Title ---------- */
+        .title-section {
+            margin-bottom: 24px;
+        }
 
+            .title-section h1 {
+                font-size: 34px;
+                font-weight: 800;
+                color: #1a1a1a;
+            }
 
+                .title-section h1 .num {
+                    color: #e8552b;
+                }
 
+            .title-section p {
+                margin-top: 10px;
+                font-size: 13px;
+                line-height: 1.6;
+                color: #6b6b6b;
+                max-width: 560px;
+            }
+
+        /* ---------- Buttons ---------- */
+        .create-btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .create-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e8552b;
+            color: #fff;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+            .create-btn:hover {
+                background: #d64923;
+                color: #fff;
+                transform: translateY(-1px);
+            }
+
+        /* ---------- Filters ---------- */
+        .filters {
+            margin-top: 34px;
+        }
+
+            .filters label {
+                display: block;
+                font-size: 12px;
+                color: #6b6b6b;
+                margin-bottom: 8px;
+            }
+
+        .filters-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-select {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border: 1px solid #dcdcdc;
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-size: 13px;
+            color: #1a1a1a;
+            width: 150px;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+            .status-select:hover {
+                border-color: #e8552b;
+            }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1px solid #dcdcdc;
+            border-radius: 10px;
+            padding: 11px 14px;
+            transition: border-color 0.2s ease;
+        }
+
+            .search-box:focus-within {
+                border-color: #e8552b;
+            }
+
+            .search-box svg {
+                width: 15px;
+                height: 15px;
+                color: #a8a8a8;
+                flex-shrink: 0;
+            }
+
+            .search-box input {
+                border: none;
+                outline: none;
+                background: transparent;
+                font-size: 13px;
+                width: 100%;
+                color: #1a1a1a;
+            }
+
+                .search-box input::placeholder {
+                    color: #b3b3b3;
+                }
+
+        /* ---------- Table ---------- */
+        .table-wrap {
+            margin-top: 28px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1a1a;
+            padding-bottom: 12px;
+            vertical-align: top;
+        }
+
+        thead tr {
+            border-bottom: 2px solid #e8552b;
+        }
+
+        tbody td {
+            font-size: 12.5px;
+            color: #1a1a1a;
+            padding: 16px 0;
+            border-bottom: 1px solid #e2e2e2;
+            vertical-align: middle;
+        }
+
+        .user-row.inactive-row {
+            opacity: 0.65;
+            background-color: #fcfcfc;
+        }
+
+        .badge-status {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        .badge-active {
+            background: #e6f4ea;
+            color: #137333;
+        }
+
+        .badge-inactive {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+
+        .badge-group {
+            background: #f1f3f4;
+            color: #3c4043;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        .view-btn {
+            display: inline-block;
+            border: 1.5px solid #e8552b;
+            color: #e8552b;
+            background: transparent;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+            .view-btn:hover {
+                background: #e8552b;
+                color: #fff;
+            }
+
+        th:nth-child(1), td:nth-child(1) {
+            width: 25%;
+        }
+
+        th:nth-child(2), td:nth-child(2) {
+            width: 30%;
+        }
+
+        th:nth-child(3), td:nth-child(3) {
+            width: 20%;
+        }
+
+        th:nth-child(4), td:nth-child(4) {
+            width: 15%;
+        }
+
+        th:nth-child(5), td:nth-child(5) {
+            width: 10%;
+            text-align: right;
+        }
+
+        /* ---------- Footer ---------- */
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+            .footer .showing {
+                font-size: 12px;
+                color: #6b6b6b;
+            }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .pagination button {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                border: 1px solid #dcdcdc;
+                background: #fff;
+                color: #6b6b6b;
+                font-size: 13px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+                .pagination button:hover {
+                    border-color: #e8552b;
+                    color: #e8552b;
+                }
+
+                .pagination button.page-num {
+                    border: none;
+                    background: transparent;
+                    color: #1a1a1a;
+                }
+
+                    .pagination button.page-num:hover {
+                        background: #fbeae5;
+                        color: #e8552b;
+                    }
+
+                .pagination button.active {
+                    background: #e8552b;
+                    border-color: #e8552b;
+                    color: #fff;
+                }
     </style>
 </head>
+<body>
 
+    <div class="page p-100 container-fluid px-4">
 
+        <div class="title-section">
+            <h1><span class="num">3</span> System Users</h1>
+            <p>Manage registered user accounts, assigned permission groups, and active statuses.</p>
 
+            <div class="create-btn-group">
+                <a href="#" class="create-btn"><span>+</span> New User</a>
+            </div>
+        </div>
 
-<section class="sp-body">
+        <div class="filters">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="status-filter">Status</label>
+                    <select id="status-filter" class="status-select">
+                        <option value="all" selected>All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
 
-    <div class="sp-card">
+                <div class="filter-group" style="flex: 1;">
+                    <label for="search-input">Search Users (Client-Side)</label>
+                    <div class="search-box">
+                        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                        <input id="search-input" type="text" placeholder="Type name, email, or group name to search instantly..." autocomplete="off">
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <div class="sp-icon">✓</div>
+        <div class="table-wrap">
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Group Name</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr class="user-row" data-status="active">
+                        <td class="col-name">
+                            <strong>John Doe</strong>
+                        </td>
+                        <td>john.doe@example.com</td>
+                        <td>
+                            <span class="badge-group">Administrators</span>
+                        </td>
+                        <td>
+                            <span class="badge-status badge-active">Active</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="#" class="view-btn">VIEW</a>
+                        </td>
+                    </tr>
+                    <tr class="user-row" data-status="active">
+                        <td class="col-name">
+                            <strong>Sarah Smith</strong>
+                        </td>
+                        <td>sarah.smith@example.com</td>
+                        <td>
+                            <span class="badge-group">HR Managers</span>
+                        </td>
+                        <td>
+                            <span class="badge-status badge-active">Active</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="#" class="view-btn">VIEW</a>
+                        </td>
+                    </tr>
+                    <tr class="user-row inactive-row" data-status="inactive">
+                        <td class="col-name">
+                            <strong>Michael Brown</strong>
+                        </td>
+                        <td>michael.brown@example.com</td>
+                        <td>
+                            <span class="badge-group">Support Team</span>
+                        </td>
+                        <td>
+                            <span class="badge-status badge-inactive">Inactive</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="#" class="view-btn">VIEW</a>
+                        </td>
+                    </tr>
+                    <tr id="noResultsRow" style="display: none;">
+                        <td colspan="5" style="text-align: center; padding: 32px; color: #888;">
+                            No matching users found.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <h2>Welcome!</h2>
+        <div class="footer">
+            <div class="showing" id="showingText">Showing 0 records</div>
+            <div class="pagination" id="paginationContainer"></div>
+        </div>
 
-        <p class="text-muted mt-2">The new user account has been created and saved to the database successfully.</p>
-
-        <a asp-controller="Home" asp-action="home" class="sp-btn-home">Go to Dashboard</a>
     </div>
 
-</section>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("search-input");
+            const statusFilter = document.getElementById("status-filter");
+
+            const allRows = Array.from(document.querySelectorAll("#tableBody tr.user-row"));
+            const noResultsRow = document.getElementById("noResultsRow");
+            const showingText = document.getElementById("showingText");
+            const paginationContainer = document.getElementById("paginationContainer");
+
+            const itemsPerPage = 7;
+            let visibleRows = [...allRows];
+            let currentPage = 1;
+
+            function renderTable() {
+                const totalVisible = visibleRows.length;
+                const totalPages = Math.max(1, Math.ceil(totalVisible / itemsPerPage));
+
+                if (currentPage > totalPages) currentPage = totalPages;
+
+                const startIdx = (currentPage - 1) * itemsPerPage;
+                const endIdx = startIdx + itemsPerPage;
+
+                allRows.forEach(row => row.style.display = "none");
+                visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
+
+                if (totalVisible === 0) {
+                    if (noResultsRow) noResultsRow.style.display = "";
+                    showingText.textContent = "Showing 0 records";
+                    paginationContainer.innerHTML = "";
+                    return;
+                } else {
+                    if (noResultsRow) noResultsRow.style.display = "none";
+                }
+
+                const actualEnd = Math.min(endIdx, totalVisible);
+                showingText.textContent = `Showing ${startIdx + 1}-${actualEnd} of ${totalVisible} records`;
+
+                let html = `<button type="button" class="arrow" id="prevBtn" ${currentPage === 1 ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8249;</button>`;
+
+                for (let i = 1; i <= totalPages; i++) {
+                    html += `<button type="button" class="${i === currentPage ? 'active' : 'page-num'}" data-page="${i}">${i}</button>`;
+                }
+
+                html += `<button type="button" class="arrow" id="nextBtn" ${currentPage === totalPages ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8250;</button>`;
+
+                paginationContainer.innerHTML = html;
+            }
+
+            function applyFilters() {
+                const query = searchInput.value.trim().toLowerCase();
+                const selectedStatus = statusFilter.value.toLowerCase();
+
+                visibleRows = allRows.filter(row => {
+                    const text = row.innerText.toLowerCase();
+                    const matchesSearch = text.includes(query);
+
+                    const rowStatus = (row.getAttribute("data-status") || "active").toLowerCase();
+                    const matchesStatus = (selectedStatus === "all" || rowStatus === selectedStatus);
+
+                    return matchesSearch && matchesStatus;
+                });
+
+                currentPage = 1;
+                renderTable();
+            }
+
+            searchInput.addEventListener("input", applyFilters);
+            statusFilter.addEventListener("change", applyFilters);
+
+            paginationContainer.addEventListener("click", function (e) {
+                const btn = e.target.closest("button");
+                if (!btn || btn.disabled) return;
+
+                if (btn.id === "prevBtn") {
+                    if (currentPage > 1) currentPage--;
+                } else if (btn.id === "nextBtn") {
+                    const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
+                    if (currentPage < totalPages) currentPage++;
+                } else if (btn.dataset.page) {
+                    currentPage = parseInt(btn.dataset.page, 10);
+                }
+
+                renderTable();
+            });
+
+            applyFilters();
+        });
+    </script>
+
+</body>
+</html>
