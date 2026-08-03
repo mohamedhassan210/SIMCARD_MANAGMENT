@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj": {}
+    "C:\\Users\\sd\\Documents\\EsimY\\SIMCARD.Test\\SIMCARD.Test.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
+    "C:\\Users\\sd\\Documents\\EsimY\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
+        "projectUniqueName": "C:\\Users\\sd\\Documents\\EsimY\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
         "projectName": "Sim-Card-Managment",
-        "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
+        "projectPath": "C:\\Users\\sd\\Documents\\EsimY\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
         "packagesPath": "C:\\Users\\sd\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\obj\\",
+        "outputPath": "C:\\Users\\sd\\Documents\\ESimY\\Sim-Card-Managment\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -124,18 +124,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj": {
+    "C:\\Users\\sd\\Documents\\EsimY\\SIMCARD.Test\\SIMCARD.Test.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+        "projectUniqueName": "C:\\Users\\sd\\Documents\\EsimY\\SIMCARD.Test\\SIMCARD.Test.csproj",
         "projectName": "SIMCARD.Test",
-        "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+        "projectPath": "C:\\Users\\sd\\Documents\\EsimY\\SIMCARD.Test\\SIMCARD.Test.csproj",
         "packagesPath": "C:\\Users\\sd\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\obj\\",
+        "outputPath": "C:\\Users\\sd\\Documents\\ESimY\\SIMCARD.Test\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -156,8 +156,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
-                "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj"
+              "C:\\Users\\sd\\Documents\\EsimY\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
+                "projectPath": "C:\\Users\\sd\\Documents\\EsimY\\Sim-Card-Managment\\Sim-Card-Managment.csproj"
               }
             }
           }
@@ -218,7 +218,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
