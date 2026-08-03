@@ -280,21 +280,8 @@ namespace Sim_Card_Managment.Controllers
         #region 4. User Profile Details
 
         [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> ProfileDetails(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var currentUserIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(currentUserIdClaim) || !int.TryParse(currentUserIdClaim, out int loggedInUserId))
-            {
-                return ForceLogoutAndRedirect();
-            }
-
-            if (loggedInUserId != id && !User.IsInRole("Manager"))
-            {
-                return RedirectToAction("AccessDenied");
-            }
-
             var userProfile = await _accountRepo.GetProfileByIdAsync(id);
             if (userProfile == null) return NotFound();
 
@@ -350,6 +337,7 @@ namespace Sim_Card_Managment.Controllers
             }
             return View(model);
         }
+
 
         [HttpPost]
         // [Authorize(Roles = "Manager")]
