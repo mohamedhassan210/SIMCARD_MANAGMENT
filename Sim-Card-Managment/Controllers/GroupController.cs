@@ -6,6 +6,7 @@ using System.Security.Claims;
 
 namespace Sim_Card_Managment.Controllers
 {
+    [RequirePermission]
     public class GroupController : Controller
     {
         private readonly IGroupRepo _groups;
