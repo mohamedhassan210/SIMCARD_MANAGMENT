@@ -71,6 +71,7 @@ builder.Services.AddScoped<ISerialRepo, SerialRepo>();
 builder.Services.AddScoped<IDocumentDetailsRepo, DocumentDetailsRepo>();
 builder.Services.AddScoped<IItemTypeRepo, ItemTypeRepo>();
 builder.Services.AddScoped<IDeviceSerialOperationsRepo, DeviceSerialOperationsRepo>();
+builder.Services.AddScoped<IUserPermissionService, UserPermissionService>();
 
 // 7. Enable Session
 builder.Services.AddSession(options =>
