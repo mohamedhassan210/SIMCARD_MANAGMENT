@@ -239,7 +239,7 @@ namespace Sim_Card_Managment.Controllers
         #region 3. User Registration (Manager-Only)
 
         [HttpGet]
-        // [Authorize(Roles = "Manager")]
+        [RequirePermission]
         public async Task<IActionResult> Register()
         {
             // جلب المجموعات من قاعدة البيانات وتحويلها لـ SelectList للـ Dropdown
@@ -249,6 +249,7 @@ namespace Sim_Card_Managment.Controllers
             return View(new RegisterViewModel());
         }
 
+        [RequirePermission]
         [HttpPost]
         // [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
@@ -278,23 +279,10 @@ namespace Sim_Card_Managment.Controllers
         #endregion
 
         #region 4. User Profile Details
-
+        [RequirePermission]
         [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> ProfileDetails(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var currentUserIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(currentUserIdClaim) || !int.TryParse(currentUserIdClaim, out int loggedInUserId))
-            {
-                return ForceLogoutAndRedirect();
-            }
-
-            if (loggedInUserId != id && !User.IsInRole("Manager"))
-            {
-                return RedirectToAction("AccessDenied");
-            }
-
             var userProfile = await _accountRepo.GetProfileByIdAsync(id);
             if (userProfile == null) return NotFound();
 
@@ -326,6 +314,7 @@ namespace Sim_Card_Managment.Controllers
         #region 6. User Management (Manager Only)
 
         [HttpGet]
+        [RequirePermission]
         // [Authorize(Roles = "Manager")]
         public async Task<IActionResult> ManageUsers(string? search, int? groupId, bool? isActive)
         {
@@ -339,6 +328,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [HttpGet]
+        [RequirePermission]
         // [Authorize(Roles = "Manager")]
         public async Task<IActionResult> EditUser(int id)
         {
@@ -351,11 +341,7 @@ namespace Sim_Card_Managment.Controllers
             return View(model);
         }
 
-        public IActionResult details()
-        {
-            return View();
-        }
-
+        [RequirePermission]
         [HttpPost]
         // [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
@@ -374,6 +360,7 @@ namespace Sim_Card_Managment.Controllers
             return View(model);
         }
 
+        [RequirePermission]
         [HttpPost]
         // [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
@@ -391,8 +378,8 @@ namespace Sim_Card_Managment.Controllers
             return RedirectToAction("ManageUsers");
         }
 
+        [RequirePermission]
         [HttpPost]
-        // [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SoftDelete(int id)
         {
@@ -400,11 +387,19 @@ namespace Sim_Card_Managment.Controllers
             if (!result)
             {
                 TempData["Warning"] = "Unable to delete user.";
+                return RedirectToAction("ManageUsers");
             }
-            else
+
+            TempData["Success"] = "User moved to soft-deleted items successfully.";
+
+            // Check if the deleted user is the currently logged-in user
+            var currentUserIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(currentUserIdClaim, out int loggedInUserId) && loggedInUserId == id)
             {
-                TempData["Success"] = "User moved to soft-deleted items successfully.";
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                return RedirectToAction("Login", "Account");
             }
+
             return RedirectToAction("ManageUsers");
         }
 

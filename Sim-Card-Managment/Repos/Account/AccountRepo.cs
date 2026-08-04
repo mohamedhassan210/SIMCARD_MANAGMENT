@@ -135,15 +135,20 @@ namespace Sim_Card_Managment.Repos.Account
 
         public async Task<UserProfileViewModel?> GetProfileByIdAsync(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null || !user.IsActive) return null;
+            var user = await _context.Users
+                .Include(u => u.Group)   // ← needed for GroupName
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null) return null;
 
             return new UserProfileViewModel
             {
                 Id = user.Id,
                 FullName = user.Username,
                 Email = user.Email ?? "No Email",
-                Role = user.Username.ToLower() == "manager" ? "Manager" : "Employee"
+                Role = user.Username.ToLower() == "manager" ? "Manager" : "Employee",
+                GroupName = user.Group?.Name ?? "N/A",   // ← add
+                IsActive = user.IsActive                // ← add
             };
         }
 
@@ -190,6 +195,7 @@ namespace Sim_Card_Managment.Repos.Account
                 Email = u.Email ?? "No Email",
                 IsActive = u.IsActive,
                 CreatedAt = u.CreatedAt,
+                GroupName = u.Group != null ? u.Group.Name : "N/A",
                 Role = u.Username.ToLower() == "manager" ? "Manager" : "Employee"
             }).ToListAsync();
         }

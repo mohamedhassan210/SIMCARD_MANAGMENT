@@ -12,6 +12,9 @@ namespace Sim_Card_Managment.Controllers
     /// Handles Group Permission Management operations.
     /// Manages assignment of permissions to groups using Repository Pattern.
     /// </summary>
+    /// 
+
+    [RequirePermission]
     public class PermissionController : Controller
     {
         private readonly IGroupRepo _groupRepo;
