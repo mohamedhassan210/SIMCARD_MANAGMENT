@@ -1,9 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -133,14 +128,36 @@
                 color: var(--text-dark);
             }
 
+        /* Fixed Table Container with Hidden Scrollbar */
+        .table-scroll-container {
+            max-height: 260px; /* Fixed height for scrolling */
+            overflow-y: auto;
+            border-bottom: 1px solid var(--card-border);
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            -webkit-overflow-scrolling: touch;
+        }
+
+            .table-scroll-container::-webkit-scrollbar {
+                display: none;
+            }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .table-scroll-container {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+
         /* Table Styling */
         .users-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1.5rem;
         }
 
             .users-table thead th {
+                position: sticky;
+                top: 0;
+                background-color: #FFFFFF;
+                z-index: 10;
                 text-align: left;
                 font-size: 0.8rem;
                 text-transform: uppercase;
@@ -172,6 +189,69 @@
             .btn-change-group:hover {
                 background: var(--brand-purple);
                 color: #FFFFFF;
+            }
+
+        /* Action Buttons Container under Table */
+        .group-actions-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 1.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            height: 44px;
+            padding: 0 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-action-edit {
+            background-color: var(--brand-orange);
+            color: #FFFFFF;
+        }
+
+            .btn-action-edit:hover {
+                background-color: #c94614;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(223, 83, 27, 0.25);
+            }
+
+        .btn-action-delete {
+            background-color: #FEF2F2;
+            color: #DC2626;
+            border: 1px solid #FCA5A5;
+        }
+
+            .btn-action-delete:hover {
+                background-color: #DC2626;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+            }
+
+        .btn-action-permissions {
+            background-color: rgba(91, 45, 144, 0.1);
+            color: var(--brand-purple);
+            border: 1px solid rgba(91, 45, 144, 0.2);
+        }
+
+            .btn-action-permissions:hover {
+                background-color: var(--brand-purple);
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(91, 45, 144, 0.25);
             }
     </style>
 </head>
@@ -217,7 +297,7 @@
                     <div class="col-12 col-sm-4 col-md-1">
                         <div class="info-grid-label">Employees</div>
                         <div class="info-grid-value">
-                            <span class="emp-count-badge">3</span>
+                            <span class="emp-count-badge">5</span>
                         </div>
                     </div>
                 </div>
@@ -234,7 +314,7 @@
                 </div>
             </div>
 
-            <div class="table-responsive">
+            <div class="table-scroll-container">
                 <table class="users-table" id="usersTable">
                     <thead>
                         <tr>
@@ -273,6 +353,26 @@
                                 </button>
                             </td>
                         </tr>
+                        <tr class="user-row">
+                            <td>
+                                <strong>Emily Davis</strong>
+                            </td>
+                            <td style="text-align: right;">
+                                <button type="button" class="btn-change-group" onclick="changeGroup('Emily Davis')">
+                                    <i class="fa-solid fa-arrows-rotate me-1"></i> Change Group
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="user-row">
+                            <td>
+                                <strong>Alex Johnson</strong>
+                            </td>
+                            <td style="text-align: right;">
+                                <button type="button" class="btn-change-group" onclick="changeGroup('Alex Johnson')">
+                                    <i class="fa-solid fa-arrows-rotate me-1"></i> Change Group
+                                </button>
+                            </td>
+                        </tr>
                         <tr id="noResultsRow" style="display: none;">
                             <td colspan="2" class="text-center text-muted py-4">
                                 No matching users found.
@@ -281,13 +381,26 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="group-actions-bar">
+                <button type="button" class="btn-action btn-action-edit" >
+                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                </button>
+                <button type="button" class="btn-action btn-action-delete" onclick="onDeleteGroup()">
+                    <i class="fa-solid fa-trash-can"></i> Delete
+                </button>
+                <a asp-action="mangePermission" asp-controller="Permission" class="btn-action btn-action-permissions">
+                    <i class="fa-solid fa-user-shield"></i> Manage Permissions
+                </a>
+            </div>
+
         </div>
 
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Search functionality
+        // Client-side search for the scrollable table
         document.getElementById('userSearchInput').addEventListener('input', function () {
             const query = this.value.toLowerCase().trim();
             const rows = document.querySelectorAll('#usersTableBody tr.user-row');
@@ -334,6 +447,23 @@
                 }
             });
         }
+
+     
+
+        function onDeleteGroup() {
+            Swal.fire({
+                title: 'Delete Group?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Yes, Delete',
+                customClass: { popup: 'rounded-4' }
+            });
+        }
+
+       
     </script>
 </body>
 </html>

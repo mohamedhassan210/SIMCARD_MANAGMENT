@@ -198,10 +198,16 @@
                 </div>
 
                 <div class="d-flex flex-wrap gap-3">
+
+                    <a asp-controller="Account" asp-action="ChangePassword" asp-route-id="@Model.Id"
+                       class="btn btn-custom btn-primary-orange">
+                        <i class="fa-solid fa-pen-to-square"></i> Change Password
+                    </a>
                     <a asp-controller="Account" asp-action="EditUser" asp-route-id="@Model.Id"
                        class="btn btn-custom btn-primary-orange">
                         <i class="fa-solid fa-pen-to-square"></i> Edit User
                     </a>
+
 
                     <form asp-controller="Account" asp-action="SoftDelete" asp-route-id="@Model.Id"
                           method="post" id="deleteForm" style="display:inline;">
