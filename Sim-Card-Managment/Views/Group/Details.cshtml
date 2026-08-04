@@ -1,8 +1,5 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model Sim_Card_Managment.Models.Group
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +27,6 @@
             padding-bottom: 3rem;
         }
 
-        /* Group Details Card */
         .details-card {
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
@@ -86,6 +82,18 @@
             text-transform: uppercase;
         }
 
+        .badge-status-inactive {
+            display: inline-block;
+            font-size: 0.75rem;
+            background-color: rgba(220, 38, 38, 0.1);
+            color: #DC2626;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            text-transform: uppercase;
+        }
+
         .emp-count-badge {
             background: #E8F0FE;
             color: #1A73E8;
@@ -96,7 +104,6 @@
             display: inline-block;
         }
 
-        /* Users Section */
         .users-card {
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
@@ -133,7 +140,6 @@
                 color: var(--text-dark);
             }
 
-        /* Table Styling */
         .users-table {
             width: 100%;
             border-collapse: collapse;
@@ -177,6 +183,8 @@
 </head>
 <body>
 
+    @Html.AntiForgeryToken()
+
     <main class="container-fluid px-lg-5 p-100">
 
         <div class="details-card">
@@ -194,30 +202,37 @@
                 <div class="row g-4">
                     <div class="col-12 col-md-3">
                         <div class="info-grid-label">Group Name</div>
-                        <div class="info-grid-value">Administrators</div>
+                        <div class="info-grid-value">@Model.Name</div>
                     </div>
 
                     <div class="col-12 col-md-4">
                         <div class="info-grid-label">Description</div>
-                        <div class="info-grid-value">Full access privileges across all modules and system settings.</div>
+                        <div class="info-grid-value">@(Model.Description ?? "No description provided.")</div>
                     </div>
 
                     <div class="col-12 col-sm-4 col-md-2">
                         <div class="info-grid-label">Status</div>
                         <div class="info-grid-value">
-                            <span class="badge-status-active">Active</span>
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge-status-active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status-inactive">Inactive</span>
+                            }
                         </div>
                     </div>
 
                     <div class="col-12 col-sm-4 col-md-2">
                         <div class="info-grid-label">Created At</div>
-                        <div class="info-grid-value">Jan 15, 2026</div>
+                        <div class="info-grid-value">@Model.CreatedAt.ToString("MMM dd, yyyy")</div>
                     </div>
 
                     <div class="col-12 col-sm-4 col-md-1">
                         <div class="info-grid-label">Employees</div>
                         <div class="info-grid-value">
-                            <span class="emp-count-badge">3</span>
+                            <span class="emp-count-badge">@(Model.Users?.Count ?? 0)</span>
                         </div>
                     </div>
                 </div>
@@ -243,37 +258,22 @@
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
-                        <tr class="user-row">
-                            <td>
-                                <strong>John Doe</strong>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-change-group" onclick="changeGroup('John Doe')">
-                                    <i class="fa-solid fa-arrows-rotate me-1"></i> Change Group
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="user-row">
-                            <td>
-                                <strong>Sarah Smith</strong>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-change-group" onclick="changeGroup('Sarah Smith')">
-                                    <i class="fa-solid fa-arrows-rotate me-1"></i> Change Group
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="user-row">
-                            <td>
-                                <strong>Michael Brown</strong>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-change-group" onclick="changeGroup('Michael Brown')">
-                                    <i class="fa-solid fa-arrows-rotate me-1"></i> Change Group
-                                </button>
-                            </td>
-                        </tr>
-                        <tr id="noResultsRow" style="display: none;">
+                        @if (Model.Users != null && Model.Users.Any())
+                        {
+                            foreach (var user in Model.Users)
+                            {
+                                <tr class="user-row">
+                                    <td><strong>@user.Username</strong></td>
+                                    <td style="text-align: right;">
+                                        <button type="button" class="btn-change-group"
+                                                onclick="changeGroup('@user.Username', @user.Id)">
+                                            <i class="fa-solid fa-arrows-rotate me-1"></i> Change Group
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        <tr id="noResultsRow" style="display: @(Model.Users == null || !Model.Users.Any() ? "" : "none");">
                             <td colspan="2" class="text-center text-muted py-4">
                                 No matching users found.
                             </td>
@@ -287,7 +287,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Search functionality
         document.getElementById('userSearchInput').addEventListener('input', function () {
             const query = this.value.toLowerCase().trim();
             const rows = document.querySelectorAll('#usersTableBody tr.user-row');
@@ -306,33 +305,46 @@
             document.getElementById('noResultsRow').style.display = hasVisibleRow ? 'none' : '';
         });
 
-        // Change Group Action
-        function changeGroup(userName) {
-            Swal.fire({
+        async function changeGroup(userName, userId) {
+            const response = await fetch('/Group/GetAllGroups');
+            const groups = await response.json();
+
+            const inputOptions = {};
+            groups.forEach(g => inputOptions[g.id] = g.name);
+
+            const { value: newGroupId, isConfirmed } = await Swal.fire({
                 title: 'Change Group',
                 text: `Reassign group for ${userName}`,
                 input: 'select',
-                inputOptions: {
-                    'Administrators': 'Administrators',
-                    'HR Managers': 'HR Managers',
-                    'Support Team': 'Support Team'
-                },
+                inputOptions: inputOptions,
                 inputPlaceholder: 'Select a new group',
                 showCancelButton: true,
                 confirmButtonColor: '#5B2D90',
                 cancelButtonColor: '#64748B',
                 confirmButtonText: 'Save Change',
                 customClass: { popup: 'rounded-4' }
-            }).then((result) => {
-                if (result.isConfirmed && result.value) {
-                    Swal.fire({
-                        title: 'Updated!',
-                        text: `${userName} was moved to ${result.value}.`,
-                        icon: 'success',
-                        customClass: { popup: 'rounded-4' }
-                    });
-                }
             });
+
+            if (!isConfirmed || !newGroupId) return;
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const postResponse = await fetch('/Group/ChangeUserGroup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `userId=${userId}&newGroupId=${newGroupId}&__RequestVerificationToken=${encodeURIComponent(token)}`
+            });
+
+            const result = await postResponse.json();
+            if (result.success) {
+                Swal.fire({
+                    title: 'Updated!',
+                    text: `${userName} has been moved to a new group.`,
+                    icon: 'success',
+                    customClass: { popup: 'rounded-4' }
+                }).then(() => location.reload());
+            } else {
+                Swal.fire('Error', result.message, 'error');
+            }
         }
     </script>
 </body>

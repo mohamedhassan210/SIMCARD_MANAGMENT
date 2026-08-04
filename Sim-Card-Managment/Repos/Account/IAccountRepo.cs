@@ -26,6 +26,7 @@ namespace Sim_Card_Managment.Repos.Account
         Task<bool> UpdateUserAsync(EditUserViewModel model);
         Task<bool> ToggleUserActiveAsync(int id); // تجميد/تفعيل الحساب
         Task<bool> SoftDeleteUserAsync(int id);   // الحذف الذكي (إخفاء وليس مسح نهائي)
+        Task<bool> ChangeUserGroupAsync(int userId, int newGroupId);
     }
 
     public class LoginResult

@@ -253,5 +253,15 @@ namespace Sim_Card_Managment.Repos.Account
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<bool> ChangeUserGroupAsync(int userId, int newGroupId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            user.GroupId = newGroupId;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
