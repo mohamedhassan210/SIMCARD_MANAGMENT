@@ -342,6 +342,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [RequirePermission]
+
         [HttpPost]
         // [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]

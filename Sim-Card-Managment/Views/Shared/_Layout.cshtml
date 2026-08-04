@@ -1,7 +1,45 @@
-﻿@{
+﻿@using Sim_Card_Managment.Services
+@inject IUserPermissionService PermissionService
+@{
     // Get the current controller and action from the route
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+
+    var isManager = User.IsInRole("Manager");
+    var permissionKeys = await PermissionService.GetPermissionKeysAsync();
+    Func<string, string, bool> Has = (controller, action) =>
+        isManager || permissionKeys.Contains($"{controller}|{action}");
+
+    // Per-item visibility
+    var canManageUsers = Has("Account", "ManageUsers");
+    var canManagePermissions = Has("Permission", "Index");
+    var canViewGroups = Has("Group", "Index");
+
+    var canCreateSim = Has("SIM", "Create");
+    var canViewSims = Has("SIM", "Index");
+
+    var canCreateUsb = Has("USB", "Create");
+    var canViewUsbs = Has("USB", "Index");
+
+    var canViewDocuments = Has("Document", "Index");
+    var canCreateDocument = Has("Document", "Create");
+
+    var canViewServiceProviders = Has("ServiceProvider", "Index");
+    var canCreateServiceProvider = Has("ServiceProvider", "Create");
+
+    var canViewReport = Has("Report", "Index");
+
+    var canViewSubscription = Has("Subscription", "Index");
+    var canCreateSubscription = Has("Subscription", "Create");
+
+    // Per-section visibility (header only shows if at least one child is visible)
+    var showUserSection = canManageUsers || canManagePermissions || canViewGroups;
+    var showSimSection = canCreateSim || canViewSims;
+    var showUsbSection = canCreateUsb || canViewUsbs;
+    var showDocumentSection = canViewDocuments || canCreateDocument;
+    var showServiceProviderSection = canViewServiceProviders || canCreateServiceProvider;
+    var showReportSection = canViewReport;
+    var showSubscriptionSection = canViewSubscription || canCreateSubscription;
 }
 
 <!DOCTYPE html>
@@ -34,226 +72,289 @@
 
         <div class="accordion sidebar-accordion mx-auto g-5 flex-grow-1 overflow-auto p-3" id="sidebarMenu" style="max-width: 400px; width: 100%;">
 
-            <div class="accordion-item mb-2">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseUser" aria-expanded="true" style="cursor: pointer;">
-                    <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 6l-6 10h12z" />
-                        </svg>
-                    </div>
-                    <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                        </svg>
-                    </div>
-                    <span class="text-white fs-6">User</span>
-                </div>
-
-                <div id="collapseUser" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
-                    <div class="accordion-body p-0 pt-3 pb-3 ms-2">
-                        <a asp-controller="Account" asp-action="Register" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                            <span class="sub-item-text">Create new user</span>
-                        </a>
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <img src="~/img/icon-park-outline_permissions.png" alt="Alternate Text" />
-                            </div>
-                            <span class="sub-item-text">Manage Permissions</span>
+            @if (showUserSection)
+            {
+                <div class="accordion-item mb-2">
+                    <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseUser" aria-expanded="true" style="cursor: pointer;">
+                        <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                            <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6l-6 10h12z" />
+                            </svg>
                         </div>
-                        <a class="d-flex align-items-center gap-3 text-decoration-none" asp-controller="Group" asp-action="Create">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <i class="fa-solid fa-user-group"></i>
-                            </div>
-                            <span class="sub-item-text">Create new group</span>
-                        </a>
+                        <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                            </svg>
+                        </div>
+                        <span class="text-white fs-6">User</span>
                     </div>
-                </div>
-            </div>
 
-            <div class="accordion-item mb-2">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseSim" aria-expanded="true" style="cursor: pointer;">
-                    <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 6l-6 10h12z" />
-                        </svg>
+                    <div id="collapseUser" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
+                        <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                            @if (canManageUsers)
+                            {
+                                <a asp-controller="Account" asp-action="ManageUsers" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </div>
+                                    <span class="sub-item-text">View Users</span>
+                                </a>
+                            }
+                            @if (canManagePermissions)
+                            {
+                                <a asp-controller="Permission" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <img src="~/img/icon-park-outline_permissions.png" alt="Alternate Text" />
+                                    </div>
+                                    <span class="sub-item-text">Manage Permissions</span>
+                                </a>
+                            }
+                            @if (canViewGroups)
+                            {
+                                <a class="d-flex align-items-center gap-3 text-decoration-none" asp-controller="Group" asp-action="Index">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-user-group"></i>
+                                    </div>
+                                    <span class="sub-item-text">View Groups</span>
+                                </a>
+                            }
+                        </div>
                     </div>
-                    <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18 2h-8L4 8v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM7 17h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zM7 13h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z" />
-                        </svg>
-                    </div>
-                    <span class="text-white fs-6">SIM cards</span>
                 </div>
+            }
 
-                <div id="collapseSim" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
-                    <div class="accordion-body p-0 pt-3 pb-3 ms-2">
-                        <a asp-controller="SIM" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <img src="~/img/Vector.png" alt="Alternate Text" style="width: 20px" />
-                            </div>
-                            <span class="sub-item-text">Create new SIM</span>
-                        </a>
-                        <a asp-controller="SIM" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <img src="~/img/icon-park-outline_permissions.png" alt="Alternate Text" />
-                            </div>
-                            <span class="sub-item-text">View All Sims</span>
-                        </a>
+            @if (showSimSection)
+            {
+                <div class="accordion-item mb-2">
+                    <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseSim" aria-expanded="true" style="cursor: pointer;">
+                        <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                            <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6l-6 10h12z" />
+                            </svg>
+                        </div>
+                        <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18 2h-8L4 8v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM7 17h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zM7 13h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z" />
+                            </svg>
+                        </div>
+                        <span class="text-white fs-6">SIM cards</span>
                     </div>
-                </div>
-            </div>
 
-            <div class="accordion-item mb-2">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseUsb" aria-expanded="true" style="cursor: pointer;">
-                    <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 6l-6 10h12z" />
-                        </svg>
+                    <div id="collapseSim" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
+                        <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                            @if (canCreateSim)
+                            {
+                                <a asp-controller="SIM" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <img src="~/img/Vector.png" alt="Alternate Text" style="width: 20px" />
+                                    </div>
+                                    <span class="sub-item-text">Create new SIM</span>
+                                </a>
+                            }
+                            @if (canViewSims)
+                            {
+                                <a asp-controller="SIM" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <img src="~/img/icon-park-outline_permissions.png" alt="Alternate Text" />
+                                    </div>
+                                    <span class="sub-item-text">View All Sims</span>
+                                </a>
+                            }
+                        </div>
                     </div>
-                    <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
-                        <img src="~/img/boxicons_usb.png" alt="Alternate Text" style="width: 20px" />
-                    </div>
-                    <span class="text-white fs-6">USB</span>
                 </div>
+            }
 
-                <div id="collapseUsb" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
-                    <div class="accordion-body p-0 pt-3 pb-3 ms-2">
-                        <a asp-controller="USB" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <img src="~/img/Vector.png" alt="Alternate Text" style="width: 20px" />
-                            </div>
-                            <span class="sub-item-text">Create new USB</span>
-                        </a>
-                        <a asp-controller="USB" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <img src="~/img/icon-park-outline_permissions.png" alt="Alternate Text" />
-                            </div>
-                            <span class="sub-item-text">View All USBs</span>
-                        </a>
+            @if (showUsbSection)
+            {
+                <div class="accordion-item mb-2">
+                    <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseUsb" aria-expanded="true" style="cursor: pointer;">
+                        <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                            <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6l-6 10h12z" />
+                            </svg>
+                        </div>
+                        <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                            <img src="~/img/boxicons_usb.png" alt="Alternate Text" style="width: 20px" />
+                        </div>
+                        <span class="text-white fs-6">USB</span>
                     </div>
-                </div>
-            </div>
 
-            <div class="accordion-item mb-2">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseDocument" aria-expanded="true" style="cursor: pointer;">
-                    <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 6l-6 10h12z" />
-                        </svg>
+                    <div id="collapseUsb" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
+                        <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                            @if (canCreateUsb)
+                            {
+                                <a asp-controller="USB" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <img src="~/img/Vector.png" alt="Alternate Text" style="width: 20px" />
+                                    </div>
+                                    <span class="sub-item-text">Create new USB</span>
+                                </a>
+                            }
+                            @if (canViewUsbs)
+                            {
+                                <a asp-controller="USB" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <img src="~/img/icon-park-outline_permissions.png" alt="Alternate Text" />
+                                    </div>
+                                    <span class="sub-item-text">View All USBs</span>
+                                </a>
+                            }
+                        </div>
                     </div>
-                    <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
-                        <i class="fa-solid fa-folder-open"></i>
-                    </div>
-                    <span class="text-white fs-6">Document</span>
                 </div>
+            }
 
-                <div id="collapseDocument" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
-                    <div class="accordion-body p-0 pt-3 pb-3 ms-2">
-                        <a asp-controller="Document" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <i class="fa-solid fa-file-lines"></i>
-                            </div>
-                            <span class="sub-item-text">View Documents</span>
-                        </a>
-                        <a asp-controller="Document" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                            <span class="sub-item-text">Create new Document</span>
-                        </a>
+            @if (showDocumentSection)
+            {
+                <div class="accordion-item mb-2">
+                    <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseDocument" aria-expanded="true" style="cursor: pointer;">
+                        <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                            <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6l-6 10h12z" />
+                            </svg>
+                        </div>
+                        <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                            <i class="fa-solid fa-folder-open"></i>
+                        </div>
+                        <span class="text-white fs-6">Document</span>
                     </div>
-                </div>
-            </div>
 
-            <div class="accordion-item mb-2">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseServiceProvider" aria-expanded="true" style="cursor: pointer;">
-                    <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 6l-6 10h12z" />
-                        </svg>
+                    <div id="collapseDocument" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
+                        <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                            @if (canViewDocuments)
+                            {
+                                <a asp-controller="Document" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-file-lines"></i>
+                                    </div>
+                                    <span class="sub-item-text">View Documents</span>
+                                </a>
+                            }
+                            @if (canCreateDocument)
+                            {
+                                <a asp-controller="Document" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </div>
+                                    <span class="sub-item-text">Create new Document</span>
+                                </a>
+                            }
+                        </div>
                     </div>
-                    <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
-                        <i class="fa-solid fa-tower-cell"></i>
-                    </div>
-                    <span class="text-white fs-6">ServiceProvider</span>
                 </div>
+            }
 
-                <div id="collapseServiceProvider" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
-                    <div class="accordion-body p-0 pt-3 pb-3 ms-2">
-                        <a asp-controller="ServiceProvider" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <i class="fa-solid fa-list-check"></i>
-                            </div>
-                            <span class="sub-item-text">View ServiceProviders</span>
-                        </a>
-                        <a asp-controller="ServiceProvider" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                            <span class="sub-item-text">Create new ServiceProvider</span>
-                        </a>
+            @if (showServiceProviderSection)
+            {
+                <div class="accordion-item mb-2">
+                    <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseServiceProvider" aria-expanded="true" style="cursor: pointer;">
+                        <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                            <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6l-6 10h12z" />
+                            </svg>
+                        </div>
+                        <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                            <i class="fa-solid fa-tower-cell"></i>
+                        </div>
+                        <span class="text-white fs-6">ServiceProvider</span>
                     </div>
-                </div>
-            </div>
 
-            <div class="accordion-item mb-2">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseReport" aria-expanded="true" style="cursor: pointer;">
-                    <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 6l-6 10h12z" />
-                        </svg>
+                    <div id="collapseServiceProvider" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
+                        <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                            @if (canViewServiceProviders)
+                            {
+                                <a asp-controller="ServiceProvider" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-list-check"></i>
+                                    </div>
+                                    <span class="sub-item-text">View ServiceProviders</span>
+                                </a>
+                            }
+                            @if (canCreateServiceProvider)
+                            {
+                                <a asp-controller="ServiceProvider" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </div>
+                                    <span class="sub-item-text">Create new ServiceProvider</span>
+                                </a>
+                            }
+                        </div>
                     </div>
-                    <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
-                        <i class="fa-solid fa-chart-simple"></i>
-                    </div>
-                    <span class="text-white fs-6">Report</span>
                 </div>
+            }
 
-                <div id="collapseReport" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
-                    <div class="accordion-body p-0 pt-3 pb-3 ms-2">
-                        <a asp-controller="Report" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <i class="fa-solid fa-file-lines"></i>
-                            </div>
-                            <span class="sub-item-text">View report</span>
-                        </a>
+            @if (showReportSection)
+            {
+                <div class="accordion-item mb-2">
+                    <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseReport" aria-expanded="true" style="cursor: pointer;">
+                        <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                            <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6l-6 10h12z" />
+                            </svg>
+                        </div>
+                        <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </div>
+                        <span class="text-white fs-6">Report</span>
                     </div>
-                </div>
-            </div>
 
-            <div class="accordion-item mb-2">
-                <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseSubscription" aria-expanded="true" style="cursor: pointer;">
-                    <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
-                        <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 6l-6 10h12z" />
-                        </svg>
+                    <div id="collapseReport" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
+                        <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                            @if (canViewReport)
+                            {
+                                <a asp-controller="Report" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-file-lines"></i>
+                                    </div>
+                                    <span class="sub-item-text">View report</span>
+                                </a>
+                            }
+                        </div>
                     </div>
-                    <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
-                        <i class="fa-solid fa-file-invoice"></i>
-                    </div>
-                    <span class="text-white fs-6">Subscription</span>
                 </div>
+            }
 
-                <div id="collapseSubscription" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
-                    <div class="accordion-body p-0 pt-3 pb-3 ms-2">
-                        <a asp-controller="Subscription" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <i class="fa-solid fa-file-lines"></i>
-                            </div>
-                            <span class="sub-item-text">View subscription</span>
-                        </a>
-                        <a asp-controller="Subscription" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
-                            <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                <i class="fa-solid fa-plus"></i>
-                            </div>
-                            <span class="sub-item-text">Add subscription</span>
-                        </a>
+            @if (showSubscriptionSection)
+            {
+                <div class="accordion-item mb-2">
+                    <div class="d-flex align-items-center gap-3 sidebar-toggle-btn" data-bs-toggle="collapse" data-bs-target="#collapseSubscription" aria-expanded="true" style="cursor: pointer;">
+                        <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                            <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6l-6 10h12z" />
+                            </svg>
+                        </div>
+                        <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <span class="text-white fs-6">Subscription</span>
+                    </div>
+
+                    <div id="collapseSubscription" class="accordion-collapse collapse show" data-bs-parent="#sidebarMenu">
+                        <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                            @if (canViewSubscription)
+                            {
+                                <a asp-controller="Subscription" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-file-lines"></i>
+                                    </div>
+                                    <span class="sub-item-text">View subscription</span>
+                                </a>
+                            }
+                            @if (canCreateSubscription)
+                            {
+                                <a asp-controller="Subscription" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </div>
+                                    <span class="sub-item-text">Add subscription</span>
+                                </a>
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
 
         </div>
 
@@ -290,19 +391,24 @@
                     <li class="nav-item">
                         <a class="nav-link fw-bold px-4 text-white @(currentController == "Home" && currentAction == "home" ? "active" : "")"
                            asp-controller="/Home" asp-action="home">HOME</a>
-                           
+
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-white @(currentController == "SIM" && currentAction == "Index" ? "active" : "")"
-                           asp-controller="SIM" asp-action="Index">DEVICES</a>
-                    </li>
+                    @if (canViewSims)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-4 text-white @(currentController == "SIM" && currentAction == "Index" ? "active" : "")"
+                               asp-controller="SIM" asp-action="Index">DEVICES</a>
+                        </li>
+                    }
 
-                   
-                    <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-white @(currentController == "Employee" ? "active" : "")"
-                           asp-controller="Employee" asp-action="Index">USERS</a>
-                    </li>
+                    @if (Has("Employee", "Index"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold px-4 text-white @(currentController == "Employee" ? "active" : "")"
+                               asp-controller="Employee" asp-action="Index">USERS</a>
+                        </li>
+                    }
 
                 </ul>
             </div>

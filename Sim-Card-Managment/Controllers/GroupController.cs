@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Sim_Card_Managment.Models;
+using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Repos.GroupRepos;
 using Sim_Card_Managment.Viewmodel;
-using Sim_Card_Managment.Models;
 using System.Security.Claims;
 
 namespace Sim_Card_Managment.Controllers
@@ -11,11 +12,13 @@ namespace Sim_Card_Managment.Controllers
     {
         private readonly IGroupRepo _groups;
         private readonly IPermissionRepo _permissions;
+        private readonly IAccountRepo _accountRepo;
 
-        public GroupController(IGroupRepo groups, IPermissionRepo permissions)
+        public GroupController(IGroupRepo groups, IPermissionRepo permissions , IAccountRepo accountRepo)
         {
             _groups = groups;
             _permissions = permissions;
+            _accountRepo = accountRepo;
         }
 
         // GET: Group/Index
@@ -137,6 +140,27 @@ namespace Sim_Card_Managment.Controllers
             await _groups.SoftDeleteAsync(id);
             TempData["Success"] = "Group deactivated successfully.";
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Group/GetAllGroups — returns groups as JSON for the Swal dropdown
+        [HttpGet]
+        public async Task<IActionResult> GetAllGroups()
+        {
+            var groups = await _groups.GetAllAsync();
+            var result = groups.Where(g => g.IsActive).Select(g => new { g.Id, g.Name });
+            return Json(result);
+        }
+
+        // POST: Group/ChangeUserGroup
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeUserGroup(int userId, int newGroupId)
+        {
+            var result = await _accountRepo.ChangeUserGroupAsync(userId, newGroupId);
+            if (!result)
+                return Json(new { success = false, message = "Failed to change group." });
+
+            return Json(new { success = true });
         }
     }
 }
