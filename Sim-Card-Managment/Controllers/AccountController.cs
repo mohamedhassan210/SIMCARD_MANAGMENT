@@ -329,7 +329,6 @@ namespace Sim_Card_Managment.Controllers
 
         [HttpGet]
         [RequirePermission]
-        // [Authorize(Roles = "Manager")]
         public async Task<IActionResult> EditUser(int id)
         {
             var model = await _accountRepo.GetUserForEditAsync(id);
@@ -338,6 +337,10 @@ namespace Sim_Card_Managment.Controllers
                 TempData["Warning"] = "The user does not exist or has been deleted.";
                 return RedirectToAction("ManageUsers");
             }
+
+            var groups = await _accountRepo.GetAllGroupsAsync();
+            ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(groups, "Id", "Name", model.GroupId);
+
             return View(model);
         }
 
@@ -417,6 +420,41 @@ namespace Sim_Card_Managment.Controllers
         private RedirectToActionResult ForceLogoutAndRedirect()
         {
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login");
+        }
+
+        #endregion
+        #region 8. Change Password (Logged-in User)
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult ChangePassword()
+        {
+            return View(new ChangePasswordViewModel());
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdClaim, out int currentUserId))
+            {
+                return ForceLogoutAndRedirect();
+            }
+
+            var result = await _accountRepo.ChangePasswordAsync(currentUserId, model.CurrentPassword, model.NewPassword);
+
+            if (!result.IsSuccess)
+            {
+                ModelState.AddModelError(nameof(model.CurrentPassword), result.ErrorMessage ?? "Unable to change password.");
+                return View(model);
+            }
+
+            TempData["Success"] = "Your password has been updated successfully.";
             return RedirectToAction("Login");
         }
 

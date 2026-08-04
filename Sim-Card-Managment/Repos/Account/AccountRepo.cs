@@ -263,5 +263,24 @@ namespace Sim_Card_Managment.Repos.Account
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<ChangePasswordResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return new ChangePasswordResult { IsSuccess = false, ErrorMessage = "User not found." };
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
+            {
+                return new ChangePasswordResult { IsSuccess = false, ErrorMessage = "Current password is incorrect." };
+            }
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return new ChangePasswordResult { IsSuccess = true };
+        }
     }
 }

@@ -1,8 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model Sim_Card_Managment.Viewmodel.EditUserViewModel
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +26,6 @@
             padding-bottom: 3rem;
         }
 
-        /* Form Card Layout */
         .form-card {
             max-width: 680px;
             margin: 3rem auto 0 auto;
@@ -59,7 +54,6 @@
             font-size: 1.25rem;
         }
 
-        /* Form Controls */
         .form-label-custom {
             font-size: 0.8rem;
             text-transform: uppercase;
@@ -106,7 +100,6 @@
             cursor: pointer;
         }
 
-        /* Action Buttons */
         .btn-custom {
             height: 48px;
             padding: 0 28px;
@@ -163,43 +156,47 @@
                 </div>
             </div>
 
-            <form id="editUserForm" onsubmit="handleFormSubmit(event)">
+            <form asp-action="EditUser" asp-controller="Account" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Role" />
+
                 <div class="p-4 p-md-5">
                     <div class="row g-4">
 
                         <div class="col-12">
-                            <label for="userName" class="form-label-custom">Full Name</label>
+                            <label for="Username" class="form-label-custom">Username</label>
                             <div class="input-group-custom">
                                 <i class="fa-regular fa-user"></i>
-                                <input type="text" id="userName" class="form-control-custom" value="John Doe" placeholder="Enter full name" required>
+                                <input asp-for="Username" class="form-control-custom" readonly style="cursor: not-allowed; opacity: 0.7;" />
                             </div>
+                            <div class="text-muted small mt-1">Username cannot be changed here.</div>
                         </div>
 
                         <div class="col-12">
-                            <label for="userEmail" class="form-label-custom">Email Address</label>
+                            <label for="Email" class="form-label-custom">Email Address</label>
                             <div class="input-group-custom">
                                 <i class="fa-regular fa-envelope"></i>
-                                <input type="email" id="userEmail" class="form-control-custom" value="john.doe@example.com" placeholder="Enter email address" required>
+                                <input asp-for="Email" type="email" class="form-control-custom" placeholder="Enter email address" required />
                             </div>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
 
                         <div class="col-12">
-                            <label for="userGroup" class="form-label-custom">Assign Group</label>
+                            <label for="GroupId" class="form-label-custom">Assign Group</label>
                             <div class="input-group-custom">
                                 <i class="fa-solid fa-users-rectangle"></i>
-                                <select id="userGroup" class="form-select-custom" required>
+                                <select asp-for="GroupId" asp-items="ViewBag.Groups" class="form-select-custom" required>
                                     <option value="" disabled>Select group</option>
-                                    <option value="Administrators" selected>Administrators</option>
-                                    <option value="HR Managers">HR Managers</option>
-                                    <option value="Support Team">Support Team</option>
                                 </select>
                             </div>
+                            <span asp-validation-for="GroupId" class="text-danger small"></span>
                         </div>
 
                     </div>
 
                     <div class="d-flex align-items-center justify-content-end gap-3 mt-5 pt-3 border-top">
-                        <a href="#" class="btn-custom btn-secondary-soft">Cancel</a>
+                        <a asp-action="ManageUsers" asp-controller="Account" class="btn-custom btn-secondary-soft">Cancel</a>
                         <button type="submit" class="btn-custom btn-primary-orange">
                             <i class="fa-solid fa-floppy-disk"></i> Save Changes
                         </button>
@@ -212,23 +209,5 @@
 
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function handleFormSubmit(event) {
-            event.preventDefault();
-
-            const name = document.getElementById('userName').value;
-            const email = document.getElementById('userEmail').value;
-            const group = document.getElementById('userGroup').value;
-
-            Swal.fire({
-                title: 'User Updated!',
-                text: `${name} has been updated and assigned to ${group}.`,
-                icon: 'success',
-                confirmButtonColor: '#DF531B',
-                customClass: { popup: 'rounded-4' }
-            });
-        }
-    </script>
 </body>
 </html>
