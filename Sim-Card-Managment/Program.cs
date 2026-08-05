@@ -3,15 +3,19 @@ using Microsoft.EntityFrameworkCore;
 using Sim_Card_Management.Repos.DeviceSerialOperationsRepos;
 using Sim_Card_Management.Repos.DocumentDetailsRepos;
 using Sim_Card_Management.Repos.ItemTypeRepos;
-using Sim_Card_Managment.Services;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repos.Account;
+using Sim_Card_Managment.Repos.BranchRepos;
 using Sim_Card_Managment.Repos.EmployeeRepos;
 using Sim_Card_Managment.Repos.GroupRepos;
+using Sim_Card_Managment.Repos.InternetLineRepos;
+using Sim_Card_Managment.Repos.LookupRepos;
 using Sim_Card_Managment.Repos.NonEmployeeRepos;
 using Sim_Card_Managment.Repos.QuoteRepo;
+using Sim_Card_Managment.Repos.VpnConnectionRepos;
 using Sim_Card_Managment.Repositories;
+using Sim_Card_Managment.Services;
 using Sim_Card_Managment.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -72,6 +76,11 @@ builder.Services.AddScoped<IDocumentDetailsRepo, DocumentDetailsRepo>();
 builder.Services.AddScoped<IItemTypeRepo, ItemTypeRepo>();
 builder.Services.AddScoped<IDeviceSerialOperationsRepo, DeviceSerialOperationsRepo>();
 builder.Services.AddScoped<IUserPermissionService, UserPermissionService>();
+
+builder.Services.AddScoped<IBranchRepo, BranchRepo>();
+builder.Services.AddScoped<IInternetLineRepo, InternetLineRepo>();
+builder.Services.AddScoped<IVpnConnectionRepo, VpnConnectionRepo>();
+builder.Services.AddScoped<ILookupRepo, LookupRepo>();
 
 // 7. Enable Session
 builder.Services.AddSession(options =>
