@@ -81,10 +81,16 @@ namespace Sim_Card_Managment.Repos.Account
 
         public async Task<LoginResult> Login(LoginViewmodel model)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
+            var user = await _context.Users
+                       .Include(u => u.Group)
+                       .FirstOrDefaultAsync(u => u.Username == model.Username);
             if (user == null || !user.IsActive || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
                 return new LoginResult { IsSuccess = false, ErrorMessage = "Invalid Username, Password, or Inactive Account." };
+            }
+            if (user.Group == null || !user.Group.IsActive)
+            {
+                return new LoginResult { IsSuccess = false, ErrorMessage = "Your account's group has been deactivated. Please contact your administrator." };
             }
             var claims = new List<Claim>
     {
@@ -281,6 +287,15 @@ namespace Sim_Card_Managment.Repos.Account
             await _context.SaveChangesAsync();
 
             return new ChangePasswordResult { IsSuccess = true };
+        }
+        public async Task<bool> ActivateUserAsync(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return false;
+            user.IsActive = true;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

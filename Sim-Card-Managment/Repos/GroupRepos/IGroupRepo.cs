@@ -13,5 +13,6 @@ namespace Sim_Card_Managment.Repos.GroupRepos
         Task AssignPermissionsAsync(int groupId, List<int> selectedPermissionIds);
         Task<Group?> GetByIdWithDetailsAsync(int id);
         Task SoftDeleteAsync(int id);
+        Task ActivateAsync(int id);
     }
 }

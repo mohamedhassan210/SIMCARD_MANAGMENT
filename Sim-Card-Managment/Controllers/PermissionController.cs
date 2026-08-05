@@ -14,7 +14,7 @@ namespace Sim_Card_Managment.Controllers
     /// </summary>
     /// 
 
-    //[RequirePermission]
+    [RequirePermission]
     public class PermissionController : Controller
     {
         private readonly IGroupRepo _groupRepo;

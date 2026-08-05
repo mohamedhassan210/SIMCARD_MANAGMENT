@@ -111,7 +111,15 @@ namespace Sim_Card_Managment.Repos.GroupRepos
                 await _context.SaveChangesAsync();
             }
         }
-
+        public async Task ActivateAsync(int id)
+        {
+            var group = await _context.Groups.FindAsync(id);
+            if (group != null)
+            {
+                group.IsActive = true;
+                await _context.SaveChangesAsync();
+            }
+        }
 
     }
 }

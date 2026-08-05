@@ -254,6 +254,20 @@
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(91, 45, 144, 0.25);
             }
+
+        .btn-action-activate-group {
+            background-color: #EFF6FF;
+            color: #1D4ED8;
+            border: 1px solid #93C5FD;
+        }
+
+            .btn-action-activate-group:hover {
+                background-color: #1D4ED8;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
+            }
+
     </style>
 </head>
 <body>
@@ -359,12 +373,23 @@
             </div>
 
             <div class="group-actions-bar">
-                <button type="button" class="btn-action btn-action-edit">
+                <a asp-controller="Group" asp-action="Edit" asp-route-id="@Model.Id" class="btn-action btn-action-edit">
                     <i class="fa-solid fa-pen-to-square"></i> Edit
-                </button>
-                <button type="button" class="btn-action btn-action-delete" onclick="onDeleteGroup(@Model.Id)">
-                    <i class="fa-solid fa-trash-can"></i> Delete
-                </button>
+                </a>
+
+                @if (Model.IsActive)
+                {
+                    <button type="button" class="btn-action btn-action-delete" onclick="onDeleteGroup(@Model.Id)">
+                        <i class="fa-solid fa-trash-can"></i> Delete
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn-action btn-action-activate-group" onclick="onActivateGroup(@Model.Id)">
+                        <i class="fa-solid fa-circle-check"></i> Activate
+                    </button>
+                }
+
                 <a asp-action="mangePermission" asp-controller="Permission" asp-route-groupId="@Model.Id" class="btn-action btn-action-permissions">
                     <i class="fa-solid fa-user-shield"></i> Manage Permissions
                 </a>
@@ -449,7 +474,7 @@
             }
         }
 
-        function onDeleteGroup(groupId) {
+               function onDeleteGroup(groupId) {
             Swal.fire({
                 title: 'Delete Group?',
                 text: 'This action cannot be undone.',
@@ -477,6 +502,38 @@
                 }
             });
         }
+
+        function onActivateGroup(groupId) {
+            Swal.fire({
+                title: 'Activate Group?',
+                text: 'This will reactivate the group.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#1D4ED8',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Yes, Activate',
+                customClass: { popup: 'rounded-4' }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('__RequestVerificationToken', getAntiForgeryToken());
+
+                    const res = await fetch(`/Group/Activate/${groupId}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (res.ok || res.redirected) {
+                        window.location.reload();
+                    } else {
+                        Swal.fire('Error', 'Failed to activate group.', 'error');
+                    }
+                }
+            });
+        }
+
+
+        
     </script>
 </body>
 </html>

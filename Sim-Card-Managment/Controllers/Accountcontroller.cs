@@ -57,7 +57,7 @@ namespace Sim_Card_Managment.Controllers
                     return RedirectToAction("ResetPassword", new { username = model.Username });
                 }
 
-                return RedirectToAction("ManageUsers", "Account");
+                return RedirectToAction("home", "Home");
             }
 
             ModelState.AddModelError("", loginResult.ErrorMessage ?? "Invalid login attempt.");
@@ -405,6 +405,16 @@ namespace Sim_Card_Managment.Controllers
             }
 
             return RedirectToAction("ManageUsers");
+        }
+
+        [RequirePermission]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ActivateUser(int id)
+        {
+            await _accountRepo.ActivateUserAsync(id);
+            TempData["Success"] = "User activated successfully.";
+            return RedirectToAction("Details", new { id });
         }
 
         #endregion

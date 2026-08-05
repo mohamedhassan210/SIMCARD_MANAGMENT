@@ -162,5 +162,14 @@ namespace Sim_Card_Managment.Controllers
 
             return Json(new { success = true });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Activate(int id)
+        {
+            await _groups.ActivateAsync(id);
+            TempData["Success"] = "Group activated successfully.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
     }
 }

@@ -28,6 +28,7 @@ namespace Sim_Card_Managment.Repos.Account
         Task<bool> SoftDeleteUserAsync(int id);   // الحذف الذكي (إخفاء وليس مسح نهائي)
         Task<bool> ChangeUserGroupAsync(int userId, int newGroupId);
         Task<ChangePasswordResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+        Task<bool> ActivateUserAsync(int id);
     }
 
     public class LoginResult

@@ -173,7 +173,6 @@
         vertical-align: middle;
     }
 
-    /* Dim inactive records for visual clarity */
     .person-row.inactive-row {
         opacity: 0.65;
         background-color: #fcfcfc;
@@ -198,16 +197,40 @@
         color: #c5221f;
     }
 
+    .view-btn {
+        display: inline-block;
+        border: 1.5px solid #e8552b;
+        color: #e8552b;
+        background: transparent;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 6px 18px;
+        border-radius: 16px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .view-btn:hover {
+            background: #e8552b;
+            color: #fff;
+        }
+
     th:nth-child(1), td:nth-child(1) {
-        width: 35%;
+        width: 30%;
     }
 
     th:nth-child(2), td:nth-child(2) {
-        width: 45%;
+        width: 35%;
     }
 
     th:nth-child(3), td:nth-child(3) {
         width: 20%;
+    }
+
+    th:nth-child(4), td:nth-child(4) {
+        width: 15%;
+        text-align: right;
     }
 
     /* ---------- Footer ---------- */
@@ -315,6 +338,7 @@
                     <th>Name</th>
                     <th>Display Name</th>
                     <th>Status</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody id="spTableBody">
@@ -338,13 +362,16 @@
                                     <span class="badge-type badge-non-employee">Inactive</span>
                                 }
                             </td>
+                            <td style="text-align: right;">
+                                <a asp-controller="ServiceProvider" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                            </td>
                         </tr>
                     }
                 }
                 else
                 {
                     <tr id="emptyRow">
-                        <td colspan="3" style="text-align: center; color: #888; padding: 24px 0;">No service providers found.</td>
+                        <td colspan="4" style="text-align: center; color: #888; padding: 24px 0;">No service providers found.</td>
                     </tr>
                 }
             </tbody>
@@ -375,7 +402,6 @@
                 const searchTerm = searchInput.value.trim().toLowerCase();
                 const selectedStatus = statusFilter.value;
 
-                // 1. Filter rows based on search input and status dropdown
                 const filteredRows = rows.filter(row => {
                     const name = (row.getAttribute('data-name') || '').toLowerCase();
                     const displayName = (row.getAttribute('data-displayname') || '').toLowerCase();
@@ -390,7 +416,6 @@
                 const totalFiltered = filteredRows.length;
                 totalCountHeader.textContent = totalFiltered;
 
-                // 2. Calculate pages
                 const totalPages = Math.ceil(totalFiltered / pageSize) || 1;
                 if (currentPage > totalPages) currentPage = totalPages;
                 if (currentPage < 1) currentPage = 1;
@@ -398,16 +423,13 @@
                 const startIndex = (currentPage - 1) * pageSize;
                 const endIndex = startIndex + pageSize;
 
-                // 3. Hide all rows, then display only current page subset
                 rows.forEach(r => r.style.display = 'none');
                 filteredRows.slice(startIndex, endIndex).forEach(r => r.style.display = '');
 
-                // 4. Update Footer Info
                 const startShow = totalFiltered === 0 ? 0 : startIndex + 1;
                 const endShow = Math.min(endIndex, totalFiltered);
                 showingText.textContent = `Showing ${startShow} to ${endShow} of ${totalFiltered} records`;
 
-                // 5. Build Pagination Buttons
                 renderPagination(totalPages);
             }
 
@@ -416,7 +438,6 @@
 
                 if (totalPages <= 1) return;
 
-                // Previous Button (<)
                 const prevBtn = document.createElement('button');
                 prevBtn.innerHTML = '&#8249;';
                 prevBtn.disabled = currentPage === 1;
@@ -428,7 +449,6 @@
                 });
                 paginationContainer.appendChild(prevBtn);
 
-                // Page Number Buttons
                 for (let i = 1; i <= totalPages; i++) {
                     const pageBtn = document.createElement('button');
                     pageBtn.className = `page-num ${i === currentPage ? 'active' : ''}`;
@@ -440,7 +460,6 @@
                     paginationContainer.appendChild(pageBtn);
                 }
 
-                // Next Button (>)
                 const nextBtn = document.createElement('button');
                 nextBtn.innerHTML = '&#8250;';
                 nextBtn.disabled = currentPage === totalPages;
@@ -453,7 +472,6 @@
                 paginationContainer.appendChild(nextBtn);
             }
 
-            // Event Listeners
             searchInput.addEventListener('input', () => {
                 currentPage = 1;
                 updateTable();
@@ -464,7 +482,6 @@
                 updateTable();
             });
 
-            // Initial Execution
             updateTable();
         });
     </script>

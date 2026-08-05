@@ -1,0 +1,564 @@
+﻿@model Sim_Card_Managment.Viewmodel.ServiceProviderDetailsViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Provider Details</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --brand-orange: #DF531B;
+            --brand-orange-light: #FFF8F6;
+            --brand-purple: #5B2D90;
+            --bg-canvas: #F4F5F8;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --card-border: #E2E8F0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding-bottom: 3rem;
+        }
+
+        .details-card {
+            background-color: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            margin-top: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-header-styled {
+            border-bottom: 1px solid var(--card-border);
+            padding: 1.5rem 2rem;
+            background: linear-gradient(180deg, var(--brand-orange-light) 0%, #FFFFFF 100%);
+        }
+
+        .section-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background-color: rgba(223, 83, 27, 0.12);
+            color: var(--brand-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .info-grid-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .info-grid-value {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .badge-status-active {
+            display: inline-block;
+            font-size: 0.75rem;
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #15803D;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            text-transform: uppercase;
+        }
+
+        .emp-count-badge {
+            background: #E8F0FE;
+            color: #1A73E8;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .devices-card {
+            background-color: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            padding: 2rem;
+        }
+
+        .group-actions-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 1.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            height: 44px;
+            padding: 0 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-action-edit {
+            background-color: var(--brand-orange);
+            color: #FFFFFF;
+        }
+
+            .btn-action-edit:hover {
+                background-color: #c94614;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(223, 83, 27, 0.25);
+            }
+
+        .btn-action-delete {
+            background-color: #FEF2F2;
+            color: #DC2626;
+            border: 1px solid #FCA5A5;
+        }
+
+            .btn-action-delete:hover {
+                background-color: #DC2626;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+            }
+
+        .btn-action-activate {
+            background-color: #EFF6FF;
+            color: #1D4ED8;
+            border: 1px solid #93C5FD;
+        }
+
+            .btn-action-activate:hover {
+                background-color: #1D4ED8;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
+            }
+
+        /* ---------- Filters (from SIM Index) ---------- */
+        .filters { margin-top: 8px; }
+        .filters label { display: block; font-size: 12px; color: #6b6b6b; margin-bottom: 8px; }
+        .filters-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+        .status-select {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #fff; border: 1px solid #dcdcdc; border-radius: 10px;
+            padding: 11px 14px; font-size: 13px; color: #1a1a1a; width: 150px;
+            cursor: pointer; transition: border-color 0.2s ease;
+        }
+        .status-select:hover { border-color: #e8552b; }
+
+        .search-box {
+            flex: 1; display: flex; align-items: center; gap: 8px;
+            background: #fff; border: 1px solid #dcdcdc; border-radius: 10px;
+            padding: 11px 14px; transition: border-color 0.2s ease; min-width: 250px;
+        }
+        .search-box:focus-within { border-color: #e8552b; }
+        .search-box svg { width: 15px; height: 15px; color: #a8a8a8; flex-shrink: 0; }
+        .search-box input { border: none; outline: none; background: transparent; font-size: 13px; width: 100%; color: #1a1a1a; }
+        .search-box input::placeholder { color: #b3b3b3; }
+
+        /* ---------- Table (from SIM Index) ---------- */
+        .table-wrap { margin-top: 28px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead th { text-align: left; font-size: 12px; font-weight: 600; color: #1a1a1a; padding-bottom: 12px; vertical-align: top; }
+        thead tr { border-bottom: 2px solid #e8552b; }
+        tbody td { font-size: 12.5px; color: #1a1a1a; padding: 16px 0; border-bottom: 1px solid #e2e2e2; vertical-align: middle; }
+
+        .badge-type { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; }
+        .badge-sim { background: #e6f4ea; color: #137333; }
+        .badge-usb { background: #feefc3; color: #b06000; }
+
+        .view-btn {
+            display: inline-block; border: 1.5px solid #e8552b; color: #e8552b;
+            background: transparent; font-size: 11px; font-weight: 700; padding: 6px 18px;
+            border-radius: 16px; cursor: pointer; text-decoration: none; transition: all 0.2s ease;
+        }
+        .view-btn:hover { background: #e8552b; color: #fff; }
+
+        /* ---------- Footer / Pagination (from SIM Index) ---------- */
+        .footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }
+        .footer .showing { font-size: 12px; color: #6b6b6b; }
+        .pagination { display: flex; align-items: center; gap: 6px; }
+        .pagination button {
+            width: 30px; height: 30px; border-radius: 50%; border: 1px solid #dcdcdc;
+            background: #fff; color: #6b6b6b; font-size: 13px; font-weight: 600;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .pagination button:hover { border-color: #e8552b; color: #e8552b; }
+        .pagination button.page-num { border: none; background: transparent; color: #1a1a1a; }
+        .pagination button.page-num:hover { background: #fbeae5; color: #e8552b; }
+        .pagination button.active { background: #e8552b; border-color: #e8552b; color: #fff; }
+    </style>
+</head>
+<body>
+
+    @Html.AntiForgeryToken()
+
+    <main class="container-fluid px-lg-5 p-100">
+
+        <div class="details-card">
+            <div class="card-header-styled d-flex align-items-center gap-3">
+                <div class="section-icon-wrapper">
+                    <i class="fa-solid fa-tower-cell"></i>
+                </div>
+                <div>
+                    <h3 class="m-0 fs-5 fw-bold text-dark">Service Provider Details</h3>
+                    <p class="m-0 text-muted small">Provider information and assigned device count</p>
+                </div>
+            </div>
+
+            <div class="p-4 p-md-5">
+                <div class="row g-4">
+                    <div class="col-12 col-md-4">
+                        <div class="info-grid-label">Name</div>
+                        <div class="info-grid-value">@Model.Name</div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="info-grid-label">Display Name</div>
+                        <div class="info-grid-value">@(string.IsNullOrEmpty(Model.DisplayName) ? "N/A" : Model.DisplayName)</div>
+                    </div>
+
+                    <div class="col-12 col-sm-4 col-md-2">
+                        <div class="info-grid-label">Status</div>
+                        <div class="info-grid-value">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge-status-active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status-active" style="background-color: rgba(220,38,38,0.1); color:#DC2626; border-color: rgba(220,38,38,0.2);">Inactive</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-4 col-md-2">
+                        <div class="info-grid-label">Devices</div>
+                        <div class="info-grid-value">
+                            <span class="emp-count-badge">@Model.Devices.Count</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="devices-card">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <h4 class="fw-bold fs-5 m-0 text-dark">Assigned Devices</h4>
+            </div>
+
+            <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="status-filter">Status</label>
+                        <select id="status-filter" class="status-select">
+                            <option value="all">All</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="device-type-filter">Type</label>
+                        <select id="device-type-filter" class="status-select">
+                            <option value="all">All Types</option>
+                            <option value="sim">SIM Card</option>
+                            <option value="usb">USB Modem</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group" style="flex: 1;">
+                        <label for="search-input">Search</label>
+                        <div class="search-box">
+                            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                            </svg>
+                            <input id="search-input" type="text" placeholder="Search by Serial, Phone, or Assignee..." autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="table-wrap">
+                <table id="deviceTable">
+                    <thead>
+                        <tr>
+                            <th>Serial Number</th>
+                            <th>Type</th>
+                            <th>Details</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        @if (Model.Devices.Any())
+                        {
+                            foreach (var item in Model.Devices)
+                            {
+                                var normalizedType = (item.DeviceType != null && item.DeviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase))
+                                ? "sim"
+                                : (item.DeviceType != null && item.DeviceType.Contains("USB", StringComparison.OrdinalIgnoreCase))
+                                ? "usb"
+                                : "";
+
+                                <tr class="device-row"
+                                    data-status="@(item.Status?.ToLower() ?? "")"
+                                    data-type="@normalizedType">
+                                    <td><strong>@item.SerialNumber</strong></td>
+                                    <td>
+                                        <span class="badge-type @(normalizedType == "sim" ? "badge-sim" : "badge-usb")">
+                                            @item.DeviceType
+                                        </span>
+                                    </td>
+                                    <td>@(string.IsNullOrEmpty(item.Identifier) || item.Identifier == "N/A" ? "-" : item.Identifier)</td>
+                                    <td>@item.Status</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.AssignedTo) && item.AssignedTo != "Unassigned")
+                                        {
+                                            @item.AssignedTo
+                                        }
+                                        else
+                                        {
+                                            <span style="color: #a8a8a8;">Unassigned</span>
+                                        }
+                                    </td>
+                                    <td style="text-align: right;">
+                                        @if (normalizedType == "sim")
+                                        {
+                                            <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        <tr id="noResultsRow" style="display: @(Model.Devices.Any() ? "none" : "");">
+                            <td colspan="6" style="text-align: center; padding: 32px; color: #888;">
+                                No matching devices found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="footer">
+                <div class="showing" id="showingText">Showing 0 records</div>
+                <div class="pagination" id="paginationContainer"></div>
+            </div>
+
+            <div class="group-actions-bar">
+                <a asp-action="Edit" asp-controller="ServiceProvider" asp-route-id="@Model.Id" class="btn-action btn-action-edit">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                </a>
+
+                @if (Model.IsActive)
+                {
+                    <button type="button" class="btn-action btn-action-delete" onclick="onDeleteProvider(@Model.Id)">
+                        <i class="fa-solid fa-trash-can"></i> Delete
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn-action btn-action-activate" onclick="onActivateProvider(@Model.Id)">
+                        <i class="fa-solid fa-circle-check"></i> Activate
+                    </button>
+                }
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function getAntiForgeryToken() {
+            return document.querySelector('input[name="__RequestVerificationToken"]').value;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("search-input");
+            const statusFilter = document.getElementById("status-filter");
+            const typeFilter = document.getElementById("device-type-filter");
+
+            const allRows = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
+            const noResultsRow = document.getElementById("noResultsRow");
+            const showingText = document.getElementById("showingText");
+            const paginationContainer = document.getElementById("paginationContainer");
+
+            const itemsPerPage = 7;
+            let visibleRows = [...allRows];
+            let currentPage = 1;
+
+            function applyFilters() {
+                const query = searchInput.value.trim().toLowerCase();
+                const statusVal = statusFilter.value.toLowerCase();
+                const typeVal = typeFilter.value.toLowerCase();
+
+                visibleRows = allRows.filter(row => {
+                    const text = row.innerText.toLowerCase();
+                    const matchesSearch = text.includes(query);
+
+                    const rowStatus = row.getAttribute("data-status");
+                    const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
+
+                    const rowType = row.getAttribute("data-type");
+                    const matchesType = (typeVal === "all") || (rowType === typeVal);
+
+                    return matchesSearch && matchesStatus && matchesType;
+                });
+
+                currentPage = 1;
+                renderTable();
+            }
+
+            function renderTable() {
+                const totalVisible = visibleRows.length;
+                const totalPages = Math.max(1, Math.ceil(totalVisible / itemsPerPage));
+
+                if (currentPage > totalPages) currentPage = totalPages;
+
+                const startIdx = (currentPage - 1) * itemsPerPage;
+                const endIdx = startIdx + itemsPerPage;
+
+                allRows.forEach(row => row.style.display = "none");
+                visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
+
+                if (totalVisible === 0) {
+                    noResultsRow.style.display = "";
+                    showingText.textContent = "Showing 0 records";
+                    paginationContainer.innerHTML = "";
+                    return;
+                } else {
+                    noResultsRow.style.display = "none";
+                }
+
+                const actualEnd = Math.min(endIdx, totalVisible);
+                showingText.textContent = `Showing ${startIdx + 1}-${actualEnd} of ${totalVisible} records`;
+
+                let html = `<button type="button" class="arrow" id="prevBtn" ${currentPage === 1 ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8249;</button>`;
+
+                for (let i = 1; i <= totalPages; i++) {
+                    html += `<button type="button" class="${i === currentPage ? 'active' : 'page-num'}" data-page="${i}">${i}</button>`;
+                }
+
+                html += `<button type="button" class="arrow" id="nextBtn" ${currentPage === totalPages ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8250;</button>`;
+
+                paginationContainer.innerHTML = html;
+            }
+
+            searchInput.addEventListener("input", applyFilters);
+            statusFilter.addEventListener("change", applyFilters);
+            typeFilter.addEventListener("change", applyFilters);
+
+            paginationContainer.addEventListener("click", function (e) {
+                const btn = e.target.closest("button");
+                if (!btn || btn.disabled) return;
+
+                if (btn.id === "prevBtn") {
+                    if (currentPage > 1) currentPage--;
+                } else if (btn.id === "nextBtn") {
+                    const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
+                    if (currentPage < totalPages) currentPage++;
+                } else if (btn.dataset.page) {
+                    currentPage = parseInt(btn.dataset.page);
+                }
+
+                renderTable();
+            });
+
+            applyFilters();
+        });
+
+        function onDeleteProvider(providerId) {
+            Swal.fire({
+                title: 'Delete Service Provider?',
+                text: 'This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Yes, Delete',
+                customClass: { popup: 'rounded-4' }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('__RequestVerificationToken', getAntiForgeryToken());
+
+                    const res = await fetch(`/ServiceProvider/Delete/${providerId}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (res.ok || res.redirected) {
+                        window.location.href = '/ServiceProvider/Index';
+                    } else {
+                        Swal.fire('Error', 'Failed to delete service provider.', 'error');
+                    }
+                }
+            });
+        }
+                function onActivateProvider(providerId) {
+            Swal.fire({
+                title: 'Activate Service Provider?',
+                text: 'This will reactivate the service provider.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#1D4ED8',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Yes, Activate',
+                customClass: { popup: 'rounded-4' }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('__RequestVerificationToken', getAntiForgeryToken());
+
+                    const res = await fetch(`/ServiceProvider/Activate/${providerId}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (res.ok || res.redirected) {
+                        window.location.reload();
+                    } else {
+                        Swal.fire('Error', 'Failed to activate service provider.', 'error');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
