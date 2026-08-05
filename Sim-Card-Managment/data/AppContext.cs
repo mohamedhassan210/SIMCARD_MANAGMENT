@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 using Sim_Card_Management.Models;
 using Sim_Card_Managment.Models;
+using ServiceProvider = Sim_Card_Managment.Models.ServiceProvider;
 
 namespace Sim_Card_Managment.data
 {
@@ -46,7 +47,15 @@ namespace Sim_Card_Managment.data
 
 
         // ── Service Providor──────────────────────────────────────────────
-         public DbSet<Models.ServiceProvider> ServiceProviders { get; set; }
+        public DbSet<Models.ServiceProvider> ServiceProviders { get; set; }
+
+        // ── Internet / VPN tables ──────────────────────────────────────────────
+        public DbSet<Branch> Branches { get; set; }
+        public DbSet<PaymentType> PaymentTypes { get; set; }
+        public DbSet<ServiceType> ServiceTypes { get; set; }
+        public DbSet<InternetLine> InternetLines { get; set; }
+        public DbSet<VpnConnectionType> VpnConnectionTypes { get; set; }
+        public DbSet<VpnConnection> VpnConnections { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -75,7 +84,7 @@ namespace Sim_Card_Managment.data
 
             modelBuilder.Entity<Group>()
                 .HasIndex(g => g.Name).IsUnique();
-            
+
 
             // ── DeviceTransfer: two FKs to Subscription ───────────────
             modelBuilder.Entity<DeviceTransfer>()
@@ -190,7 +199,7 @@ namespace Sim_Card_Managment.data
                 .WithMany(dt => dt.Documents)
                 .HasForeignKey(d => d.DocumenttypeId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             // ── Document: User ──────────────────────────────
             modelBuilder.Entity<Models.Document>()
                 .HasOne(d => d.CreatedBy)
@@ -239,7 +248,7 @@ namespace Sim_Card_Managment.data
                 .WithMany(s => s.Serials)
                 .HasForeignKey(s => s.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             // ── ServiceProvider: Sim ──────────────────────────────
             modelBuilder.Entity<Sim>()
                 .HasOne(s => s.ServiceProvider)
@@ -261,7 +270,7 @@ namespace Sim_Card_Managment.data
                 .WithMany(s => s.Documents)
                 .HasForeignKey(s => s.ServiceProviderId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             // ── ServiceProvider: Qouta ──────────────────────────────
             modelBuilder.Entity<Quota>()
                 .HasOne(s => s.ServiceProvider)
@@ -285,9 +294,65 @@ namespace Sim_Card_Managment.data
 
             // ── User: Group ──────────────────────────────
             modelBuilder.Entity<User>()
-                .HasMany(u=>u.UserCreatedGroups)
-                .WithOne(g=> g.CreatedBy)
-                .HasForeignKey(g=>g.CreatedById)
+                .HasMany(u => u.UserCreatedGroups)
+                .WithOne(g => g.CreatedBy)
+                .HasForeignKey(g => g.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── InternetLine: Branch ──────────────────────────────
+            modelBuilder.Entity<InternetLine>()
+                .HasOne(il => il.Branch)
+                .WithMany(b => b.InternetLines)
+                .HasForeignKey(il => il.BranchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── InternetLine: ServiceProvider ──────────────────────────────
+            modelBuilder.Entity<InternetLine>()
+                .HasOne(il => il.ServiceProvider)
+                .WithMany(sp => sp.InternetLines)
+                .HasForeignKey(il => il.ServiceProviderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── InternetLine: PaymentType ──────────────────────────────
+            modelBuilder.Entity<InternetLine>()
+                .HasOne(il => il.PaymentType)
+                .WithMany(pt => pt.InternetLines)
+                .HasForeignKey(il => il.PaymentTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── InternetLine: ServiceType ──────────────────────────────
+            modelBuilder.Entity<InternetLine>()
+                .HasOne(il => il.ServiceType)
+                .WithMany(st => st.InternetLines)
+                .HasForeignKey(il => il.ServiceTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── InternetLine: Sim ──────────────────────────────
+            modelBuilder.Entity<InternetLine>()
+                .HasOne(il => il.Sim)
+                .WithMany(s => s.InternetLines)
+                .HasForeignKey(il => il.SimId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── VpnConnection: Branch ──────────────────────────────
+            modelBuilder.Entity<VpnConnection>()
+                .HasOne(vc => vc.Branch)
+                .WithMany(b => b.VpnConnections)
+                .HasForeignKey(vc => vc.BranchId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── VpnConnection: ServiceProvider ──────────────────────────────
+            modelBuilder.Entity<ServiceProvider>()
+                .HasMany(sp => sp.VpnConnections)
+                .WithOne(vp => vp.ServiceProvider)
+                .HasForeignKey(vc => vc.ServiceProviderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── VpnConnection: VpnConnectionType ──────────────────────────────
+            modelBuilder.Entity<VpnConnection>()
+                .HasOne(vc => vc.ConnectionType)
+                .WithMany(ct => ct.VpnConnections)
+                .HasForeignKey(vc => vc.ConnectionTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
         }
