@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Sim_Card_Management.Models;
 
 namespace Sim_Card_Managment.Models
 {
@@ -23,6 +24,8 @@ namespace Sim_Card_Managment.Models
         public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
         public virtual ICollection<Sim> Sims { get; set; } = new List<Sim>();
         public virtual ICollection<Usb> Usbs { get; set; } = new List<Usb>();
+        public virtual ICollection<InternetLine> InternetLines { get; set; } = new List<InternetLine>();
+        public virtual ICollection<VpnConnection> VpnConnections { get; set; } = new List<VpnConnection>();
         //public virtual ICollection<Quota> Quotas { get; set; }
     }
 }

@@ -38,5 +38,6 @@ namespace Sim_Card_Managment.Models
 
         public int ServiceProviderId { get; set; }
         public virtual ServiceProvider ServiceProvider { get; set; }      //////drop
+        public virtual ICollection<InternetLine> InternetLines { get; set; } = new List<InternetLine>();
     }
 }
