@@ -1,0 +1,238 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connection Details</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --brand-orange: #DF531B;
+            --brand-orange-light: #FFF8F6;
+            --brand-purple: #5B2D90;
+            --bg-canvas: #F4F5F8;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --card-border: #E2E8F0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding-bottom: 3rem;
+        }
+
+        /* Details Card Layout */
+        .details-card {
+            max-width: 800px;
+            margin: 3rem auto 0 auto;
+            background-color: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+        }
+
+        .card-header-styled {
+            border-bottom: 1px solid var(--card-border);
+            padding: 1.5rem 2rem;
+            background: linear-gradient(180deg, var(--brand-orange-light) 0%, #FFFFFF 100%);
+        }
+
+        .section-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background-color: rgba(223, 83, 27, 0.12);
+            color: var(--brand-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        /* Information Grid Display */
+        .info-grid-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .info-grid-value {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .notes-box {
+            background-color: #F8FAFC;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            min-height: 90px;
+        }
+
+        /* Status Badge */
+        .badge-status-up {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #15803D;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Action Buttons */
+        .btn-custom {
+            height: 44px;
+            padding: 0 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-orange {
+            background-color: var(--brand-orange);
+            color: #FFFFFF;
+        }
+
+            .btn-primary-orange:hover {
+                background-color: #c94614;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
+            }
+
+        .btn-secondary-soft {
+            background-color: #F1F5F9;
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+        }
+
+            .btn-secondary-soft:hover {
+                background-color: #E2E8F0;
+                color: var(--text-dark);
+            }
+    </style>
+</head>
+<body>
+
+    <main class="container px-3 p-100">
+
+        <div class="details-card">
+
+            <div class="card-header-styled d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="section-icon-wrapper">
+                        <i class="fa-solid fa-network-wired"></i>
+                    </div>
+                    <div>
+                        <h3 class="m-0 fs-5 fw-bold text-dark">Connection Details</h3>
+                        <p class="m-0 text-muted small">Comprehensive view of network line configuration</p>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="badge-status-up">
+                        <i class="fa-solid fa-circle"></i> Active / Up
+                    </span>
+                </div>
+            </div>
+
+            <div class="p-4 p-md-5">
+                <div class="row g-4">
+
+                    <div class="col-12 col-md-6">
+                        <div class="info-grid-label">Branch Name</div>
+                        <div class="info-grid-value">
+                            <i class="fa-solid fa-building text-muted me-2"></i>Cairo Main Branch
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="info-grid-label">Connection Type Name</div>
+                        <div class="info-grid-value">
+                            <i class="fa-solid fa-diagram-project text-muted me-2"></i>Site-to-Site IPsec VPN
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="info-grid-label">Service Provider Name</div>
+                        <div class="info-grid-value">
+                            <i class="fa-solid fa-tower-cell text-muted me-2"></i>Vodafone Egypt
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="info-grid-label">NID</div>
+                        <div class="info-grid-value">
+                            <code class="text-dark fw-bold">NID-99201-CAI</code>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="info-grid-label">Status</div>
+                        <div class="info-grid-value">Up</div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="info-grid-label">Created By Username</div>
+                        <div class="info-grid-value">
+                            <i class="fa-solid fa-user text-muted me-2"></i>admin_user
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="info-grid-label">Notes</div>
+                        <div class="notes-box">
+                            Primary fiber link configured with automatic failover to 4G LTE backup. Router SLA checks enabled every 30 seconds.
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="d-flex align-items-center justify-content-end gap-3 mt-5 pt-3 border-top">
+                    <a href="javascript:history.back()" class="btn-custom btn-secondary-soft">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                    </a>
+                    <a href="#" class="btn-custom btn-primary-orange">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Connection
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
