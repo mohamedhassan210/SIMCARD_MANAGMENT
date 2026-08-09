@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Sim_Card_Managment.Repos.InternetLineRepos;
-using Sim_Card_Managment.Repos.BranchRepos;
-using Sim_Card_Managment.Repos.LookupRepos;
 using Sim_Card_Managment.Repos;
+using Sim_Card_Managment.Repos.BranchRepos;
+using Sim_Card_Managment.Repos.InternetLineRepos;
+using Sim_Card_Managment.Repos.LookupRepos;
 using Sim_Card_Managment.Viewmodel;
+using System.Security.Claims;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -89,6 +90,15 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(InternetLineCreateViewModel model)
         {
+            if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int currentUserId))
+            {
+                model.CreatedById = currentUserId;
+            }
+            else
+            {
+                model.CreatedById = 1; // Default fallback ID if unauthenticated in dev
+            }
+
             if (!ModelState.IsValid)
             {
                 await PopulateDropdowns(model);
@@ -96,6 +106,7 @@ namespace Sim_Card_Managment.Controllers
             }
 
             await _internetLineRepo.AddAsync(model);
+
             TempData["Success"] = "Internet line created successfully.";
             return RedirectToAction(nameof(Index));
         }

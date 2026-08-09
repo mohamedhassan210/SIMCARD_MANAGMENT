@@ -16,7 +16,7 @@ namespace Sim_Card_Managment.Models
         public string? Description { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public int CreatedById { get; set; }
+        public int? CreatedById { get; set; }
         public bool IsActive { get; set; }
         // Navigation properties
         public virtual ICollection<User> Users { get; set; } = new List<User>();

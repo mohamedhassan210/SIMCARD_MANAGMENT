@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Sim_Card_Management.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class init_database : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,21 +51,6 @@ namespace Sim_Card_Management.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DocumentTypes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Groups",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Groups", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -128,6 +113,19 @@ namespace Sim_Card_Management.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ServiceTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServiceTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserOtps",
                 columns: table => new
                 {
@@ -141,55 +139,6 @@ namespace Sim_Card_Management.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserOtps", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    GroupId = table.Column<int>(type: "int", nullable: false),
-                    LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GroupPermissions",
-                columns: table => new
-                {
-                    GroupId = table.Column<int>(type: "int", nullable: false),
-                    PermissionId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GroupPermissions", x => new { x.GroupId, x.PermissionId });
-                    table.ForeignKey(
-                        name: "FK_GroupPermissions_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_GroupPermissions_Permissions_PermissionId",
-                        column: x => x.PermissionId,
-                        principalTable: "Permissions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -281,74 +230,45 @@ namespace Sim_Card_Management.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AuditLogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AuditLogs_Users_PerformedBy",
-                        column: x => x.PerformedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Documents",
+                name: "Branches",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DocumenttypeId = table.Column<int>(type: "int", nullable: true),
-                    ActionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    SignatureType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    SignatureData = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    VpnOverInternetStatus = table.Column<bool>(type: "bit", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    DocumentNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ServiceProviderId = table.Column<int>(type: "int", nullable: false)
+                    CreatedById = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Documents", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Documents_DocumentTypes_DocumenttypeId",
-                        column: x => x.DocumenttypeId,
-                        principalTable: "DocumentTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Documents_ServiceProviders_ServiceProviderId",
-                        column: x => x.ServiceProviderId,
-                        principalTable: "ServiceProviders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Documents_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                    table.PrimaryKey("PK_Branches", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Employees",
+                name: "DeviceSerialOperations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Position = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    NationalID = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EmpCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    SimId = table.Column<int>(type: "int", nullable: false),
+                    OldSerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NewSerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NetworkTypeChange = table.Column<bool>(type: "bit", nullable: false),
+                    OperationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedById = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employees", x => x.Id);
+                    table.PrimaryKey("PK_DeviceSerialOperations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Employees_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
+                        name: "FK_DeviceSerialOperations_Sims_SimId",
+                        column: x => x.SimId,
+                        principalTable: "Sims",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -401,12 +321,36 @@ namespace Sim_Card_Management.Migrations
                         principalTable: "Usbs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DeviceTransfers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FromSubscriptionId = table.Column<int>(type: "int", nullable: false),
+                    ToEmpId = table.Column<int>(type: "int", nullable: false),
+                    SimId = table.Column<int>(type: "int", nullable: true),
+                    UsbId = table.Column<int>(type: "int", nullable: true),
+                    TransferDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
+                    NewSubscriptionId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeviceTransfers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DeviceStatuses_Users_ReportedBy",
-                        column: x => x.ReportedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        name: "FK_DeviceTransfers_Sims_SimId",
+                        column: x => x.SimId,
+                        principalTable: "Sims",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_DeviceTransfers_Usbs_UsbId",
+                        column: x => x.UsbId,
+                        principalTable: "Usbs",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -423,15 +367,183 @@ namespace Sim_Card_Management.Migrations
                 {
                     table.PrimaryKey("PK_DocumentDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DocumentDetails_Documents_DocumentId",
-                        column: x => x.DocumentId,
-                        principalTable: "Documents",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_DocumentDetails_ItemTypes_ItemTypeId",
                         column: x => x.ItemTypeId,
                         principalTable: "ItemTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Documents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DocumenttypeId = table.Column<int>(type: "int", nullable: true),
+                    ActionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    SignatureType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    SignatureData = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    DocumentNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ServiceProviderId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Documents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Documents_DocumentTypes_DocumenttypeId",
+                        column: x => x.DocumenttypeId,
+                        principalTable: "DocumentTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Documents_ServiceProviders_ServiceProviderId",
+                        column: x => x.ServiceProviderId,
+                        principalTable: "ServiceProviders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Employees",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Position = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    NationalID = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EmpCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Employees", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupPermissions",
+                columns: table => new
+                {
+                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    PermissionId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupPermissions", x => new { x.GroupId, x.PermissionId });
+                    table.ForeignKey(
+                        name: "FK_GroupPermissions_Permissions_PermissionId",
+                        column: x => x.PermissionId,
+                        principalTable: "Permissions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedById = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaymentTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreatedById = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentTypes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaymentTypes_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Serials",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    SimId = table.Column<int>(type: "int", nullable: true),
+                    UsbId = table.Column<int>(type: "int", nullable: true),
+                    DocumentDetailsId = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Serials", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Serials_DocumentDetails_DocumentDetailsId",
+                        column: x => x.DocumentDetailsId,
+                        principalTable: "DocumentDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Serials_Sims_SimId",
+                        column: x => x.SimId,
+                        principalTable: "Sims",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Serials_Usbs_UsbId",
+                        column: x => x.UsbId,
+                        principalTable: "Usbs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Serials_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -502,96 +614,80 @@ namespace Sim_Card_Management.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Serials",
+                name: "VpnConnectionTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    SimId = table.Column<int>(type: "int", nullable: true),
-                    UsbId = table.Column<int>(type: "int", nullable: true),
-                    DocumentDetailsId = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreatedById = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Serials", x => x.Id);
+                    table.PrimaryKey("PK_VpnConnectionTypes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Serials_DocumentDetails_DocumentDetailsId",
-                        column: x => x.DocumentDetailsId,
-                        principalTable: "DocumentDetails",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Serials_Sims_SimId",
-                        column: x => x.SimId,
-                        principalTable: "Sims",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Serials_Usbs_UsbId",
-                        column: x => x.UsbId,
-                        principalTable: "Usbs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Serials_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_VpnConnectionTypes_Users_CreatedById",
+                        column: x => x.CreatedById,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DeviceTransfers",
+                name: "InternetLines",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FromSubscriptionId = table.Column<int>(type: "int", nullable: false),
-                    ToEmpId = table.Column<int>(type: "int", nullable: false),
+                    BranchId = table.Column<int>(type: "int", nullable: false),
+                    ServiceProviderId = table.Column<int>(type: "int", nullable: false),
+                    PaymentTypeId = table.Column<int>(type: "int", nullable: false),
+                    ServiceTypeId = table.Column<int>(type: "int", nullable: false),
                     SimId = table.Column<int>(type: "int", nullable: true),
-                    UsbId = table.Column<int>(type: "int", nullable: true),
-                    TransferDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Reason = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    NewSubscriptionId = table.Column<int>(type: "int", nullable: true)
+                    PhoneNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Bandwidth = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    RenewalDay = table.Column<int>(type: "int", nullable: true),
+                    QuotaGB = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    CreatedById = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DeviceTransfers", x => x.Id);
+                    table.PrimaryKey("PK_InternetLines", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DeviceTransfers_Employees_ToEmpId",
-                        column: x => x.ToEmpId,
-                        principalTable: "Employees",
+                        name: "FK_InternetLines_Branches_BranchId",
+                        column: x => x.BranchId,
+                        principalTable: "Branches",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_DeviceTransfers_Sims_SimId",
+                        name: "FK_InternetLines_PaymentTypes_PaymentTypeId",
+                        column: x => x.PaymentTypeId,
+                        principalTable: "PaymentTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InternetLines_ServiceProviders_ServiceProviderId",
+                        column: x => x.ServiceProviderId,
+                        principalTable: "ServiceProviders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InternetLines_ServiceTypes_ServiceTypeId",
+                        column: x => x.ServiceTypeId,
+                        principalTable: "ServiceTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InternetLines_Sims_SimId",
                         column: x => x.SimId,
                         principalTable: "Sims",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_DeviceTransfers_Subscriptions_FromSubscriptionId",
-                        column: x => x.FromSubscriptionId,
-                        principalTable: "Subscriptions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_DeviceTransfers_Subscriptions_NewSubscriptionId",
-                        column: x => x.NewSubscriptionId,
-                        principalTable: "Subscriptions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_DeviceTransfers_Usbs_UsbId",
-                        column: x => x.UsbId,
-                        principalTable: "Usbs",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_DeviceTransfers_Users_CreatedBy",
-                        column: x => x.CreatedBy,
+                        name: "FK_InternetLines_Users_CreatedById",
+                        column: x => x.CreatedById,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -626,10 +722,69 @@ namespace Sim_Card_Management.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "VpnConnections",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BranchId = table.Column<int>(type: "int", nullable: false),
+                    ConnectionTypeId = table.Column<int>(type: "int", nullable: false),
+                    ServiceProviderId = table.Column<int>(type: "int", nullable: false),
+                    NID = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    LineSpeed = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    CreatedById = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VpnConnections", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VpnConnections_Branches_BranchId",
+                        column: x => x.BranchId,
+                        principalTable: "Branches",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_VpnConnections_ServiceProviders_ServiceProviderId",
+                        column: x => x.ServiceProviderId,
+                        principalTable: "ServiceProviders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_VpnConnections_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_VpnConnections_VpnConnectionTypes_ConnectionTypeId",
+                        column: x => x.ConnectionTypeId,
+                        principalTable: "VpnConnectionTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AuditLogs_PerformedBy",
                 table: "AuditLogs",
                 column: "PerformedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Branches_CreatedById",
+                table: "Branches",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeviceSerialOperations_CreatedById",
+                table: "DeviceSerialOperations",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeviceSerialOperations_SimId",
+                table: "DeviceSerialOperations",
+                column: "SimId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DeviceStatuses_ReplacedBySimId",
@@ -735,10 +890,50 @@ namespace Sim_Card_Management.Migrations
                 column: "PermissionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Groups_CreatedById",
+                table: "Groups",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Groups_Name",
                 table: "Groups",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InternetLines_BranchId",
+                table: "InternetLines",
+                column: "BranchId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InternetLines_CreatedById",
+                table: "InternetLines",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InternetLines_PaymentTypeId",
+                table: "InternetLines",
+                column: "PaymentTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InternetLines_ServiceProviderId",
+                table: "InternetLines",
+                column: "ServiceProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InternetLines_ServiceTypeId",
+                table: "InternetLines",
+                column: "ServiceTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InternetLines_SimId",
+                table: "InternetLines",
+                column: "SimId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentTypes_CreatedById",
+                table: "PaymentTypes",
+                column: "CreatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Quotas_ServiceProviderId",
@@ -849,13 +1044,149 @@ namespace Sim_Card_Management.Migrations
                 table: "Users",
                 column: "Username",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VpnConnections_BranchId",
+                table: "VpnConnections",
+                column: "BranchId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VpnConnections_ConnectionTypeId",
+                table: "VpnConnections",
+                column: "ConnectionTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VpnConnections_CreatedById",
+                table: "VpnConnections",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VpnConnections_ServiceProviderId",
+                table: "VpnConnections",
+                column: "ServiceProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VpnConnectionTypes_CreatedById",
+                table: "VpnConnectionTypes",
+                column: "CreatedById");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AuditLogs_Users_PerformedBy",
+                table: "AuditLogs",
+                column: "PerformedBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Branches_Users_CreatedById",
+                table: "Branches",
+                column: "CreatedById",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DeviceSerialOperations_Users_CreatedById",
+                table: "DeviceSerialOperations",
+                column: "CreatedById",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DeviceStatuses_Users_ReportedBy",
+                table: "DeviceStatuses",
+                column: "ReportedBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DeviceTransfers_Employees_ToEmpId",
+                table: "DeviceTransfers",
+                column: "ToEmpId",
+                principalTable: "Employees",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DeviceTransfers_Subscriptions_FromSubscriptionId",
+                table: "DeviceTransfers",
+                column: "FromSubscriptionId",
+                principalTable: "Subscriptions",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DeviceTransfers_Subscriptions_NewSubscriptionId",
+                table: "DeviceTransfers",
+                column: "NewSubscriptionId",
+                principalTable: "Subscriptions",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DeviceTransfers_Users_CreatedBy",
+                table: "DeviceTransfers",
+                column: "CreatedBy",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DocumentDetails_Documents_DocumentId",
+                table: "DocumentDetails",
+                column: "DocumentId",
+                principalTable: "Documents",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Documents_Users_UserId",
+                table: "Documents",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Employees_Users_UserId",
+                table: "Employees",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_GroupPermissions_Groups_GroupId",
+                table: "GroupPermissions",
+                column: "GroupId",
+                principalTable: "Groups",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Groups_Users_CreatedById",
+                table: "Groups",
+                column: "CreatedById",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Groups_Users_CreatedById",
+                table: "Groups");
+
             migrationBuilder.DropTable(
                 name: "AuditLogs");
+
+            migrationBuilder.DropTable(
+                name: "DeviceSerialOperations");
 
             migrationBuilder.DropTable(
                 name: "DeviceStatuses");
@@ -867,6 +1198,9 @@ namespace Sim_Card_Management.Migrations
                 name: "GroupPermissions");
 
             migrationBuilder.DropTable(
+                name: "InternetLines");
+
+            migrationBuilder.DropTable(
                 name: "ReceiverSignatures");
 
             migrationBuilder.DropTable(
@@ -876,16 +1210,31 @@ namespace Sim_Card_Management.Migrations
                 name: "UserOtps");
 
             migrationBuilder.DropTable(
+                name: "VpnConnections");
+
+            migrationBuilder.DropTable(
                 name: "DeviceStatusesType");
 
             migrationBuilder.DropTable(
                 name: "Permissions");
 
             migrationBuilder.DropTable(
+                name: "PaymentTypes");
+
+            migrationBuilder.DropTable(
+                name: "ServiceTypes");
+
+            migrationBuilder.DropTable(
                 name: "Subscriptions");
 
             migrationBuilder.DropTable(
                 name: "DocumentDetails");
+
+            migrationBuilder.DropTable(
+                name: "Branches");
+
+            migrationBuilder.DropTable(
+                name: "VpnConnectionTypes");
 
             migrationBuilder.DropTable(
                 name: "Actions");

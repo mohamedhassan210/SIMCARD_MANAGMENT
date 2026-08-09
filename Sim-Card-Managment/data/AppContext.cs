@@ -355,6 +355,41 @@ namespace Sim_Card_Managment.data
                 .HasForeignKey(vc => vc.ConnectionTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // ── VpnConnection: User ──────────────────────────────
+            modelBuilder.Entity<VpnConnection>()
+                .HasOne(vc => vc.CreatedBy)
+                .WithMany(ct => ct.VpnConnections)
+                .HasForeignKey(vc => vc.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── User: VpnConnectionType ──────────────────────────────
+            modelBuilder.Entity<VpnConnectionType>()
+                .HasOne(vc => vc.CreatedBy)
+                .WithMany(ct => ct.VpnConnectionTypes)
+                .HasForeignKey(vc => vc.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── Branch: user ──────────────────────────────
+            modelBuilder.Entity<Branch>()
+                .HasOne(vc => vc.CreatedBy)
+                .WithMany(ct => ct.Branches)
+                .HasForeignKey(vc => vc.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── User: InternetLine ──────────────────────────────
+            modelBuilder.Entity<InternetLine>()
+                .HasOne(vc => vc.CreatedBy)
+                .WithMany(ct => ct.InternetLines)
+                .HasForeignKey(vc => vc.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ── User: PaymentType ──────────────────────────────
+            modelBuilder.Entity<PaymentType>()
+                .HasOne(vc => vc.CreatedBy)
+                .WithMany(ct => ct.PaymentTypes)
+                .HasForeignKey(vc => vc.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

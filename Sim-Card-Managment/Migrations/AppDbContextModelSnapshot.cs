@@ -33,6 +33,9 @@ namespace Sim_Card_Management.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -45,6 +48,8 @@ namespace Sim_Card_Management.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.ToTable("Branches");
                 });
@@ -144,6 +149,9 @@ namespace Sim_Card_Management.Migrations
                     b.Property<int>("BranchId")
                         .HasColumnType("int");
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -176,6 +184,8 @@ namespace Sim_Card_Management.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("PaymentTypeId");
 
@@ -214,12 +224,17 @@ namespace Sim_Card_Management.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.ToTable("PaymentTypes");
                 });
@@ -256,6 +271,9 @@ namespace Sim_Card_Management.Migrations
                     b.Property<int>("ConnectionTypeId")
                         .HasColumnType("int");
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
                     b.Property<string>("LineSpeed")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -280,6 +298,8 @@ namespace Sim_Card_Management.Migrations
 
                     b.HasIndex("ConnectionTypeId");
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("ServiceProviderId");
 
                     b.ToTable("VpnConnections");
@@ -293,12 +313,17 @@ namespace Sim_Card_Management.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.ToTable("VpnConnectionTypes");
                 });
@@ -613,7 +638,7 @@ namespace Sim_Card_Management.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedById")
+                    b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -1064,6 +1089,17 @@ namespace Sim_Card_Management.Migrations
                     b.ToTable("UserOtps");
                 });
 
+            modelBuilder.Entity("Sim_Card_Management.Models.Branch", b =>
+                {
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("Branches")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+                });
+
             modelBuilder.Entity("Sim_Card_Management.Models.DeviceSerialOperation", b =>
                 {
                     b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
@@ -1110,6 +1146,12 @@ namespace Sim_Card_Management.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("InternetLines")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Sim_Card_Management.Models.PaymentType", "PaymentType")
                         .WithMany("InternetLines")
                         .HasForeignKey("PaymentTypeId")
@@ -1135,6 +1177,8 @@ namespace Sim_Card_Management.Migrations
 
                     b.Navigation("Branch");
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("PaymentType");
 
                     b.Navigation("ServiceProvider");
@@ -1142,6 +1186,17 @@ namespace Sim_Card_Management.Migrations
                     b.Navigation("ServiceType");
 
                     b.Navigation("Sim");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.PaymentType", b =>
+                {
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("PaymentTypes")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Sim_Card_Management.Models.VpnConnection", b =>
@@ -1158,6 +1213,12 @@ namespace Sim_Card_Management.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("VpnConnections")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Sim_Card_Managment.Models.ServiceProvider", "ServiceProvider")
                         .WithMany("VpnConnections")
                         .HasForeignKey("ServiceProviderId")
@@ -1168,7 +1229,20 @@ namespace Sim_Card_Management.Migrations
 
                     b.Navigation("ConnectionType");
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("ServiceProvider");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.VpnConnectionType", b =>
+                {
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("VpnConnectionTypes")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.AuditLog", b =>
@@ -1316,8 +1390,7 @@ namespace Sim_Card_Management.Migrations
                     b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
                         .WithMany("UserCreatedGroups")
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
                 });
@@ -1625,6 +1698,8 @@ namespace Sim_Card_Management.Migrations
                 {
                     b.Navigation("AuditLogs");
 
+                    b.Navigation("Branches");
+
                     b.Navigation("CreatedSubscriptions");
 
                     b.Navigation("DeviceSerialOperations");
@@ -1633,7 +1708,11 @@ namespace Sim_Card_Management.Migrations
 
                     b.Navigation("Employee");
 
+                    b.Navigation("InternetLines");
+
                     b.Navigation("LoggedTransfers");
+
+                    b.Navigation("PaymentTypes");
 
                     b.Navigation("ReportedStatuses");
 
@@ -1642,6 +1721,10 @@ namespace Sim_Card_Management.Migrations
                     b.Navigation("Signatures");
 
                     b.Navigation("UserCreatedGroups");
+
+                    b.Navigation("VpnConnectionTypes");
+
+                    b.Navigation("VpnConnections");
                 });
 #pragma warning restore 612, 618
         }
