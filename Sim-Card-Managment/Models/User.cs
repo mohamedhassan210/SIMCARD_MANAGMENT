@@ -57,6 +57,11 @@ namespace Sim_Card_Managment.Models
         public virtual ICollection<Serial> Serials { get; set; } = new List<Serial>();
         public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
         public virtual ICollection<DeviceSerialOperation> DeviceSerialOperations { get; set; } = new List<DeviceSerialOperation>();
+        public virtual ICollection<Branch> Branches { get; set; } = new List<Branch>();
+        public virtual ICollection<VpnConnection> VpnConnections { get; set; } = new List<VpnConnection>();
+        public virtual ICollection<VpnConnectionType> VpnConnectionTypes { get; set; } = new List<VpnConnectionType>();
+        public virtual ICollection<PaymentType> PaymentTypes { get; set; } = new List<PaymentType>();
+        public virtual ICollection<InternetLine> InternetLines { get; set; } = new List<InternetLine>();
     }
 
 }

@@ -29,7 +29,10 @@ namespace Sim_Card_Management.Models
         [StringLength(500)]
         public string? Notes { get; set; }
 
+        public int CreatedById { get; set; }
         // Navigation properties
+        [ForeignKey(nameof(CreatedById))]
+        public virtual User CreatedBy { get; set; }
         [ForeignKey(nameof(BranchId))]
         public virtual Branch Branch { get; set; } = null!;
 

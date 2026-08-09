@@ -12,8 +12,8 @@ using Sim_Card_Managment.data;
 namespace Sim_Card_Management.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260729115427_addDeviceSerialOperation")]
-    partial class addDeviceSerialOperation
+    [Migration("20260809101715_init_database")]
+    partial class init_database
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,38 @@ namespace Sim_Card_Management.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Sim_Card_Management.Models.Branch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool?>("VpnOverInternetStatus")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("Branches");
+                });
 
             modelBuilder.Entity("Sim_Card_Management.Models.DeviceSerialOperation", b =>
                 {
@@ -39,11 +71,13 @@ namespace Sim_Card_Management.Migrations
                     b.Property<bool>("NetworkTypeChange")
                         .HasColumnType("bit");
 
-                    b.Property<int>("NewSerialNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("NewSerialNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OldSerialNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("OldSerialNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("OperationDate")
                         .HasColumnType("datetime2");
@@ -103,6 +137,70 @@ namespace Sim_Card_Management.Migrations
                     b.ToTable("DocumentDetails");
                 });
 
+            modelBuilder.Entity("Sim_Card_Management.Models.InternetLine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Bandwidth")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("PaymentTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal?>("QuotaGB")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int?>("RenewalDay")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceProviderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SimId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("PaymentTypeId");
+
+                    b.HasIndex("ServiceProviderId");
+
+                    b.HasIndex("ServiceTypeId");
+
+                    b.HasIndex("SimId");
+
+                    b.ToTable("InternetLines");
+                });
+
             modelBuilder.Entity("Sim_Card_Management.Models.ItemType", b =>
                 {
                     b.Property<int>("Id")
@@ -119,6 +217,118 @@ namespace Sim_Card_Management.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ItemTypes");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.PaymentType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("PaymentTypes");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.ServiceType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ServiceTypes");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.VpnConnection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ConnectionTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LineSpeed")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("NID")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ServiceProviderId")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("Status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("ConnectionTypeId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ServiceProviderId");
+
+                    b.ToTable("VpnConnections");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.VpnConnectionType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("VpnConnectionTypes");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.AuditLog", b =>
@@ -431,9 +641,15 @@ namespace Sim_Card_Management.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -441,6 +657,8 @@ namespace Sim_Card_Management.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -874,6 +1092,17 @@ namespace Sim_Card_Management.Migrations
                     b.ToTable("UserOtps");
                 });
 
+            modelBuilder.Entity("Sim_Card_Management.Models.Branch", b =>
+                {
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("Branches")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+                });
+
             modelBuilder.Entity("Sim_Card_Management.Models.DeviceSerialOperation", b =>
                 {
                     b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
@@ -910,6 +1139,113 @@ namespace Sim_Card_Management.Migrations
                     b.Navigation("Document");
 
                     b.Navigation("ItemType");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.InternetLine", b =>
+                {
+                    b.HasOne("Sim_Card_Management.Models.Branch", "Branch")
+                        .WithMany("InternetLines")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("InternetLines")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Sim_Card_Management.Models.PaymentType", "PaymentType")
+                        .WithMany("InternetLines")
+                        .HasForeignKey("PaymentTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Sim_Card_Managment.Models.ServiceProvider", "ServiceProvider")
+                        .WithMany("InternetLines")
+                        .HasForeignKey("ServiceProviderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Sim_Card_Management.Models.ServiceType", "ServiceType")
+                        .WithMany("InternetLines")
+                        .HasForeignKey("ServiceTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Sim_Card_Managment.Models.Sim", "Sim")
+                        .WithMany("InternetLines")
+                        .HasForeignKey("SimId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("PaymentType");
+
+                    b.Navigation("ServiceProvider");
+
+                    b.Navigation("ServiceType");
+
+                    b.Navigation("Sim");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.PaymentType", b =>
+                {
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("PaymentTypes")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.VpnConnection", b =>
+                {
+                    b.HasOne("Sim_Card_Management.Models.Branch", "Branch")
+                        .WithMany("VpnConnections")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Sim_Card_Management.Models.VpnConnectionType", "ConnectionType")
+                        .WithMany("VpnConnections")
+                        .HasForeignKey("ConnectionTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("VpnConnections")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Sim_Card_Managment.Models.ServiceProvider", "ServiceProvider")
+                        .WithMany("VpnConnections")
+                        .HasForeignKey("ServiceProviderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("ConnectionType");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("ServiceProvider");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.VpnConnectionType", b =>
+                {
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("VpnConnectionTypes")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.AuditLog", b =>
@@ -1050,6 +1386,17 @@ namespace Sim_Card_Management.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Sim_Card_Managment.Models.Group", b =>
+                {
+                    b.HasOne("Sim_Card_Managment.Models.User", "CreatedBy")
+                        .WithMany("UserCreatedGroups")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.GroupPermission", b =>
@@ -1222,6 +1569,13 @@ namespace Sim_Card_Management.Migrations
                     b.Navigation("Group");
                 });
 
+            modelBuilder.Entity("Sim_Card_Management.Models.Branch", b =>
+                {
+                    b.Navigation("InternetLines");
+
+                    b.Navigation("VpnConnections");
+                });
+
             modelBuilder.Entity("Sim_Card_Management.Models.DeviceStatusType", b =>
                 {
                     b.Navigation("DeviceStatuses");
@@ -1235,6 +1589,21 @@ namespace Sim_Card_Management.Migrations
             modelBuilder.Entity("Sim_Card_Management.Models.ItemType", b =>
                 {
                     b.Navigation("DocumentDetails");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.PaymentType", b =>
+                {
+                    b.Navigation("InternetLines");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.ServiceType", b =>
+                {
+                    b.Navigation("InternetLines");
+                });
+
+            modelBuilder.Entity("Sim_Card_Management.Models.VpnConnectionType", b =>
+                {
+                    b.Navigation("VpnConnections");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.DeviceAction", b =>
@@ -1285,11 +1654,15 @@ namespace Sim_Card_Management.Migrations
                 {
                     b.Navigation("Documents");
 
+                    b.Navigation("InternetLines");
+
                     b.Navigation("Quotas");
 
                     b.Navigation("Sims");
 
                     b.Navigation("Usbs");
+
+                    b.Navigation("VpnConnections");
                 });
 
             modelBuilder.Entity("Sim_Card_Managment.Models.Sim", b =>
@@ -1299,6 +1672,8 @@ namespace Sim_Card_Management.Migrations
                     b.Navigation("DeviceStatuses");
 
                     b.Navigation("DeviceTransfers");
+
+                    b.Navigation("InternetLines");
 
                     b.Navigation("Serials");
 
@@ -1327,6 +1702,8 @@ namespace Sim_Card_Management.Migrations
                 {
                     b.Navigation("AuditLogs");
 
+                    b.Navigation("Branches");
+
                     b.Navigation("CreatedSubscriptions");
 
                     b.Navigation("DeviceSerialOperations");
@@ -1335,13 +1712,23 @@ namespace Sim_Card_Management.Migrations
 
                     b.Navigation("Employee");
 
+                    b.Navigation("InternetLines");
+
                     b.Navigation("LoggedTransfers");
+
+                    b.Navigation("PaymentTypes");
 
                     b.Navigation("ReportedStatuses");
 
                     b.Navigation("Serials");
 
                     b.Navigation("Signatures");
+
+                    b.Navigation("UserCreatedGroups");
+
+                    b.Navigation("VpnConnectionTypes");
+
+                    b.Navigation("VpnConnections");
                 });
 #pragma warning restore 612, 618
         }

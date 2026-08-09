@@ -6,6 +6,7 @@ using Sim_Card_Managment.Repos.InternetLineRepos;
 using Sim_Card_Managment.Repos.VpnConnectionRepos;
 using Sim_Card_Managment.Viewmodel;
 using System.Drawing;
+using System.Security.Claims;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -48,12 +49,23 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]      
         public async Task<IActionResult> Create(BranchCreateViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int currentUserId))
+            {
+                model.CreatedById = currentUserId;
+            }
+            else
+            {
+                model.CreatedById = 1; // Default fallback ID if unauthenticated in dev
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
 
             await _branchRepo.AddAsync(model);
+
             TempData["Success"] = "Branch created successfully.";
             return RedirectToAction(nameof(Index));
         }

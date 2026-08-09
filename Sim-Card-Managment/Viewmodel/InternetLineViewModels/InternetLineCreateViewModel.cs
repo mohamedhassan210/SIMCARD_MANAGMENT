@@ -23,6 +23,7 @@ namespace Sim_Card_Managment.Viewmodel
         public bool Status { get; set; } = true;
         [StringLength(500)]
         public string? Notes { get; set; }
+        public int CreatedById { get; set; }
 
         // Dropdowns
         public IEnumerable<SelectListItem> Branches { get; set; } = new List<SelectListItem>();
