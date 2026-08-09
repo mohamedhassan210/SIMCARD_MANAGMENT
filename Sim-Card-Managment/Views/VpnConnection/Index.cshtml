@@ -341,6 +341,7 @@
                             <th>NID</th>
                             <th>Line Speed</th>
                             <th>Status</th>
+                            <th>Created By</th>
                             <th style="text-align: right;">Actions</th>
                         </tr>
                     </thead>
@@ -376,6 +377,11 @@
                                             </span>
                                         }
                                     </td>
+
+                                    <td>
+                                        <span class="fw-semibold">@item.CreatedByUsername</span>
+                                    </td>
+
                                     <td style="text-align: right;">
                                         <div class="d-inline-flex gap-1">
                                             <a asp-controller="VpnConnection" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit Link">
@@ -387,7 +393,7 @@
                             }
                         }
                         <tr id="noResultsRow" style="display: @(Model == null || !Model.Any() ? "" : "none");">
-                            <td colspan="7" class="text-center text-muted py-4">
+                            <td colspan="8" class="text-center text-muted py-4">
                                 No matching VPN links found.
                             </td>
                         </tr>
