@@ -1,8 +1,5 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.VpnConnectionListItemViewModel>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +27,6 @@
             padding-bottom: 3rem;
         }
 
-        /* Page Header */
         .page-header {
             background: #FFFFFF;
             border-bottom: 1px solid var(--card-border);
@@ -46,7 +42,6 @@
             color: var(--text-dark);
         }
 
-        /* Stats Cards */
         .stat-card {
             background: #FFFFFF;
             border: 1px solid var(--card-border);
@@ -98,7 +93,6 @@
             font-weight: 700;
         }
 
-        /* Main Table Card */
         .table-card {
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
@@ -107,7 +101,6 @@
             padding: 2rem;
         }
 
-        /* Search & Filter Bar */
         .search-box {
             display: flex;
             align-items: center;
@@ -151,7 +144,6 @@
                 border-color: var(--brand-orange);
             }
 
-        /* Buttons */
         .btn-custom {
             height: 44px;
             padding: 0 24px;
@@ -200,13 +192,6 @@
                 border-color: rgba(223, 83, 27, 0.3);
             }
 
-        .btn-action-delete:hover {
-            background: #FEF2F2;
-            color: #DC2626;
-            border-color: rgba(220, 38, 38, 0.3);
-        }
-
-        /* Table Styling */
         .vpn-table {
             width: 100%;
             border-collapse: collapse;
@@ -257,6 +242,20 @@
             align-items: center;
             gap: 6px;
         }
+
+        .badge-status-unknown {
+            background-color: rgba(100, 116, 139, 0.1);
+            color: #64748B;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(100, 116, 139, 0.2);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
@@ -269,7 +268,7 @@
                     <p class="text-muted m-0 small mt-1">Manage network links, line speeds, and operational status across all branches</p>
                 </div>
                 <div>
-                    <a  class="btn-custom btn-primary-orange">
+                    <a asp-controller="VpnConnection" asp-action="Create" class="btn-custom btn-primary-orange">
                         <i class="fa-solid fa-plus"></i> New VPN Link
                     </a>
                 </div>
@@ -286,7 +285,7 @@
                         <i class="fa-solid fa-network-wired"></i>
                     </div>
                     <div>
-                        <div class="stat-value">4</div>
+                        <div class="stat-value">@(Model?.Count() ?? 0)</div>
                         <div class="stat-label">Total Links</div>
                     </div>
                 </div>
@@ -297,7 +296,7 @@
                         <i class="fa-solid fa-circle-check"></i>
                     </div>
                     <div>
-                        <div class="stat-value">3</div>
+                        <div class="stat-value">@(Model?.Count(v => v.Status == true) ?? 0)</div>
                         <div class="stat-label">Active (Up)</div>
                     </div>
                 </div>
@@ -308,7 +307,7 @@
                         <i class="fa-solid fa-circle-xmark"></i>
                     </div>
                     <div>
-                        <div class="stat-value">1</div>
+                        <div class="stat-value">@(Model?.Count(v => v.Status == false) ?? 0)</div>
                         <div class="stat-label">Offline (Down)</div>
                     </div>
                 </div>
@@ -318,12 +317,10 @@
         <div class="table-card">
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-
                 <div class="search-box col-12 col-md-5">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input id="vpnSearchInput" type="text" placeholder="Search by branch, provider, or NID..." autocomplete="off">
                 </div>
-
                 <div class="d-flex align-items-center gap-2">
                     <span class="text-muted small fw-bold">Status:</span>
                     <select id="statusFilter" class="filter-select">
@@ -344,94 +341,56 @@
                             <th>NID</th>
                             <th>Line Speed</th>
                             <th>Status</th>
-                            <th>Notes</th>
                             <th style="text-align: right;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="vpnTableBody">
-
-                        <tr class="vpn-row" data-status="UP">
-                            <td><strong>Cairo Main Branch</strong></td>
-                            <td>MPLS Link</td>
-                            <td>Vodafone</td>
-                            <td><code class="text-dark fw-semibold">NID-99201</code></td>
-                            <td>100 Mbps</td>
-                            <td>
-                                <span class="badge-status-up">
-                                    <i class="fa-solid fa-circle"></i> Up
-                                </span>
-                            </td>
-                            <td class="text-muted small">Primary line on fiber port #4</td>
-                            <td style="text-align: right;">
-                                <div class="d-inline-flex gap-1">
-                                    <a href="#" class="btn-action-icon" title="Edit Link"><i class="fa-solid fa-pen"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="vpn-row" data-status="UP">
-                            <td><strong>Alexandria Hub</strong></td>
-                            <td>Site-to-Site VPN</td>
-                            <td>Orange</td>
-                            <td><code class="text-dark fw-semibold">NID-44120</code></td>
-                            <td>50 Mbps</td>
-                            <td>
-                                <span class="badge-status-up">
-                                    <i class="fa-solid fa-circle"></i> Up
-                                </span>
-                            </td>
-                            <td class="text-muted small">Backup router active</td>
-                            <td style="text-align: right;">
-                                <div class="d-inline-flex gap-1">
-                                    <a href="#" class="btn-action-icon" title="Edit Link"><i class="fa-solid fa-pen"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="vpn-row" data-status="DOWN">
-                            <td><strong>Giza Office</strong></td>
-                            <td>ADSL Corporate</td>
-                            <td>WE</td>
-                            <td><code class="text-dark fw-semibold">NID-11058</code></td>
-                            <td>20 Mbps</td>
-                            <td>
-                                <span class="badge-status-down">
-                                    <i class="fa-solid fa-circle"></i> Down
-                                </span>
-                            </td>
-                            <td class="text-muted small">Ticket #8839 open with provider</td>
-                            <td style="text-align: right;">
-                                <div class="d-inline-flex gap-1">
-                                    <a href="#" class="btn-action-icon" title="Edit Link"><i class="fa-solid fa-pen"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="vpn-row" data-status="UP">
-                            <td><strong>Tanta Branch</strong></td>
-                            <td>MPLS Link</td>
-                            <td>Etisalat (e&)</td>
-                            <td><code class="text-dark fw-semibold">NID-77309</code></td>
-                            <td>30 Mbps</td>
-                            <td>
-                                <span class="badge-status-up">
-                                    <i class="fa-solid fa-circle"></i> Up
-                                </span>
-                            </td>
-                            <td class="text-muted small">Stable connection</td>
-                            <td style="text-align: right;">
-                                <div class="d-inline-flex gap-1">
-                                    <a  class="btn-action-icon" title="Edit Link"><i class="fa-solid fa-pen"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr id="noResultsRow" style="display: none;">
-                            <td colspan="8" class="text-center text-muted py-4">
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                var statusAttr = item.Status == true ? "UP" : item.Status == false ? "DOWN" : "UNKNOWN";
+                                <tr class="vpn-row" data-status="@statusAttr">
+                                    <td><strong>@item.BranchName</strong></td>
+                                    <td>@item.ConnectionTypeName</td>
+                                    <td>@item.ServiceProviderName</td>
+                                    <td><code class="text-dark fw-semibold">@(item.NID ?? "N/A")</code></td>
+                                    <td>@(item.LineSpeed ?? "N/A")</td>
+                                    <td>
+                                        @if (item.Status == true)
+                                        {
+                                            <span class="badge-status-up">
+                                                <i class="fa-solid fa-circle"></i> Up
+                                            </span>
+                                        }
+                                        else if (item.Status == false)
+                                        {
+                                            <span class="badge-status-down">
+                                                <i class="fa-solid fa-circle"></i> Down
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-status-unknown">
+                                                <i class="fa-solid fa-circle"></i> Unknown
+                                            </span>
+                                        }
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <div class="d-inline-flex gap-1">
+                                            <a asp-controller="VpnConnection" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit Link">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        <tr id="noResultsRow" style="display: @(Model == null || !Model.Any() ? "" : "none");">
+                            <td colspan="7" class="text-center text-muted py-4">
                                 No matching VPN links found.
                             </td>
                         </tr>
-
                     </tbody>
                 </table>
             </div>
@@ -454,7 +413,6 @@
             rows.forEach(row => {
                 const text = row.innerText.toLowerCase();
                 const rowStatus = row.getAttribute('data-status');
-
                 const matchesQuery = text.includes(query);
                 const matchesStatus = (selectedStatus === 'ALL') || (rowStatus === selectedStatus);
 
@@ -471,28 +429,6 @@
 
         searchInput.addEventListener('input', filterTable);
         statusFilter.addEventListener('change', filterTable);
-
-        function deleteLink(branchName) {
-            Swal.fire({
-                title: 'Delete VPN Link?',
-                text: `Are you sure you want to delete the VPN connection for ${branchName}?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#DC2626',
-                cancelButtonColor: '#64748B',
-                confirmButtonText: 'Yes, Delete',
-                customClass: { popup: 'rounded-4' }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Deleted!',
-                        text: 'VPN link record has been removed.',
-                        icon: 'success',
-                        customClass: { popup: 'rounded-4' }
-                    });
-                }
-            });
-        }
     </script>
 </body>
 </html>
