@@ -236,3 +236,478 @@
 
 </body>
 </html>
+
+@* 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Type</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --brand-orange: #DF531B;
+            --brand-orange-light: #FFF8F6;
+            --brand-purple: #5B2D90;
+            --bg-canvas: #F4F5F8;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --card-border: #E2E8F0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding-bottom: 3rem;
+        }
+
+        /* Form Card Layout */
+        .form-card {
+            max-width: 550px;
+            margin: 3rem auto 0 auto;
+            background-color: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+        }
+
+        .card-header-styled {
+            border-bottom: 1px solid var(--card-border);
+            padding: 1.5rem 2rem;
+            background: linear-gradient(180deg, var(--brand-orange-light) 0%, #FFFFFF 100%);
+        }
+
+        .section-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background-color: rgba(223, 83, 27, 0.12);
+            color: var(--brand-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        /* Form Controls */
+        .form-label-custom {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .input-group-custom {
+            display: flex;
+            align-items: center;
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0 14px;
+            transition: all 0.2s ease;
+        }
+
+            .input-group-custom:focus-within {
+                border-color: var(--brand-orange);
+                box-shadow: 0 0 0 3px rgba(223, 83, 27, 0.1);
+            }
+
+            .input-group-custom i {
+                color: var(--text-muted);
+                font-size: 1rem;
+                margin-right: 10px;
+            }
+
+        .form-control-custom {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 0.95rem;
+            width: 100%;
+            height: 48px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .btn-custom {
+            height: 48px;
+            padding: 0 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-orange {
+            background-color: var(--brand-orange);
+            color: #FFFFFF;
+        }
+
+            .btn-primary-orange:hover {
+                background-color: #c94614;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
+            }
+
+        .btn-secondary-soft {
+            background-color: #F1F5F9;
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+        }
+
+            .btn-secondary-soft:hover {
+                background-color: #E2E8F0;
+                color: var(--text-dark);
+            }
+    </style>
+</head>
+<body>
+
+    <main class="container px-3">
+
+        <div class="form-card">
+
+            <div class="card-header-styled d-flex align-items-center gap-3">
+                <div class="section-icon-wrapper">
+                    <i class="fa-solid fa-plus-circle"></i>
+                </div>
+                <div>
+                    <h3 class="m-0 fs-5 fw-bold text-dark">Create New Type</h3>
+                    <p class="m-0 text-muted small">Enter the details to add a new classification type</p>
+                </div>
+            </div>
+
+            <form id="createTypeForm" onsubmit="handleFormSubmit(event)">
+                <div class="p-4 p-md-5">
+                    <div class="row g-4">
+
+                        <div class="col-12">
+                            <label for="typeName" class="form-label-custom">Type Name</label>
+                            <div class="input-group-custom">
+                                <i class="fa-solid fa-tag"></i>
+                                <input type="text" id="typeName" class="form-control-custom" placeholder="e.g., Fiber Optic, IPsec VPN" required>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-end gap-3 mt-5 pt-3 border-top">
+                        <a href="javascript:history.back()" class="btn-custom btn-secondary-soft">Cancel</a>
+                        <button type="submit" class="btn-custom btn-primary-orange">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Type
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('typeName').value;
+
+            Swal.fire({
+                title: 'Created Successfully!',
+                text: `New type "${name}" has been added.`,
+                icon: 'success',
+                confirmButtonColor: '#DF531B',
+                customClass: { popup: 'rounded-4' }
+            });
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Types Index</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --brand-orange: #DF531B;
+            --brand-orange-light: #FFF8F6;
+            --brand-purple: #5B2D90;
+            --bg-canvas: #F4F5F8;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --card-border: #E2E8F0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding-bottom: 3rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: #FFFFFF;
+            border-bottom: 1px solid var(--card-border);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        }
+
+        .page-title {
+            font-size: clamp(1.5rem, 3vw, 2.25rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-dark);
+        }
+
+        /* Main Table Card */
+        .table-card {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            padding: 2rem;
+        }
+
+        /* Search Bar */
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #FFF;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            transition: border-color 0.2s ease;
+        }
+
+            .search-box:focus-within {
+                border-color: var(--brand-orange);
+            }
+
+            .search-box i {
+                color: var(--text-muted);
+            }
+
+            .search-box input {
+                border: none;
+                outline: none;
+                background: transparent;
+                font-size: 0.95rem;
+                width: 100%;
+                color: var(--text-dark);
+            }
+
+        /* Buttons */
+        .btn-custom {
+            height: 44px;
+            padding: 0 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-orange {
+            background-color: var(--brand-orange);
+            color: #FFFFFF;
+        }
+
+            .btn-primary-orange:hover {
+                background-color: #c94614;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
+            }
+
+        .btn-action-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--card-border);
+            background: #FFFFFF;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+            .btn-action-icon:hover {
+                background: var(--brand-orange-light);
+                color: var(--brand-orange);
+                border-color: rgba(223, 83, 27, 0.3);
+            }
+
+        /* Table Styling */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .custom-table thead th {
+                text-align: left;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                padding: 12px 16px;
+                border-bottom: 2px solid var(--brand-orange);
+                background: #FFFFFF;
+            }
+
+            .custom-table tbody td {
+                font-size: 0.95rem;
+                padding: 16px;
+                border-bottom: 1px solid var(--card-border);
+                vertical-align: middle;
+            }
+    </style>
+</head>
+<body>
+
+    <header class="page-header">
+        <div class="container-fluid px-lg-5">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div>
+                    <h1 class="page-title m-0">Types Directory</h1>
+                    <p class="text-muted m-0 small mt-1">Manage system connection and service types</p>
+                </div>
+                <div>
+                    <a href="/Types/Create" class="btn-custom btn-primary-orange">
+                        <i class="fa-solid fa-plus"></i> New Type
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container-fluid px-lg-5">
+
+        <div class="table-card">
+
+            <div class="mb-4">
+                <div class="search-box col-12">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input id="typeSearchInput" type="text" placeholder="Search types..." autocomplete="off">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="custom-table" id="typeTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="typeTableBody">
+
+                        <tr class="type-row">
+                            <td><strong>Fiber Optic</strong></td>
+                            <td style="text-align: right;">
+                                <a href="/Types/Edit/1" class="btn-action-icon" title="Edit Type">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr class="type-row">
+                            <td><strong>IPsec VPN</strong></td>
+                            <td style="text-align: right;">
+                                <a href="/Types/Edit/2" class="btn-action-icon" title="Edit Type">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr class="type-row">
+                            <td><strong>4G LTE Backup</strong></td>
+                            <td style="text-align: right;">
+                                <a href="/Types/Edit/3" class="btn-action-icon" title="Edit Type">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr class="type-row">
+                            <td><strong>MPLS Circuit</strong></td>
+                            <td style="text-align: right;">
+                                <a href="/Types/Edit/4" class="btn-action-icon" title="Edit Type">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr id="noResultsRow" style="display: none;">
+                            <td colspan="2" class="text-center text-muted py-4">
+                                No matching types found.
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // Real-time Search Logic
+        const searchInput = document.getElementById('typeSearchInput');
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#typeTableBody tr.type-row');
+            let hasVisibleRow = false;
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    row.style.display = '';
+                    hasVisibleRow = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            document.getElementById('noResultsRow').style.display = hasVisibleRow ? 'none' : '';
+        });
+    </script>
+</body>
+</html> *@
