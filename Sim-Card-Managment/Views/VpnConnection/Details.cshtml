@@ -1,8 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model Sim_Card_Managment.Viewmodel.VpnConnectionDetailsViewModel
 
 <!DOCTYPE html>
 <html lang="en">
@@ -141,6 +137,34 @@
                 background-color: #E2E8F0;
                 color: var(--text-dark);
             }
+
+        .badge-status-down {
+            background-color: rgba(220, 38, 38, 0.1);
+            color: #DC2626;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-status-unknown {
+            background-color: rgba(100, 116, 139, 0.1);
+            color: #64748B;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(100, 116, 139, 0.2);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
@@ -156,76 +180,148 @@
                     </div>
                     <div>
                         <h3 class="m-0 fs-5 fw-bold text-dark">Connection Details</h3>
-                        <p class="m-0 text-muted small">Comprehensive view of network line configuration</p>
+                        <p class="m-0 text-muted small">
+                            Comprehensive view of network line configuration
+                        </p>
                     </div>
                 </div>
 
                 <div>
-                    <span class="badge-status-up">
-                        <i class="fa-solid fa-circle"></i> Active / Up
-                    </span>
+                    @if (Model.Status == true)
+                    {
+                        <span class="badge-status-up">
+                            <i class="fa-solid fa-circle"></i> Active / Up
+                        </span>
+                    }
+                    else if (Model.Status == false)
+                    {
+                        <span class="badge-status-down">
+                            <i class="fa-solid fa-circle"></i> Down / Inactive
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge-status-unknown">
+                            <i class="fa-solid fa-circle"></i> Unknown
+                        </span>
+                    }
                 </div>
             </div>
 
             <div class="p-4 p-md-5">
+
                 <div class="row g-4">
 
+                    <!-- Branch -->
                     <div class="col-12 col-md-6">
                         <div class="info-grid-label">Branch Name</div>
                         <div class="info-grid-value">
-                            <i class="fa-solid fa-building text-muted me-2"></i>Cairo Main Branch
+                            <i class="fa-solid fa-building text-muted me-2"></i>
+                            @Model.BranchName
                         </div>
                     </div>
 
+                    <!-- Connection Type -->
                     <div class="col-12 col-md-6">
                         <div class="info-grid-label">Connection Type Name</div>
                         <div class="info-grid-value">
-                            <i class="fa-solid fa-diagram-project text-muted me-2"></i>Site-to-Site IPsec VPN
+                            <i class="fa-solid fa-diagram-project text-muted me-2"></i>
+                            @Model.ConnectionTypeName
                         </div>
                     </div>
 
+                    <!-- Service Provider -->
                     <div class="col-12 col-md-6">
                         <div class="info-grid-label">Service Provider Name</div>
                         <div class="info-grid-value">
-                            <i class="fa-solid fa-tower-cell text-muted me-2"></i>Vodafone Egypt
+                            <i class="fa-solid fa-tower-cell text-muted me-2"></i>
+                            @Model.ServiceProviderName
                         </div>
                     </div>
 
+                    <!-- NID -->
                     <div class="col-12 col-md-6">
                         <div class="info-grid-label">NID</div>
                         <div class="info-grid-value">
-                            <code class="text-dark fw-bold">NID-99201-CAI</code>
+                            <code class="text-dark fw-bold">
+                                @(Model.NID ?? "N/A")
+                            </code>
                         </div>
                     </div>
 
+                    <!-- Line Speed -->
                     <div class="col-12 col-md-6">
-                        <div class="info-grid-label">Status</div>
-                        <div class="info-grid-value">Up</div>
+                        <div class="info-grid-label">Line Speed</div>
+                        <div class="info-grid-value">
+                            <i class="fa-solid fa-gauge-high text-muted me-2"></i>
+                            @(Model.LineSpeed ?? "N/A")
+                        </div>
                     </div>
 
+                    <!-- Status -->
+                    <div class="col-12 col-md-6">
+                        <div class="info-grid-label">Status</div>
+                        <div class="info-grid-value">
+                            @if (Model.Status == true)
+                            {
+                                <span class="text-success fw-bold">Up</span>
+                            }
+                            else if (Model.Status == false)
+                            {
+                                <span class="text-danger fw-bold">Down</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fw-bold">Unknown</span>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Created By -->
                     <div class="col-12 col-md-6">
                         <div class="info-grid-label">Created By Username</div>
                         <div class="info-grid-value">
-                            <i class="fa-solid fa-user text-muted me-2"></i>admin_user
+                            <i class="fa-solid fa-user text-muted me-2"></i>
+                            @Model.CreatedByUsername
                         </div>
                     </div>
 
+                    <!-- Created By ID -->
+                    <div class="col-12 col-md-6">
+                        <div class="info-grid-label">Created By ID</div>
+                        <div class="info-grid-value">
+                            @Model.CreatedById
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
                     <div class="col-12">
                         <div class="info-grid-label">Notes</div>
+
                         <div class="notes-box">
-                            Primary fiber link configured with automatic failover to 4G LTE backup. Router SLA checks enabled every 30 seconds.
+                            @(string.IsNullOrWhiteSpace(Model.Notes)
+                                                        ? "No notes available."
+                                                        : Model.Notes)
                         </div>
                     </div>
 
                 </div>
 
                 <div class="d-flex align-items-center justify-content-end gap-3 mt-5 pt-3 border-top">
-                    <a href="javascript:history.back()" class="btn-custom btn-secondary-soft">
+
+                    <a asp-controller="VpnConnection"
+                       asp-action="Index"
+                       class="btn-custom btn-secondary-soft">
                         <i class="fa-solid fa-arrow-left"></i> Back
                     </a>
-                    <a href="#" class="btn-custom btn-primary-orange">
+
+                    <a asp-controller="VpnConnection"
+                       asp-action="Edit"
+                       asp-route-id="@Model.Id"
+                       class="btn-custom btn-primary-orange">
                         <i class="fa-solid fa-pen-to-square"></i> Edit Connection
                     </a>
+
                 </div>
 
             </div>
@@ -233,7 +329,6 @@
         </div>
 
     </main>
-
 </body>
 </html>
 
