@@ -10,5 +10,6 @@ namespace Sim_Card_Managment.Repos.VpnConnectionRepos
         Task<IEnumerable<VpnConnectionListItemViewModel>> GetByBranchAsync(int branchId);
         Task AddAsync(VpnConnectionCreateViewModel model);
         Task UpdateAsync(VpnConnectionEditViewModel model);
+        Task<List<VpnExcelBranch>> GetForExcelAsync();
     }
 }

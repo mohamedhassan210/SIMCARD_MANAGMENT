@@ -13,7 +13,6 @@
         public string? PhoneNumber { get; set; }
         public bool Status { get; set; }
 
-        public int CreatedById { get; set; }
         public string CreatedByUsername { get; set; } = string.Empty;
     }
 }

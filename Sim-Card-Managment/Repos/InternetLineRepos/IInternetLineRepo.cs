@@ -10,5 +10,6 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
         Task<IEnumerable<InternetLineListItemViewModel>> GetByBranchAsync(int branchId);
         Task AddAsync(InternetLineCreateViewModel model);
         Task UpdateAsync(InternetLineEditViewModel model);
+        Task<List<InternetLineExcelViewModel>> GetForExcelAsync();
     }
 }

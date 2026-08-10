@@ -37,7 +37,7 @@ namespace Sim_Card_Managment.Repos.VpnConnectionRepos
                     LineSpeed = v.LineSpeed,
                     Status = v.Status,
 
-                    CreatedById = v.CreatedById,
+                   
                     CreatedByUsername = v.CreatedBy.Username
                 })
                 .ToListAsync();
@@ -71,7 +71,7 @@ namespace Sim_Card_Managment.Repos.VpnConnectionRepos
                 Status = vpn.Status,
                 Notes = vpn.Notes,
 
-                CreatedById = vpn.CreatedById,
+               
                 CreatedByUsername = vpn.CreatedBy.Username
             };
         }
@@ -124,7 +124,7 @@ namespace Sim_Card_Managment.Repos.VpnConnectionRepos
                     LineSpeed = v.LineSpeed,
                     Status = v.Status,
 
-                    CreatedById = v.CreatedById,
+                    
                     CreatedByUsername = v.CreatedBy.Username
                 })
                 .ToListAsync();
@@ -179,5 +179,51 @@ namespace Sim_Card_Managment.Repos.VpnConnectionRepos
             _context.VpnConnections.Update(vpn);
             await _context.SaveChangesAsync();
         }
+
+
+        public async Task<List<VpnExcelBranch>> GetForExcelAsync()
+        {
+            var branches = await _context.Branches
+                .Include(b => b.VpnConnections)
+                    .ThenInclude(v => v.ConnectionType)
+                .Include(b => b.VpnConnections)
+                    .ThenInclude(v => v.ServiceProvider)
+                .ToListAsync();
+
+            return branches.Select(branch => new VpnExcelBranch
+            {
+                BranchName = branch.Name,
+
+                IsActive = branch.IsActive,
+
+                VpnOverInternetStatus = branch.VpnOverInternetStatus,
+
+                Connections = branch.VpnConnections
+                    .Select(v => new VpnExcelConnection
+                    {
+                        ConnectionTypeName = v.ConnectionType.Name,
+
+                        ServiceProviderName = v.ServiceProvider.Name,
+
+                        NID = v.NID,
+
+                        LineSpeed = v.LineSpeed,
+
+                        Status = v.Status,
+
+                        Notes = v.Notes
+                    })
+                    .ToList(),
+
+                Notes = string.Join(
+                    Environment.NewLine,
+                    branch.VpnConnections
+                        .Where(v => !string.IsNullOrWhiteSpace(v.Notes))
+                        .Select(v => v.Notes)
+                        .Distinct()
+                )
+            }).ToList();
+        }
+
     }
 }
