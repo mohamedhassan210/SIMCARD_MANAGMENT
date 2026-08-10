@@ -32,16 +32,15 @@ namespace Sim_Card_Managment.Controllers
         // POST: ServiceType/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ServiceType serviceType)
+        public async Task<IActionResult> Create(string Name)
         {
-            ModelState.Remove(nameof(serviceType.InternetLines));
-
-            if (!ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(Name))
             {
-                return View(serviceType);
+                ModelState.AddModelError("", "Name is required.");
+                return View(new ServiceType());
             }
 
-            await _lookupRepo.AddServiceTypeAsync(serviceType);
+            await _lookupRepo.AddServiceTypeAsync(new ServiceType { Name = Name });
 
             TempData["Success"] = "Service type created successfully.";
             return RedirectToAction(nameof(Index));

@@ -1,8 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model Sim_Card_Managment.Viewmodel.BranchEditViewModel
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +26,6 @@
             padding-bottom: 3rem;
         }
 
-        /* Form Card Layout */
         .form-card {
             max-width: 620px;
             margin: 3rem auto 0 auto;
@@ -59,7 +54,6 @@
             font-size: 1.25rem;
         }
 
-        /* Form Controls */
         .form-label-custom {
             font-size: 0.8rem;
             text-transform: uppercase;
@@ -106,7 +100,6 @@
             cursor: pointer;
         }
 
-        /* Action Buttons */
         .btn-custom {
             height: 48px;
             padding: 0 28px;
@@ -163,27 +156,43 @@
                 </div>
             </div>
 
-            <form id="editBranchForm" onsubmit="handleFormSubmit(event)">
+            <form asp-controller="Branch" asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="px-4 pt-4">
+                        <div class="alert alert-danger" role="alert">
+                            <ul class="mb-0">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+
                 <div class="p-4 p-md-5">
                     <div class="row g-4">
 
                         <div class="col-12">
-                            <label for="branchName" class="form-label-custom">Branch Name</label>
+                            <label for="Name" class="form-label-custom">Branch Name</label>
                             <div class="input-group-custom">
                                 <i class="fa-solid fa-building"></i>
-                                <input type="text" id="branchName" class="form-control-custom" value="Cairo Main Branch" placeholder="Enter branch name" required>
+                                <input asp-for="Name" class="form-control-custom" placeholder="Enter branch name" required>
                             </div>
                         </div>
 
                         <div class="col-12">
-                            <label for="vpnOverInternetStatus" class="form-label-custom">VPN Over Internet Status</label>
+                            <label for="VpnOverInternetStatus" class="form-label-custom">VPN Over Internet Status</label>
                             <div class="input-group-custom">
                                 <i class="fa-solid fa-globe"></i>
-                                <select id="vpnOverInternetStatus" class="form-select-custom" required>
-                                    <option value="" disabled>Select status</option>
-                                    <option value="Enabled" selected>Enabled (Active)</option>
-                                    <option value="Disabled">Disabled (Inactive)</option>
-                                    <option value="Pending">Pending Configuration</option>
+                                <select asp-for="VpnOverInternetStatus" class="form-select-custom">
+                                    <option value="" selected="@(Model.VpnOverInternetStatus == null)">Not Configured</option>
+                                    <option value="true" selected="@(Model.VpnOverInternetStatus == true)">Enabled</option>
+                                    <option value="false" selected="@(Model.VpnOverInternetStatus == false)">Disabled</option>
                                 </select>
                             </div>
                         </div>
@@ -191,7 +200,7 @@
                     </div>
 
                     <div class="d-flex align-items-center justify-content-end gap-3 mt-5 pt-3 border-top">
-                        <a href="#" class="btn-custom btn-secondary-soft">Cancel</a>
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn-custom btn-secondary-soft">Cancel</a>
                         <button type="submit" class="btn-custom btn-primary-orange">
                             <i class="fa-solid fa-floppy-disk"></i> Save Changes
                         </button>
@@ -204,22 +213,5 @@
 
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function handleFormSubmit(event) {
-            event.preventDefault();
-
-            const name = document.getElementById('branchName').value;
-            const vpnStatus = document.getElementById('vpnOverInternetStatus').value;
-
-            Swal.fire({
-                title: 'Updated Successfully!',
-                text: `Branch "${name}" has been updated with VPN Over Internet status set to "${vpnStatus}".`,
-                icon: 'success',
-                confirmButtonColor: '#DF531B',
-                customClass: { popup: 'rounded-4' }
-            });
-        }
-    </script>
 </body>
 </html>

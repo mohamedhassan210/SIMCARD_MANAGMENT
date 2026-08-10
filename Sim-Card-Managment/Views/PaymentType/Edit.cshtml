@@ -1,10 +1,11 @@
-﻿@model Sim_Card_Managment.Viewmodel.BranchCreateViewModel
+﻿@model Sim_Card_Management.Models.PaymentType
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Branch</title>
+    <title>Edit Payment Type</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
@@ -12,7 +13,6 @@
         :root {
             --brand-orange: #DF531B;
             --brand-orange-light: #FFF8F6;
-            --brand-purple: #5B2D90;
             --bg-canvas: #F4F5F8;
             --text-dark: #1E293B;
             --text-muted: #64748B;
@@ -27,12 +27,12 @@
         }
 
         .form-card {
-            max-width: 580px;
+            max-width: 550px;
             margin: 3rem auto 0 auto;
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
             overflow: hidden;
         }
 
@@ -46,7 +46,7 @@
             width: 44px;
             height: 44px;
             border-radius: 12px;
-            background-color: rgba(223, 83, 27, 0.12);
+            background-color: rgba(223,83,27,0.12);
             color: var(--brand-orange);
             display: flex;
             align-items: center;
@@ -76,7 +76,7 @@
 
             .input-group-custom:focus-within {
                 border-color: var(--brand-orange);
-                box-shadow: 0 0 0 3px rgba(223, 83, 27, 0.1);
+                box-shadow: 0 0 0 3px rgba(223,83,27,0.1);
             }
 
             .input-group-custom i {
@@ -121,7 +121,7 @@
                 background-color: #c94614;
                 color: #FFFFFF;
                 transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
+                box-shadow: 0 6px 16px rgba(223,83,27,0.25);
             }
 
         .btn-secondary-soft {
@@ -139,62 +139,42 @@
 <body>
 
     <main class="container px-3 p-100">
-
         <div class="form-card">
-
             <div class="card-header-styled d-flex align-items-center gap-3">
                 <div class="section-icon-wrapper">
-                    <i class="fa-solid fa-code-branch"></i>
+                    <i class="fa-solid fa-pen-to-square"></i>
                 </div>
                 <div>
-                    <h3 class="m-0 fs-5 fw-bold text-dark">Create New Branch</h3>
-                    <p class="m-0 text-muted small">Add a new organization location</p>
+                    <h3 class="m-0 fs-5 fw-bold text-dark">Edit Payment Type</h3>
+                    <p class="m-0 text-muted small">Update the classification type name</p>
                 </div>
             </div>
 
-            <form asp-controller="Branch" asp-action="Create" method="post">
+            <form asp-controller="PaymentType" asp-action="Edit" method="post">
                 @Html.AntiForgeryToken()
-
-                @if (!ViewData.ModelState.IsValid)
-                {
-                    <div class="px-4 pt-4">
-                        <div class="alert alert-danger" role="alert">
-                            <ul class="mb-0">
-                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                                {
-                                    <li>@error.ErrorMessage</li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                }
-
+                <input type="hidden" asp-for="Id" />
                 <div class="p-4 p-md-5">
                     <div class="row g-4">
-
                         <div class="col-12">
-                            <label for="Name" class="form-label-custom">Branch Name</label>
+                            <label class="form-label-custom">Type Name</label>
                             <div class="input-group-custom">
-                                <i class="fa-solid fa-building"></i>
-                                <input asp-for="Name" class="form-control-custom" placeholder="e.g., Cairo Main Branch" required>
+                                <i class="fa-solid fa-tag"></i>
+                                <input asp-for="Name" class="form-control-custom" placeholder="e.g., Fiber Optic, IPsec VPN">
                             </div>
                         </div>
-
                     </div>
 
                     <div class="d-flex align-items-center justify-content-end gap-3 mt-5 pt-3 border-top">
-                        <a asp-action="Index" class="btn-custom btn-secondary-soft">Cancel</a>
+                        <a asp-controller="PaymentType" asp-action="Index" class="btn-custom btn-secondary-soft">Cancel</a>
                         <button type="submit" class="btn-custom btn-primary-orange">
-                            <i class="fa-solid fa-plus"></i> Create Branch
+                            <i class="fa-solid fa-floppy-disk"></i> Save Changes
                         </button>
                     </div>
-
                 </div>
             </form>
-
         </div>
-
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

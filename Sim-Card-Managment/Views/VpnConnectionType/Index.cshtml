@@ -1,0 +1,278 @@
+﻿@model IEnumerable<Sim_Card_Management.Models.VpnConnectionType>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vpn Connection Types</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --brand-orange: #DF531B;
+            --brand-orange-light: #FFF8F6;
+            --brand-purple: #5B2D90;
+            --bg-canvas: #F4F5F8;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --card-border: #E2E8F0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding-bottom: 3rem;
+        }
+
+        .page-header {
+            background: #FFFFFF;
+            border-bottom: 1px solid var(--card-border);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        }
+
+        .page-title {
+            font-size: clamp(1.5rem, 3vw, 2.25rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-dark);
+        }
+
+        .table-card {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            padding: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #FFF;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            transition: border-color 0.2s ease;
+        }
+
+            .search-box:focus-within {
+                border-color: var(--brand-orange);
+            }
+
+            .search-box i {
+                color: var(--text-muted);
+            }
+
+            .search-box input {
+                border: none;
+                outline: none;
+                background: transparent;
+                font-size: 0.95rem;
+                width: 100%;
+                color: var(--text-dark);
+            }
+
+        .btn-custom {
+            height: 44px;
+            padding: 0 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-orange {
+            background-color: var(--brand-orange);
+            color: #FFFFFF;
+        }
+
+            .btn-primary-orange:hover {
+                background-color: #c94614;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
+            }
+
+        .btn-action-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--card-border);
+            background: #FFFFFF;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+            .btn-action-icon:hover {
+                background: var(--brand-orange-light);
+                color: var(--brand-orange);
+                border-color: rgba(223, 83, 27, 0.3);
+            }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .custom-table thead th {
+                text-align: left;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                padding: 12px 16px;
+                border-bottom: 2px solid var(--brand-orange);
+                background: #FFFFFF;
+            }
+
+            .custom-table tbody td {
+                font-size: 0.95rem;
+                padding: 16px;
+                border-bottom: 1px solid var(--card-border);
+                vertical-align: middle;
+            }
+
+        .btn-action-delete:hover {
+            background: #FEF2F2;
+            color: #DC2626;
+            border-color: rgba(220, 38, 38, 0.3);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="page-header p-100">
+        <div class="container-fluid px-lg-5">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div>
+                    <h1 class="page-title m-0">Vpn Connection Types Directory</h1>
+                    <p class="text-muted m-0 small mt-1">Manage system connection and service types</p>
+                </div>
+                <div>
+                    <a asp-controller="VpnConnectionType" asp-action="Create" class="btn-custom btn-primary-orange">
+                        <i class="fa-solid fa-plus"></i> New Type
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container-fluid px-lg-5">
+
+        <div class="table-card">
+
+            <div class="mb-4">
+                <div class="search-box col-12">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input id="typeSearchInput" type="text" placeholder="Search types..." autocomplete="off">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="custom-table" id="typeTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="typeTableBody">
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr class="type-row">
+                                    <td><strong>@item.Name</strong></td>
+                                    <td style="text-align: right;">
+                                        <div class="d-inline-flex gap-1">
+                                            <a asp-controller="VpnConnectionType" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit Type">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <form asp-controller="VpnConnectionType" asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <button type="button" class="btn-action-icon btn-action-delete" title="Delete Type" onclick="confirmDelete(this)">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        <tr id="noResultsRow" style="display: @(Model == null || !Model.Any() ? "" : "none");">
+                            <td colspan="2" class="text-center text-muted py-4">
+                                No matching types found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        const searchInput = document.getElementById('typeSearchInput');
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#typeTableBody tr.type-row');
+            let hasVisibleRow = false;
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    row.style.display = '';
+                    hasVisibleRow = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            document.getElementById('noResultsRow').style.display = hasVisibleRow ? 'none' : '';
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(btn) {
+            Swal.fire({
+                title: 'Delete Type?',
+                text: 'This cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Yes, Delete',
+                customClass: { popup: 'rounded-4' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    btn.closest('form').submit();
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

@@ -34,28 +34,21 @@ namespace Sim_Card_Managment.Controllers
         // POST: PaymentType/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PaymentType paymentType)
+        public async Task<IActionResult> Create(string Name)
         {
-            ModelState.Remove(nameof(paymentType.CreatedBy));
-            ModelState.Remove(nameof(paymentType.InternetLines));
-
-            if (int.TryParse(
-                User.FindFirstValue(ClaimTypes.NameIdentifier),
-                out int currentUserId))
+            if (string.IsNullOrWhiteSpace(Name))
             {
-                paymentType.CreatedById = currentUserId;
-            }
-            else
-            {
-                paymentType.CreatedById = 1;
+                ModelState.AddModelError("", "Name is required.");
+                return View(new PaymentType());
             }
 
-            if (!ModelState.IsValid)
-            {
-                return View(paymentType);
-            }
+            var currentUserId = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int uid) ? uid : 1;
 
-            await _lookupRepo.AddPaymentTypeAsync(paymentType);
+            await _lookupRepo.AddPaymentTypeAsync(new PaymentType
+            {
+                Name = Name,
+                CreatedById = currentUserId
+            });
 
             TempData["Success"] = "Payment type created successfully.";
             return RedirectToAction(nameof(Index));

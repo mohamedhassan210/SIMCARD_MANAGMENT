@@ -1,10 +1,11 @@
-﻿@model Sim_Card_Managment.Viewmodel.BranchCreateViewModel
+﻿@model Sim_Card_Management.Models.VpnConnectionType
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Branch</title>
+    <title>Create VpnConnectionType</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
@@ -27,7 +28,7 @@
         }
 
         .form-card {
-            max-width: 580px;
+            max-width: 550px;
             margin: 3rem auto 0 auto;
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
@@ -144,48 +145,33 @@
 
             <div class="card-header-styled d-flex align-items-center gap-3">
                 <div class="section-icon-wrapper">
-                    <i class="fa-solid fa-code-branch"></i>
+                    <i class="fa-solid fa-plus-circle"></i>
                 </div>
                 <div>
-                    <h3 class="m-0 fs-5 fw-bold text-dark">Create New Branch</h3>
-                    <p class="m-0 text-muted small">Add a new organization location</p>
+                    <h3 class="m-0 fs-5 fw-bold text-dark">Create New Vpn Connection Type</h3>
+                    <p class="m-0 text-muted small">Enter the details to add a new classification type</p>
                 </div>
             </div>
 
-            <form asp-controller="Branch" asp-action="Create" method="post">
+            <form asp-controller="VpnConnectionType" asp-action="Create" method="post">
                 @Html.AntiForgeryToken()
-
-                @if (!ViewData.ModelState.IsValid)
-                {
-                    <div class="px-4 pt-4">
-                        <div class="alert alert-danger" role="alert">
-                            <ul class="mb-0">
-                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                                {
-                                    <li>@error.ErrorMessage</li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                }
-
                 <div class="p-4 p-md-5">
                     <div class="row g-4">
 
                         <div class="col-12">
-                            <label for="Name" class="form-label-custom">Branch Name</label>
+                            <label class="form-label-custom">Type Name</label>
                             <div class="input-group-custom">
-                                <i class="fa-solid fa-building"></i>
-                                <input asp-for="Name" class="form-control-custom" placeholder="e.g., Cairo Main Branch" required>
+                                <i class="fa-solid fa-tag"></i>
+                                <input asp-for="Name" class="form-control-custom" placeholder="e.g., Fiber Optic, IPsec VPN">
                             </div>
                         </div>
 
                     </div>
 
                     <div class="d-flex align-items-center justify-content-end gap-3 mt-5 pt-3 border-top">
-                        <a asp-action="Index" class="btn-custom btn-secondary-soft">Cancel</a>
+                        <a asp-controller="VpnConnectionType" asp-action="Index" class="btn-custom btn-secondary-soft">Cancel</a>
                         <button type="submit" class="btn-custom btn-primary-orange">
-                            <i class="fa-solid fa-plus"></i> Create Branch
+                            <i class="fa-solid fa-floppy-disk"></i> Save Type
                         </button>
                     </div>
 
@@ -196,5 +182,6 @@
 
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

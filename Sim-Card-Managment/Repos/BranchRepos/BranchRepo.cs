@@ -27,6 +27,7 @@ namespace Sim_Card_Managment.Repos.BranchRepos
                     IsActive = b.IsActive,
                     VpnOverInternetStatus = b.VpnOverInternetStatus,
                     CreatedAt = b.CreatedAt,
+                    CreatedByUsername = b.CreatedBy != null ? b.CreatedBy.Username : "N/A",
                     InternetLineCount = b.InternetLines.Count,
                     VpnConnectionCount = b.VpnConnections.Count
                 })
@@ -36,6 +37,7 @@ namespace Sim_Card_Managment.Repos.BranchRepos
         public async Task<BranchDetailsViewModel?> GetByIdWithDetailsAsync(int id)
         {
             var branch = await _context.Branches
+                .Include(b => b.CreatedBy)
                 .Include(b => b.InternetLines)
                     .ThenInclude(il => il.ServiceProvider)
                 .Include(b => b.InternetLines)
@@ -57,6 +59,7 @@ namespace Sim_Card_Managment.Repos.BranchRepos
                 IsActive = branch.IsActive,
                 VpnOverInternetStatus = branch.VpnOverInternetStatus,
                 CreatedAt = branch.CreatedAt,
+                CreatedByUsername = branch.CreatedBy?.Username ?? "N/A",
                 InternetLines = branch.InternetLines.Select(il => new InternetLineListItemViewModel
                 {
                     Id = il.Id,
@@ -101,7 +104,8 @@ namespace Sim_Card_Managment.Repos.BranchRepos
                 Name = model.Name,
                 VpnOverInternetStatus = model.VpnOverInternetStatus,
                 IsActive = true,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                CreatedById = model.CreatedById   // <-- was missing, so every branch got CreatedById = 0
             };
             await _context.Branches.AddAsync(branch);
             await _context.SaveChangesAsync();

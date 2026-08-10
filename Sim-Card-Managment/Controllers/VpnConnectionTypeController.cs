@@ -33,28 +33,21 @@ namespace Sim_Card_Managment.Controllers
         // POST: VpnConnectionType/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VpnConnectionType connectionType)
+        public async Task<IActionResult> Create(string Name)
         {
-            ModelState.Remove(nameof(connectionType.CreatedBy));
-            ModelState.Remove(nameof(connectionType.VpnConnections));
-
-            if (int.TryParse(
-                User.FindFirstValue(ClaimTypes.NameIdentifier),
-                out int currentUserId))
+            if (string.IsNullOrWhiteSpace(Name))
             {
-                connectionType.CreatedById = currentUserId;
-            }
-            else
-            {
-                connectionType.CreatedById = 1;
+                ModelState.AddModelError("", "Name is required.");
+                return View(new VpnConnectionType());
             }
 
-            if (!ModelState.IsValid)
-            {
-                return View(connectionType);
-            }
+            var currentUserId = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int uid) ? uid : 1;
 
-            await _lookupRepo.AddVpnConnectionTypeAsync(connectionType);
+            await _lookupRepo.AddVpnConnectionTypeAsync(new VpnConnectionType
+            {
+                Name = Name,
+                CreatedById = currentUserId
+            });
 
             TempData["Success"] = "VPN connection type created successfully.";
             return RedirectToAction(nameof(Index));
