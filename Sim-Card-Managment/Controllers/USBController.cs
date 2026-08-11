@@ -18,11 +18,11 @@ namespace Sim_Card_Managment.Controllers
             _usbRepo = usbRepo;
             _context = context;
         }
-        // GET: /USB
+        // GET: /USB — the standalone USB list is no longer used; everything is shown
+        // in the combined device directory at SIM/Index.
         public IActionResult Index()
         {
-            var usbs = _usbRepo.GetAll();
-            return View(usbs);
+            return RedirectToAction("Index", "SIM", new { type = "usb" });
         }
         [HttpGet]
         public IActionResult Details(int id)
@@ -49,6 +49,7 @@ namespace Sim_Card_Managment.Controllers
             {
                 usb.RegisteredAt = DateTime.Now;
                 usb.IsActive = true;
+                usb.Status = "Unassigned";
                 _usbRepo.Add(usb);
                 return RedirectToAction("Index", "SIM", new { type = "usb" });
             }

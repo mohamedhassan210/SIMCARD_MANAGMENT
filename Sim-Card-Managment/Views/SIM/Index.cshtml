@@ -211,26 +211,30 @@
         }
 
     th:nth-child(1), td:nth-child(1) {
-        width: 22%;
-    }
-
-    th:nth-child(2), td:nth-child(2) {
-        width: 12%;
-    }
-
-    th:nth-child(3), td:nth-child(3) {
-        width: 18%;
-    }
-
-    th:nth-child(4), td:nth-child(4) {
-        width: 16%;
-    }
-
-    th:nth-child(5), td:nth-child(5) {
         width: 20%;
     }
 
+    th:nth-child(2), td:nth-child(2) {
+        width: 10%;
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+        width: 16%;
+    }
+
+    th:nth-child(4), td:nth-child(4) {
+        width: 12%;
+    }
+
+    th:nth-child(5), td:nth-child(5) {
+        width: 14%;
+    }
+
     th:nth-child(6), td:nth-child(6) {
+        width: 16%;
+    }
+
+    th:nth-child(7), td:nth-child(7) {
         width: 12%;
         text-align: right;
     }
@@ -309,11 +313,11 @@
     <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
         <div class="filters-row">
             <div class="filter-group">
-                <label for="status-filter">Active Status</label>
+                <label for="status-filter">Availability</label>
                 <select id="status-filter" class="status-select">
                     <option value="all">All</option>
                     <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="inactive">Not Active</option>
                 </select>
             </div>
 
@@ -360,6 +364,7 @@
                     <th>Serial Number</th>
                     <th>Type</th>
                     <th>Details</th>
+                    <th>Availability</th>
                     <th>Status</th>
                     <th>Assigned To</th>
                     <th></th>
@@ -382,7 +387,7 @@
                         <tr class="device-row"
                             data-status="@(item.IsActive ? "active" : "inactive")"
                             data-type="@normalizedType"
-                            data-status-type="@(item.CurrentStatusType?.ToLower() ?? "none")">
+                            data-status-type="@(item.Status?.ToLower() ?? "unassigned")">
                             <td>
                                 <strong>@item.SerialNumber</strong>
                                 @if (!string.IsNullOrEmpty(item.ProviderName))
@@ -409,12 +414,22 @@
                                 }
                                 else
                                 {
-                                    <span style="color:#c5221f; font-weight:700;">Inactive</span>
+                                    <span style="color:#c5221f; font-weight:700;">Not Active</span>
                                 }
-                                @if (!string.IsNullOrEmpty(item.CurrentStatusType))
-                                {
-                                    <div style="font-size:11px; color:#888;">@item.CurrentStatusType</div>
+                            </td>
+                            <td>
+                                @{
+                                    var statusColor = item.Status switch
+                                    {
+                                        "Occupied" => "#137333",
+                                        "Unassigned" => "#6b6b6b",
+                                        "Lost" => "#c5221f",
+                                        "Replaced" => "#b06000",
+                                        "Returned" => "#1a73e8",
+                                        _ => "#1a1a1a"
+                                    };
                                 }
+                                <span style="color:@statusColor; font-weight:700;">@item.Status</span>
                             </td>
                             <td>
                                 @if (!string.IsNullOrEmpty(item.AssignedToName))
@@ -447,7 +462,7 @@
                 }
             </tbody>
             <tr id="noResultsRow" style="display: none;">
-                <td colspan="6" style="text-align: center; padding: 32px; color: #888;">
+                <td colspan="7" style="text-align: center; padding: 32px; color: #888;">
                     No matching devices found.
                 </td>
             </tr>

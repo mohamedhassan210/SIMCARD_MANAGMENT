@@ -133,6 +133,24 @@ namespace Sim_Card_Managment.Controllers
             // 7. Save Entity
             _subscriptionRepo.Add(subscription);
 
+            // 8. Mark the assigned SIM (and USB, if any) as Occupied
+            var assignedSim = subscription.SimId.HasValue ? _simRepo.GetById(subscription.SimId.Value) : null;
+            if (assignedSim != null)
+            {
+                assignedSim.Status = "Occupied";
+                _simRepo.Update(assignedSim);
+            }
+
+            if (subscription.UsbId.HasValue)
+            {
+                var assignedUsb = _usbRepo.GetById(subscription.UsbId.Value);
+                if (assignedUsb != null)
+                {
+                    assignedUsb.Status = "Occupied";
+                    _usbRepo.Update(assignedUsb);
+                }
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

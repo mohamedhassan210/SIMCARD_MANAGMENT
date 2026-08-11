@@ -9,10 +9,14 @@ namespace Sim_Card_Managment.Controllers
     public class DeviceTransferController : Controller
     {
         private readonly IDeviceTransferRepo _repo;
+        private readonly ISIMRepo _simRepo;
+        private readonly IUSBRepo _usbRepo;
 
-        public DeviceTransferController(IDeviceTransferRepo repo)
+        public DeviceTransferController(IDeviceTransferRepo repo, ISIMRepo simRepo, IUSBRepo usbRepo)
         {
             _repo = repo;
+            _simRepo = simRepo;
+            _usbRepo = usbRepo;
         }
 
         public IActionResult Index()
@@ -36,7 +40,7 @@ namespace Sim_Card_Managment.Controllers
             Subscription? activeSubscription = null;
 
             // 1. Retrieve the active subscription based on passed ID
-            
+
             if (simId.HasValue)
             {
                 activeSubscription = _repo.GetActiveSubscriptionBySimId(simId.Value);
@@ -121,6 +125,27 @@ namespace Sim_Card_Managment.Controllers
                     deviceTransfer.NewSubscription = newSubscription;
 
                     _repo.AddDeviceTransfer(deviceTransfer);
+
+                    // The device is still assigned (now to the new recipient) — keep it Occupied
+                    if (newSubscription.SimId.HasValue && newSubscription.SimId != 0)
+                    {
+                        var transferredSim = _simRepo.GetById(newSubscription.SimId.Value);
+                        if (transferredSim != null)
+                        {
+                            transferredSim.Status = "Occupied";
+                            _simRepo.Update(transferredSim);
+                        }
+                    }
+
+                    if (newSubscription.UsbId.HasValue)
+                    {
+                        var transferredUsb = _usbRepo.GetById(newSubscription.UsbId.Value);
+                        if (transferredUsb != null)
+                        {
+                            transferredUsb.Status = "Occupied";
+                            _usbRepo.Update(transferredUsb);
+                        }
+                    }
 
                     // EF Core will save both and populate the FK automatically in 1 transaction
                     _repo.CompleteTransaction();
