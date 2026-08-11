@@ -1,195 +1,133 @@
-@model Sim_Card_Managment.Models.Sim
+﻿@model Sim_Card_Managment.Models.Sim
 
 @{
     Layout = null;
 }
 
 <!DOCTYPE html>
-<html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create New SIM</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
 
-    <style>
-        body {
-            background-color: #E24D17;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-        }
-
-        .create-card {
-            background-color: #ffffff;
-            border-radius: 30px;
-            max-width: 800px;
-            width: 100%;
-            padding: 3rem 4rem;
-        }
-
-        .title-header {
-            font-weight: 700;
-            font-size: 32px;
-            color: #000;
-            margin-bottom: 2.5rem;
-        }
-
-        .custom-label {
-            font-weight: 500;
-            color: #000;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .custom-input, .custom-select {
-            background-color: #d8d8d8;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 18px;
-            color: #333;
-            width: 100%;
-            font-size: 14px;
-            transition: box-shadow 0.2s ease-in-out;
-        }
-
-            .custom-input:focus, .custom-select:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px #E24D17;
-            }
-
-        .custom-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1.2em;
-            cursor: pointer;
-        }
-
-        .btn-cancel {
-            border: 1px solid #E24D17;
-            background-color: #ffffff;
-            color: #000;
-            border-radius: 30px;
-            padding: 10px 45px;
-            font-weight: 700;
-            font-size: 15px;
-            text-decoration: none;
-        }
-
-            .btn-cancel:hover {
-                background-color: #fffaf8;
-                color: #E24D17;
-            }
-
-        .btn-create {
-            background-color: #E24D17;
-            border: 1px solid #E24D17;
-            color: #fff;
-            border-radius: 30px;
-            padding: 10px 45px;
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-            .btn-create:hover {
-                background-color: #c84111;
-                color: #fff;
-            }
-
-        .field-error {
-            color: #D41212;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .provider-badge {
-            display: inline-block;
-            font-size: 12px;
-            font-weight: 700;
-            margin-top: 6px;
-            padding: 4px 12px;
-            border-radius: 20px;
-        }
-    </style>
 </head>
 
-<body>
 
-    <div class="create-card shadow">
-        <h2 class="title-header">Create New SIM</h2>
+
+
+<section class="cs-body">
+
+    <div class="cs-card shadow">
+        <h2 class="cs-title">Create New SIM</h2>
 
         <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-        <form id="simForm" asp-controller="SIM" asp-action="Create" method="post">
+        <form id="cs-sim-form" asp-controller="SIM" asp-action="Create" method="post">
             @Html.AntiForgeryToken()
 
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="custom-label" asp-for="SerialNumber">Serial Number</label>
-                    <input type="text" class="custom-input" asp-for="SerialNumber" placeholder="Enter serial number" required />
-                    <span asp-validation-for="SerialNumber" class="field-error"></span>
+                    <label class="cs-label" asp-for="SerialNumber">Serial Number</label>
+                    <input type="text" class="cs-input" asp-for="SerialNumber" placeholder="Enter serial number" required />
+                    <span asp-validation-for="SerialNumber" class="cs-error"></span>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label" asp-for="PhoneNumber">Phone Number</label>
-                    <input type="text" maxlength="11" id="phoneInput" class="custom-input" asp-for="PhoneNumber" placeholder="e.g. 010..., 012..., 015..." required />
-                    <div id="providerDetected" class="provider-badge" style="display:none;"></div>
-                    <span asp-validation-for="PhoneNumber" class="field-error"></span>
+                    <label class="cs-label" asp-for="PhoneNumber">Phone Number</label>
+                    <input type="text" maxlength="11" id="cs-phone-input" class="cs-input" asp-for="PhoneNumber" placeholder="e.g. 010..., 012..., 015..." required />
+                    <div id="cs-provider-detected" class="cs-provider-badge" style="display:none;"></div>
+                    <span asp-validation-for="PhoneNumber" class="cs-error"></span>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label" asp-for="NetworkType">Network Type</label>
-                    <select class="custom-select" asp-for="NetworkType">
+                    <label class="cs-label" asp-for="NetworkType">Network Type</label>
+                    <select class="cs-select" asp-for="NetworkType">
                         <option value="4G">4G</option>
                         <option value="5G">5G</option>
                         <option value="3G">3G</option>
                     </select>
                 </div>
-
-              
+            </div>
 
             <div class="d-flex justify-content-end gap-3 mt-4">
-                <a class="btn btn-cancel" asp-controller="SIM" asp-action="Index">Cancel</a>
-                <button type="submit" class="btn btn-create">Create SIM</button>
+                <a class="cs-btn-cancel" asp-controller="SIM" asp-action="Index">Cancel</a>
+                <button type="submit" class="cs-btn-create">Create SIM</button>
             </div>
         </form>
     </div>
 
+    </section>
+
     <script>
-        document.getElementById('phoneInput').addEventListener('input', function () {
+        // ============================================
+        // 📱 PHONE NUMBER PROVIDER DETECTION
+        // ============================================
+        document.getElementById('cs-phone-input').addEventListener('input', function () {
             const val = this.value.trim();
-            const badge = document.getElementById('providerDetected');
+            const badge = document.getElementById('cs-provider-detected');
+
+            // Remove all provider classes
+            badge.className = 'cs-provider-badge';
 
             if (val.startsWith('010')) {
                 badge.style.display = 'inline-block';
-                badge.style.backgroundColor = '#e60000';
-                badge.style.color = '#ffffff';
+                badge.classList.add('cs-provider-vodafone');
                 badge.innerText = 'Detected Provider: Vodafone';
             } else if (val.startsWith('012')) {
                 badge.style.display = 'inline-block';
-                badge.style.backgroundColor = '#ff6600';
-                badge.style.color = '#ffffff';
+                badge.classList.add('cs-provider-orange');
                 badge.innerText = 'Detected Provider: Orange';
             } else if (val.startsWith('015')) {
                 badge.style.display = 'inline-block';
-                badge.style.backgroundColor = '#5f259f';
-                badge.style.color = '#ffffff';
+                badge.classList.add('cs-provider-we');
                 badge.innerText = 'Detected Provider: WE';
             } else if (val.startsWith('011')) {
                 badge.style.display = 'inline-block';
-                badge.style.backgroundColor = '#78be20';
-                badge.style.color = '#ffffff';
+                badge.classList.add('cs-provider-etisalat');
                 badge.innerText = 'Detected Provider: Etisalat';
             } else {
                 badge.style.display = 'none';
             }
         });
+
+        // ============================================
+        // 📱 FORM VALIDATION
+        // ============================================
+        document.getElementById('cs-sim-form').addEventListener('submit', function (e) {
+            const serial = document.querySelector('[asp-for="SerialNumber"]');
+            const phone = document.querySelector('[asp-for="PhoneNumber"]');
+
+            let isValid = true;
+
+            if (!serial.value.trim()) {
+                serial.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                serial.classList.remove('is-invalid');
+            }
+
+            if (!phone.value.trim()) {
+                phone.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                phone.classList.remove('is-invalid');
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+            }
+        });
+
+        // Remove invalid class on typing
+        document.querySelectorAll('.cs-input').forEach(input => {
+            input.addEventListener('input', function () {
+                this.classList.remove('is-invalid');
+            });
+        });
     </script>
-</body>
-</html>
+
+<script src="~/js/bootstrap.bundle.min.js"></script>
