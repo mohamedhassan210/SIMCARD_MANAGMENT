@@ -17,7 +17,7 @@ namespace Sim_Card_Managment.data
         public DbSet<Sim> Sims { get; set; }
         public DbSet<Usb> Usbs { get; set; }
         public DbSet<Quota> Quotas { get; set; }
-        public DbSet<DeviceAction> Actions { get; set; }
+        public DbSet<DeviceAction> DeviceActions { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<DeviceSerialOperation> DeviceSerialOperations { get; set; }
 

@@ -14,12 +14,12 @@ namespace Sim_Card_Managment.Repos
 
         public IEnumerable<DeviceAction> GetAllDeviceActions()
         {
-            return _context.Actions.ToList();
+            return _context.DeviceActions.ToList();
         }
 
         public void AddDeviceAction(DeviceAction deviceAction)
         {
-            _context.Actions.Add(deviceAction);
+            _context.DeviceActions.Add(deviceAction);
             _context.SaveChanges();
         }
     }
