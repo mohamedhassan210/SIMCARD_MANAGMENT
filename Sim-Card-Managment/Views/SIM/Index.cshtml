@@ -1,1 +1,349 @@
-﻿
+﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.DeviceDirectoryViewModel>
+
+@{
+}
+
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devices</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
+
+</head>
+
+
+
+<section>
+
+    <div class="page p-100 container-fluid px-4">
+
+
+        <div class="di-title-section">
+            <h1><span class="di-num">@(Model?.Count() ?? 0)</span> Devices Directory</h1>
+            <p>Manage all active, available, and assigned SIM cards and USB modems in one place.</p>
+
+            <div class="di-btn-group">
+                <a asp-controller="SIM" asp-action="Create" class="di-btn-primary">
+                    <i class="fas fa-plus"></i> New SIM Card
+                </a>
+                <a asp-controller="USB" asp-action="Create" class="di-btn-secondary">
+                    <i class="fas fa-plus"></i> New USB Modem
+                </a>
+                <a asp-controller="DeviceStatusType" asp-action="Index" class="di-btn-secondary">
+                    <i class="fas fa-tags"></i> Status Types
+                </a>
+            </div>
+        </div>
+
+
+        <form id="di-filter-form" class="di-filters" onsubmit="event.preventDefault();">
+            <div class="di-filters-row">
+                <div class="di-filter-group">
+                    <label for="di-status-filter">Active Status</label>
+                    <select id="di-status-filter" class="di-status-select">
+                        <option value="all">All</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="di-filter-group">
+                    <label for="di-type-filter">Type</label>
+                    <select id="di-type-filter" class="di-status-select">
+                        <option value="all">All Types</option>
+                        <option value="sim">SIM Card</option>
+                        <option value="usb">USB Modem</option>
+                    </select>
+                </div>
+
+                <div class="di-filter-group">
+                    <label for="di-status-type-filter">Status Type</label>
+                    <select id="di-status-type-filter" class="di-status-select">
+                        <option value="all">All Status Types</option>
+                        @if (ViewBag.StatusTypes != null)
+                        {
+                            foreach (var st in ViewBag.StatusTypes as List<string>)
+                            {
+                                <option value="@st.ToLower()">@st</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="di-filter-group" style="flex: 1; min-width: 200px;">
+                    <label for="di-search-input">Search</label>
+                    <div class="di-search-box">
+                        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                        <input id="di-search-input" type="text" placeholder="Search by Serial, Phone, Model, Provider, or Assignee..." autocomplete="off">
+                    </div>
+                </div>
+            </div>
+        </form>
+
+
+        <div class="di-table-wrap">
+            <table class="di-table" id="di-device-table">
+                <thead>
+                    <tr>
+                        <th>Serial Number</th>
+                        <th>Type</th>
+                        <th>Details</th>
+                        <th>Status</th>
+                        <th>Assigned To</th>
+                        <th style="text-align:right; padding-right:0;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="di-table-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            var normalizedType = (item.DeviceType != null && item.DeviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase))
+                            ? "sim"
+                            : (item.DeviceType != null && item.DeviceType.Contains("USB", StringComparison.OrdinalIgnoreCase))
+                            ? "usb"
+                            : "";
+
+                            <tr class="di-device-row"
+                                data-status="@(item.IsActive ? "active" : "inactive")"
+                                data-type="@normalizedType"
+                                data-status-type="@(item.CurrentStatusType?.ToLower() ?? "none")">
+                                <td>
+                                    <strong>@item.SerialNumber</strong>
+                                    @if (!string.IsNullOrEmpty(item.ProviderName))
+                                    {
+                                        <div class="di-text-muted">@item.ProviderName</div>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="di-badge-type @(item.DeviceType == "SIM" ? "di-badge-sim" : "di-badge-usb")">
+                                        @item.DeviceType
+                                    </span>
+                                </td>
+                                <td>
+                                    <div>@(string.IsNullOrEmpty(item.Identifier) ? "-" : item.Identifier)</div>
+                                    @if (!string.IsNullOrEmpty(item.Detail))
+                                    {
+                                        <div class="di-text-muted">@item.Detail</div>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="di-status-active">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="di-status-inactive">Inactive</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.CurrentStatusType))
+                                    {
+                                        <div class="di-text-muted">@item.CurrentStatusType</div>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.AssignedToName))
+                                    {
+                                        <div>
+                                            @item.AssignedToName
+                                            @if (!string.IsNullOrEmpty(item.AssignedToType))
+                                            {
+                                                <span class="di-text-muted">(@item.AssignedToType)</span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="di-text-unassigned">Unassigned</span>
+                                    }
+                                </td>
+                                <td style="text-align: right; padding-right: 0;">
+                                    @if (item.DeviceType.Contains("SIM"))
+                                    {
+                                        <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="di-btn-view">VIEW</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="di-btn-view">VIEW</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6">
+                                <div class="di-no-results">
+                                    <i class="fas fa-box-open"></i>
+                                    No devices found. Create a new device to get started.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <tr id="di-no-results-row" style="display: none;">
+                <td colspan="6" class="di-no-results">
+                    <i class="fas fa-search"></i>
+                    No matching devices found.
+                </td>
+            </tr>
+        </div>
+
+
+        <div class="di-footer">
+            <div class="di-showing" id="di-showing-text">Showing 0 records</div>
+            <div class="di-pagination" id="di-pagination-container"></div>
+        </div>
+
+    </div>
+
+
+
+</section>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("di-search-input");
+        const statusFilter = document.getElementById("di-status-filter");
+        const typeFilter = document.getElementById("di-type-filter");
+        const statusTypeFilter = document.getElementById("di-status-type-filter");
+
+        const allRows = Array.from(document.querySelectorAll("#di-table-body tr.di-device-row"));
+        const noResultsRow = document.getElementById("di-no-results-row");
+        const showingText = document.getElementById("di-showing-text");
+        const paginationContainer = document.getElementById("di-pagination-container");
+
+        const itemsPerPage = 7;
+        let visibleRows = [...allRows];
+        let currentPage = 1;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("status")) {
+            statusFilter.value = urlParams.get("status").toLowerCase();
+        }
+        if (urlParams.has("type")) {
+            typeFilter.value = urlParams.get("type").toLowerCase();
+        }
+
+        // Handle URL update for server-side state synchronization
+        function updateUrlParams() {
+            const statusVal = statusFilter.value;
+            const typeVal = typeFilter.value;
+            const statusTypeVal = statusTypeFilter.value;
+            window.location.href = `?status=${statusVal}&type=${typeVal}&statusType=${statusTypeVal}`;
+        }
+
+        // Local filtering logic for instant live search
+        function applyFilters() {
+            const query = searchInput.value.trim().toLowerCase();
+            const statusVal = statusFilter.value.toLowerCase();
+            const typeVal = typeFilter.value.toLowerCase();
+            const statusTypeVal = statusTypeFilter.value.toLowerCase();
+
+            visibleRows = allRows.filter(row => {
+                const text = row.innerText.toLowerCase();
+                const matchesSearch = text.includes(query);
+
+                const rowStatus = row.getAttribute("data-status");
+                const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
+
+                const rowType = row.getAttribute("data-type");
+                const matchesType = (typeVal === "all") || (rowType === typeVal);
+
+                const rowStatusType = row.getAttribute("data-status-type") ?? "";
+                const matchesStatusType = (statusTypeVal === "all") || (rowStatusType === statusTypeVal);
+
+                return matchesSearch && matchesStatus && matchesType && matchesStatusType;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const totalVisible = visibleRows.length;
+
+            if (totalVisible === 0) {
+                allRows.forEach(row => row.style.display = "none");
+                noResultsRow.style.display = "";
+                showingText.textContent = "Showing 0 records";
+                paginationContainer.innerHTML = "";
+                return;
+            }
+
+            noResultsRow.style.display = "none";
+
+            const totalPages = Math.max(1, Math.ceil(totalVisible / itemsPerPage));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = Math.min(startIdx + itemsPerPage, totalVisible);
+
+            allRows.forEach(row => row.style.display = "none");
+            visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
+
+            showingText.textContent = `Showing ${startIdx + 1}-${endIdx} of ${totalVisible} records`;
+
+            // Build pagination
+            let html = `<button type="button" class="di-prev-btn" ${currentPage === 1 ? 'disabled' : ''}>&#8249;</button>`;
+
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button type="button" class="di-page-num ${i === currentPage ? 'di-active' : ''}" data-page="${i}">${i}</button>`;
+            }
+
+            html += `<button type="button" class="di-next-btn" ${currentPage === totalPages ? 'disabled' : ''}>&#8250;</button>`;
+
+            paginationContainer.innerHTML = html;
+        }
+
+        // Live input search
+        searchInput.addEventListener("input", applyFilters);
+
+        // Dropdown filter changes
+        statusFilter.addEventListener("change", function () {
+            applyFilters();
+            updateUrlParams();
+        });
+
+        typeFilter.addEventListener("change", function () {
+            applyFilters();
+            updateUrlParams();
+        });
+
+        statusTypeFilter.addEventListener("change", function () {
+            applyFilters();
+            updateUrlParams();
+        });
+
+        // Pagination handler
+        paginationContainer.addEventListener("click", function (e) {
+            const btn = e.target.closest("button");
+            if (!btn || btn.disabled) return;
+
+            const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
+
+            if (btn.classList.contains("di-prev-btn")) {
+                if (currentPage > 1) currentPage--;
+            } else if (btn.classList.contains("di-next-btn")) {
+                if (currentPage < totalPages) currentPage++;
+            } else if (btn.dataset.page) {
+                currentPage = parseInt(btn.dataset.page);
+            }
+
+            renderTable();
+        });
+
+        // Initialize view
+        applyFilters();
+    });
+</script>
