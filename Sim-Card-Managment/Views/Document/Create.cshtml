@@ -196,11 +196,28 @@
             font-weight: 500;
         }
 
-        .is-invalid {
+        
+
+        .form-control.is-invalid,
+        .form-select.is-invalid {
             border-color: #dc3545 !important;
-            background-color: #fff5f5;
+            padding-right: calc(1.5em + 0.75rem);
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
         }
 
+        .invalid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+
+        .is-invalid ~ .invalid-feedback {
+            display: block;
+        }
         .status-text {
             font-size: 0.8rem;
             color: #e65319;
@@ -237,17 +254,20 @@
     <section class="container-fluid px-4 mt-4">
         <div class="row">
             <div class="col-12 col-md-3 col-lg-2">
-                <div class="d-flex align-items-center mb-4 step-active" id="sidebarStep1">
+                <div class="d-flex align-items-center mb-4 step-active" id="sidebarStep1" style="cursor: pointer;">
                     <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle1">1</div>
                     <div class="step-text fw-bold" id="stepText1">Document Info</div>
                 </div>
 
-                <div class="d-flex align-items-center mb-4 step-inactive" id="sidebarStep2">
-                    <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle2">2</div>
-                    <div class="step-text" id="stepText2">Device Quantity</div>
+                <div class="mb-4">
+                    <div class="d-flex align-items-center step-inactive" id="sidebarStep2" style="cursor: pointer;">
+                        <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle2">2</div>
+                        <div class="step-text" id="stepText2">Device Quantity</div>
+                    </div>
+                    <div id="sidebarBatchesTree" class="ms-4 mt-2 d-flex flex-column gap-1" style="display: none;"></div>
                 </div>
 
-                <div class="d-flex align-items-center mb-4 step-inactive" id="sidebarStep3">
+                <div class="d-flex align-items-center mb-4 step-inactive" id="sidebarStep3" style="cursor: pointer;">
                     <div class="step-circle rounded-circle d-flex justify-content-center align-items-center me-3" id="stepCircle3">3</div>
                     <div class="step-text" id="stepText3">Item Details</div>
                 </div>
@@ -321,7 +341,7 @@
                                 <i class="fas fa-layer-group"></i> 2. Device Selection & Quantity
                             </h2>
 
-                            <div class="device-subsection">
+                            <div class="device-subsection mb-4">
                                 <div class="subsection-header">
                                     <i class="fas fa-plus-circle text-danger"></i> Add Device Batch
                                 </div>
@@ -351,12 +371,9 @@
                                 <div id="batchSummaryContainer" class="text-muted small fst-italic">No device batches added yet.</div>
                             </div>
 
-                            <div class="d-flex justify-content-between mt-4">
+                            <div class="d-flex justify-content-start mt-4">
                                 <button type="button" id="step2BackBtn" class="btn btn-action btn-outline-back">
                                     <i class="fas fa-arrow-left me-2"></i> Back
-                                </button>
-                                <button type="button" id="step2NextBtn" class="btn btn-action btn-activate" disabled>
-                                    Continue to Items <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
                         </div>
@@ -366,41 +383,44 @@
                                 <i class="fas fa-microchip"></i> 3. Item Details Entry
                             </h2>
 
-                            <div class="row g-4 mb-4">
-                                <div class="col-md-6">
-                                    <label class="custom-form-label">
-                                        <i class="fas fa-tasks text-muted"></i> Select Item to Edit <span class="text-danger">*</span>
-                                    </label>
-                                    <select id="itemSelector" class="form-select custom-form-select">
-                                        <option value="">-- Select Item --</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="device-subsection" id="dynamicFieldsPanel" style="display: none;">
-                                <div class="subsection-header" id="dynamicFormHeader">
-                                    <i class="fas fa-edit text-danger"></i> Configure Item Details
-                                </div>
-                                <div id="dynamicFieldsContainer"></div>
-                                <div class="d-flex justify-content-end mt-3">
-                                    <button type="button" id="saveItemDataBtn" class="btn btn-action btn-activate">
-                                        <i class="fas fa-check me-2"></i> Save Item Details
+                            <ul class="nav nav-pills mb-4 gap-2" id="deviceCategoryTabs" role="tablist">
+                                <li class="nav-item" role="presentation" id="tabItemSIM">
+                                    <button class="nav-link active fw-bold px-3 py-2" id="sim-tab" data-bs-toggle="pill" data-bs-target="#sim-pane" type="button" role="tab">
+                                        <i class="fas fa-sim-card me-2 text-danger"></i>SIM Cards <span id="simBadgeCount" class="badge bg-secondary ms-1">0</span>
                                     </button>
+                                </li>
+                                <li class="nav-item" role="presentation" id="tabItemUSB">
+                                    <button class="nav-link fw-bold px-3 py-2" id="usb-tab" data-bs-toggle="pill" data-bs-target="#usb-pane" type="button" role="tab">
+                                        <i class="fas fa-usb me-2 text-secondary"></i>USB Modems <span id="usbBadgeCount" class="badge bg-secondary ms-1">0</span>
+                                    </button>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content mb-4" id="deviceCategoryContent">
+                                <div class="tab-pane fade show active" id="sim-pane" role="tabpanel">
+                                    <div id="simItemsContainer" class="d-flex flex-column gap-3"></div>
+                                </div>
+                                <div class="tab-pane fade" id="usb-pane" role="tabpanel">
+                                    <div id="usbItemsContainer" class="d-flex flex-column gap-3"></div>
                                 </div>
                             </div>
 
-                            <div class="mt-4">
-                                <h6 class="fw-bold text-dark mb-3"><i class="fas fa-boxes-stacked me-2 text-muted"></i>Configured Hardware Items</h6>
-                                <div id="addedItemsCardsContainer"></div>
-                            </div>
-
-                            <div class="d-flex justify-content-between mt-4">
+                            <div class="d-flex justify-content-between align-items-center mt-4">
                                 <button type="button" id="step3BackBtn" class="btn btn-action btn-outline-back">
                                     <i class="fas fa-arrow-left me-2"></i> Back
                                 </button>
-                                <button type="submit" id="submitDocumentBtn" class="btn btn-action btn-success-custom">
-                                    <i class="fas fa-check me-2"></i> Save Document
-                                </button>
+
+                                <div class="d-flex gap-2">
+                                    <button type="button" id="addMoreItemsBtn" class="btn btn-action btn-outline-primary">
+                                        <i class="fas fa-plus me-1"></i> Add More
+                                    </button>
+                                    <button type="button" id="doneItemsBtn" class="btn btn-action btn-activate">
+                                        <i class="fas fa-check me-1"></i> Done
+                                    </button>
+                                    <button type="submit" id="submitDocumentBtn" class="btn btn-action btn-activate" style="display: none;">
+                                        <i class="fas fa-save me-2"></i> Save Document
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -421,9 +441,16 @@
             // Application State
             const state = {
                 currentStep: 1,
-                items: [], // { id, type, label, serialNumber, phoneNumber, networkType, model, saved }
-                selectedItemIndex: -1
+                items: [] // { id, type, label, serialNumber, model, networkType, phoneNumber, isNullSerial }
             };
+
+            function setError($input) {
+                $input.addClass('is-invalid');
+            }
+
+            function clearError($input) {
+                $input.removeClass('is-invalid');
+            }
 
             // ==========================================
             // STEP 1 VALIDATION & NAVIGATION
@@ -448,17 +475,28 @@
             // STEP 2 BATCH ADDITION
             // ==========================================
             $('#addDeviceBatchBtn').on('click', function () {
-                const type = $('#deviceTypeSelect').val();
-                const qty = parseInt($('#deviceQtyInput').val());
+                const $typeSelect = $('#deviceTypeSelect');
+                const $qtyInput = $('#deviceQtyInput');
+
+                const type = $typeSelect.val();
+                const qtyVal = $qtyInput.val();
+                const qty = parseInt(qtyVal, 10);
+                let isValid = true;
+
+                clearError($typeSelect);
+                clearError($qtyInput);
 
                 if (!type) {
-                    alert('Please select a device type.');
-                    return;
+                    setError($typeSelect);
+                    isValid = false;
                 }
-                if (isNaN(qty) || qty < 1) {
-                    alert('Quantity must be at least 1.');
-                    return;
+
+                if (!qtyVal || isNaN(qty) || qty < 1) {
+                    setError($qtyInput);
+                    isValid = false;
                 }
+
+                if (!isValid) return;
 
                 const existingTypeCount = state.items.filter(i => i.type === type).length;
 
@@ -470,18 +508,33 @@
                         type: type,
                         label: itemLabel,
                         serialNumber: '',
-                        phoneNumber: '',
-                        networkType: '4G',
                         model: '',
-                        saved: false
+                        networkType: '',
+                        phoneNumber: '',
+                        isNullSerial: false
                     });
                 }
 
-                $('#deviceTypeSelect').val('');
-                $('#deviceQtyInput').val('1');
+                // Reset inputs
+                $typeSelect.val('');
+                $qtyInput.val('1');
 
                 renderBatchSummary();
-                checkStep2Valid();
+                renderSidebarBranches();
+
+                // Transition directly to Step 3 targeting the added category
+                renderAllItems();
+                switchTab(type);
+                goToStep(3);
+            });
+
+            $('#deviceTypeSelect').on('change', function () {
+                if ($(this).val()) clearError($(this));
+            });
+
+            $('#deviceQtyInput').on('input change', function () {
+                const val = parseInt($(this).val(), 10);
+                if (!isNaN(val) && val >= 1) clearError($(this));
             });
 
             function renderBatchSummary() {
@@ -505,224 +558,338 @@
                 $('#batchSummaryContainer').html(html);
             }
 
-            function checkStep2Valid() {
-                const isValid = state.items.length > 0;
-                $('#step2NextBtn').prop('disabled', !isValid);
-                return isValid;
+            function renderSidebarBranches() {
+                const $tree = $('#sidebarBatchesTree');
+                $tree.empty();
+
+                if (state.items.length === 0) {
+                    $tree.hide();
+                    return;
+                }
+
+                const simCount = state.items.filter(i => i.type === 'SIM').length;
+                const usbCount = state.items.filter(i => i.type === 'USB').length;
+
+                let treeHtml = '';
+                if (simCount > 0) {
+                    treeHtml += `<div class="sidebar-branch text-muted small ps-2 py-1 border-start" style="cursor: pointer;" data-type="SIM"><i class="fas fa-angle-right me-1"></i> SIM Cards (${simCount})</div>`;
+                }
+                if (usbCount > 0) {
+                    treeHtml += `<div class="sidebar-branch text-muted small ps-2 py-1 border-start" style="cursor: pointer;" data-type="USB"><i class="fas fa-angle-right me-1"></i> USB Modems (${usbCount})</div>`;
+                }
+
+                $tree.html(treeHtml).show();
             }
+
+            // Sidebar Branch Click Navigation
+            $(document).on('click', '.sidebar-branch', function () {
+                const targetType = $(this).data('type');
+                if (state.items.length > 0) {
+                    renderAllItems();
+                    switchTab(targetType);
+                    goToStep(3);
+                }
+            });
 
             $('#step2BackBtn').on('click', function () {
                 goToStep(1);
             });
 
-            $('#step2NextBtn').on('click', function () {
-                if (checkStep2Valid()) {
-                    populateItemSelector();
-                    goToStep(3);
+            // Switch Tab Programmatically
+            function switchTab(type) {
+                if (type === 'SIM') {
+                    var simTab = new bootstrap.Tab(document.querySelector('#sim-tab'));
+                    simTab.show();
+                } else if (type === 'USB') {
+                    var usbTab = new bootstrap.Tab(document.querySelector('#usb-tab'));
+                    usbTab.show();
                 }
-            });
+            }
 
             // ==========================================
-            // STEP 3 ITEM DETAILS ENTRY
+            // STEP 3 SEPARATED RENDER LOGIC
             // ==========================================
-            function populateItemSelector() {
-                const $select = $('#itemSelector');
-                $select.empty();
-                $select.append('<option value="">-- Select Item --</option>');
+            function renderAllItems() {
+                const $simContainer = $('#simItemsContainer').empty();
+                const $usbContainer = $('#usbItemsContainer').empty();
 
-                state.items.forEach((item, index) => {
-                    const statusIcon = item.saved ? ' ✓' : '';
-                    $select.append(`<option value="${index}">${item.label}${statusIcon}</option>`);
-                });
+                $('#submitDocumentBtn').hide();
+                $('#doneItemsBtn').show();
 
-                if (state.items.length > 0) {
-                    const firstUnsavedIndex = state.items.findIndex(i => !i.saved);
-                    const targetIndex = firstUnsavedIndex !== -1 ? firstUnsavedIndex : 0;
-                    $select.val(targetIndex).trigger('change');
-                } else {
-                    $('#dynamicFieldsPanel').hide();
-                }
-            }
+                const simItems = state.items.filter(i => i.type === 'SIM');
+                const usbItems = state.items.filter(i => i.type === 'USB');
 
-            $('#itemSelector').on('change', function () {
-                const index = parseInt($(this).val());
-                if (isNaN(index) || index < 0 || index >= state.items.length) {
-                    state.selectedItemIndex = -1;
-                    $('#dynamicFieldsPanel').hide();
-                    return;
+                $('#simBadgeCount').text(simItems.length);
+                $('#usbBadgeCount').text(usbItems.length);
+
+                // Toggle Tab Visibility based on availability
+                $('#tabItemSIM').toggle(simItems.length > 0);
+                $('#tabItemUSB').toggle(usbItems.length > 0);
+
+                if (simItems.length === 0 && usbItems.length > 0) {
+                    switchTab('USB');
+                } else if (simItems.length > 0) {
+                    switchTab('SIM');
                 }
 
-                state.selectedItemIndex = index;
-                renderDynamicForm(state.items[index]);
-            });
-
-            function renderDynamicForm(item) {
-                $('#dynamicFormHeader').html(`<i class="fas fa-edit text-danger"></i> Details for ${item.label}`);
-                let fieldsHtml = '';
-
-                if (item.type === 'SIM') {
-                    fieldsHtml = `
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="custom-form-label">Serial Number (S/N) <span class="text-danger">*</span></label>
-                                <input type="text" id="inputSN" class="form-control custom-form-control" value="${item.serialNumber}" placeholder="Enter SIM Serial No.">
-                                <div class="serial-warning" id="snWarning"></div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="custom-form-label">Phone Number <span class="text-danger">*</span></label>
-                                <input type="text" id="inputPhone" class="form-control custom-form-control" value="${item.phoneNumber}" placeholder="010xxxxxxxx">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="custom-form-label">Network Type <span class="text-danger">*</span></label>
-                                <select id="inputNetwork" class="form-select custom-form-select">
-                                    <option value="4G" ${item.networkType === '4G' ? 'selected' : ''}>4G</option>
-                                    <option value="5G" ${item.networkType === '5G' ? 'selected' : ''}>5G</option>
-                                    <option value="3G" ${item.networkType === '3G' ? 'selected' : ''}>3G</option>
-                                </select>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    fieldsHtml = `
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="custom-form-label">Serial Number (S/N) <span class="text-danger">*</span></label>
-                                <input type="text" id="inputSN" class="form-control custom-form-control" value="${item.serialNumber}" placeholder="Enter USB Serial No.">
-                                <div class="serial-warning" id="snWarning"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="custom-form-label">Model Name <span class="text-danger">*</span></label>
-                                <input type="text" id="inputModel" class="form-control custom-form-control" value="${item.model}" placeholder="e.g. Huawei E3372">
-                            </div>
-                        </div>
-                    `;
-                }
-
-                $('#dynamicFieldsContainer').html(fieldsHtml);
-                $('#dynamicFieldsPanel').show();
-
-                // Attach debounced Serial check
-                $('#inputSN').on('input', function () {
-                    const val = $(this).val().trim();
-                    clearTimeout(debounceTimer);
-                    if (!val) {
-                        $('#snWarning').hide();
-                        $(this).removeClass('is-invalid');
-                        return;
-                    }
-                    debounceTimer = setTimeout(() => {
-                        checkSerialNumberUniqueness(val, $(this), $('#snWarning'));
-                    }, 400);
-                });
-            }
-
-            function checkSerialNumberUniqueness(serial, $input, $warning) {
-                $.getJSON(checkSerialUrl, { serialNumber: serial }, function (res) {
-                    if (res && res.exists) {
-                        $input.addClass('is-invalid');
-                        $warning.text(`Serial number already exists as ${res.type}`).show();
-                    } else {
-                        $input.removeClass('is-invalid');
-                        $warning.hide();
-                    }
-                });
-            }
-
-            $('#saveItemDataBtn').on('click', function () {
-                const idx = state.selectedItemIndex;
-                if (idx < 0 || idx >= state.items.length) return;
-
-                const item = state.items[idx];
-                const $snInput = $('#inputSN');
-
-                if ($snInput.hasClass('is-invalid')) {
-                    alert('Please resolve the serial number validation warning before saving.');
-                    return;
-                }
-
-                const sn = $snInput.val().trim();
-                if (!sn) {
-                    alert('Serial Number is required.');
-                    return;
-                }
-
-                if (item.type === 'SIM') {
-                    const phone = $('#inputPhone').val().trim();
-                    if (!phone) {
-                        alert('Phone Number is required.');
-                        return;
-                    }
-                    item.serialNumber = sn;
-                    item.phoneNumber = phone;
-                    item.networkType = $('#inputNetwork').val();
-                } else {
-                    const model = $('#inputModel').val().trim();
-                    if (!model) {
-                        alert('Model is required.');
-                        return;
-                    }
-                    item.serialNumber = sn;
-                    item.model = model;
-                }
-
-                item.saved = true;
-
-                // Auto advance to next unsaved item or re-populate
-                populateItemSelector();
-                renderCardsList();
-            });
-
-            function renderCardsList() {
-                const $container = $('#addedItemsCardsContainer');
-                if (state.items.length === 0) {
-                    $container.html('');
-                    return;
-                }
-
-                let html = '';
                 state.items.forEach((item, index) => {
                     const icon = item.type === 'SIM' ? 'fa-sim-card text-danger' : 'fa-usb text-secondary';
-                    const detail = item.type === 'SIM'
-                        ? `Phone: <strong>${item.phoneNumber || 'N/A'}</strong> | Network: <strong>${item.networkType}</strong>`
-                        : `Model: <strong>${item.model || 'N/A'}</strong>`;
-                    const statusBadge = item.saved
-                        ? '<span class="badge bg-success"><i class="fas fa-check me-1"></i>Saved</span>'
-                        : '<span class="badge bg-warning text-dark">Pending Details</span>';
+                    const isChecked = item.isNullSerial ? 'checked' : '';
+                    const isDisabled = item.isNullSerial ? 'disabled' : '';
 
-                    html += `
-                        <div class="added-item-card d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="fas ${icon} fa-2x"></i>
-                                <div>
-                                    <h6 class="fw-bold mb-1">${item.label} ${statusBadge}</h6>
-                                    <div class="small text-muted">
-                                        S/N: <strong>${item.serialNumber || 'N/A'}</strong> | ${detail}
-                                    </div>
+                    let cardBodyHtml = '';
+
+                    if (item.type === 'SIM') {
+                        // SIM Card Fields: NetworkType, PhoneNumber (11 digits), SerialNumber
+                        cardBodyHtml = `
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="custom-form-label">Network Type <span class="text-danger">*</span></label>
+                                    <select class="form-select custom-form-select input-network">
+                                        <option value="">-- Select Network --</option>
+                                        <option value="4G" ${item.networkType === '4G' ? 'selected' : ''}>4G</option>
+                                        <option value="5G" ${item.networkType === '5G' ? 'selected' : ''}>5G</option>
+                                        <option value="3G" ${item.networkType === '3G' ? 'selected' : ''}>3G</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="custom-form-label">Phone Number (11 Digits) <span class="text-danger">*</span></label>
+                                    <input type="text" maxlength="11" class="form-control custom-form-control input-phone" value="${item.phoneNumber}" placeholder="e.g. 01012345678">
+                                    <div class="invalid-feedback">Must be exactly 11 digits.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="custom-form-label d-flex justify-content-between align-items-center">
+                                        <span>Serial Number (S/N)</span>
+                                        <div class="form-check mb-0">
+                                            <input class="form-check-input chk-null-sn" type="checkbox" id="nullSn_${index}" ${isChecked}>
+                                            <label class="form-check-label text-muted small" for="nullSn_${index}">No S/N</label>
+                                        </div>
+                                    </label>
+                                    <input type="text" class="form-control custom-form-control input-sn" value="${item.serialNumber}" placeholder="Enter Serial No." ${isDisabled}>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-danger border-0 remove-item-btn" data-index="${index}">
-                                <i class="fas fa-trash-can fa-lg"></i>
-                            </button>
+                        `;
+                    } else {
+                        // USB Modem Fields: Model, SerialNumber
+                        cardBodyHtml = `
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="custom-form-label">Model Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control custom-form-control input-model" value="${item.model}" placeholder="e.g. Model / Brand Name">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="custom-form-label d-flex justify-content-between align-items-center">
+                                        <span>Serial Number (S/N)</span>
+                                        <div class="form-check mb-0">
+                                            <input class="form-check-input chk-null-sn" type="checkbox" id="nullSn_${index}" ${isChecked}>
+                                            <label class="form-check-label text-muted small" for="nullSn_${index}">No S/N</label>
+                                        </div>
+                                    </label>
+                                    <input type="text" class="form-control custom-form-control input-sn" value="${item.serialNumber}" placeholder="Enter Serial No." ${isDisabled}>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    const cardHtml = `
+                        <div class="card p-3 shadow-sm item-card" data-index="${index}">
+                            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                <div class="fw-bold">
+                                    <i class="fas ${icon} me-2"></i>${item.label}
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger border-0 remove-card-btn" data-index="${index}">
+                                    <i class="fas fa-trash-can"></i>
+                                </button>
+                            </div>
+                            ${cardBodyHtml}
                         </div>
                     `;
-                });
 
-                $container.html(html);
+                    if (item.type === 'SIM') {
+                        $simContainer.append(cardHtml);
+                    } else {
+                        $usbContainer.append(cardHtml);
+                    }
+                });
             }
 
-            $(document).on('click', '.remove-item-btn', function () {
-                const idx = parseInt($(this).data('index'));
-                if (!isNaN(idx)) {
-                    state.items.splice(idx, 1);
-                    renderBatchSummary();
-                    checkStep2Valid();
-                    populateItemSelector();
-                    renderCardsList();
+            // Live Binding for SIM specific Inputs
+            $(document).on('change', '.input-network', function () {
+                const index = $(this).closest('.item-card').data('index');
+                const val = $(this).val();
+                state.items[index].networkType = val;
+                if (val) clearError($(this));
+            });
+
+            $(document).on('input', '.input-phone', function () {
+                const index = $(this).closest('.item-card').data('index');
+                // Restrict input strictly to digits
+                let val = $(this).val().replace(/\D/g, '');
+                if (val.length > 11) val = val.substring(0, 11);
+                $(this).val(val);
+
+                state.items[index].phoneNumber = val;
+
+                if (val.length === 11) {
+                    clearError($(this));
                 }
+            });
+
+            // Live Binding for Model (USB)
+            $(document).on('input', '.input-model', function () {
+                const index = $(this).closest('.item-card').data('index');
+                const val = $(this).val().trim();
+                state.items[index].model = val;
+
+                if (val) clearError($(this));
+            });
+
+            // Live Binding for Null Serial Checkbox
+            $(document).on('change', '.chk-null-sn', function () {
+                const $card = $(this).closest('.item-card');
+                const index = $card.data('index');
+                const isChecked = $(this).is(':checked');
+                const $snInput = $card.find('.input-sn');
+
+                state.items[index].isNullSerial = isChecked;
+
+                if (isChecked) {
+                    $snInput.val('').prop('disabled', true);
+                    clearError($snInput);
+                    state.items[index].serialNumber = '';
+                } else {
+                    $snInput.prop('disabled', false);
+                }
+            });
+
+            // Live Binding for Serial Number
+            $(document).on('input', '.input-sn', function () {
+                const $card = $(this).closest('.item-card');
+                const index = $card.data('index');
+                const val = $(this).val().trim();
+                const $input = $(this);
+
+                state.items[index].serialNumber = val;
+
+                if (val) clearError($input);
+
+                clearTimeout(debounceTimer);
+                if (!val) return;
+
+                debounceTimer = setTimeout(() => {
+                    $.getJSON(checkSerialUrl, { serialNumber: val }, function (res) {
+                        if (res && res.exists) {
+                            $input.addClass('is-invalid');
+                        } else {
+                            if (val) clearError($input);
+                        }
+                    });
+                }, 400);
+            });
+
+            // Delete Individual Card
+            $(document).on('click', '.remove-card-btn', function () {
+                const index = $(this).data('index');
+                state.items.splice(index, 1);
+                renderBatchSummary();
+                renderSidebarBranches();
+
+                if (state.items.length === 0) {
+                    goToStep(2);
+                } else {
+                    renderAllItems();
+                }
+            });
+
+            // Navigation Actions inside Step 3
+            $('#addMoreItemsBtn').on('click', function () {
+                goToStep(2);
+            });
+
+            $('#doneItemsBtn').on('click', function () {
+                let isValid = true;
+
+                $('.item-card').each(function () {
+                    const index = $(this).data('index');
+                    const item = state.items[index];
+
+                    if (item.type === 'SIM') {
+                        const $netInput = $(this).find('.input-network');
+                        const $phoneInput = $(this).find('.input-phone');
+                        const $snInput = $(this).find('.input-sn');
+
+                        // Network Type Validation
+                        if (!item.networkType) {
+                            setError($netInput);
+                            isValid = false;
+                        } else {
+                            clearError($netInput);
+                        }
+
+                        // Phone Number Validation (Must be exactly 11 digits)
+                        if (!item.phoneNumber || item.phoneNumber.length !== 11) {
+                            setError($phoneInput);
+                            isValid = false;
+                        } else {
+                            clearError($phoneInput);
+                        }
+
+                        // Serial Number Validation
+                        if (!item.isNullSerial && !item.serialNumber) {
+                            setError($snInput);
+                            isValid = false;
+                        } else if ($snInput.hasClass('is-invalid') && !item.isNullSerial) {
+                            isValid = false;
+                        } else {
+                            if (item.isNullSerial || item.serialNumber) {
+                                clearError($snInput);
+                            }
+                        }
+
+                    } else {
+                        const $modelInput = $(this).find('.input-model');
+                        const $snInput = $(this).find('.input-sn');
+
+                        // Model Validation
+                        if (!item.model) {
+                            setError($modelInput);
+                            isValid = false;
+                        } else {
+                            clearError($modelInput);
+                        }
+
+                        // Serial Number Validation
+                        if (!item.isNullSerial && !item.serialNumber) {
+                            setError($snInput);
+                            isValid = false;
+                        } else if ($snInput.hasClass('is-invalid') && !item.isNullSerial) {
+                            isValid = false;
+                        } else {
+                            if (item.isNullSerial || item.serialNumber) {
+                                clearError($snInput);
+                            }
+                        }
+                    }
+                });
+
+                if (!isValid) return;
+
+                $(this).hide();
+                $('#submitDocumentBtn').show();
             });
 
             $('#step3BackBtn').on('click', function () {
                 goToStep(2);
+            });
+
+            // Direct Sidebar Clicks
+            $('#sidebarStep1').on('click', function () { goToStep(1); });
+            $('#sidebarStep2').on('click', function () { goToStep(2); });
+            $('#sidebarStep3').on('click', function () {
+                if (state.items.length > 0) {
+                    renderAllItems();
+                    goToStep(3);
+                }
             });
 
             // ==========================================
@@ -735,7 +902,6 @@
                 $('#step2Section').toggle(stepNum === 2);
                 $('#step3Section').toggle(stepNum === 3);
 
-                // Update Step 1 Indicator
                 if (stepNum > 1 || checkStep1Valid()) {
                     $('#sidebarStep1').addClass('step-completed').removeClass('step-active step-inactive');
                     $('#stepCircle1').html('<i class="fas fa-check"></i>');
@@ -744,7 +910,6 @@
                     $('#stepCircle1').text('1');
                 }
 
-                // Update Step 2 Indicator
                 if (stepNum === 2) {
                     $('#sidebarStep2').addClass('step-active').removeClass('step-completed step-inactive');
                     $('#stepCircle2').text('2');
@@ -756,7 +921,6 @@
                     $('#stepCircle2').text('2');
                 }
 
-                // Update Step 3 Indicator
                 if (stepNum === 3) {
                     $('#sidebarStep3').addClass('step-active').removeClass('step-completed step-inactive');
                     $('#stepCircle3').text('3');
@@ -772,27 +936,16 @@
             $('#documentCreateForm').on('submit', function (e) {
                 if (!checkStep1Valid()) {
                     e.preventDefault();
-                    alert('Please select both Document Type and Service Provider.');
                     goToStep(1);
                     return false;
                 }
 
                 if (state.items.length === 0) {
                     e.preventDefault();
-                    alert('Please add at least one device item.');
                     goToStep(2);
                     return false;
                 }
 
-                const unsavedItems = state.items.filter(i => !i.saved);
-                if (unsavedItems.length > 0) {
-                    e.preventDefault();
-                    alert(`Please complete and save details for all items. (${unsavedItems.length} item(s) pending)`);
-                    goToStep(3);
-                    return false;
-                }
-
-                // Generate Hidden Inputs mapping directly to DocumentCreateViewModel (Sims & Usbs lists)
                 const $container = $('#hiddenInputsContainer');
                 $container.empty();
 
@@ -800,13 +953,15 @@
                 let usbIdx = 0;
 
                 state.items.forEach(item => {
+                    const snValue = item.isNullSerial ? '' : item.serialNumber;
+
                     if (item.type === 'SIM') {
-                        $container.append(`<input type="hidden" name="Sims[${simIdx}].SerialNumber" value="${item.serialNumber}" />`);
-                        $container.append(`<input type="hidden" name="Sims[${simIdx}].PhoneNumber" value="${item.phoneNumber}" />`);
                         $container.append(`<input type="hidden" name="Sims[${simIdx}].NetworkType" value="${item.networkType}" />`);
+                        $container.append(`<input type="hidden" name="Sims[${simIdx}].PhoneNumber" value="${item.phoneNumber}" />`);
+                        $container.append(`<input type="hidden" name="Sims[${simIdx}].SerialNumber" value="${snValue}" />`);
                         simIdx++;
                     } else if (item.type === 'USB') {
-                        $container.append(`<input type="hidden" name="Usbs[${usbIdx}].SerialNumber" value="${item.serialNumber}" />`);
+                        $container.append(`<input type="hidden" name="Usbs[${usbIdx}].SerialNumber" value="${snValue}" />`);
                         $container.append(`<input type="hidden" name="Usbs[${usbIdx}].Model" value="${item.model}" />`);
                         usbIdx++;
                     }
