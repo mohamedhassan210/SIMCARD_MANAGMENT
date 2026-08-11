@@ -48,11 +48,8 @@ namespace Sim_Card_Managment.Controllers
             ViewBag.CurrentStatus = status.ToLower();
             ViewBag.CurrentType = type.ToLower();
 
-            // For the "Status Type" filter dropdown — every type that exists, whether currently in use or not
-            ViewBag.StatusTypes = _context.DeviceStatusesType
-                .OrderBy(t => t.Name)
-                .Select(t => t.Name)
-                .ToList();
+            // For the "Status" filter dropdown — the fixed set of values Sim/Usb.Status can hold
+            ViewBag.StatusTypes = new List<string> { "Unassigned", "Occupied", "Lost", "Replaced", "Returned" };
 
             var simsList = _simRepo.GetAll().Select(s => new DeviceDirectoryViewModel
             {
@@ -62,10 +59,7 @@ namespace Sim_Card_Managment.Controllers
                 DeviceType = "SIM Card",
                 ServiceProvider = s.ServiceProvider?.Name ?? "N/A",
                 IsActive = s.IsActive,
-                CurrentStatusType = s.DeviceStatuses
-                    .OrderByDescending(ds => ds.StatusDate)
-                    .Select(ds => ds.StatusType.Name)
-                    .FirstOrDefault(),
+                Status = s.Status,
                 RegisteredAt = s.RegisteredAt,
                 AssignedTo = s.Subscriptions?
                     .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
@@ -81,10 +75,7 @@ namespace Sim_Card_Managment.Controllers
                 DeviceType = "USB Modem",
                 ServiceProvider = u.ServiceProvider?.Name ?? "N/A",
                 IsActive = u.IsActive,
-                CurrentStatusType = u.DeviceStatuses
-                    .OrderByDescending(ds => ds.StatusDate)
-                    .Select(ds => ds.StatusType.Name)
-                    .FirstOrDefault(),
+                Status = u.Status,
                 RegisteredAt = u.RegisteredAt,
                 AssignedTo = u.Subscriptions?
                     .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
@@ -144,6 +135,7 @@ namespace Sim_Card_Managment.Controllers
             {
                 sim.RegisteredAt = DateTime.Now;
                 sim.IsActive = true;
+                sim.Status = "Unassigned";
                 _simRepo.Add(sim);
                 return RedirectToAction(nameof(Index));
             }

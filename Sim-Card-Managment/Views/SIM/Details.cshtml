@@ -88,6 +88,19 @@
                             <strong class="fs-6 sd-text-dark">@(Model.NetworkType ?? "N/A")</strong>
                         </div>
 
+                    <div class="col-6">
+                        <small class="text-muted d-block mb-1">Availability</small>
+                        <span class="badge-status @(Model.IsActive ? "badge-active" : "badge-inactive")">
+                            @(Model.IsActive ? "Active" : "Not Active")
+                        </span>
+                    </div>
+
+                    <div class="col-6">
+                        <small class="text-muted d-block mb-1">Status</small>
+                        <span class="badge-status @(Model.Status == "Occupied" ? "badge-active" : "badge-inactive")">
+                            @Model.Status
+                        </span>
+                    </div>
                         <div class="col-6">
                             <small class="sd-text-muted d-block mb-1">Status</small>
                             <span class="sd-badge-status @(Model.IsActive ? "sd-badge-active" : "sd-badge-inactive")">

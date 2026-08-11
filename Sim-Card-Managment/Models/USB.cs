@@ -9,7 +9,7 @@ namespace Sim_Card_Managment.Models
 
         [Required]
         [StringLength(100)]
-        public string SerialNumber { get; set; } = string.Empty;   
+        public string SerialNumber { get; set; } = string.Empty;
 
         [StringLength(200)]
         public string? Model { get; set; }
@@ -17,7 +17,7 @@ namespace Sim_Card_Managment.Models
 
         [Required]
         [StringLength(20)]
-        public string Status { get; set; } = "Active"; // Active / Lost / Replaced / Returned
+        public string Status { get; set; } = "Unassigned"; // Unassigned / Occupied / Lost / Replaced / Returned
 
         public bool IsActive { get; set; } = true;
 
@@ -29,7 +29,7 @@ namespace Sim_Card_Managment.Models
         public virtual ICollection<DeviceTransfer> DeviceTransfers { get; set; } = new List<DeviceTransfer>();
         public virtual ICollection<DeviceStatus> DeviceStatuses { get; set; } = new List<DeviceStatus>();
         public virtual ICollection<Serial> Serials { get; set; } = new List<Serial>();
-        
+
 
         public int ServiceProviderId { get; set; }
         public virtual ServiceProvider ServiceProvider { get; set; }

@@ -23,7 +23,7 @@ namespace Sim_Card_Managment.Models
 
         [Required]
         [StringLength(20)]
-        public string Status { get; set; } = "Active"; // Active / Lost / Replaced / Returned
+        public string Status { get; set; } = "Unassigned"; // Unassigned / Occupied / Lost / Replaced / Returned
 
         public bool IsActive { get; set; } = true;
 
