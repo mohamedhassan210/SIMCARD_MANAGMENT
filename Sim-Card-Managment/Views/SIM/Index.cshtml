@@ -302,13 +302,14 @@
         <div class="create-btn-group">
             <a asp-controller="SIM" asp-action="Create" class="create-btn"><span>+</span> New SIM Card</a>
             <a asp-controller="USB" asp-action="Create" class="create-btn create-btn-secondary"><span>+</span> New USB Modem</a>
+            <a asp-controller="DeviceStatusType" asp-action="Index" class="create-btn create-btn-secondary">Status Types</a>
         </div>
     </div>
 
     <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
         <div class="filters-row">
             <div class="filter-group">
-                <label for="status-filter">Status</label>
+                <label for="status-filter">Active Status</label>
                 <select id="status-filter" class="status-select">
                     <option value="all">All</option>
                     <option value="active">Active</option>
@@ -322,6 +323,20 @@
                     <option value="all">All Types</option>
                     <option value="sim">SIM Card</option>
                     <option value="usb">USB Modem</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="status-type-filter">Status Type</label>
+                <select id="status-type-filter" class="status-select">
+                    <option value="all">All Status Types</option>
+                    @if (ViewBag.StatusTypes != null)
+                    {
+                        foreach (var st in ViewBag.StatusTypes as List<string>)
+                        {
+                            <option value="@st.ToLower()">@st</option>
+                        }
+                    }
                 </select>
             </div>
 
@@ -365,9 +380,9 @@
                         : "";
 
                         <tr class="device-row"
-                            data-status="@(item.Status?.ToLower() ?? "")"
+                            data-status="@(item.IsActive ? "active" : "inactive")"
                             data-type="@normalizedType"
-                            data-assignee-type="@(item.AssignedToType?.ToLower() ?? "")">
+                            data-status-type="@(item.CurrentStatusType?.ToLower() ?? "none")">
                             <td>
                                 <strong>@item.SerialNumber</strong>
                                 @if (!string.IsNullOrEmpty(item.ProviderName))
@@ -387,7 +402,20 @@
                                     <div style="font-size: 11px; color: #888;">@item.Detail</div>
                                 }
                             </td>
-                            <td>@item.Status</td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span style="color:#137333; font-weight:700;">Active</span>
+                                }
+                                else
+                                {
+                                    <span style="color:#c5221f; font-weight:700;">Inactive</span>
+                                }
+                                @if (!string.IsNullOrEmpty(item.CurrentStatusType))
+                                {
+                                    <div style="font-size:11px; color:#888;">@item.CurrentStatusType</div>
+                                }
+                            </td>
                             <td>
                                 @if (!string.IsNullOrEmpty(item.AssignedToName))
                                 {
@@ -438,6 +466,7 @@
         const searchInput = document.getElementById("search-input");
         const statusFilter = document.getElementById("status-filter");
         const typeFilter = document.getElementById("device-type-filter");
+        const statusTypeFilter = document.getElementById("status-type-filter");
 
         const allRows = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
         const noResultsRow = document.getElementById("noResultsRow");
@@ -464,28 +493,32 @@
             window.location.href = `?status=${statusVal}&type=${typeVal}`;
         }
 
-        // Local filtering logic for instant live search
-        function applyFilters() {
-            const query = searchInput.value.trim().toLowerCase();
-            const statusVal = statusFilter.value.toLowerCase();
-            const typeVal = typeFilter.value.toLowerCase();
+        // Local filtering logic for instant live search        
+    function applyFilters() {
+        const query = searchInput.value.trim().toLowerCase();
+        const statusVal = statusFilter.value.toLowerCase();
+        const typeVal = typeFilter.value.toLowerCase();
+        const statusTypeVal = statusTypeFilter.value.toLowerCase();
 
-            visibleRows = allRows.filter(row => {
-                const text = row.innerText.toLowerCase();
-                const matchesSearch = text.includes(query);
+        visibleRows = allRows.filter(row => {
+            const text = row.innerText.toLowerCase();
+            const matchesSearch = text.includes(query);
 
-                const rowStatus = row.getAttribute("data-status");
-                const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
+            const rowStatus = row.getAttribute("data-status");
+            const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
 
-                const rowType = row.getAttribute("data-type");
-                const matchesType = (typeVal === "all") || (rowType === typeVal);
+            const rowType = row.getAttribute("data-type");
+            const matchesType = (typeVal === "all") || (rowType === typeVal);
 
-                return matchesSearch && matchesStatus && matchesType;
-            });
+            const rowStatusType = row.getAttribute("data-status-type") ?? "";
+            const matchesStatusType = (statusTypeVal === "all") || (rowStatusType === statusTypeVal);
 
-            currentPage = 1;
-            renderTable();
-        }
+            return matchesSearch && matchesStatus && matchesType && matchesStatusType;
+        });
+
+        currentPage = 1;
+        renderTable();
+    }
 
         function renderTable() {
             const totalVisible = visibleRows.length;
@@ -528,6 +561,9 @@
         // Update URL and reload data when dropdown filters change
         statusFilter.addEventListener("change", updateUrlParams);
         typeFilter.addEventListener("change", updateUrlParams);
+
+        statusTypeFilter.addEventListener("change", updateUrlParams);
+
 
         // Pagination handler
         paginationContainer.addEventListener("click", function (e) {

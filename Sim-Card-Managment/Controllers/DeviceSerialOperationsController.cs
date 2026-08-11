@@ -58,7 +58,8 @@ namespace Sim_Card_Managment.Controllers
                 phone = s.PhoneNumber,
                 serial = s.SerialNumber,
                 networkType = s.NetworkType,
-                status = s.Status,
+                IsActive = s.IsActive ? "Active" : "Inactive",
+                Status = s.Status,
                 provider = s.ServiceProvider?.Name ?? "Unknown"
             }).ToList();
 

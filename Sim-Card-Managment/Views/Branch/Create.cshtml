@@ -1,8 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model Sim_Card_Managment.Viewmodel.BranchCreateViewModel
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +26,6 @@
             padding-bottom: 3rem;
         }
 
-        /* Form Card Layout */
         .form-card {
             max-width: 580px;
             margin: 3rem auto 0 auto;
@@ -59,7 +54,6 @@
             font-size: 1.25rem;
         }
 
-        /* Form Controls */
         .form-label-custom {
             font-size: 0.8rem;
             text-transform: uppercase;
@@ -102,7 +96,6 @@
             font-weight: 500;
         }
 
-        /* Action Buttons */
         .btn-custom {
             height: 48px;
             padding: 0 28px;
@@ -159,22 +152,38 @@
                 </div>
             </div>
 
-            <form id="createBranchForm" onsubmit="handleFormSubmit(event)">
+            <form asp-controller="Branch" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="px-4 pt-4">
+                        <div class="alert alert-danger" role="alert">
+                            <ul class="mb-0">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+
                 <div class="p-4 p-md-5">
                     <div class="row g-4">
 
                         <div class="col-12">
-                            <label for="branchName" class="form-label-custom">Branch Name</label>
+                            <label for="Name" class="form-label-custom">Branch Name</label>
                             <div class="input-group-custom">
                                 <i class="fa-solid fa-building"></i>
-                                <input type="text" id="branchName" class="form-control-custom" placeholder="e.g., Cairo Main Branch" required>
+                                <input asp-for="Name" class="form-control-custom" placeholder="e.g., Cairo Main Branch" required>
                             </div>
                         </div>
 
                     </div>
 
                     <div class="d-flex align-items-center justify-content-end gap-3 mt-5 pt-3 border-top">
-                        <a href="#" class="btn-custom btn-secondary-soft">Cancel</a>
+                        <a asp-action="Index" class="btn-custom btn-secondary-soft">Cancel</a>
                         <button type="submit" class="btn-custom btn-primary-orange">
                             <i class="fa-solid fa-plus"></i> Create Branch
                         </button>
@@ -187,23 +196,5 @@
 
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function handleFormSubmit(event) {
-            event.preventDefault();
-
-            const branchName = document.getElementById('branchName').value;
-
-            Swal.fire({
-                title: 'Branch Created!',
-                text: `"${branchName}" has been successfully created.`,
-                icon: 'success',
-                confirmButtonColor: '#DF531B',
-                customClass: { popup: 'rounded-4' }
-            }).then(() => {
-                document.getElementById('createBranchForm').reset();
-            });
-        }
-    </script>
 </body>
 </html>

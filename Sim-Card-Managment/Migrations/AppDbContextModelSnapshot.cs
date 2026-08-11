@@ -874,6 +874,9 @@ namespace Sim_Card_Management.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("NetworkType")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
@@ -982,6 +985,9 @@ namespace Sim_Card_Management.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Model")
                         .HasMaxLength(200)

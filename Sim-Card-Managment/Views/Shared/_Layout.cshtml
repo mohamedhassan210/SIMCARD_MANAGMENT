@@ -32,6 +32,20 @@
     var canViewSubscription = Has("Subscription", "Index");
     var canCreateSubscription = Has("Subscription", "Create");
 
+
+    // Branch
+    var canViewBranches = Has("Branch", "Index");
+    var canCreateBranch = Has("Branch", "Create");
+
+    // VPN Connection
+    var canViewVpnConnections = Has("VpnConnection", "Index");
+    var canCreateVpnConnection = Has("VpnConnection", "Create");
+
+    // Internet Line
+    var canViewInternetLines = Has("InternetLine", "Index");
+    var canCreateInternetLine = Has("InternetLine", "Create");
+
+
     // Per-section visibility (header only shows if at least one child is visible)
     var showUserSection = canManageUsers || canManagePermissions || canViewGroups;
     var showSimSection = canCreateSim || canViewSims;
@@ -40,6 +54,9 @@
     var showServiceProviderSection = canViewServiceProviders || canCreateServiceProvider;
     var showReportSection = canViewReport;
     var showSubscriptionSection = canViewSubscription || canCreateSubscription;
+    var showBranchSection = canViewBranches || canCreateBranch;
+    var showVpnConnectionSection = canViewVpnConnections || canCreateVpnConnection;
+    var showInternetLineSection = canViewInternetLines || canCreateInternetLine;
 }
 
 <!DOCTYPE html>
@@ -353,6 +370,190 @@
                                     <span class="sub-item-text">Add subscription</span>
                                 </a>
                             }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (showBranchSection)
+            {
+                <div class="accordion-item mb-2">
+                    <div class="d-flex align-items-center gap-3 sidebar-toggle-btn"
+                         data-bs-toggle="collapse"
+                         data-bs-target="#collapseBranch"
+                         aria-expanded="true"
+                         style="cursor: pointer;">
+
+                        <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                            <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6l-6 10h12z" />
+                            </svg>
+                        </div>
+
+                        <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                            <i class="fa-solid fa-code-branch"></i>
+                        </div>
+
+                        <span class="text-white fs-6">Branch</span>
+                    </div>
+
+                    <div id="collapseBranch"
+                         class="accordion-collapse collapse show"
+                         data-bs-parent="#sidebarMenu">
+
+                        <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+
+                            @if (canViewBranches)
+                            {
+                                <a asp-controller="Branch"
+                                   asp-action="Index"
+                                   class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-list"></i>
+                                    </div>
+
+                                    <span class="sub-item-text">View Branches</span>
+                                </a>
+                            }
+
+                            @if (canCreateBranch)
+                            {
+                                <a asp-controller="Branch"
+                                   asp-action="Create"
+                                   class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </div>
+
+                                    <span class="sub-item-text">Create new Branch</span>
+                                </a>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (showVpnConnectionSection)
+            {
+                <div class="accordion-item mb-2">
+                    <div class="d-flex align-items-center gap-3 sidebar-toggle-btn"
+                         data-bs-toggle="collapse"
+                         data-bs-target="#collapseVpnConnection"
+                         aria-expanded="true"
+                         style="cursor: pointer;">
+
+                        <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                            <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6l-6 10h12z" />
+                            </svg>
+                        </div>
+
+                        <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                            <i class="fa-solid fa-network-wired"></i>
+                        </div>
+
+                        <span class="text-white fs-6">Vpn Connection</span>
+                    </div>
+
+                    <div id="collapseVpnConnection"
+                         class="accordion-collapse collapse show"
+                         data-bs-parent="#sidebarMenu">
+
+                        <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+
+                            @if (canViewVpnConnections)
+                            {
+                                <a asp-controller="VpnConnection"
+                                   asp-action="Index"
+                                   class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-list"></i>
+                                    </div>
+
+                                    <span class="sub-item-text">View VPN Connections</span>
+                                </a>
+                            }
+
+                            @if (canCreateVpnConnection)
+                            {
+                                <a asp-controller="VpnConnection"
+                                   asp-action="Create"
+                                   class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </div>
+
+                                    <span class="sub-item-text">Create new VPN Connection</span>
+                                </a>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+            @if (showInternetLineSection)
+            {
+                <div class="accordion-item mb-2">
+                    <div class="d-flex align-items-center gap-3 sidebar-toggle-btn"
+                         data-bs-toggle="collapse"
+                         data-bs-target="#collapseInternetLine"
+                         aria-expanded="true"
+                         style="cursor: pointer;">
+
+                        <div class="triangle-box rounded-3 d-flex justify-content-center align-items-center text-secondary">
+                            <svg class="toggle-triangle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 6l-6 10h12z" />
+                            </svg>
+                        </div>
+
+                        <div class="icon-box-main rounded-3 d-flex justify-content-center align-items-center text-white">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+
+                        <span class="text-white fs-6">Internet Line</span>
+                    </div>
+
+                    <div id="collapseInternetLine"
+                         class="accordion-collapse collapse show"
+                         data-bs-parent="#sidebarMenu">
+
+                        <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+
+                            @if (canViewInternetLines)
+                            {
+                                <a asp-controller="InternetLine"
+                                   asp-action="Index"
+                                   class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-list"></i>
+                                    </div>
+
+                                    <span class="sub-item-text">View Internet Lines</span>
+                                </a>
+                            }
+
+                            @if (canCreateInternetLine)
+                            {
+                                <a asp-controller="InternetLine"
+                                   asp-action="Create"
+                                   class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </div>
+
+                                    <span class="sub-item-text">Create new Internet Line</span>
+                                </a>
+                            }
+
                         </div>
                     </div>
                 </div>

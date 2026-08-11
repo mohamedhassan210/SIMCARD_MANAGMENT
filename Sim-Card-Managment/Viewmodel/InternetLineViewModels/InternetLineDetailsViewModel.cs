@@ -17,7 +17,6 @@
         public string? Notes { get; set; }
         public string? SimSerial { get; set; }
 
-        public int CreatedById { get; set; }
         public string CreatedByUsername { get; set; } = string.Empty;
     }
 }

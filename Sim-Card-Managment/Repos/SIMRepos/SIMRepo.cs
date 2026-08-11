@@ -1,30 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
-
 namespace Sim_Card_Managment.Repos
 {
     public class SIMRepo : ISIMRepo
     {
         private readonly AppDbContext _context;
-
         public SIMRepo(AppDbContext context)
         {
             _context = context;
         }
-
         public async Task<IEnumerable<Sim>> GetAvailableSimsAsync()
         {
             return await _context.Sims
                 .Where(s => !_context.Serials.Any(ser => ser.SimId == s.Id))
                 .ToListAsync();
         }
-
         public async Task<IEnumerable<Sim>> GetAvailableSimsAsync(string query)
         {
             return await _context.Sims
                 .Include(s => s.ServiceProvider)
-                .Where(s => s.Status == "Active" &&
+                .Where(s => s.IsActive &&
                             (string.IsNullOrEmpty(query) || s.PhoneNumber.Contains(query) || s.SerialNumber.Contains(query)))
                 .Take(6)
                 .ToListAsync();
@@ -48,9 +44,10 @@ namespace Sim_Card_Managment.Repos
                     .ThenInclude(sub => sub.Employee)
                 .Include(s => s.Subscriptions!)
                     .ThenInclude(sub => sub.NonEmployee)
+                .Include(s => s.DeviceStatuses)
+                    .ThenInclude(ds => ds.StatusType)
                 .ToList();
         }
-
         public Sim? GetById(int id)
         {
             return _context.Sims
@@ -61,9 +58,10 @@ namespace Sim_Card_Managment.Repos
                     .ThenInclude(sub => sub.NonEmployee)
                 .Include(s => s.Subscriptions!)
                     .ThenInclude(sub => sub.Quota)
+                .Include(s => s.DeviceStatuses)
+                    .ThenInclude(ds => ds.StatusType)
                 .FirstOrDefault(s => s.Id == id);
         }
-
         public void Add(Sim sim)
         {
             _context.Sims.Add(sim);
@@ -74,17 +72,15 @@ namespace Sim_Card_Managment.Repos
             await _context.Sims.AddAsync(sim);
             await _context.SaveChangesAsync();
         }
-
         public async Task<Sim?> GetBySerialNumberAsync(string serialNumber)
         {
             return await _context.Sims
-                .Include (s => s.ServiceProvider)
+                .Include(s => s.ServiceProvider)
                 .FirstOrDefaultAsync(s => s.SerialNumber == serialNumber);
         }
         public async Task<IEnumerable<Sim>> SearchAsync(string searchTerm)
         {
             var searchLower = searchTerm.ToLower().Trim();
-
             return await _context.Sims
                 .Include(s => s.ServiceProvider)
                 .Where(s => (s.PhoneNumber != null && s.PhoneNumber.Contains(searchTerm))
@@ -97,7 +93,6 @@ namespace Sim_Card_Managment.Repos
             _context.Sims.Update(sim);
             _context.SaveChanges();
         }
-
         public void Delete(int id)
         {
             var sim = GetById(id);

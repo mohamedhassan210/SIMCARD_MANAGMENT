@@ -151,8 +151,8 @@
 
                     <div class="col-6">
                         <small class="text-muted d-block mb-1">Status</small>
-                        <span class="badge-status @(Model.Status?.ToLower() == "active" ? "badge-active" : "badge-inactive")">
-                            @Model.Status
+                        <span class="badge-status @(Model.IsActive ? "badge-active" : "badge-inactive")">
+                            @(Model.IsActive ? "Active" : "Inactive")
                         </span>
                     </div>
 

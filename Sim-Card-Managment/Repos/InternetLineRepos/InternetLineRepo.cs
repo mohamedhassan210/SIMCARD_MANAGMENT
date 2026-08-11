@@ -21,6 +21,7 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 .Include(il => il.ServiceProvider)
                 .Include(il => il.ServiceType)
                 .Include(il => il.PaymentType)
+                .Include(il => il.CreatedBy)
                 .OrderBy(il => il.Branch.Name)
                 .Select(il => new InternetLineListItemViewModel
                 {
@@ -31,7 +32,8 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                     PaymentTypeName = il.PaymentType.Name,
                     Bandwidth = il.Bandwidth,
                     PhoneNumber = il.PhoneNumber,
-                    Status = il.Status
+                    Status = il.Status,
+                    CreatedByUsername = il.CreatedBy.Username
                 })
                 .ToListAsync();
         }
@@ -44,6 +46,7 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 .Include(il => il.ServiceType)
                 .Include(il => il.PaymentType)
                 .Include(il => il.Sim)
+                .Include(il => il.CreatedBy)
                 .FirstOrDefaultAsync(il => il.Id == id);
 
             if (line == null) return null;
@@ -61,7 +64,8 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 QuotaGB = line.QuotaGB,
                 Status = line.Status,
                 Notes = line.Notes,
-                SimSerial = line.Sim?.SerialNumber
+                SimSerial = line.Sim?.SerialNumber,
+                CreatedByUsername = line.CreatedBy.Username
             };
         }
 
@@ -93,6 +97,7 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 .Include(il => il.ServiceProvider)
                 .Include(il => il.ServiceType)
                 .Include(il => il.PaymentType)
+                .Include(il => il.CreatedBy)
                 .Where(il => il.BranchId == branchId)
                 .Select(il => new InternetLineListItemViewModel
                 {
@@ -103,7 +108,8 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                     PaymentTypeName = il.PaymentType.Name,
                     Bandwidth = il.Bandwidth,
                     PhoneNumber = il.PhoneNumber,
-                    Status = il.Status
+                    Status = il.Status,
+                    CreatedByUsername = il.CreatedBy.Username
                 })
                 .ToListAsync();
         }
@@ -122,8 +128,11 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 RenewalDay = model.RenewalDay,
                 QuotaGB = model.QuotaGB,
                 Status = model.Status,
-                Notes = model.Notes
+                Notes = model.Notes,
+
+                CreatedById = model.CreatedById
             };
+
             await _context.InternetLines.AddAsync(line);
             await _context.SaveChangesAsync();
         }
@@ -148,5 +157,50 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
             _context.InternetLines.Update(line);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<InternetLineExcelViewModel>> GetForExcelAsync()
+        {
+            return await _context.InternetLines
+                .Include(x => x.Branch)
+                .Include(x => x.ServiceProvider)
+                .Include(x => x.PaymentType)
+                .Include(x => x.ServiceType)
+                .Include(x => x.Sim)
+                .GroupBy(x => new
+                {
+                    x.BranchId,
+                    BranchName = x.Branch.Name
+                })
+                .Select(g => new InternetLineExcelViewModel
+                {
+                    BranchName = g.Key.BranchName,
+
+                    InternetLines = g.Select(x => new InternetLineExcelItem
+                    {
+                        ServiceProviderName = x.ServiceProvider.Name,
+                        PaymentTypeName = x.PaymentType.Name,
+                        ServiceTypeName = x.ServiceType.Name,
+
+                        SimSerialNumber = x.Sim != null
+                            ? x.Sim.SerialNumber
+                            : null,
+
+                        PhoneNumber = x.PhoneNumber,
+
+                        RenewalDay = x.RenewalDay,
+
+                        QuotaGB = x.QuotaGB,
+
+                        Bandwidth = x.Bandwidth,
+
+                        Status = x.Status,
+
+                        Notes = x.Notes
+                    }).ToList()
+                })
+                .OrderBy(x => x.BranchName)
+                .ToListAsync();
+        }
+
     }
 }

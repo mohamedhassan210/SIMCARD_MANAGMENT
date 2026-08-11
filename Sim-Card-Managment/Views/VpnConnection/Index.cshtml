@@ -172,6 +172,18 @@
                 box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
             }
 
+        .btn-secondary-soft {
+            background-color: #F1F5F9;
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+        }
+
+            .btn-secondary-soft:hover {
+                background-color: #E2E8F0;
+                color: var(--text-dark);
+            }
+
+
         .btn-action-icon {
             width: 36px;
             height: 36px;
@@ -267,10 +279,29 @@
                     <h1 class="page-title m-0">VPN Connections</h1>
                     <p class="text-muted m-0 small mt-1">Manage network links, line speeds, and operational status across all branches</p>
                 </div>
-                <div>
-                    <a asp-controller="VpnConnection" asp-action="Create" class="btn-custom btn-primary-orange">
-                        <i class="fa-solid fa-plus"></i> New VPN Link
+                <div class="d-flex gap-2">
+
+                    <a asp-controller="VpnConnectionType"
+                       asp-action="Index"
+                       class="btn-custom btn-secondary-soft">
+                        <i class="fa-solid fa-diagram-project"></i>
+                        VPN Connection Types
                     </a>
+
+                    <a asp-controller="VpnConnection"
+                       asp-action="ExportToExcel"
+                       class="btn-custom btn-secondary-soft">
+                        <i class="fa-solid fa-file-excel"></i>
+                        Excel
+                    </a>
+
+                    <a asp-controller="VpnConnection"
+                       asp-action="Create"
+                       class="btn-custom btn-primary-orange">
+                        <i class="fa-solid fa-plus"></i>
+                        New VPN Link
+                    </a>
+
                 </div>
             </div>
         </div>
@@ -351,7 +382,7 @@
                             foreach (var item in Model)
                             {
                                 var statusAttr = item.Status == true ? "UP" : item.Status == false ? "DOWN" : "UNKNOWN";
-                                <tr class="vpn-row" data-status="@statusAttr">
+                                <tr class="vpn-row" data-status="@statusAttr" data-href="/VpnConnection/Details/@item.Id">
                                     <td><strong>@item.BranchName</strong></td>
                                     <td>@item.ConnectionTypeName</td>
                                     <td>@item.ServiceProviderName</td>
@@ -383,7 +414,7 @@
                                     </td>
 
                                     <td style="text-align: right;">
-                                        <div class="d-inline-flex gap-1">
+                                        <div class="d-inline-flex gap-1 action-buttons">
                                             <a asp-controller="VpnConnection" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit Link">
                                                 <i class="fa-solid fa-pen"></i>
                                             </a>
@@ -407,34 +438,57 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        const searchInput = document.getElementById('vpnSearchInput');
-        const statusFilter = document.getElementById('statusFilter');
-
-        function filterTable() {
-            const query = searchInput.value.toLowerCase().trim();
-            const selectedStatus = statusFilter.value;
-            const rows = document.querySelectorAll('#vpnTableBody tr.vpn-row');
-            let hasVisibleRow = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Row Click Navigation Fix
+            const rows = document.querySelectorAll('.vpn-row'); // Fixed uppercase 'V'
 
             rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                const rowStatus = row.getAttribute('data-status');
-                const matchesQuery = text.includes(query);
-                const matchesStatus = (selectedStatus === 'ALL') || (rowStatus === selectedStatus);
-
-                if (matchesQuery && matchesStatus) {
-                    row.style.display = '';
-                    hasVisibleRow = true;
-                } else {
-                    row.style.display = 'none';
-                }
+                row.addEventListener('click', (e) => {
+                    // Now works because we added 'action-buttons' class to the HTML
+                    if (e.target.closest('.action-buttons')) {
+                        return;
+                    }
+                    const targetUrl = row.getAttribute('data-href');
+                    if (targetUrl) {
+                        window.location.href = targetUrl;
+                    }
+                });
             });
 
-            document.getElementById('noResultsRow').style.display = hasVisibleRow ? 'none' : '';
-        }
+            // 2. Search and Filter Implementation
+            const searchInput = document.getElementById('vpnSearchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const noResultsRow = document.getElementById('noResultsRow');
 
-        searchInput.addEventListener('input', filterTable);
-        statusFilter.addEventListener('change', filterTable);
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const statusValue = statusFilter.value;
+                let visibleCount = 0;
+
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    const rowStatus = row.getAttribute('data-status');
+
+                    const matchesSearch = text.includes(searchTerm);
+                    const matchesStatus = statusValue === 'ALL' || rowStatus === statusValue;
+
+                    if (matchesSearch && matchesStatus) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Show/hide the "No results found" row
+                if (noResultsRow) {
+                    noResultsRow.style.display = visibleCount === 0 ? '' : 'none';
+                }
+            }
+
+            if (searchInput) searchInput.addEventListener('input', filterTable);
+            if (statusFilter) statusFilter.addEventListener('change', filterTable);
+        });
     </script>
 </body>
 </html>

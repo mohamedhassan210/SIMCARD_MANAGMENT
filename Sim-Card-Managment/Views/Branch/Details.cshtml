@@ -1,9 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
+﻿@model Sim_Card_Managment.Viewmodel.BranchDetailsViewModel
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +26,6 @@
             padding-bottom: 3rem;
         }
 
-        /* Top Details Card */
         .details-card {
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
@@ -75,7 +69,6 @@
             color: var(--text-dark);
         }
 
-        /* Section Tables Card */
         .section-card {
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
@@ -85,7 +78,6 @@
             margin-bottom: 2rem;
         }
 
-        /* Controls: Search and Filter */
         .search-box {
             display: flex;
             align-items: center;
@@ -129,7 +121,6 @@
                 border-color: var(--brand-orange);
             }
 
-        /* Common Table Styling */
         .custom-table {
             width: 100%;
             border-collapse: collapse;
@@ -153,7 +144,6 @@
                 vertical-align: middle;
             }
 
-        /* Badges */
         .badge-active, .badge-status-up, .badge-enabled {
             background-color: rgba(34, 197, 94, 0.1);
             color: #15803D;
@@ -182,7 +172,6 @@
             gap: 6px;
         }
 
-        /* View Link Column Styling */
         .link-view {
             color: var(--brand-orange);
             font-weight: 600;
@@ -219,31 +208,49 @@
                 <div class="row g-4">
                     <div class="col-12 col-md-3">
                         <div class="info-grid-label">Branch Name</div>
-                        <div class="info-grid-value">Cairo Main Branch</div>
+                        <div class="info-grid-value">@Model.Name</div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-2">
                         <div class="info-grid-label">Is Active</div>
                         <div class="info-grid-value">
-                            <span class="badge-active"><i class="fa-solid fa-circle"></i> Active</span>
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge-active"><i class="fa-solid fa-circle"></i> Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge-inactive"><i class="fa-solid fa-circle"></i> Inactive</span>
+                            }
                         </div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-3">
                         <div class="info-grid-label">VPN Over Internet Status</div>
                         <div class="info-grid-value">
-                            <span class="badge-enabled"><i class="fa-solid fa-circle"></i> Enabled</span>
+                            @if (Model.VpnOverInternetStatus == true)
+                            {
+                                <span class="badge-enabled"><i class="fa-solid fa-circle"></i> Enabled</span>
+                            }
+                            else if (Model.VpnOverInternetStatus == false)
+                            {
+                                <span class="badge-disabled"><i class="fa-solid fa-circle"></i> Disabled</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not Configured</span>
+                            }
                         </div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-2">
                         <div class="info-grid-label">Created At</div>
-                        <div class="info-grid-value">Jan 10, 2026</div>
+                        <div class="info-grid-value">@Model.CreatedAt.ToString("MMM dd, yyyy")</div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-2">
                         <div class="info-grid-label">Created By</div>
-                        <div class="info-grid-value">Admin User</div>
+                        <div class="info-grid-value">@Model.CreatedByUsername</div>
                     </div>
                 </div>
             </div>
@@ -282,43 +289,32 @@
                         </tr>
                     </thead>
                     <tbody id="ispTableBody">
-                        <tr class="isp-row" data-status="UP">
-                            <td><strong>Vodafone Egypt</strong></td>
-                            <td>Dedicated Fiber</td>
-                            <td>200 Mbps</td>
-                            <td>+20 100 123 4567</td>
-                            <td>
-                                <span class="badge-status-up"><i class="fa-solid fa-circle"></i> Up</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <a href="#" class="link-view"><i class="fa-regular fa-eye"></i> View</a>
-                            </td>
-                        </tr>
-                        <tr class="isp-row" data-status="UP">
-                            <td><strong>Orange Business</strong></td>
-                            <td>4G Corporate Backup</td>
-                            <td>50 Mbps</td>
-                            <td>+20 122 987 6543</td>
-                            <td>
-                                <span class="badge-status-up"><i class="fa-solid fa-circle"></i> Up</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <a href="#" class="link-view"><i class="fa-regular fa-eye"></i> View</a>
-                            </td>
-                        </tr>
-                        <tr class="isp-row" data-status="DOWN">
-                            <td><strong>WE (Telecom Egypt)</strong></td>
-                            <td>ADSL Backup</td>
-                            <td>16 Mbps</td>
-                            <td>+20 227 554 3210</td>
-                            <td>
-                                <span class="badge-status-down"><i class="fa-solid fa-circle"></i> Down</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <a href="#" class="link-view"><i class="fa-regular fa-eye"></i> View</a>
-                            </td>
-                        </tr>
-                        <tr id="noIspResults" style="display: none;">
+                        @if (Model.InternetLines.Any())
+                        {
+                            foreach (var line in Model.InternetLines)
+                            {
+                                <tr class="isp-row" data-status="@(line.Status ? "UP" : "DOWN")">
+                                    <td><strong>@line.ServiceProviderName</strong></td>
+                                    <td>@line.ServiceTypeName</td>
+                                    <td>@(line.Bandwidth ?? "N/A")</td>
+                                    <td>@(line.PhoneNumber ?? "N/A")</td>
+                                    <td>
+                                        @if (line.Status)
+                                        {
+                                            <span class="badge-status-up"><i class="fa-solid fa-circle"></i> Up</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-status-down"><i class="fa-solid fa-circle"></i> Down</span>
+                                        }
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a asp-controller="InternetLine" asp-action="Details" asp-route-id="@line.Id" class="link-view"><i class="fa-regular fa-eye"></i> View</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        <tr id="noIspResults" style="display: @(Model.InternetLines.Any() ? "none" : "");">
                             <td colspan="6" class="text-center text-muted py-4">No matching ISP connections found.</td>
                         </tr>
                     </tbody>
@@ -359,31 +355,36 @@
                         </tr>
                     </thead>
                     <tbody id="vpnTableBody">
-                        <tr class="vpn-row" data-status="UP">
-                            <td>Site-to-Site IPsec</td>
-                            <td>Vodafone</td>
-                            <td><code class="text-dark fw-semibold">NID-99201</code></td>
-                            <td>100 Mbps</td>
-                            <td>
-                                <span class="badge-status-up"><i class="fa-solid fa-circle"></i> Up</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <a href="#" class="link-view"><i class="fa-regular fa-eye"></i> View</a>
-                            </td>
-                        </tr>
-                        <tr class="vpn-row" data-status="DOWN">
-                            <td>MPLS Link</td>
-                            <td>Etisalat (e&)</td>
-                            <td><code class="text-dark fw-semibold">NID-77309</code></td>
-                            <td>30 Mbps</td>
-                            <td>
-                                <span class="badge-status-down"><i class="fa-solid fa-circle"></i> Down</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <a href="#" class="link-view"><i class="fa-regular fa-eye"></i> View</a>
-                            </td>
-                        </tr>
-                        <tr id="noVpnResults" style="display: none;">
+                        @if (Model.VpnConnections.Any())
+                        {
+                            foreach (var vpn in Model.VpnConnections)
+                            {
+                                <tr class="vpn-row" data-status="@(vpn.Status == true ? "UP" : vpn.Status == false ? "DOWN" : "")">
+                                    <td>@vpn.ConnectionTypeName</td>
+                                    <td>@vpn.ServiceProviderName</td>
+                                    <td><code class="text-dark fw-semibold">@(vpn.NID ?? "N/A")</code></td>
+                                    <td>@(vpn.LineSpeed ?? "N/A")</td>
+                                    <td>
+                                        @if (vpn.Status == true)
+                                        {
+                                            <span class="badge-status-up"><i class="fa-solid fa-circle"></i> Up</span>
+                                        }
+                                        else if (vpn.Status == false)
+                                        {
+                                            <span class="badge-status-down"><i class="fa-solid fa-circle"></i> Down</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Unknown</span>
+                                        }
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <a asp-controller="VpnConnection" asp-action="Details" asp-route-id="@vpn.Id" class="link-view"><i class="fa-regular fa-eye"></i> View</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        <tr id="noVpnResults" style="display: @(Model.VpnConnections.Any() ? "none" : "");">
                             <td colspan="6" class="text-center text-muted py-4">No matching VPN lines found.</td>
                         </tr>
                     </tbody>
@@ -394,7 +395,6 @@
     </main>
 
     <script>
-        // Table 1 (ISP Connections) Filter Logic
         const ispSearchInput = document.getElementById('ispSearchInput');
         const ispStatusFilter = document.getElementById('ispStatusFilter');
 
@@ -425,7 +425,6 @@
         ispSearchInput.addEventListener('input', filterIspTable);
         ispStatusFilter.addEventListener('change', filterIspTable);
 
-        // Table 2 (VPN Lines) Filter Logic
         const vpnSearchInput = document.getElementById('vpnSearchInput');
         const vpnStatusFilter = document.getElementById('vpnStatusFilter');
 

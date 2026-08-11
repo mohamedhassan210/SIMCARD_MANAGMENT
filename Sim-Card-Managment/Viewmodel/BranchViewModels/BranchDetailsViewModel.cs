@@ -10,7 +10,6 @@
         public bool? VpnOverInternetStatus { get; set; }
         public DateTime CreatedAt { get; set; }
 
-        public int CreatedById { get; set; }
         public string CreatedByUsername { get; set; } = string.Empty;
 
         public List<InternetLineListItemViewModel> InternetLines { get; set; } = new();

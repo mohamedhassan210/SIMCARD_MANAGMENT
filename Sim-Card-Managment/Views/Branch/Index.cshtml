@@ -1,8 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.BranchListItemViewModel>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +26,6 @@
             padding-bottom: 3rem;
         }
 
-        /* Page Header */
         .page-header {
             background: #FFFFFF;
             border-bottom: 1px solid var(--card-border);
@@ -46,7 +41,6 @@
             color: var(--text-dark);
         }
 
-        /* Main Table Card */
         .table-card {
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
@@ -55,7 +49,6 @@
             padding: 2rem;
         }
 
-        /* Search & Filter Bar */
         .search-box {
             display: flex;
             align-items: center;
@@ -99,7 +92,6 @@
                 border-color: var(--brand-orange);
             }
 
-        /* Buttons */
         .btn-custom {
             height: 44px;
             padding: 0 24px;
@@ -154,7 +146,6 @@
             border-color: rgba(220, 38, 38, 0.3);
         }
 
-        /* Table Styling */
         .branch-table {
             width: 100%;
             border-collapse: collapse;
@@ -178,7 +169,6 @@
                 vertical-align: middle;
             }
 
-        /* Make Table Rows Clickable */
         .branch-row {
             cursor: pointer;
             transition: background-color 0.15s ease;
@@ -188,7 +178,6 @@
                 background-color: var(--brand-orange-light);
             }
 
-        /* Status Badges */
         .badge-enabled {
             background-color: rgba(34, 197, 94, 0.1);
             color: #15803D;
@@ -242,6 +231,8 @@
 </head>
 <body>
 
+    @Html.AntiForgeryToken()
+
     <header class="page-header p-100">
         <div class="container-fluid px-lg-5">
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
@@ -287,93 +278,57 @@
                             <th>VPN Over Internet</th>
                             <th>Is Active</th>
                             <th>Created At</th>
+                            <th>Created By</th>
                             <th style="text-align: right;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="branchTableBody">
-
-                        <tr class="branch-row" data-active="ACTIVE" data-href="/Branches/Details/1">
-                            <td><strong>Cairo Main Branch</strong></td>
-                            <td>
-                                <span class="badge-enabled">
-                                    <i class="fa-solid fa-circle"></i> Enabled
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge-active">Active</span>
-                            </td>
-                            <td><span class="text-muted">Jan 10, 2026</span></td>
-                            <td style="text-align: right;">
-                                <div class="d-inline-flex gap-1 action-buttons">
-                                    <a href="/Branches/Edit/1" class="btn-action-icon" title="Edit Branch"><i class="fa-solid fa-pen"></i></a>
-                                    <button type="button" class="btn-action-icon btn-action-delete" title="Delete" onclick="deleteBranch('Cairo Main Branch', event)"><i class="fa-solid fa-trash-can"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="branch-row" data-active="ACTIVE" data-href="/Branches/Details/2">
-                            <td><strong>Alexandria Hub</strong></td>
-                            <td>
-                                <span class="badge-enabled">
-                                    <i class="fa-solid fa-circle"></i> Enabled
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge-active">Active</span>
-                            </td>
-                            <td><span class="text-muted">Feb 02, 2026</span></td>
-                            <td style="text-align: right;">
-                                <div class="d-inline-flex gap-1 action-buttons">
-                                    <a href="/Branches/Edit/2" class="btn-action-icon" title="Edit Branch"><i class="fa-solid fa-pen"></i></a>
-                                    <button type="button" class="btn-action-icon btn-action-delete" title="Delete" onclick="deleteBranch('Alexandria Hub', event)"><i class="fa-solid fa-trash-can"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="branch-row" data-active="INACTIVE" data-href="/Branches/Details/3">
-                            <td><strong>Giza Office</strong></td>
-                            <td>
-                                <span class="badge-disabled">
-                                    <i class="fa-solid fa-circle"></i> Disabled
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge-inactive">Inactive</span>
-                            </td>
-                            <td><span class="text-muted">Mar 15, 2026</span></td>
-                            <td style="text-align: right;">
-                                <div class="d-inline-flex gap-1 action-buttons">
-                                    <a href="/Branches/Edit/3" class="btn-action-icon" title="Edit Branch"><i class="fa-solid fa-pen"></i></a>
-                                    <button type="button" class="btn-action-icon btn-action-delete" title="Delete" onclick="deleteBranch('Giza Office', event)"><i class="fa-solid fa-trash-can"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="branch-row" data-active="ACTIVE" data-href="/Branches/Details/4">
-                            <td><strong>Tanta Branch</strong></td>
-                            <td>
-                                <span class="badge-enabled">
-                                    <i class="fa-solid fa-circle"></i> Enabled
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge-active">Active</span>
-                            </td>
-                            <td><span class="text-muted">Apr 21, 2026</span></td>
-                            <td style="text-align: right;">
-                                <div class="d-inline-flex gap-1 action-buttons">
-                                    <a href="/Branches/Edit/4" class="btn-action-icon" title="Edit Branch"><i class="fa-solid fa-pen"></i></a>
-                                    <button type="button" class="btn-action-icon btn-action-delete" title="Delete" onclick="deleteBranch('Tanta Branch', event)"><i class="fa-solid fa-trash-can"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr id="noResultsRow" style="display: none;">
-                            <td colspan="5" class="text-center text-muted py-4">
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var branch in Model)
+                            {
+                                <tr class="branch-row" data-active="@(branch.IsActive ? "ACTIVE" : "INACTIVE")" data-href="/Branch/Details/@branch.Id">
+                                    <td><strong>@branch.Name</strong></td>
+                                    <td>
+                                        @if (branch.VpnOverInternetStatus == true)
+                                        {
+                                            <span class="badge-enabled"><i class="fa-solid fa-circle"></i> Enabled</span>
+                                        }
+                                        else if (branch.VpnOverInternetStatus == false)
+                                        {
+                                            <span class="badge-disabled"><i class="fa-solid fa-circle"></i> Disabled</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Not Configured</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (branch.IsActive)
+                                        {
+                                            <span class="badge-active">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-inactive">Inactive</span>
+                                        }
+                                    </td>
+                                    <td><span class="text-muted">@branch.CreatedAt.ToString("MMM dd, yyyy")</span></td>
+                                    <td><span class="text-muted">@branch.CreatedByUsername</span></td>
+                                    <td style="text-align: right;">
+                                        <div class="d-inline-flex gap-1 action-buttons">
+                                            <a href="/Branch/Edit/@branch.Id" class="btn-action-icon" title="Edit Branch"><i class="fa-solid fa-pen"></i></a>
+                                            <button type="button" class="btn-action-icon btn-action-delete" title="Delete" onclick="deleteBranch(@branch.Id, '@branch.Name', event)"><i class="fa-solid fa-trash-can"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        <tr id="noResultsRow" style="display: @((Model != null && Model.Any()) ? "none" : "");">
+                            <td colspan="6" class="text-center text-muted py-4">
                                 No matching branches found.
                             </td>
                         </tr>
-
                     </tbody>
                 </table>
             </div>
@@ -384,12 +339,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Row Click Navigation Handler
+        function getAntiForgeryToken() {
+            return document.querySelector('input[name="__RequestVerificationToken"]').value;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const rows = document.querySelectorAll('.branch-row');
             rows.forEach(row => {
                 row.addEventListener('click', (e) => {
-                    // Prevent navigation if the user clicks inside action buttons
                     if (e.target.closest('.action-buttons')) {
                         return;
                     }
@@ -401,7 +358,6 @@
             });
         });
 
-        // Search and Filter Logic
         const searchInput = document.getElementById('branchSearchInput');
         const activeFilter = document.getElementById('activeFilter');
 
@@ -432,9 +388,7 @@
         searchInput.addEventListener('input', filterTable);
         activeFilter.addEventListener('change', filterTable);
 
-        // Delete Confirmation Alert
-        function deleteBranch(branchName, event) {
-            // Stop row-click navigation when clicking delete
+        function deleteBranch(branchId, branchName, event) {
             if (event) event.stopPropagation();
 
             Swal.fire({
@@ -446,14 +400,21 @@
                 cancelButtonColor: '#64748B',
                 confirmButtonText: 'Yes, Delete',
                 customClass: { popup: 'rounded-4' }
-            }).then((result) => {
+            }).then(async (result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Deleted!',
-                        text: 'Branch record has been removed.',
-                        icon: 'success',
-                        customClass: { popup: 'rounded-4' }
+                    const formData = new FormData();
+                    formData.append('__RequestVerificationToken', getAntiForgeryToken());
+
+                    const res = await fetch(`/Branch/Delete/${branchId}`, {
+                        method: 'POST',
+                        body: formData
                     });
+
+                    if (res.ok || res.redirected) {
+                        window.location.reload();
+                    } else {
+                        Swal.fire('Error', 'Failed to delete branch.', 'error');
+                    }
                 }
             });
         }
