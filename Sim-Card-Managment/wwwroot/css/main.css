@@ -8,15 +8,14 @@
     background-color: #fe6a35 !important;
     color: #ffffff !important;
 }
-/* Hide scrollbar for Chrome, Safari and Opera */
 #sidebarMenu::-webkit-scrollbar {
     display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
+
 #sidebarMenu {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
 }
 @font-face {
     font-family: 'Roboto';
