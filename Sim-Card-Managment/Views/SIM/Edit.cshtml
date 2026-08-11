@@ -5,117 +5,26 @@
 }
 
 <!DOCTYPE html>
-<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit SIM Card</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        body {
-            background-color: #E24D17;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-        }
-
-        .edit-card {
-            background-color: #ffffff;
-            border-radius: 30px;
-            max-width: 800px;
-            width: 100%;
-            padding: 3rem 4rem;
-        }
-
-        .title-header {
-            font-weight: 700;
-            font-size: 32px;
-            color: #000;
-            margin-bottom: 2.5rem;
-        }
-
-        .custom-label {
-            font-weight: 500;
-            color: #000;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .custom-input, .custom-select {
-            background-color: #d8d8d8;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 18px;
-            color: #333;
-            width: 100%;
-            font-size: 14px;
-            transition: box-shadow 0.2s ease-in-out;
-        }
-
-            .custom-input:focus, .custom-select:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px #E24D17;
-            }
-
-        .custom-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1.2em;
-            cursor: pointer;
-        }
-
-        .btn-cancel {
-            border: 1px solid #E24D17;
-            background-color: #ffffff;
-            color: #000;
-            border-radius: 30px;
-            padding: 10px 45px;
-            font-weight: 700;
-            font-size: 15px;
-            text-decoration: none;
-        }
-
-            .btn-cancel:hover {
-                background-color: #fffaf8;
-                color: #E24D17;
-            }
-
-        .btn-save {
-            background-color: #E24D17;
-            border: 1px solid #E24D17;
-            color: #fff;
-            border-radius: 30px;
-            padding: 10px 45px;
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-            .btn-save:hover {
-                background-color: #c84111;
-                color: #fff;
-            }
-
-        .field-error {
-            color: #D41212;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-    </style>
+    <title>Edit SIM</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
 </head>
 
-<body>
+<section class="es-body">
 
-    <div class="edit-card shadow">
-        <h2 class="title-header">Edit SIM Card</h2>
+    <div class="es-card shadow">
+        <h2 class="es-title">Edit SIM Card</h2>
 
-        <form asp-controller="SIM" asp-action="Edit" method="post">
+        <div id="es-form-errors" class="alert alert-danger" style="display:none;">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span id="es-form-error-text">Please fix the errors below.</span>
+        </div>
+
+        <form id="es-edit-form" asp-controller="SIM" asp-action="Edit" method="post" novalidate>
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="RegisteredAt" />
@@ -124,35 +33,315 @@
 
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="custom-label" asp-for="SerialNumber">Serial Number</label>
-                    <input type="text" class="custom-input" asp-for="SerialNumber" required />
-                    <span asp-validation-for="SerialNumber" class="field-error"></span>
+                    <label class="es-label" asp-for="SerialNumber">
+                        <i class="fas fa-hashtag"></i> Serial Number <span class="text-danger">*</span>
+                    </label>
+                    <div class="es-input-wrapper">
+                        <input type="text"
+                               class="es-input"
+                               id="es-serial-input"
+                               asp-for="SerialNumber"
+                               placeholder="Enter serial number"
+                               maxlength="30"
+                               required />
+                        <i class="fas fa-check-circle es-success-icon" id="es-serial-success"></i>
+                    </div>
+                    <span asp-validation-for="SerialNumber" class="es-error" id="es-serial-error"></span>
+                    <small class="es-helper" id="es-serial-helper">
+                        <i class="fas fa-info-circle"></i> Serial number must be at least 5 characters
+                    </small>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label" asp-for="PhoneNumber">Phone Number</label>
-                    <input type="text" class="custom-input" asp-for="PhoneNumber" required />
-                    <span asp-validation-for="PhoneNumber" class="field-error"></span>
+                    <label class="es-label" asp-for="PhoneNumber">
+                        <i class="fas fa-phone"></i> Phone Number <span class="text-danger">*</span>
+                    </label>
+                    <div class="es-input-wrapper">
+                        <input type="text"
+                               class="es-input"
+                               id="es-phone-input"
+                               asp-for="PhoneNumber"
+                               placeholder="e.g. 01012345678"
+                               maxlength="15"
+                               required />
+                        <i class="fas fa-check-circle es-success-icon" id="es-phone-success"></i>
+                    </div>
+                    <span asp-validation-for="PhoneNumber" class="es-error" id="es-phone-error"></span>
+                    <small class="es-helper" id="es-phone-helper">
+                        <i class="fas fa-info-circle"></i> Enter a valid Egyptian phone number (010, 011, 012, 015)
+                    </small>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label" asp-for="NetworkType">Network Type</label>
-                    <select class="custom-select" asp-for="NetworkType">
+                    <label class="es-label" asp-for="NetworkType">
+                        <i class="fas fa-wifi"></i> Network Type <span class="text-danger">*</span>
+                    </label>
+                    <select class="es-select" id="es-network-select" asp-for="NetworkType" required>
+                        <option value="">-- Select Network --</option>
                         <option value="4G">4G</option>
                         <option value="5G">5G</option>
                         <option value="3G">3G</option>
                     </select>
+                    <span asp-validation-for="NetworkType" class="es-error" id="es-network-error"></span>
                 </div>
-
-             
+            </div>
 
             <div class="d-flex justify-content-end gap-3 mt-4">
-                <a class="btn btn-cancel" asp-controller="SIM" asp-action="Index">Cancel</a>
-                <button type="submit" class="btn btn-save">Save Changes</button>
+                <a class="es-btn-cancel" asp-controller="SIM" asp-action="Index">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+                <button type="submit" class="es-btn-save" id="es-save-btn">
+                    <i class="fas fa-save me-2"></i>Save Changes
+                </button>
             </div>
 
         </form>
     </div>
 
-</body>
-</html>
+ 
+</section>
+<script>
+
+
+    const phoneRegex = /^(010|011|012|015)\d{8}$/;
+
+    const MIN_SERIAL_LENGTH = 5;
+    const MAX_SERIAL_LENGTH = 30;
+
+    function validateSerial(value) {
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return { valid: false, message: 'Serial number is required.' };
+        }
+        if (trimmed.length < MIN_SERIAL_LENGTH) {
+            return { valid: false, message: `Serial number must be at least ${MIN_SERIAL_LENGTH} characters.` };
+        }
+        if (trimmed.length > MAX_SERIAL_LENGTH) {
+            return { valid: false, message: `Serial number cannot exceed ${MAX_SERIAL_LENGTH} characters.` };
+        }
+        if (/[^a-zA-Z0-9\-_]/.test(trimmed)) {
+            return { valid: false, message: 'Serial number contains invalid characters. Use letters, numbers, hyphens, or underscores.' };
+        }
+        return { valid: true, message: '' };
+    }
+
+    function validatePhone(value) {
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return { valid: false, message: 'Phone number is required.' };
+        }
+        if (!phoneRegex.test(trimmed)) {
+            return { valid: false, message: 'Invalid phone number. Format: 010, 011, 012, or 015 + 8 digits (e.g., 01012345678).' };
+        }
+        return { valid: true, message: '' };
+    }
+
+    function validateNetwork(value) {
+        if (!value) {
+            return { valid: false, message: 'Please select a network type.' };
+        }
+        return { valid: true, message: '' };
+    }
+
+
+    function validateSerialField() {
+        const input = document.getElementById('es-serial-input');
+        const error = document.getElementById('es-serial-error');
+        const helper = document.getElementById('es-serial-helper');
+        const successIcon = document.getElementById('es-serial-success');
+        const value = input.value;
+
+        const result = validateSerial(value);
+
+        input.classList.remove('is-valid', 'is-invalid');
+        error.classList.remove('show');
+        successIcon.classList.remove('show');
+
+        if (value.trim() === '') {
+            helper.classList.remove('hidden');
+            return false;
+        }
+
+        helper.classList.add('hidden');
+
+        if (result.valid) {
+            input.classList.add('is-valid');
+            successIcon.classList.add('show');
+            return true;
+        } else {
+            input.classList.add('is-invalid');
+            error.textContent = result.message;
+            error.classList.add('show');
+            return false;
+        }
+    }
+
+    function validatePhoneField() {
+        const input = document.getElementById('es-phone-input');
+        const error = document.getElementById('es-phone-error');
+        const helper = document.getElementById('es-phone-helper');
+        const successIcon = document.getElementById('es-phone-success');
+        const value = input.value;
+
+        const result = validatePhone(value);
+
+        input.classList.remove('is-valid', 'is-invalid');
+        error.classList.remove('show');
+        successIcon.classList.remove('show');
+
+        if (value.trim() === '') {
+            helper.classList.remove('hidden');
+            return false;
+        }
+
+        helper.classList.add('hidden');
+
+        if (result.valid) {
+            input.classList.add('is-valid');
+            successIcon.classList.add('show');
+            return true;
+        } else {
+            input.classList.add('is-invalid');
+            error.textContent = result.message;
+            error.classList.add('show');
+            return false;
+        }
+    }
+
+    function validateNetworkField() {
+        const select = document.getElementById('es-network-select');
+        const error = document.getElementById('es-network-error');
+        const value = select.value;
+
+        const result = validateNetwork(value);
+
+        select.classList.remove('is-valid', 'is-invalid');
+        error.classList.remove('show');
+
+        if (result.valid) {
+            select.classList.add('is-valid');
+            return true;
+        } else {
+            select.classList.add('is-invalid');
+            error.textContent = result.message;
+            error.classList.add('show');
+            return false;
+        }
+    }
+
+
+
+    document.getElementById('es-serial-input').addEventListener('input', function () {
+        validateSerialField();
+        updateSaveButton();
+    });
+
+    document.getElementById('es-serial-input').addEventListener('blur', function () {
+        validateSerialField();
+        updateSaveButton();
+    });
+
+    document.getElementById('es-phone-input').addEventListener('input', function () {
+        validatePhoneField();
+        updateSaveButton();
+    });
+
+    document.getElementById('es-phone-input').addEventListener('blur', function () {
+        validatePhoneField();
+        updateSaveButton();
+    });
+
+    document.getElementById('es-network-select').addEventListener('change', function () {
+        validateNetworkField();
+        updateSaveButton();
+    });
+
+
+
+    function updateSaveButton() {
+        const serialValid = validateSerialField();
+        const phoneValid = validatePhoneField();
+        const networkValid = validateNetworkField();
+
+        const saveBtn = document.getElementById('es-save-btn');
+        const formErrors = document.getElementById('es-form-errors');
+
+        const allValid = serialValid && phoneValid && networkValid;
+
+        saveBtn.disabled = !allValid;
+
+        if (!allValid) {
+            formErrors.style.display = 'block';
+            document.getElementById('es-form-error-text').textContent = 'Please fix all errors before saving.';
+        } else {
+            formErrors.style.display = 'none';
+        }
+    }
+
+
+
+    document.getElementById('es-edit-form').addEventListener('submit', function (e) {
+        const serialValid = validateSerialField();
+        const phoneValid = validatePhoneField();
+        const networkValid = validateNetworkField();
+
+        if (!serialValid || !phoneValid || !networkValid) {
+            e.preventDefault();
+
+            const formErrors = document.getElementById('es-form-errors');
+            formErrors.style.display = 'block';
+
+            let errorMessages = [];
+            if (!serialValid) {
+                errorMessages.push('Serial Number: ' + document.getElementById('es-serial-error').textContent);
+            }
+            if (!phoneValid) {
+                errorMessages.push('Phone Number: ' + document.getElementById('es-phone-error').textContent);
+            }
+            if (!networkValid) {
+                errorMessages.push('Network Type: ' + document.getElementById('es-network-error').textContent);
+            }
+
+            document.getElementById('es-form-error-text').textContent = errorMessages.join(' | ');
+
+            const firstInvalid = document.querySelector('.es-input.is-invalid, .es-select.is-invalid');
+            if (firstInvalid) {
+                firstInvalid.focus();
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            return false;
+        }
+
+        const saveBtn = document.getElementById('es-save-btn');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        validateSerialField();
+        validatePhoneField();
+        validateNetworkField();
+        updateSaveButton();
+    });
+
+
+    document.getElementById('es-phone-input').addEventListener('input', function () {
+        let value = this.value.replace(/\D/g, '');
+
+        if (value.length > 11) {
+            value = value.slice(0, 11);
+        }
+
+        this.value = value;
+    });
+
+
+
+    document.getElementById('es-serial-input').addEventListener('input', function () {
+        let value = this.value.replace(/[^a-zA-Z0-9\-_]/g, '');
+        this.value = value;
+    });
+</script>

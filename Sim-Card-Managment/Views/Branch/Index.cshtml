@@ -1,247 +1,35 @@
 ﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.BranchListItemViewModel>
+
+@{
+   
+}
+
 <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Branches Index</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <title>Branches </title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
 
-    <style>
-        :root {
-            --brand-orange: #DF531B;
-            --brand-orange-light: #FFF8F6;
-            --brand-purple: #5B2D90;
-            --bg-canvas: #F4F5F8;
-            --text-dark: #1E293B;
-            --text-muted: #64748B;
-            --card-border: #E2E8F0;
-        }
 
-        body {
-            background-color: var(--bg-canvas);
-            color: var(--text-dark);
-            font-family: system-ui, -apple-system, sans-serif;
-            padding-bottom: 3rem;
-        }
-
-        .page-header {
-            background: #FFFFFF;
-            border-bottom: 1px solid var(--card-border);
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-        }
-
-        .page-title {
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: var(--text-dark);
-        }
-
-        .table-card {
-            background-color: #FFFFFF;
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-            padding: 2rem;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #FFF;
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 10px 16px;
-            transition: border-color 0.2s ease;
-        }
-
-            .search-box:focus-within {
-                border-color: var(--brand-orange);
-            }
-
-            .search-box i {
-                color: var(--text-muted);
-            }
-
-            .search-box input {
-                border: none;
-                outline: none;
-                background: transparent;
-                font-size: 0.95rem;
-                width: 100%;
-                color: var(--text-dark);
-            }
-
-        .filter-select {
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            outline: none;
-            background: #FFF;
-            cursor: pointer;
-        }
-
-            .filter-select:focus {
-                border-color: var(--brand-orange);
-            }
-
-        .btn-custom {
-            height: 44px;
-            padding: 0 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary-orange {
-            background-color: var(--brand-orange);
-            color: #FFFFFF;
-        }
-
-            .btn-primary-orange:hover {
-                background-color: #c94614;
-                color: #FFFFFF;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
-            }
-
-        .btn-action-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--card-border);
-            background: #FFFFFF;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-            .btn-action-icon:hover {
-                background: var(--brand-orange-light);
-                color: var(--brand-orange);
-                border-color: rgba(223, 83, 27, 0.3);
-            }
-
-        .btn-action-delete:hover {
-            background: #FEF2F2;
-            color: #DC2626;
-            border-color: rgba(220, 38, 38, 0.3);
-        }
-
-        .branch-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-            .branch-table thead th {
-                text-align: left;
-                font-size: 0.8rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: var(--text-muted);
-                padding: 12px 16px;
-                border-bottom: 2px solid var(--brand-orange);
-                background: #FFFFFF;
-            }
-
-            .branch-table tbody td {
-                font-size: 0.95rem;
-                padding: 16px;
-                border-bottom: 1px solid var(--card-border);
-                vertical-align: middle;
-            }
-
-        .branch-row {
-            cursor: pointer;
-            transition: background-color 0.15s ease;
-        }
-
-            .branch-row:hover {
-                background-color: var(--brand-orange-light);
-            }
-
-        .badge-enabled {
-            background-color: rgba(34, 197, 94, 0.1);
-            color: #15803D;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .badge-disabled {
-            background-color: rgba(220, 38, 38, 0.1);
-            color: #DC2626;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(220, 38, 38, 0.2);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .badge-active {
-            background-color: rgba(59, 130, 246, 0.1);
-            color: #1D4ED8;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-        }
-
-        .badge-inactive {
-            background-color: rgba(100, 116, 139, 0.1);
-            color: #475569;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(100, 116, 139, 0.2);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-        }
-    </style>
 </head>
-<body>
+
+<section class="bi-body">
 
     @Html.AntiForgeryToken()
 
-    <header class="page-header p-100">
+    
+    <header class="bi-page-header p-100">
         <div class="container-fluid px-lg-5">
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
                 <div>
-                    <h1 class="page-title m-0">Branches Directory</h1>
-                    <p class="text-muted m-0 small mt-1">Manage organization branches and VPN configuration status</p>
+                    <h1 class="bi-page-title m-0">Branches Directory</h1>
+                    <p class="bi-text-muted m-0 small mt-1">Manage organization branches and VPN configuration status</p>
                 </div>
                 <div>
-                    <a asp-action="Create" class="btn-custom btn-primary-orange">
+                    <a asp-action="Create" class="bi-btn bi-btn-primary">
                         <i class="fa-solid fa-plus"></i> New Branch
                     </a>
                 </div>
@@ -249,20 +37,21 @@
         </div>
     </header>
 
+   
     <main class="container-fluid px-lg-5">
 
-        <div class="table-card">
+        <div class="bi-table-card">
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
 
-                <div class="search-box col-12 col-md-5">
+                <div class="bi-search-box col-12 col-md-5">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input id="branchSearchInput" type="text" placeholder="Search by branch name..." autocomplete="off">
+                    <input id="bi-search-input" type="text" placeholder="Search by branch name..." autocomplete="off">
                 </div>
 
                 <div class="d-flex align-items-center gap-2">
-                    <span class="text-muted small fw-bold">Active Status:</span>
-                    <select id="activeFilter" class="filter-select">
+                    <span class="bi-text-muted small fw-bold">Active Status:</span>
+                    <select id="bi-active-filter" class="bi-filter-select">
                         <option value="ALL">All</option>
                         <option value="ACTIVE">Active</option>
                         <option value="INACTIVE">Inactive</option>
@@ -271,7 +60,7 @@
             </div>
 
             <div class="table-responsive">
-                <table class="branch-table" id="branchTable">
+                <table class="bi-table" id="bi-branch-table">
                     <thead>
                         <tr>
                             <th>Branch Name</th>
@@ -282,50 +71,50 @@
                             <th style="text-align: right;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="branchTableBody">
+                    <tbody id="bi-table-body">
                         @if (Model != null && Model.Any())
                         {
                             foreach (var branch in Model)
                             {
-                                <tr class="branch-row" data-active="@(branch.IsActive ? "ACTIVE" : "INACTIVE")" data-href="/Branch/Details/@branch.Id">
+                                <tr class="bi-row" data-active="@(branch.IsActive ? "ACTIVE" : "INACTIVE")" data-href="/Branch/Details/@branch.Id">
                                     <td><strong>@branch.Name</strong></td>
                                     <td>
                                         @if (branch.VpnOverInternetStatus == true)
                                         {
-                                            <span class="badge-enabled"><i class="fa-solid fa-circle"></i> Enabled</span>
+                                            <span class="bi-badge-enabled"><i class="fa-solid fa-circle"></i> Enabled</span>
                                         }
                                         else if (branch.VpnOverInternetStatus == false)
                                         {
-                                            <span class="badge-disabled"><i class="fa-solid fa-circle"></i> Disabled</span>
+                                            <span class="bi-badge-disabled"><i class="fa-solid fa-circle"></i> Disabled</span>
                                         }
                                         else
                                         {
-                                            <span class="text-muted">Not Configured</span>
+                                            <span class="bi-text-muted">Not Configured</span>
                                         }
                                     </td>
                                     <td>
                                         @if (branch.IsActive)
                                         {
-                                            <span class="badge-active">Active</span>
+                                            <span class="bi-badge-active">Active</span>
                                         }
                                         else
                                         {
-                                            <span class="badge-inactive">Inactive</span>
+                                            <span class="bi-badge-inactive">Inactive</span>
                                         }
                                     </td>
-                                    <td><span class="text-muted">@branch.CreatedAt.ToString("MMM dd, yyyy")</span></td>
-                                    <td><span class="text-muted">@branch.CreatedByUsername</span></td>
+                                    <td><span class="bi-text-muted">@branch.CreatedAt.ToString("MMM dd, yyyy")</span></td>
+                                    <td><span class="bi-text-muted">@branch.CreatedByUsername</span></td>
                                     <td style="text-align: right;">
-                                        <div class="d-inline-flex gap-1 action-buttons">
-                                            <a href="/Branch/Edit/@branch.Id" class="btn-action-icon" title="Edit Branch"><i class="fa-solid fa-pen"></i></a>
-                                            <button type="button" class="btn-action-icon btn-action-delete" title="Delete" onclick="deleteBranch(@branch.Id, '@branch.Name', event)"><i class="fa-solid fa-trash-can"></i></button>
+                                        <div class="d-inline-flex gap-1 bi-action-buttons">
+                                            <a href="/Branch/Edit/@branch.Id" class="bi-btn-action" title="Edit Branch"><i class="fa-solid fa-pen"></i></a>
+                                            <button type="button" class="bi-btn-action bi-btn-delete" title="Delete" onclick="biDeleteBranch(@branch.Id, '@branch.Name', event)"><i class="fa-solid fa-trash-can"></i></button>
                                         </div>
                                     </td>
                                 </tr>
                             }
                         }
-                        <tr id="noResultsRow" style="display: @((Model != null && Model.Any()) ? "none" : "");">
-                            <td colspan="6" class="text-center text-muted py-4">
+                        <tr id="bi-no-results" style="display: @((Model != null && Model.Any()) ? "none" : "");">
+                            <td colspan="6" class="bi-no-results">
                                 No matching branches found.
                             </td>
                         </tr>
@@ -337,74 +126,80 @@
 
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function getAntiForgeryToken() {
-            return document.querySelector('input[name="__RequestVerificationToken"]').value;
-        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const rows = document.querySelectorAll('.branch-row');
-            rows.forEach(row => {
-                row.addEventListener('click', (e) => {
-                    if (e.target.closest('.action-buttons')) {
-                        return;
-                    }
-                    const targetUrl = row.getAttribute('data-href');
-                    if (targetUrl) {
-                        window.location.href = targetUrl;
-                    }
-                });
-            });
-        });
 
-        const searchInput = document.getElementById('branchSearchInput');
-        const activeFilter = document.getElementById('activeFilter');
+</section>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+   
+    function biGetToken() {
+        return document.querySelector('input[name="__RequestVerificationToken"]').value;
+    }
 
-        function filterTable() {
-            const query = searchInput.value.toLowerCase().trim();
-            const selectedActive = activeFilter.value;
-            const rows = document.querySelectorAll('#branchTableBody tr.branch-row');
-            let hasVisibleRow = false;
-
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                const rowActive = row.getAttribute('data-active');
-
-                const matchesQuery = text.includes(query);
-                const matchesActive = (selectedActive === 'ALL') || (rowActive === selectedActive);
-
-                if (matchesQuery && matchesActive) {
-                    row.style.display = '';
-                    hasVisibleRow = true;
-                } else {
-                    row.style.display = 'none';
+    document.addEventListener('DOMContentLoaded', function () {
+        const rows = document.querySelectorAll('.bi-row');
+        rows.forEach(row => {
+            row.addEventListener('click', function (e) {
+                if (e.target.closest('.bi-action-buttons')) {
+                    return;
+                }
+                const targetUrl = this.getAttribute('data-href');
+                if (targetUrl) {
+                    window.location.href = targetUrl;
                 }
             });
+        });
+    });
 
-            document.getElementById('noResultsRow').style.display = hasVisibleRow ? 'none' : '';
-        }
 
-        searchInput.addEventListener('input', filterTable);
-        activeFilter.addEventListener('change', filterTable);
+    const searchInput = document.getElementById('bi-search-input');
+    const activeFilter = document.getElementById('bi-active-filter');
 
-        function deleteBranch(branchId, branchName, event) {
-            if (event) event.stopPropagation();
+    function biFilterTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        const selectedActive = activeFilter.value;
+        const rows = document.querySelectorAll('#bi-table-body tr.bi-row');
+        let hasVisibleRow = false;
 
-            Swal.fire({
-                title: 'Delete Branch?',
-                text: `Are you sure you want to delete "${branchName}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#DC2626',
-                cancelButtonColor: '#64748B',
-                confirmButtonText: 'Yes, Delete',
-                customClass: { popup: 'rounded-4' }
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    const formData = new FormData();
-                    formData.append('__RequestVerificationToken', getAntiForgeryToken());
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const rowActive = row.getAttribute('data-active');
 
+            const matchesQuery = text.includes(query);
+            const matchesActive = (selectedActive === 'ALL') || (rowActive === selectedActive);
+
+            if (matchesQuery && matchesActive) {
+                row.style.display = '';
+                hasVisibleRow = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        document.getElementById('bi-no-results').style.display = hasVisibleRow ? 'none' : '';
+    }
+
+    searchInput.addEventListener('input', biFilterTable);
+    activeFilter.addEventListener('change', biFilterTable);
+
+    function biDeleteBranch(branchId, branchName, event) {
+        if (event) event.stopPropagation();
+
+        Swal.fire({
+            title: 'Delete Branch?',
+            text: `Are you sure you want to delete "${branchName}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#DC2626',
+            cancelButtonColor: '#64748B',
+            confirmButtonText: 'Yes, Delete',
+            customClass: { popup: 'rounded-4' }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('__RequestVerificationToken', biGetToken());
+
+                try {
                     const res = await fetch(`/Branch/Delete/${branchId}`, {
                         method: 'POST',
                         body: formData
@@ -415,9 +210,10 @@
                     } else {
                         Swal.fire('Error', 'Failed to delete branch.', 'error');
                     }
+                } catch (error) {
+                    Swal.fire('Error', 'An error occurred while deleting.', 'error');
                 }
-            });
-        }
-    </script>
-</body>
-</html>
+            }
+        });
+    }
+</script>

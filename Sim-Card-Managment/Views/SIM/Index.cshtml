@@ -1,57 +1,24 @@
 ﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.DeviceDirectoryViewModel>
 
-<style>
-    /* ---------- Title ---------- */
-    .title-section {
-        margin-bottom: 24px;
-    }
+@{
+}
 
-        .title-section h1 {
-            font-size: 34px;
-            font-weight: 800;
-            color: #1a1a1a;
-        }
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devices</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
 
-            .title-section h1 .num {
-                color: #e8552b;
-            }
+</head>
 
-        .title-section p {
-            margin-top: 10px;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #6b6b6b;
-            max-width: 560px;
-        }
 
-    /* ---------- Buttons ---------- */
-    .create-btn-group {
-        display: flex;
-        gap: 12px;
-        margin-top: 20px;
-    }
 
-    .create-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #e8552b;
-        color: #fff;
-        border: none;
-        padding: 11px 20px;
-        border-radius: 24px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        text-decoration: none;
-        transition: background 0.2s ease, transform 0.2s ease;
-    }
+<section>
 
-        .create-btn:hover {
-            background: #d64923;
-            color: #fff;
-            transform: translateY(-1px);
-        }
+    <div class="page p-100 container-fluid px-4">
 
     .create-btn-secondary {
         background: #ffffff;
@@ -303,12 +270,18 @@
         <h1><span class="num">@(Model?.Count() ?? 0)</span> Devices Directory</h1>
         <p>Manage all active, available, and assigned SIM cards and USB modems in one place.</p>
 
-        <div class="create-btn-group">
-            <a asp-controller="SIM" asp-action="Create" class="create-btn"><span>+</span> New SIM Card</a>
-            <a asp-controller="USB" asp-action="Create" class="create-btn create-btn-secondary"><span>+</span> New USB Modem</a>
-            <a asp-controller="DeviceStatusType" asp-action="Index" class="create-btn create-btn-secondary">Status Types</a>
+            <div class="di-btn-group">
+                <a asp-controller="SIM" asp-action="Create" class="di-btn-primary">
+                    <i class="fas fa-plus"></i> New SIM Card
+                </a>
+                <a asp-controller="USB" asp-action="Create" class="di-btn-secondary">
+                    <i class="fas fa-plus"></i> New USB Modem
+                </a>
+                <a asp-controller="DeviceStatusType" asp-action="Index" class="di-btn-secondary">
+                    <i class="fas fa-tags"></i> Status Types
+                </a>
+            </div>
         </div>
-    </div>
 
     <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
         <div class="filters-row">
@@ -321,41 +294,41 @@
                 </select>
             </div>
 
-            <div class="filter-group">
-                <label for="device-type-filter">Type</label>
-                <select id="device-type-filter" class="status-select">
-                    <option value="all">All Types</option>
-                    <option value="sim">SIM Card</option>
-                    <option value="usb">USB Modem</option>
-                </select>
-            </div>
+                <div class="di-filter-group">
+                    <label for="di-type-filter">Type</label>
+                    <select id="di-type-filter" class="di-status-select">
+                        <option value="all">All Types</option>
+                        <option value="sim">SIM Card</option>
+                        <option value="usb">USB Modem</option>
+                    </select>
+                </div>
 
-            <div class="filter-group">
-                <label for="status-type-filter">Status Type</label>
-                <select id="status-type-filter" class="status-select">
-                    <option value="all">All Status Types</option>
-                    @if (ViewBag.StatusTypes != null)
-                    {
-                        foreach (var st in ViewBag.StatusTypes as List<string>)
+                <div class="di-filter-group">
+                    <label for="di-status-type-filter">Status Type</label>
+                    <select id="di-status-type-filter" class="di-status-select">
+                        <option value="all">All Status Types</option>
+                        @if (ViewBag.StatusTypes != null)
                         {
-                            <option value="@st.ToLower()">@st</option>
+                            foreach (var st in ViewBag.StatusTypes as List<string>)
+                            {
+                                <option value="@st.ToLower()">@st</option>
+                            }
                         }
-                    }
-                </select>
-            </div>
+                    </select>
+                </div>
 
-            <div class="filter-group" style="flex: 1;">
-                <label for="search-input">Search</label>
-                <div class="search-box">
-                    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
-                        <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                    <input id="search-input" type="text" placeholder="Search by Serial, Phone, Model, Provider, or Assignee..." autocomplete="off">
+                <div class="di-filter-group" style="flex: 1; min-width: 200px;">
+                    <label for="di-search-input">Search</label>
+                    <div class="di-search-box">
+                        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                        <input id="di-search-input" type="text" placeholder="Search by Serial, Phone, Model, Provider, or Assignee..." autocomplete="off">
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
 
     <div class="table-wrap">
         <table id="deviceTable">
@@ -466,33 +439,38 @@
                     No matching devices found.
                 </td>
             </tr>
-        </table>
+        </div>
+
+      
+        <div class="di-footer">
+            <div class="di-showing" id="di-showing-text">Showing 0 records</div>
+            <div class="di-pagination" id="di-pagination-container"></div>
+        </div>
+
     </div>
 
-    <div class="footer">
-        <div class="showing" id="showingText">Showing 0 records</div>
-        <div class="pagination" id="paginationContainer"></div>
-    </div>
+    
 
-</div>
+</section>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const searchInput = document.getElementById("search-input");
-        const statusFilter = document.getElementById("status-filter");
-        const typeFilter = document.getElementById("device-type-filter");
-        const statusTypeFilter = document.getElementById("status-type-filter");
 
-        const allRows = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
-        const noResultsRow = document.getElementById("noResultsRow");
-        const showingText = document.getElementById("showingText");
-        const paginationContainer = document.getElementById("paginationContainer");
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("di-search-input");
+        const statusFilter = document.getElementById("di-status-filter");
+        const typeFilter = document.getElementById("di-type-filter");
+        const statusTypeFilter = document.getElementById("di-status-type-filter");
+
+        const allRows = Array.from(document.querySelectorAll("#di-table-body tr.di-device-row"));
+        const noResultsRow = document.getElementById("di-no-results-row");
+        const showingText = document.getElementById("di-showing-text");
+        const paginationContainer = document.getElementById("di-pagination-container");
 
         const itemsPerPage = 7;
         let visibleRows = [...allRows];
         let currentPage = 1;
 
-        // Set initial select values from URL params if present
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has("status")) {
             statusFilter.value = urlParams.get("status").toLowerCase();
@@ -505,67 +483,69 @@
         function updateUrlParams() {
             const statusVal = statusFilter.value;
             const typeVal = typeFilter.value;
-            window.location.href = `?status=${statusVal}&type=${typeVal}`;
+            const statusTypeVal = statusTypeFilter.value;
+            window.location.href = `?status=${statusVal}&type=${typeVal}&statusType=${statusTypeVal}`;
         }
 
-        // Local filtering logic for instant live search        
-    function applyFilters() {
-        const query = searchInput.value.trim().toLowerCase();
-        const statusVal = statusFilter.value.toLowerCase();
-        const typeVal = typeFilter.value.toLowerCase();
-        const statusTypeVal = statusTypeFilter.value.toLowerCase();
+        // Local filtering logic for instant live search
+        function applyFilters() {
+            const query = searchInput.value.trim().toLowerCase();
+            const statusVal = statusFilter.value.toLowerCase();
+            const typeVal = typeFilter.value.toLowerCase();
+            const statusTypeVal = statusTypeFilter.value.toLowerCase();
 
-        visibleRows = allRows.filter(row => {
-            const text = row.innerText.toLowerCase();
-            const matchesSearch = text.includes(query);
+            visibleRows = allRows.filter(row => {
+                const text = row.innerText.toLowerCase();
+                const matchesSearch = text.includes(query);
 
-            const rowStatus = row.getAttribute("data-status");
-            const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
+                const rowStatus = row.getAttribute("data-status");
+                const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
 
-            const rowType = row.getAttribute("data-type");
-            const matchesType = (typeVal === "all") || (rowType === typeVal);
+                const rowType = row.getAttribute("data-type");
+                const matchesType = (typeVal === "all") || (rowType === typeVal);
 
-            const rowStatusType = row.getAttribute("data-status-type") ?? "";
-            const matchesStatusType = (statusTypeVal === "all") || (rowStatusType === statusTypeVal);
+                const rowStatusType = row.getAttribute("data-status-type") ?? "";
+                const matchesStatusType = (statusTypeVal === "all") || (rowStatusType === statusTypeVal);
 
-            return matchesSearch && matchesStatus && matchesType && matchesStatusType;
-        });
+                return matchesSearch && matchesStatus && matchesType && matchesStatusType;
+            });
 
-        currentPage = 1;
-        renderTable();
-    }
+            currentPage = 1;
+            renderTable();
+        }
 
         function renderTable() {
             const totalVisible = visibleRows.length;
-            const totalPages = Math.max(1, Math.ceil(totalVisible / itemsPerPage));
-
-            if (currentPage > totalPages) currentPage = totalPages;
-
-            const startIdx = (currentPage - 1) * itemsPerPage;
-            const endIdx = startIdx + itemsPerPage;
-
-            allRows.forEach(row => row.style.display = "none");
-            visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
 
             if (totalVisible === 0) {
+                allRows.forEach(row => row.style.display = "none");
                 noResultsRow.style.display = "";
                 showingText.textContent = "Showing 0 records";
                 paginationContainer.innerHTML = "";
                 return;
-            } else {
-                noResultsRow.style.display = "none";
             }
 
-            const actualEnd = Math.min(endIdx, totalVisible);
-            showingText.textContent = `Showing ${startIdx + 1}-${actualEnd} of ${totalVisible} records`;
+            noResultsRow.style.display = "none";
 
-            let html = `<button type="button" class="arrow" id="prevBtn" ${currentPage === 1 ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8249;</button>`;
+            const totalPages = Math.max(1, Math.ceil(totalVisible / itemsPerPage));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = Math.min(startIdx + itemsPerPage, totalVisible);
+
+            allRows.forEach(row => row.style.display = "none");
+            visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
+
+            showingText.textContent = `Showing ${startIdx + 1}-${endIdx} of ${totalVisible} records`;
+
+            // Build pagination
+            let html = `<button type="button" class="di-prev-btn" ${currentPage === 1 ? 'disabled' : ''}>&#8249;</button>`;
 
             for (let i = 1; i <= totalPages; i++) {
-                html += `<button type="button" class="${i === currentPage ? 'active' : 'page-num'}" data-page="${i}">${i}</button>`;
+                html += `<button type="button" class="di-page-num ${i === currentPage ? 'di-active' : ''}" data-page="${i}">${i}</button>`;
             }
 
-            html += `<button type="button" class="arrow" id="nextBtn" ${currentPage === totalPages ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8250;</button>`;
+            html += `<button type="button" class="di-next-btn" ${currentPage === totalPages ? 'disabled' : ''}>&#8250;</button>`;
 
             paginationContainer.innerHTML = html;
         }
@@ -573,22 +553,32 @@
         // Live input search
         searchInput.addEventListener("input", applyFilters);
 
-        // Update URL and reload data when dropdown filters change
-        statusFilter.addEventListener("change", updateUrlParams);
-        typeFilter.addEventListener("change", updateUrlParams);
+        // Dropdown filter changes
+        statusFilter.addEventListener("change", function () {
+            applyFilters();
+            updateUrlParams();
+        });
 
-        statusTypeFilter.addEventListener("change", updateUrlParams);
+        typeFilter.addEventListener("change", function () {
+            applyFilters();
+            updateUrlParams();
+        });
 
+        statusTypeFilter.addEventListener("change", function () {
+            applyFilters();
+            updateUrlParams();
+        });
 
         // Pagination handler
         paginationContainer.addEventListener("click", function (e) {
             const btn = e.target.closest("button");
             if (!btn || btn.disabled) return;
 
-            if (btn.id === "prevBtn") {
+            const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
+
+            if (btn.classList.contains("di-prev-btn")) {
                 if (currentPage > 1) currentPage--;
-            } else if (btn.id === "nextBtn") {
-                const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
+            } else if (btn.classList.contains("di-next-btn")) {
                 if (currentPage < totalPages) currentPage++;
             } else if (btn.dataset.page) {
                 currentPage = parseInt(btn.dataset.page);
@@ -597,7 +587,7 @@
             renderTable();
         });
 
-        // Initialize view render
+        // Initialize view
         applyFilters();
     });
 </script>

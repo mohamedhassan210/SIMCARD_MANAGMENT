@@ -1,201 +1,27 @@
 ﻿@model Sim_Card_Managment.Viewmodel.BranchDetailsViewModel
+
+@{
+}
+
 <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Branch Details</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
 
-    <style>
-        :root {
-            --brand-orange: #DF531B;
-            --brand-orange-light: #FFF8F6;
-            --brand-purple: #5B2D90;
-            --bg-canvas: #F4F5F8;
-            --text-dark: #1E293B;
-            --text-muted: #64748B;
-            --card-border: #E2E8F0;
-        }
-
-        body {
-            background-color: var(--bg-canvas);
-            color: var(--text-dark);
-            font-family: system-ui, -apple-system, sans-serif;
-            padding-bottom: 3rem;
-        }
-
-        .details-card {
-            background-color: #FFFFFF;
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-            overflow: hidden;
-            margin-top: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .card-header-styled {
-            border-bottom: 1px solid var(--card-border);
-            padding: 1.5rem 2rem;
-            background: linear-gradient(180deg, var(--brand-orange-light) 0%, #FFFFFF 100%);
-        }
-
-        .section-icon-wrapper {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background-color: rgba(223, 83, 27, 0.12);
-            color: var(--brand-orange);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-
-        .info-grid-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .info-grid-value {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .section-card {
-            background-color: #FFFFFF;
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #FFF;
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 10px 16px;
-            transition: border-color 0.2s ease;
-        }
-
-            .search-box:focus-within {
-                border-color: var(--brand-orange);
-            }
-
-            .search-box i {
-                color: var(--text-muted);
-            }
-
-            .search-box input {
-                border: none;
-                outline: none;
-                background: transparent;
-                font-size: 0.95rem;
-                width: 100%;
-                color: var(--text-dark);
-            }
-
-        .filter-select {
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            outline: none;
-            background: #FFF;
-            cursor: pointer;
-        }
-
-            .filter-select:focus {
-                border-color: var(--brand-orange);
-            }
-
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-            .custom-table thead th {
-                text-align: left;
-                font-size: 0.8rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: var(--text-muted);
-                padding: 12px 16px;
-                border-bottom: 2px solid var(--brand-orange);
-                background: #FFFFFF;
-            }
-
-            .custom-table tbody td {
-                font-size: 0.95rem;
-                padding: 16px;
-                border-bottom: 1px solid var(--card-border);
-                vertical-align: middle;
-            }
-
-        .badge-active, .badge-status-up, .badge-enabled {
-            background-color: rgba(34, 197, 94, 0.1);
-            color: #15803D;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .badge-inactive, .badge-status-down, .badge-disabled {
-            background-color: rgba(220, 38, 38, 0.1);
-            color: #DC2626;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(220, 38, 38, 0.2);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .link-view {
-            color: var(--brand-orange);
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-            transition: color 0.2s ease;
-        }
-
-            .link-view:hover {
-                color: #c94614;
-                text-decoration: underline;
-            }
-    </style>
 </head>
-<body>
+
+<section class="bd-body">
 
     <main class="container-fluid px-lg-5 p-100">
 
-        <div class="details-card">
-            <div class="card-header-styled d-flex align-items-center gap-3">
-                <div class="section-icon-wrapper">
+        
+        <div class="bd-card">
+            <div class="bd-card-header d-flex align-items-center gap-3">
+                <div class="bd-icon-wrapper">
                     <i class="fa-solid fa-building"></i>
                 </div>
                 <div>
@@ -207,67 +33,68 @@
             <div class="p-4 p-md-5">
                 <div class="row g-4">
                     <div class="col-12 col-md-3">
-                        <div class="info-grid-label">Branch Name</div>
-                        <div class="info-grid-value">@Model.Name</div>
+                        <div class="bd-info-label">Branch Name</div>
+                        <div class="bd-info-value">@Model.Name</div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-2">
-                        <div class="info-grid-label">Is Active</div>
-                        <div class="info-grid-value">
+                        <div class="bd-info-label">Is Active</div>
+                        <div class="bd-info-value">
                             @if (Model.IsActive)
                             {
-                                <span class="badge-active"><i class="fa-solid fa-circle"></i> Active</span>
+                                <span class="bd-badge-active"><i class="fa-solid fa-circle"></i> Active</span>
                             }
                             else
                             {
-                                <span class="badge-inactive"><i class="fa-solid fa-circle"></i> Inactive</span>
+                                <span class="bd-badge-inactive"><i class="fa-solid fa-circle"></i> Inactive</span>
                             }
                         </div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-3">
-                        <div class="info-grid-label">VPN Over Internet Status</div>
-                        <div class="info-grid-value">
+                        <div class="bd-info-label">VPN Over Internet Status</div>
+                        <div class="bd-info-value">
                             @if (Model.VpnOverInternetStatus == true)
                             {
-                                <span class="badge-enabled"><i class="fa-solid fa-circle"></i> Enabled</span>
+                                <span class="bd-badge-enabled"><i class="fa-solid fa-circle"></i> Enabled</span>
                             }
                             else if (Model.VpnOverInternetStatus == false)
                             {
-                                <span class="badge-disabled"><i class="fa-solid fa-circle"></i> Disabled</span>
+                                <span class="bd-badge-disabled"><i class="fa-solid fa-circle"></i> Disabled</span>
                             }
                             else
                             {
-                                <span class="text-muted">Not Configured</span>
+                                <span class="bd-text-muted">Not Configured</span>
                             }
                         </div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-2">
-                        <div class="info-grid-label">Created At</div>
-                        <div class="info-grid-value">@Model.CreatedAt.ToString("MMM dd, yyyy")</div>
+                        <div class="bd-info-label">Created At</div>
+                        <div class="bd-info-value">@Model.CreatedAt.ToString("MMM dd, yyyy")</div>
                     </div>
 
                     <div class="col-12 col-sm-6 col-md-2">
-                        <div class="info-grid-label">Created By</div>
-                        <div class="info-grid-value">@Model.CreatedByUsername</div>
+                        <div class="bd-info-label">Created By</div>
+                        <div class="bd-info-value">@Model.CreatedByUsername</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="section-card">
+        
+        <div class="bd-section-card">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                 <h4 class="fw-bold fs-5 m-0 text-dark">ISP Connections</h4>
 
                 <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 col-12 col-md-7 justify-content-end">
-                    <div class="search-box col-12 col-sm-7">
+                    <div class="bd-search-box col-12 col-sm-7">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input id="ispSearchInput" type="text" placeholder="Search ISP records..." autocomplete="off">
+                        <input id="bd-isp-search" type="text" placeholder="Search ISP records..." autocomplete="off">
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         <span class="text-muted small fw-bold">Status:</span>
-                        <select id="ispStatusFilter" class="filter-select">
+                        <select id="bd-isp-filter" class="bd-filter-select">
                             <option value="ALL">All</option>
                             <option value="UP">Up</option>
                             <option value="DOWN">Down</option>
@@ -277,7 +104,7 @@
             </div>
 
             <div class="table-responsive">
-                <table class="custom-table" id="ispTable">
+                <table class="bd-table" id="bd-isp-table">
                     <thead>
                         <tr>
                             <th>Service Provider Name</th>
@@ -288,12 +115,12 @@
                             <th style="text-align: right;">View Details</th>
                         </tr>
                     </thead>
-                    <tbody id="ispTableBody">
+                    <tbody id="bd-isp-body">
                         @if (Model.InternetLines.Any())
                         {
                             foreach (var line in Model.InternetLines)
                             {
-                                <tr class="isp-row" data-status="@(line.Status ? "UP" : "DOWN")">
+                                <tr class="bd-isp-row" data-status="@(line.Status ? "UP" : "DOWN")">
                                     <td><strong>@line.ServiceProviderName</strong></td>
                                     <td>@line.ServiceTypeName</td>
                                     <td>@(line.Bandwidth ?? "N/A")</td>
@@ -301,39 +128,40 @@
                                     <td>
                                         @if (line.Status)
                                         {
-                                            <span class="badge-status-up"><i class="fa-solid fa-circle"></i> Up</span>
+                                            <span class="bd-badge-up"><i class="fa-solid fa-circle"></i> Up</span>
                                         }
                                         else
                                         {
-                                            <span class="badge-status-down"><i class="fa-solid fa-circle"></i> Down</span>
+                                            <span class="bd-badge-down"><i class="fa-solid fa-circle"></i> Down</span>
                                         }
                                     </td>
                                     <td style="text-align: right;">
-                                        <a asp-controller="InternetLine" asp-action="Details" asp-route-id="@line.Id" class="link-view"><i class="fa-regular fa-eye"></i> View</a>
+                                        <a asp-controller="InternetLine" asp-action="Details" asp-route-id="@line.Id" class="bd-link-view"><i class="fa-regular fa-eye"></i> View</a>
                                     </td>
                                 </tr>
                             }
                         }
-                        <tr id="noIspResults" style="display: @(Model.InternetLines.Any() ? "none" : "");">
-                            <td colspan="6" class="text-center text-muted py-4">No matching ISP connections found.</td>
+                        <tr id="bd-isp-no-results" style="display: @(Model.InternetLines.Any() ? "none" : "");">
+                            <td colspan="6" class="bd-no-results">No matching ISP connections found.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div class="section-card">
+        
+        <div class="bd-section-card">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                 <h4 class="fw-bold fs-5 m-0 text-dark">VPN Lines</h4>
 
                 <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 col-12 col-md-7 justify-content-end">
-                    <div class="search-box col-12 col-sm-7">
+                    <div class="bd-search-box col-12 col-sm-7">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input id="vpnSearchInput" type="text" placeholder="Search VPN lines..." autocomplete="off">
+                        <input id="bd-vpn-search" type="text" placeholder="Search VPN lines..." autocomplete="off">
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         <span class="text-muted small fw-bold">Status:</span>
-                        <select id="vpnStatusFilter" class="filter-select">
+                        <select id="bd-vpn-filter" class="bd-filter-select">
                             <option value="ALL">All</option>
                             <option value="UP">Up</option>
                             <option value="DOWN">Down</option>
@@ -343,7 +171,7 @@
             </div>
 
             <div class="table-responsive">
-                <table class="custom-table" id="vpnTable">
+                <table class="bd-table" id="bd-vpn-table">
                     <thead>
                         <tr>
                             <th>Connection Type Name</th>
@@ -354,38 +182,38 @@
                             <th style="text-align: right;">View Details</th>
                         </tr>
                     </thead>
-                    <tbody id="vpnTableBody">
+                    <tbody id="bd-vpn-body">
                         @if (Model.VpnConnections.Any())
                         {
                             foreach (var vpn in Model.VpnConnections)
                             {
-                                <tr class="vpn-row" data-status="@(vpn.Status == true ? "UP" : vpn.Status == false ? "DOWN" : "")">
+                                <tr class="bd-vpn-row" data-status="@(vpn.Status == true ? "UP" : vpn.Status == false ? "DOWN" : "")">
                                     <td>@vpn.ConnectionTypeName</td>
                                     <td>@vpn.ServiceProviderName</td>
-                                    <td><code class="text-dark fw-semibold">@(vpn.NID ?? "N/A")</code></td>
+                                    <td><code class="bd-code">@(vpn.NID ?? "N/A")</code></td>
                                     <td>@(vpn.LineSpeed ?? "N/A")</td>
                                     <td>
                                         @if (vpn.Status == true)
                                         {
-                                            <span class="badge-status-up"><i class="fa-solid fa-circle"></i> Up</span>
+                                            <span class="bd-badge-up"><i class="fa-solid fa-circle"></i> Up</span>
                                         }
                                         else if (vpn.Status == false)
                                         {
-                                            <span class="badge-status-down"><i class="fa-solid fa-circle"></i> Down</span>
+                                            <span class="bd-badge-down"><i class="fa-solid fa-circle"></i> Down</span>
                                         }
                                         else
                                         {
-                                            <span class="text-muted">Unknown</span>
+                                            <span class="bd-text-muted">Unknown</span>
                                         }
                                     </td>
                                     <td style="text-align: right;">
-                                        <a asp-controller="VpnConnection" asp-action="Details" asp-route-id="@vpn.Id" class="link-view"><i class="fa-regular fa-eye"></i> View</a>
+                                        <a asp-controller="VpnConnection" asp-action="Details" asp-route-id="@vpn.Id" class="bd-link-view"><i class="fa-regular fa-eye"></i> View</a>
                                     </td>
                                 </tr>
                             }
                         }
-                        <tr id="noVpnResults" style="display: @(Model.VpnConnections.Any() ? "none" : "");">
-                            <td colspan="6" class="text-center text-muted py-4">No matching VPN lines found.</td>
+                        <tr id="bd-vpn-no-results" style="display: @(Model.VpnConnections.Any() ? "none" : "");">
+                            <td colspan="6" class="bd-no-results">No matching VPN lines found.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -394,66 +222,69 @@
 
     </main>
 
-    <script>
-        const ispSearchInput = document.getElementById('ispSearchInput');
-        const ispStatusFilter = document.getElementById('ispStatusFilter');
+   
 
-        function filterIspTable() {
-            const query = ispSearchInput.value.toLowerCase().trim();
-            const selectedStatus = ispStatusFilter.value;
-            const rows = document.querySelectorAll('#ispTableBody tr.isp-row');
-            let hasVisibleRow = false;
+</section>
+<script>
+   
+    const ispSearchInput = document.getElementById('bd-isp-search');
+    const ispStatusFilter = document.getElementById('bd-isp-filter');
 
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                const rowStatus = row.getAttribute('data-status');
+    function filterIspTable() {
+        const query = ispSearchInput.value.toLowerCase().trim();
+        const selectedStatus = ispStatusFilter.value;
+        const rows = document.querySelectorAll('#bd-isp-body tr.bd-isp-row');
+        let hasVisibleRow = false;
 
-                const matchesQuery = text.includes(query);
-                const matchesStatus = (selectedStatus === 'ALL') || (rowStatus === selectedStatus);
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const rowStatus = row.getAttribute('data-status');
 
-                if (matchesQuery && matchesStatus) {
-                    row.style.display = '';
-                    hasVisibleRow = true;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+            const matchesQuery = text.includes(query);
+            const matchesStatus = (selectedStatus === 'ALL') || (rowStatus === selectedStatus);
 
-            document.getElementById('noIspResults').style.display = hasVisibleRow ? 'none' : '';
-        }
+            if (matchesQuery && matchesStatus) {
+                row.style.display = '';
+                hasVisibleRow = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
 
-        ispSearchInput.addEventListener('input', filterIspTable);
-        ispStatusFilter.addEventListener('change', filterIspTable);
+        document.getElementById('bd-isp-no-results').style.display = hasVisibleRow ? 'none' : '';
+    }
 
-        const vpnSearchInput = document.getElementById('vpnSearchInput');
-        const vpnStatusFilter = document.getElementById('vpnStatusFilter');
+    ispSearchInput.addEventListener('input', filterIspTable);
+    ispStatusFilter.addEventListener('change', filterIspTable);
 
-        function filterVpnTable() {
-            const query = vpnSearchInput.value.toLowerCase().trim();
-            const selectedStatus = vpnStatusFilter.value;
-            const rows = document.querySelectorAll('#vpnTableBody tr.vpn-row');
-            let hasVisibleRow = false;
+  
+    const vpnSearchInput = document.getElementById('bd-vpn-search');
+    const vpnStatusFilter = document.getElementById('bd-vpn-filter');
 
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                const rowStatus = row.getAttribute('data-status');
+    function filterVpnTable() {
+        const query = vpnSearchInput.value.toLowerCase().trim();
+        const selectedStatus = vpnStatusFilter.value;
+        const rows = document.querySelectorAll('#bd-vpn-body tr.bd-vpn-row');
+        let hasVisibleRow = false;
 
-                const matchesQuery = text.includes(query);
-                const matchesStatus = (selectedStatus === 'ALL') || (rowStatus === selectedStatus);
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const rowStatus = row.getAttribute('data-status');
 
-                if (matchesQuery && matchesStatus) {
-                    row.style.display = '';
-                    hasVisibleRow = true;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+            const matchesQuery = text.includes(query);
+            const matchesStatus = (selectedStatus === 'ALL') || (rowStatus === selectedStatus);
 
-            document.getElementById('noVpnResults').style.display = hasVisibleRow ? 'none' : '';
-        }
+            if (matchesQuery && matchesStatus) {
+                row.style.display = '';
+                hasVisibleRow = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
 
-        vpnSearchInput.addEventListener('input', filterVpnTable);
-        vpnStatusFilter.addEventListener('change', filterVpnTable);
-    </script>
-</body>
-</html>
+        document.getElementById('bd-vpn-no-results').style.display = hasVisibleRow ? 'none' : '';
+    }
+
+    vpnSearchInput.addEventListener('input', filterVpnTable);
+    vpnStatusFilter.addEventListener('change', filterVpnTable);
+</script>
