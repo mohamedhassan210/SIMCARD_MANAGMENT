@@ -138,7 +138,7 @@
 
                 <div class="col-md-6">
                     <label class="custom-label" asp-for="PhoneNumber">Phone Number</label>
-                    <input type="text" id="phoneInput" class="custom-input" asp-for="PhoneNumber" placeholder="e.g. 010..., 012..., 015..." required />
+                    <input type="text" maxlength="11" id="phoneInput" class="custom-input" asp-for="PhoneNumber" placeholder="e.g. 010..., 012..., 015..." required />
                     <div id="providerDetected" class="provider-badge" style="display:none;"></div>
                     <span asp-validation-for="PhoneNumber" class="field-error"></span>
                 </div>
