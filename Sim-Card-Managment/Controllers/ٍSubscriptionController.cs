@@ -132,23 +132,6 @@ namespace Sim_Card_Managment.Controllers
 
             // 7. Save Entity
             _subscriptionRepo.Add(subscription);
-            var sim =   _simRepo.GetById(model.SelectedSimId.Value);
-            if (sim != null)
-            {
-                sim.Status = "Occupied";
-                 _simRepo.Update(sim); // Or _context.SaveChanges() depending on your repo design
-            }
-
-            // 8. Update USB Status to "Occupied" (if selected)
-            if (model.SelectedUsbId.HasValue && model.SelectedUsbId.Value > 0)
-            {
-                var usb =  _usbRepo.GetById(model.SelectedUsbId.Value);
-                if (usb != null)
-                {
-                    usb.Status = "Occupied";
-                     _usbRepo.Update(usb);
-                }
-            }
 
             return RedirectToAction(nameof(Index));
         }

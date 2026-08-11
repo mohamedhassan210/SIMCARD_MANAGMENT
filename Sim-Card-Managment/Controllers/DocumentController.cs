@@ -328,7 +328,7 @@ namespace Sim_Card_Managment.Controllers
                             SerialNumber = simDto.SerialNumber,
                             PhoneNumber = simDto.PhoneNumber,
                             NetworkType = simDto.NetworkType,
-                            Status = "Active",
+                            IsActive = true,
                             RegisteredAt = DateTime.Now,
                             ServiceProviderId = viewModel.ServiceProviderId.Value
                         };
@@ -363,7 +363,7 @@ namespace Sim_Card_Managment.Controllers
                         {
                             SerialNumber = usbDto.SerialNumber,
                             Model = usbDto.Model,
-                            Status = "Active",
+                            IsActive = true,
                             RegisteredAt = DateTime.Now,
                             ServiceProviderId = viewModel.ServiceProviderId.Value
                         };

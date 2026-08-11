@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repositories;
@@ -13,10 +14,12 @@ namespace Sim_Card_Managment.Controllers
     public class ServiceProviderController : Controller
     {
         private readonly IServiceProviderRepository _repo;
+        private readonly AppDbContext _context;
 
-        public ServiceProviderController(IServiceProviderRepository repo)
+        public ServiceProviderController(IServiceProviderRepository repo, AppDbContext context)
         {
             _repo = repo;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
@@ -42,7 +45,6 @@ namespace Sim_Card_Managment.Controllers
             {
                 var provider = new Models.ServiceProvider
                 {
-                    //Id = int.Newint(),
                     Name = model.Name,
                     DisplayName = model.DisplayName,
                     IsActive = model.IsActive
@@ -61,6 +63,12 @@ namespace Sim_Card_Managment.Controllers
             var provider = await _repo.GetByIdWithDevicesAsync(id);
             if (provider == null) return NotFound();
 
+            // For the "Status Type" filter dropdown
+            ViewBag.StatusTypes = _context.DeviceStatusesType
+                .OrderBy(t => t.Name)
+                .Select(t => t.Name)
+                .ToList();
+
             var simsList = provider.Sims.Select(s => new DeviceDirectoryViewModel
             {
                 Id = s.Id,
@@ -68,7 +76,11 @@ namespace Sim_Card_Managment.Controllers
                 Identifier = s.PhoneNumber,
                 DeviceType = "SIM Card",
                 ServiceProvider = provider.Name,
-                Status = s.Status,
+                IsActive = s.IsActive,
+                CurrentStatusType = s.DeviceStatuses
+                    .OrderByDescending(ds => ds.StatusDate)
+                    .Select(ds => ds.StatusType.Name)
+                    .FirstOrDefault(),
                 RegisteredAt = s.RegisteredAt,
                 AssignedTo = s.Subscriptions?
                     .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
@@ -83,7 +95,11 @@ namespace Sim_Card_Managment.Controllers
                 Identifier = "N/A",
                 DeviceType = "USB Modem",
                 ServiceProvider = provider.Name,
-                Status = u.Status,
+                IsActive = u.IsActive,
+                CurrentStatusType = u.DeviceStatuses
+                    .OrderByDescending(ds => ds.StatusDate)
+                    .Select(ds => ds.StatusType.Name)
+                    .FirstOrDefault(),
                 RegisteredAt = u.RegisteredAt,
                 AssignedTo = u.Subscriptions?
                     .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
@@ -116,7 +132,6 @@ namespace Sim_Card_Managment.Controllers
                 Id = provider.Id,
                 Name = provider.Name,
                 DisplayName = provider.DisplayName
-                
             };
 
             return View(model);
@@ -133,7 +148,6 @@ namespace Sim_Card_Managment.Controllers
 
             existing.Name = model.Name;
             existing.DisplayName = model.DisplayName;
-            
 
             await _repo.UpdateAsync(existing);
             await _repo.SaveChangesAsync();
@@ -142,7 +156,6 @@ namespace Sim_Card_Managment.Controllers
             return RedirectToAction(nameof(Details), new { id = model.Id });
         }
 
-        // GET: ServiceProvider/Delete/{id}
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -152,7 +165,6 @@ namespace Sim_Card_Managment.Controllers
             return View(provider);
         }
 
-        // POST: ServiceProvider/Delete/{id}  (soft delete: IsActive -> false)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -162,6 +174,7 @@ namespace Sim_Card_Managment.Controllers
             TempData["Success"] = "Service provider deactivated successfully.";
             return RedirectToAction(nameof(Index));
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Activate(int id)

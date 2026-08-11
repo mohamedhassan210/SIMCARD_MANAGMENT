@@ -20,11 +20,12 @@ namespace Sim_Card_Managment.Models
         [StringLength(10)]
         public string? NetworkType { get; set; }  // 4G / 5G    //////drop
 
-           
 
         [Required]
         [StringLength(20)]
-        public string Status { get; set; } = "Active";  // Active / Lost / Replaced / Returned   //////drop
+        public string Status { get; set; } = "Active"; // Active / Lost / Replaced / Returned
+
+        public bool IsActive { get; set; } = true;
 
         public DateTime RegisteredAt { get; set; } = DateTime.Now;
 

@@ -241,7 +241,7 @@
                                             <td class="py-3 px-4">@sim.SerialNumber</td>
                                             <td class="py-3 px-4">@sim.PhoneNumber</td>
                                             <td class="py-3 px-4">
-                                                <span class="badge @(sim.Status == "Active" ? "bg-success" : "bg-warning")">@sim.Status</span>
+                                                <span class="badge @(sim.IsActive ? "bg-success" : "bg-warning")">@(sim.IsActive ? "Active" : "Inactive")</span>
                                             </td>
                                         </tr>
                                         indexCounter++;

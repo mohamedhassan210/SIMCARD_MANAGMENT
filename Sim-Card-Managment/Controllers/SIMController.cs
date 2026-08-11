@@ -32,26 +32,11 @@ namespace Sim_Card_Managment.Controllers
             string cleanedPhone = phoneNumber.Trim();
             string targetProviderName = string.Empty;
 
-            if (cleanedPhone.StartsWith("010"))
-            {
-                targetProviderName = "Vodafone";
-            }
-            else if (cleanedPhone.StartsWith("012"))
-            {
-                targetProviderName = "Orange";
-            }
-            else if (cleanedPhone.StartsWith("015"))
-            {
-                targetProviderName = "WE";
-            }
-            else if (cleanedPhone.StartsWith("011"))
-            {
-                targetProviderName = "Etisalat";
-            }
-            else
-            {
-                return null;
-            }
+            if (cleanedPhone.StartsWith("010")) targetProviderName = "Vodafone";
+            else if (cleanedPhone.StartsWith("012")) targetProviderName = "Orange";
+            else if (cleanedPhone.StartsWith("015")) targetProviderName = "WE";
+            else if (cleanedPhone.StartsWith("011")) targetProviderName = "Etisalat";
+            else return null;
 
             return _context.ServiceProviders
                 .FirstOrDefault(sp => sp.Name.ToLower() == targetProviderName.ToLower());
@@ -63,7 +48,12 @@ namespace Sim_Card_Managment.Controllers
             ViewBag.CurrentStatus = status.ToLower();
             ViewBag.CurrentType = type.ToLower();
 
-            // 1. Fetch ALL SIM Cards (Do not pre-filter on server so client-side JS gets all 48 records)
+            // For the "Status Type" filter dropdown — every type that exists, whether currently in use or not
+            ViewBag.StatusTypes = _context.DeviceStatusesType
+                .OrderBy(t => t.Name)
+                .Select(t => t.Name)
+                .ToList();
+
             var simsList = _simRepo.GetAll().Select(s => new DeviceDirectoryViewModel
             {
                 Id = s.Id,
@@ -71,7 +61,11 @@ namespace Sim_Card_Managment.Controllers
                 Identifier = s.PhoneNumber,
                 DeviceType = "SIM Card",
                 ServiceProvider = s.ServiceProvider?.Name ?? "N/A",
-                Status = s.Status,
+                IsActive = s.IsActive,
+                CurrentStatusType = s.DeviceStatuses
+                    .OrderByDescending(ds => ds.StatusDate)
+                    .Select(ds => ds.StatusType.Name)
+                    .FirstOrDefault(),
                 RegisteredAt = s.RegisteredAt,
                 AssignedTo = s.Subscriptions?
                     .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
@@ -79,7 +73,6 @@ namespace Sim_Card_Managment.Controllers
                     .FirstOrDefault() ?? "Unassigned"
             });
 
-            // 2. Fetch ALL USB Modems
             var usbsList = _usbRepo.GetAll().Select(u => new DeviceDirectoryViewModel
             {
                 Id = u.Id,
@@ -87,7 +80,11 @@ namespace Sim_Card_Managment.Controllers
                 Identifier = "N/A",
                 DeviceType = "USB Modem",
                 ServiceProvider = u.ServiceProvider?.Name ?? "N/A",
-                Status = u.Status,
+                IsActive = u.IsActive,
+                CurrentStatusType = u.DeviceStatuses
+                    .OrderByDescending(ds => ds.StatusDate)
+                    .Select(ds => ds.StatusType.Name)
+                    .FirstOrDefault(),
                 RegisteredAt = u.RegisteredAt,
                 AssignedTo = u.Subscriptions?
                     .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
@@ -102,7 +99,6 @@ namespace Sim_Card_Managment.Controllers
             return View(combinedDirectory);
         }
 
-        // SIMController.cs
         public IActionResult Details(int id)
         {
             var sim = _context.Sims
@@ -111,6 +107,8 @@ namespace Sim_Card_Managment.Controllers
                     .ThenInclude(sub => sub.Employee)
                 .Include(s => s.Subscriptions)
                     .ThenInclude(sub => sub.NonEmployee)
+                .Include(s => s.DeviceStatuses)
+                    .ThenInclude(ds => ds.StatusType)
                 .FirstOrDefault(s => s.Id == id);
 
             if (sim == null) return NotFound();
@@ -118,14 +116,12 @@ namespace Sim_Card_Managment.Controllers
             return View(sim);
         }
 
-        // GET: /SIM/Create
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: /SIM/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Sim sim)
@@ -146,8 +142,8 @@ namespace Sim_Card_Managment.Controllers
 
             if (ModelState.IsValid)
             {
-                //sim.Id = int.Newint();
                 sim.RegisteredAt = DateTime.Now;
+                sim.IsActive = true;
                 _simRepo.Add(sim);
                 return RedirectToAction(nameof(Index));
             }
@@ -155,7 +151,6 @@ namespace Sim_Card_Managment.Controllers
             return View(sim);
         }
 
-        // GET: /SIM/Edit/{id}
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -165,7 +160,6 @@ namespace Sim_Card_Managment.Controllers
             return View(sim);
         }
 
-        // POST: /SIM/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Sim sim)
@@ -193,7 +187,6 @@ namespace Sim_Card_Managment.Controllers
             return View(sim);
         }
 
-        // GET: /SIM/Delete/{id}
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -203,7 +196,6 @@ namespace Sim_Card_Managment.Controllers
             return View(sim);
         }
 
-        // POST: /SIM/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
@@ -214,7 +206,7 @@ namespace Sim_Card_Managment.Controllers
                 return NotFound();
             }
 
-            sim.Status = "Removed";
+            sim.IsActive = false;
             _simRepo.Update(sim);
 
             return RedirectToAction(nameof(Index));

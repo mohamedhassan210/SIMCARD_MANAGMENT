@@ -14,9 +14,12 @@ namespace Sim_Card_Managment.Models
         [StringLength(200)]
         public string? Model { get; set; }
 
+
         [Required]
         [StringLength(20)]
-        public string Status { get; set; } = "Active";  // Active / Lost / Replaced / Returned
+        public string Status { get; set; } = "Active"; // Active / Lost / Replaced / Returned
+
+        public bool IsActive { get; set; } = true;
 
 
         public DateTime RegisteredAt { get; set; } = DateTime.Now;

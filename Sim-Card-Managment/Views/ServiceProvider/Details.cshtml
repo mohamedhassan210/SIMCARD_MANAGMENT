@@ -333,7 +333,7 @@
                                 : "";
 
                                 <tr class="device-row"
-                                    data-status="@(item.Status?.ToLower() ?? "")"
+                                    data-status="@(item.IsActive ? "active" : "inactive")"
                                     data-type="@normalizedType">
                                     <td><strong>@item.SerialNumber</strong></td>
                                     <td>
@@ -342,7 +342,7 @@
                                         </span>
                                     </td>
                                     <td>@(string.IsNullOrEmpty(item.Identifier) || item.Identifier == "N/A" ? "-" : item.Identifier)</td>
-                                    <td>@item.Status</td>
+                                    <td>@(item.IsActive ? "Active" : "Inactive")</td>
                                     <td>
                                         @if (!string.IsNullOrEmpty(item.AssignedTo) && item.AssignedTo != "Unassigned")
                                         {

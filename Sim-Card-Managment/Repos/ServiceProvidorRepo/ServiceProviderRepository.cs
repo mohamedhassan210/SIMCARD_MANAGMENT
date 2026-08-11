@@ -37,15 +37,20 @@ namespace Sim_Card_Managment.Repositories
                 .Include(p => p.Sims)
                     .ThenInclude(s => s.Subscriptions)
                         .ThenInclude(sub => sub.NonEmployee)
+                .Include(p => p.Sims)
+                    .ThenInclude(s => s.DeviceStatuses)
+                        .ThenInclude(ds => ds.StatusType)
                 .Include(p => p.Usbs)
                     .ThenInclude(u => u.Subscriptions)
                         .ThenInclude(sub => sub.Employee)
                 .Include(p => p.Usbs)
                     .ThenInclude(u => u.Subscriptions)
                         .ThenInclude(sub => sub.NonEmployee)
+                .Include(p => p.Usbs)
+                    .ThenInclude(u => u.DeviceStatuses)
+                        .ThenInclude(ds => ds.StatusType)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
-
         public async Task AddAsync(Models.ServiceProvider provider)
         {
             await _context.ServiceProviders.AddAsync(provider);
