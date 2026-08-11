@@ -283,11 +283,11 @@
             </div>
         </div>
 
-    <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
-        <div class="filters-row">
-            <div class="filter-group">
+    <form id="di-filter-Form" class="di-filters" onsubmit="event.preventDefault();">
+        <div class="di-filters-row">
+            <div class="di-filter-group">
                 <label for="status-filter">Availability</label>
-                <select id="status-filter" class="status-select">
+                <select id="di-status-filter" class="status-select">
                     <option value="all">All</option>
                     <option value="active">Active</option>
                     <option value="inactive">Not Active</option>
@@ -330,8 +330,8 @@
             </div>
         </form>
 
-    <div class="table-wrap">
-        <table id="deviceTable">
+    <div class="di-table-wrap">
+        <table id="di-deviceTable">
             <thead>
                 <tr>
                     <th>Serial Number</th>
@@ -343,7 +343,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
+            <tbody id="di-table-Body">
                 @if (Model != null && Model.Any())
                 {
                     foreach (var item in Model)
