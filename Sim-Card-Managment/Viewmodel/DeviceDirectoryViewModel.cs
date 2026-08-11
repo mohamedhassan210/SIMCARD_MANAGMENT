@@ -9,7 +9,7 @@ namespace Sim_Card_Managment.Viewmodel
         public string? ExtraInfo { get; set; }
         public string? Detail => ExtraInfo;
         public string? Identifier { get; set; }
-        public string Status { get; set; } = ;
+        public string Status { get; set; } = "UnAssigned" ;
         public bool IsActive { get; set; }
         public string? CurrentStatusType { get; set; } // e.g. "Lost", "Replaced", "Returned"; null if no incident ever logged
 
