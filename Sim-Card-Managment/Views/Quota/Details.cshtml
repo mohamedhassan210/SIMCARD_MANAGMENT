@@ -1,6 +1,7 @@
-﻿@model Sim_Card_Managment.Models.Quota
+@model Sim_Card_Managment.Viewmodel.QuotaViewModel
 
 @{
+    Layout = null;
     ViewData["Title"] = "Quota Details";
 }
 
@@ -158,7 +159,7 @@
                     <span class="detail-label">
                         <i class="fas fa-building text-secondary"></i> Service Provider
                     </span>
-                    <p class="detail-value text-primary-emphasis">Vodafone Egypt</p>
+                    <p class="detail-value text-primary-emphasis">@(Model.ServiceProviderName ?? "—")</p>
                 </div>
             </div>
 
@@ -167,7 +168,7 @@
                     <span class="detail-label">
                         <i class="fas fa-database text-secondary"></i> Base Amount
                     </span>
-                    <p class="detail-value">100 GB</p>
+                    <p class="detail-value">@Model.BaseAmount GB</p>
                 </div>
             </div>
 
@@ -176,7 +177,14 @@
                     <span class="detail-label">
                         <i class="fas fa-plus-circle text-secondary"></i> Extra Amount
                     </span>
-                    <p class="detail-value text-success">+20 GB</p>
+                    @if (Model.ExtraAmount > 0)
+                    {
+                        <p class="detail-value text-success">+@Model.ExtraAmount GB</p>
+                    }
+                    else
+                    {
+                        <p class="detail-value text-muted">0 GB</p>
+                    }
                 </div>
             </div>
 
@@ -185,7 +193,7 @@
                     <span class="detail-label">
                         <i class="fas fa-receipt text-secondary"></i> Total Fees
                     </span>
-                    <p class="detail-value text-danger">$150.00</p>
+                    <p class="detail-value text-danger">@Model.Fees.ToString("C")</p>
                 </div>
             </div>
 
@@ -195,9 +203,18 @@
                         <i class="fas fa-toggle-on text-secondary"></i> Status
                     </span>
                     <div>
-                        <span class="badge-status-active">
-                            <i class="fas fa-circle" style="font-size: 8px;"></i> Active
-                        </span>
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge-status-active">
+                                <i class="fas fa-circle" style="font-size: 8px;"></i> Active
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge-status-inactive">
+                                <i class="fas fa-circle" style="font-size: 8px;"></i> Inactive
+                            </span>
+                        }
                     </div>
                 </div>
             </div>
@@ -205,10 +222,10 @@
         </div>
 
         <div class="d-flex justify-content-end gap-3">
-            <a class="btn btn-cancel" href="/Quota/Index">
+            <a class="btn btn-cancel" asp-action="Index">
                 <i class="fas fa-arrow-left"></i> Back to List
             </a>
-            <a class="btn btn-edit" href="/Quota/Edit/1">
+            <a class="btn btn-edit" asp-action="Edit" asp-route-id="@Model.Id">
                 <i class="fas fa-pen"></i> Edit Quota
             </a>
         </div>
@@ -217,4 +234,4 @@
 
 </body>
 
-</html> 
+</html>

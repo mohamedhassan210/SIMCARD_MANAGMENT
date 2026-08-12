@@ -7,6 +7,7 @@ using Sim_Card_Managment.data;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Repos.BranchRepos;
+using Sim_Card_Managment.Repos.DeviceStatusTypeRepo;
 using Sim_Card_Managment.Repos.EmployeeRepos;
 using Sim_Card_Managment.Repos.GroupRepos;
 using Sim_Card_Managment.Repos.InternetLineRepos;
@@ -81,6 +82,7 @@ builder.Services.AddScoped<IBranchRepo, BranchRepo>();
 builder.Services.AddScoped<IInternetLineRepo, InternetLineRepo>();
 builder.Services.AddScoped<IVpnConnectionRepo, VpnConnectionRepo>();
 builder.Services.AddScoped<ILookupRepo, LookupRepo>();
+builder.Services.AddScoped<IDeviceStatusTypeRepo, DeviceStatusTypeRepo>();
 
 // 7. Enable Session
 builder.Services.AddSession(options =>
