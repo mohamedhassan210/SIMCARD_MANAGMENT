@@ -42,20 +42,18 @@ namespace Sim_Card_Managment.Controllers
                 .FirstOrDefault(sp => sp.Name.ToLower() == targetProviderName.ToLower());
         }
 
+      
         // GET: /SIM or /SIM/Index
         public IActionResult Index(string status = "all", string type = "all")
         {
             ViewBag.CurrentStatus = status.ToLower();
             ViewBag.CurrentType = type.ToLower();
 
-            // Pull distinct status values that actually exist right now across Sims + Usbs,
-            // instead of a hardcoded list — so the filter only ever shows real options.
-            var simStatuses = _context.Sims.Select(s => s.Status).Distinct();
-            var usbStatuses = _context.Usbs.Select(u => u.Status).Distinct();
-            ViewBag.StatusTypes = simStatuses
-                .Union(usbStatuses)
-                .Where(s => !string.IsNullOrEmpty(s))
-                .OrderBy(s => s)
+            // Pull every status type defined in the DeviceStatusType lookup table,
+            // rather than only the ones currently in use on Sim/Usb rows.
+            ViewBag.StatusTypes = _context.DeviceStatusesType
+                .Select(t => t.Name.ToString())
+                .OrderBy(n => n)
                 .ToList();
 
             var simsList = _simRepo.GetAll().Select(s => new DeviceDirectoryViewModel
