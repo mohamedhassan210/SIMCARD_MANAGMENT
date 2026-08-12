@@ -81,5 +81,16 @@ namespace Sim_Card_Managment.Repos
                 _context.SaveChanges();
             }
         }
+        public async Task<IEnumerable<Usb>> GetAssignableUsbsAsync(string query)
+        {
+            return await _context.Usbs
+                .Include(u => u.ServiceProvider)
+                .Where(u => u.IsActive &&
+                            !u.Subscriptions.Any(sub => sub.EndDate == null || sub.EndDate > DateTime.Now) &&
+                            (string.IsNullOrEmpty(query) || u.SerialNumber.Contains(query) || (u.Model != null && u.Model.Contains(query))))
+                .Take(6)
+                .ToListAsync();
+        }
+
     }
 }

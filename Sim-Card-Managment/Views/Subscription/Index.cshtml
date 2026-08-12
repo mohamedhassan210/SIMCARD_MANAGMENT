@@ -241,16 +241,16 @@
                     string deviceType = isSim ? "SIM" : "USB";
                     string deviceSerial = isSim ? sub.Sim?.SerialNumber : sub.Usb?.SerialNumber;
 
-                    // 3. Resolve Quota details
+                    // 3. Resolve Quota + actual applied monthly fee (not the quota's base amount)
                     string quotaDisplay = sub.Quota != null ? $"{sub.Quota.BaseAmount} GB" : "N/A";
-                    string monthlyFees = sub.Quota != null ? $"${sub.Quota.BaseAmount}" : "N/A";
+                    string monthlyFees = $"${sub.Fees}";
 
                     <div class="row align-items-center data-row">
                         <div class="col-2">@subscriberName</div>
                         <div class="col-2 d-flex align-items-center">
                             <i class="fa-regular fa-hard-drive device-icon"></i>
                             <div class="line-height-tight">
-                                @deviceType<br>#@(string.IsNullOrEmpty(deviceSerial) ? "N/A" : deviceSerial.Length > 8 ? deviceSerial.Substring(0, 8) : deviceSerial)
+                                @deviceType<br>#@(string.IsNullOrEmpty(deviceSerial) ? "N/A" : deviceSerial)
                             </div>
                         </div>
                         <div class="col-2 text-quota">@quotaDisplay</div>

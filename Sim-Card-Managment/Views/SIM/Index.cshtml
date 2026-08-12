@@ -492,48 +492,31 @@
         let visibleRows = [...allRows];
         let currentPage = 1;
 
-        // Set initial select values from URL params if present
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has("status")) {
-            statusFilter.value = urlParams.get("status").toLowerCase();
+        function applyFilters() {
+            const query = searchInput.value.trim().toLowerCase();
+            const statusVal = statusFilter.value.toLowerCase();
+            const typeVal = typeFilter.value.toLowerCase();
+            const statusTypeVal = statusTypeFilter.value.toLowerCase();
+
+            visibleRows = allRows.filter(row => {
+                const text = row.innerText.toLowerCase();
+                const matchesSearch = text.includes(query);
+
+                const rowStatus = row.getAttribute("data-status");
+                const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
+
+                const rowType = row.getAttribute("data-type");
+                const matchesType = (typeVal === "all") || (rowType === typeVal);
+
+                const rowStatusType = row.getAttribute("data-status-type") ?? "";
+                const matchesStatusType = (statusTypeVal === "all") || (rowStatusType === statusTypeVal);
+
+                return matchesSearch && matchesStatus && matchesType && matchesStatusType;
+            });
+
+            currentPage = 1;
+            renderTable();
         }
-        if (urlParams.has("type")) {
-            typeFilter.value = urlParams.get("type").toLowerCase();
-        }
-
-        // Handle URL update for server-side state synchronization
-        function updateUrlParams() {
-            const statusVal = statusFilter.value;
-            const typeVal = typeFilter.value;
-            window.location.href = `?status=${statusVal}&type=${typeVal}`;
-        }
-
-        // Local filtering logic for instant live search        
-    function applyFilters() {
-        const query = searchInput.value.trim().toLowerCase();
-        const statusVal = statusFilter.value.toLowerCase();
-        const typeVal = typeFilter.value.toLowerCase();
-        const statusTypeVal = statusTypeFilter.value.toLowerCase();
-
-        visibleRows = allRows.filter(row => {
-            const text = row.innerText.toLowerCase();
-            const matchesSearch = text.includes(query);
-
-            const rowStatus = row.getAttribute("data-status");
-            const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
-
-            const rowType = row.getAttribute("data-type");
-            const matchesType = (typeVal === "all") || (rowType === typeVal);
-
-            const rowStatusType = row.getAttribute("data-status-type") ?? "";
-            const matchesStatusType = (statusTypeVal === "all") || (rowStatusType === statusTypeVal);
-
-            return matchesSearch && matchesStatus && matchesType && matchesStatusType;
-        });
-
-        currentPage = 1;
-        renderTable();
-    }
 
         function renderTable() {
             const totalVisible = visibleRows.length;
@@ -570,17 +553,11 @@
             paginationContainer.innerHTML = html;
         }
 
-        // Live input search
         searchInput.addEventListener("input", applyFilters);
+        statusFilter.addEventListener("change", applyFilters);
+        typeFilter.addEventListener("change", applyFilters);
+        statusTypeFilter.addEventListener("change", applyFilters);
 
-        // Update URL and reload data when dropdown filters change
-        statusFilter.addEventListener("change", updateUrlParams);
-        typeFilter.addEventListener("change", updateUrlParams);
-
-        statusTypeFilter.addEventListener("change", updateUrlParams);
-
-
-        // Pagination handler
         paginationContainer.addEventListener("click", function (e) {
             const btn = e.target.closest("button");
             if (!btn || btn.disabled) return;
@@ -597,7 +574,6 @@
             renderTable();
         });
 
-        // Initialize view render
         applyFilters();
     });
 </script>
