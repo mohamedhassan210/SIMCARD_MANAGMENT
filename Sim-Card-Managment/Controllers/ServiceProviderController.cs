@@ -77,15 +77,16 @@ namespace Sim_Card_Managment.Controllers
                 DeviceType = "SIM Card",
                 ServiceProvider = provider.Name,
                 IsActive = s.IsActive,
+                Status = s.Status,
                 CurrentStatusType = s.DeviceStatuses
-                    .OrderByDescending(ds => ds.StatusDate)
-                    .Select(ds => ds.StatusType.Name)
-                    .FirstOrDefault(),
+        .OrderByDescending(ds => ds.StatusDate)
+        .Select(ds => ds.StatusType.Name)
+        .FirstOrDefault(),
                 RegisteredAt = s.RegisteredAt,
                 AssignedTo = s.Subscriptions?
-                    .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
-                    .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
-                    .FirstOrDefault() ?? "Unassigned"
+        .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
+        .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
+        .FirstOrDefault() ?? "Unassigned"
             });
 
             var usbsList = provider.Usbs.Select(u => new DeviceDirectoryViewModel
@@ -96,6 +97,7 @@ namespace Sim_Card_Managment.Controllers
                 DeviceType = "USB Modem",
                 ServiceProvider = provider.Name,
                 IsActive = u.IsActive,
+                Status = u.Status,
                 CurrentStatusType = u.DeviceStatuses
                     .OrderByDescending(ds => ds.StatusDate)
                     .Select(ds => ds.StatusType.Name)

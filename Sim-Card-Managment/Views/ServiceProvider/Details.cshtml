@@ -276,105 +276,149 @@
                 <h4 class="fw-bold fs-5 m-0 text-dark">Assigned Devices</h4>
             </div>
 
-            <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
-                <div class="filters-row">
-                    <div class="filter-group">
-                        <label for="status-filter">Status</label>
-                        <select id="status-filter" class="status-select">
-                            <option value="all">All</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </div>
+           <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
+    <div class="filters-row">
+        <div class="filter-group">
+            <label for="status-filter">Availability</label>
+            <select id="status-filter" class="status-select">
+                <option value="all">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Not Active</option>
+            </select>
+        </div>
 
-                    <div class="filter-group">
-                        <label for="device-type-filter">Type</label>
-                        <select id="device-type-filter" class="status-select">
-                            <option value="all">All Types</option>
-                            <option value="sim">SIM Card</option>
-                            <option value="usb">USB Modem</option>
-                        </select>
-                    </div>
+        <div class="filter-group">
+            <label for="device-type-filter">Device Type</label>
+            <select id="device-type-filter" class="status-select">
+                <option value="all">All Types</option>
+                <option value="sim">SIM Card</option>
+                <option value="usb">USB Modem</option>
+            </select>
+        </div>
 
-                    <div class="filter-group" style="flex: 1;">
-                        <label for="search-input">Search</label>
-                        <div class="search-box">
-                            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
-                                <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                            </svg>
-                            <input id="search-input" type="text" placeholder="Search by Serial, Phone, or Assignee..." autocomplete="off">
-                        </div>
-                    </div>
-                </div>
-            </form>
+        <div class="filter-group">
+            <label for="status-type-filter">Status Type</label>
+            <select id="status-type-filter" class="status-select">
+                <option value="all">All Status Types</option>
+                @if (ViewBag.StatusTypes != null)
+                {
+                    foreach (var st in ViewBag.StatusTypes as List<string>)
+                    {
+                        <option value="@st.ToLower()">@st</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="filter-group" style="flex: 1;">
+            <label for="search-input">Search</label>
+            <div class="search-box">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <input id="search-input" type="text" placeholder="Search by Serial, Phone, or Assignee..." autocomplete="off">
+            </div>
+        </div>
+    </div>
+</form>
 
             <div class="table-wrap">
-                <table id="deviceTable">
-                    <thead>
-                        <tr>
-                            <th>Serial Number</th>
-                            <th>Type</th>
-                            <th>Details</th>
-                            <th>Status</th>
-                            <th>Assigned To</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        @if (Model.Devices.Any())
-                        {
-                            foreach (var item in Model.Devices)
+    <table id="deviceTable">
+        <thead>
+            <tr>
+                <th>Serial Number</th>
+                <th>Type</th>
+                <th>Details</th>
+                <th>Availability</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            @if (Model.Devices.Any())
+            {
+                foreach (var item in Model.Devices)
+                {
+                    var normalizedType = (item.DeviceType != null && item.DeviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase))
+                        ? "sim"
+                        : (item.DeviceType != null && item.DeviceType.Contains("USB", StringComparison.OrdinalIgnoreCase))
+                        ? "usb"
+                        : "";
+
+                    <tr class="device-row"
+                        data-status="@(item.IsActive ? "active" : "inactive")"
+                        data-type="@normalizedType"
+                        data-status-type="@(item.Status?.ToLower() ?? "unassigned")">
+                        <td>
+                            <strong>@item.SerialNumber</strong>
+                            @if (!string.IsNullOrEmpty(item.ProviderName))
                             {
-                                var normalizedType = (item.DeviceType != null && item.DeviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase))
-                                ? "sim"
-                                : (item.DeviceType != null && item.DeviceType.Contains("USB", StringComparison.OrdinalIgnoreCase))
-                                ? "usb"
-                                : "";
-
-                                <tr class="device-row"
-                                    data-status="@(item.IsActive ? "active" : "inactive")"
-                                    data-type="@normalizedType">
-                                    <td><strong>@item.SerialNumber</strong></td>
-                                    <td>
-                                        <span class="badge-type @(normalizedType == "sim" ? "badge-sim" : "badge-usb")">
-                                            @item.DeviceType
-                                        </span>
-                                    </td>
-                                    <td>@(string.IsNullOrEmpty(item.Identifier) || item.Identifier == "N/A" ? "-" : item.Identifier)</td>
-                                    <td>@(item.IsActive ? "Active" : "Inactive")</td>
-                                    <td>
-                                        @if (!string.IsNullOrEmpty(item.AssignedTo) && item.AssignedTo != "Unassigned")
-                                        {
-                                            @item.AssignedTo
-                                        }
-                                        else
-                                        {
-                                            <span style="color: #a8a8a8;">Unassigned</span>
-                                        }
-                                    </td>
-                                    <td style="text-align: right;">
-                                        @if (normalizedType == "sim")
-                                        {
-                                            <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
-                                        }
-                                        else
-                                        {
-                                            <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
-                                        }
-                                    </td>
-                                </tr>
+                                <div style="font-size: 11px; color: #888;">@item.ProviderName</div>
                             }
-                        }
-                        <tr id="noResultsRow" style="display: @(Model.Devices.Any() ? "none" : "");">
-                            <td colspan="6" style="text-align: center; padding: 32px; color: #888;">
-                                No matching devices found.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
+                        </td>
+                        <td>
+                            <span class="badge-type @(normalizedType == "sim" ? "badge-sim" : "badge-usb")">
+                                @item.DeviceType
+                            </span>
+                        </td>
+                        <td>@(string.IsNullOrEmpty(item.Identifier) || item.Identifier == "N/A" ? "-" : item.Identifier)</td>
+                        <td>
+                            @if (item.IsActive)
+                            {
+                                <span style="color:#137333; font-weight:700;">Active</span>
+                            }
+                            else
+                            {
+                                <span style="color:#c5221f; font-weight:700;">Not Active</span>
+                            }
+                        </td>
+                        <td>
+                            @{
+                                var statusColor = item.Status switch
+                                {
+                                    "Occupied" => "#137333",
+                                    "Unassigned" => "#6b6b6b",
+                                    "Lost" => "#c5221f",
+                                    "Replaced" => "#b06000",
+                                    "Returned" => "#1a73e8",
+                                    _ => "#1a1a1a"
+                                };
+                            }
+                            <span style="color:@statusColor; font-weight:700;">@item.Status</span>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.AssignedTo) && item.AssignedTo != "Unassigned")
+                            {
+                                @item.AssignedTo
+                            }
+                            else
+                            {
+                                <span style="color: #a8a8a8;">Unassigned</span>
+                            }
+                        </td>
+                        <td style="text-align: right;">
+                            @if (normalizedType == "sim")
+                            {
+                                <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            <tr id="noResultsRow" style="display: @(Model.Devices.Any() ? "none" : "");">
+                <td colspan="7" style="text-align: center; padding: 32px; color: #888;">
+                    No matching devices found.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
             <div class="footer">
                 <div class="showing" id="showingText">Showing 0 records</div>
                 <div class="pagination" id="paginationContainer"></div>
@@ -410,40 +454,41 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            const searchInput = document.getElementById("search-input");
-            const statusFilter = document.getElementById("status-filter");
-            const typeFilter = document.getElementById("device-type-filter");
+    const searchInput = document.getElementById("search-input");
+    const statusFilter = document.getElementById("status-filter");
+    const typeFilter = document.getElementById("device-type-filter");
+    const statusTypeFilter = document.getElementById("status-type-filter");
 
-            const allRows = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
-            const noResultsRow = document.getElementById("noResultsRow");
-            const showingText = document.getElementById("showingText");
-            const paginationContainer = document.getElementById("paginationContainer");
+    const allRows = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
+    const noResultsRow = document.getElementById("noResultsRow");
+    const showingText = document.getElementById("showingText");
+    const paginationContainer = document.getElementById("paginationContainer");
 
-            const itemsPerPage = 7;
-            let visibleRows = [...allRows];
-            let currentPage = 1;
+    const itemsPerPage = 7;
+    let visibleRows = [...allRows];
+    let currentPage = 1;
 
-            function applyFilters() {
-                const query = searchInput.value.trim().toLowerCase();
-                const statusVal = statusFilter.value.toLowerCase();
-                const typeVal = typeFilter.value.toLowerCase();
+    function applyFilters() {
+        const query = searchInput.value.trim().toLowerCase();
+        const statusVal = statusFilter.value.toLowerCase();
+        const typeVal = typeFilter.value.toLowerCase();
+        const statusTypeVal = statusTypeFilter.value.toLowerCase();
 
-                visibleRows = allRows.filter(row => {
-                    const text = row.innerText.toLowerCase();
-                    const matchesSearch = text.includes(query);
+        visibleRows = allRows.filter(row => {
+            const text = row.innerText.toLowerCase();
+            const matchesSearch = text.includes(query);
+            const rowStatus = row.getAttribute("data-status");
+            const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
+            const rowType = row.getAttribute("data-type");
+            const matchesType = (typeVal === "all") || (rowType === typeVal);
+            const rowStatusType = row.getAttribute("data-status-type") ?? "";
+            const matchesStatusType = (statusTypeVal === "all") || (rowStatusType === statusTypeVal);
+            return matchesSearch && matchesStatus && matchesType && matchesStatusType;
+        });
 
-                    const rowStatus = row.getAttribute("data-status");
-                    const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
-
-                    const rowType = row.getAttribute("data-type");
-                    const matchesType = (typeVal === "all") || (rowType === typeVal);
-
-                    return matchesSearch && matchesStatus && matchesType;
-                });
-
-                currentPage = 1;
-                renderTable();
-            }
+        currentPage = 1;
+        renderTable();
+    }
 
             function renderTable() {
                 const totalVisible = visibleRows.length;
@@ -483,6 +528,7 @@
             searchInput.addEventListener("input", applyFilters);
             statusFilter.addEventListener("change", applyFilters);
             typeFilter.addEventListener("change", applyFilters);
+            statusTypeFilter.addEventListener("change", applyFilters);
 
             paginationContainer.addEventListener("click", function (e) {
                 const btn = e.target.closest("button");
