@@ -1,4 +1,4 @@
-@model Sim_Card_Managment.Models.Employee
+@model Sim_Card_Managment.ViewModels.EmployeeUserCreateViewModel
 
 @{
 
@@ -64,6 +64,10 @@
                 box-shadow: 0 0 0 2px #E24D17;
                 background-color: #e2e2e2;
             }
+
+        select.custom-input {
+            appearance: auto;
+        }
 
         .btn-cancel {
             border: 1px solid #E24D17;
@@ -187,6 +191,8 @@
             </div>
 
             <div class="mb-5">
+                <input type="hidden" asp-for="HasAccount" id="hasAccountInput" value="false" />
+
                 <button type="button" id="toggleAccountBtn" class="account-toggle-btn">
                     <i class="fa-solid fa-user-plus"></i>  User Account 
                 </button>
@@ -195,15 +201,29 @@
                     <h6 class="fw-bold mb-3 text-dark">User Account Credentials</h6>
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="custom-label" for="username">Username</label>
-                            <input type="text" name="Username" id="username" class="custom-input" placeholder="adham.amr">
-                            <span class="error-msg" id="usernameError"></span>
+                            <label class="custom-label" asp-for="Username">Username</label>
+                            <input type="text" asp-for="Username" id="username" class="custom-input" placeholder="adham.amr">
+                            <span asp-validation-for="Username" class="error-msg" id="usernameError"></span>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="custom-label" for="password">Password</label>
-                            <input type="password" name="Password" id="password" class="custom-input" placeholder="••••••••">
-                            <span class="error-msg" id="passwordError"></span>
+                            <label class="custom-label" asp-for="Password">Password</label>
+                            <input type="password" asp-for="Password" id="password" class="custom-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
+                            <span asp-validation-for="Password" class="error-msg" id="passwordError"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="custom-label" asp-for="Email">Email</label>
+                            <input type="email" asp-for="Email" id="email" class="custom-input" placeholder="adham.amr@company.com">
+                            <span asp-validation-for="Email" class="error-msg" id="emailError"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="custom-label" asp-for="GroupId">Group</label>
+                            <select asp-for="GroupId" asp-items="Model.Groups" id="groupId" class="custom-input">
+                                <option value="">Select Group</option>
+                            </select>
+                            <span asp-validation-for="GroupId" class="error-msg" id="groupIdError"></span>
                         </div>
                     </div>
                 </div>
@@ -221,13 +241,17 @@
         document.addEventListener('DOMContentLoaded', function () {
             const toggleBtn = document.getElementById('toggleAccountBtn');
             const accountFields = document.getElementById('accountFields');
+            const hasAccountInput = document.getElementById('hasAccountInput');
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
+            const emailInput = document.getElementById('email');
+            const groupIdInput = document.getElementById('groupId');
             let hasAccount = false;
 
             // Toggle logic for User Account section
             toggleBtn.addEventListener('click', function () {
                 hasAccount = !hasAccount;
+                hasAccountInput.value = hasAccount ? 'true' : 'false';
 
                 if (hasAccount) {
                     accountFields.style.display = 'block';
@@ -241,8 +265,12 @@
                     // Clear values and errors if toggled off
                     usernameInput.value = '';
                     passwordInput.value = '';
+                    emailInput.value = '';
+                    groupIdInput.value = '';
                     usernameInput.classList.remove('is-invalid');
                     passwordInput.classList.remove('is-invalid');
+                    emailInput.classList.remove('is-invalid');
+                    groupIdInput.classList.remove('is-invalid');
                 }
             });
 
@@ -278,6 +306,16 @@
 
                     if (!passwordInput.value || passwordInput.value.trim() === '') {
                         passwordInput.classList.add('is-invalid');
+                        isValid = false;
+                    }
+
+                    if (!emailInput.value || emailInput.value.trim() === '') {
+                        emailInput.classList.add('is-invalid');
+                        isValid = false;
+                    }
+
+                    if (!groupIdInput.value) {
+                        groupIdInput.classList.add('is-invalid');
                         isValid = false;
                     }
                 }

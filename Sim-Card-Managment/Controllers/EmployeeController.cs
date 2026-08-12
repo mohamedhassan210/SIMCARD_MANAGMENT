@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using Sim_Card_Managment.ViewModels;
-using Sim_Card_Managment.Repos.EmployeeRepos;
-using Sim_Card_Managment.Repos.NonEmployeeRepos;
-using Sim_Card_Managment.Repos.GroupRepos;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
+using Sim_Card_Managment.Repos.EmployeeRepos;
+using Sim_Card_Managment.Repos.GroupRepos;
+using Sim_Card_Managment.Repos.NonEmployeeRepos;
+using Sim_Card_Managment.ViewModels;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sim_Card_Managment.Controllers
@@ -17,15 +20,18 @@ namespace Sim_Card_Managment.Controllers
         private readonly IEmployeeRepo _employeeRepo;
         private readonly INonEmployeeRepo _nonEmployeeRepo;
         private readonly IGroupRepo _groupRepo;
+        private readonly AppDbContext _context;
 
         public EmployeeController(
             IEmployeeRepo employeeRepo,
             INonEmployeeRepo nonEmployeeRepo,
-            IGroupRepo groupRepo)
+            IGroupRepo groupRepo,
+            AppDbContext context)
         {
             _employeeRepo = employeeRepo;
             _nonEmployeeRepo = nonEmployeeRepo;
             _groupRepo = groupRepo;
+            _context = context;
         }
 
         // GET: /Employee/Index
@@ -75,26 +81,67 @@ namespace Sim_Card_Managment.Controllers
         }
 
         // GET: /Employee/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var model = new EmployeeUserCreateViewModel();
+            await PopulateGroupsAsync(model);
+            return View(model);
         }
 
         // POST: /Employee/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Employee employee)
+        public async Task<IActionResult> Create(EmployeeUserCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(employee);
+                await PopulateGroupsAsync(model);
+                return View(model);
             }
 
-            //employee.Id = int.Newint();
-            employee.CreatedAt = DateTime.Now;
-            employee.IsActive = true;
+            // Extra check beyond DataAnnotations: username must be free before we commit anything
+            if (model.HasAccount)
+            {
+                bool usernameTaken = await _context.Users.AnyAsync(u => u.Username == model.Username);
+                if (usernameTaken)
+                {
+                    ModelState.AddModelError(nameof(model.Username), "This username is already taken.");
+                    await PopulateGroupsAsync(model);
+                    return View(model);
+                }
+            }
+
+            // 1. Save the Employee row
+            var employee = new Employee
+            {
+                Name = model.Name,
+                NationalID = model.NationalID,
+                EmpCode = model.EmpCode,
+                Position = model.Position,
+                CreatedAt = DateTime.Now,
+                IsActive = true
+            };
 
             _employeeRepo.Add(employee);
+
+            // 2. If requested, save an independent User row — Employee and User
+            //    are two separate tables here; UserId on Employee is intentionally
+            //    left unset, no FK link is created between the two.
+            if (model.HasAccount)
+            {
+                var user = new User
+                {
+                    Username = model.Username!,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                    Email = model.Email!,
+                    GroupId = model.GroupId!.Value,
+                    IsActive = true,
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+            }
 
             return RedirectToAction(nameof(Index));
         }
@@ -150,6 +197,12 @@ namespace Sim_Card_Managment.Controllers
             _employeeRepo.Update(employee);
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task PopulateGroupsAsync(EmployeeUserCreateViewModel model)
+        {
+            var groups = await _groupRepo.GetAllAsync();
+            model.Groups = new SelectList(groups, "Id", "Name", model.GroupId);
         }
     }
 }
