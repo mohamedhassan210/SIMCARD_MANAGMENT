@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SIMCARD.Test")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4df92af855b89d30033ed4d482ad91f100161ebe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9192e84d883fc66350b942e8703dd00f550df0af")]
 [assembly: System.Reflection.AssemblyProductAttribute("SIMCARD.Test")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SIMCARD.Test")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

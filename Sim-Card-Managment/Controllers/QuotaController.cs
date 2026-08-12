@@ -74,29 +74,7 @@ namespace Sim_Card_Managment.Controllers
             return View(quota);
         }
 
-        // GET: Quota/Delete/{id}
-        [HttpGet]
-        public IActionResult Delete(int id)
-        {
-            var quota = _quotaRepo.GetById(id);
-
-            if (quota == null)
-                return NotFound();
-
-            return View(quota);
-        }
-
-        // POST: Quota/DeleteConfirmed/{id}
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            _quotaRepo.Delete(id);
-
-            TempData["Success"] = "Quota deleted successfully";
-            return RedirectToAction(nameof(Index));
-        }
-
+       
         // GET: Quota/Details/{id}
         public IActionResult Details(int id)
         {

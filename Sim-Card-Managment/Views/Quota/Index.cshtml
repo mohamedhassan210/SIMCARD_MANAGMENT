@@ -4,45 +4,397 @@
     ViewData["Title"] = "Quota List";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Quota Plans</h2>
-        <a asp-action="Create" class="btn btn-primary">Create New Quota</a>
-    </div>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Success"]
-        </div>
+<style>
+    /* Theme & Layout Variables */
+    :root {
+        --primary-orange: #E24D17;
+        --primary-orange-hover: #c84111;
+        --bg-light: #f8f9fa;
     }
 
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>Base Amount (GB)</th>
-                    <th>Extra Amount (GB)</th>
-                    <th>Period</th>
-                    <th>Valid From</th>
-                    <th>Valid To</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+    /* Page Header */
+    .page-header-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+
+    .page-header-subtitle {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* Action Buttons */
+    .btn-orange-primary {
+        background-color: var(--primary-orange);
+        border: 1px solid var(--primary-orange);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+        .btn-orange-primary:hover {
+            background-color: var(--primary-orange-hover);
+            border-color: var(--primary-orange-hover);
+            color: #ffffff;
+        }
+
+    .btn-view-action {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        color: #333333;
+        border-radius: 8px;
+        padding: 6px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .btn-view-action:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
+        }
+
+    /* Seamless Unified Search Bar */
+    .search-bar-wrapper {
+        display: flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 6px 16px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .search-bar-wrapper:focus-within {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
+        }
+
+        .search-bar-wrapper .search-icon {
+            color: #8c8c8c;
+            font-size: 15px;
+            margin-right: 10px;
+        }
+
+        .search-bar-wrapper input {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            width: 100%;
+            font-size: 0.92rem;
+            color: #333333;
+            padding: 4px 0;
+        }
+
+    /* Custom Dropdown Filter */
+    .custom-select-filter {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 8px 36px 8px 14px;
+        background-color: #ffffff;
+        font-size: 0.9rem;
+        color: #495057;
+        transition: border-color 0.2s ease;
+    }
+
+        .custom-select-filter:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
+            outline: none;
+        }
+
+    /* Status Badges */
+    .badge-status-active {
+        background-color: #d1e7dd;
+        color: #0f5132;
+        border: 1px solid #badbcc;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .badge-status-inactive {
+        background-color: #f8d7da;
+        color: #842029;
+        border: 1px solid #f5c2c7;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    /* Amount Text Highlights */
+    .amount-primary {
+        font-weight: 700;
+        color: #212529;
+    }
+
+    .amount-extra {
+        font-weight: 600;
+        color: #198754;
+    }
+
+    .amount-fees {
+        font-weight: 600;
+        color: #dc3545;
+    }
+</style>
+
+<div class="container-fluid px-4 p-100">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="page-header-title mb-1">Quota Management</h1>
+            <p class="page-header-subtitle mb-0">Overview of provider quota allocations, extra amounts, and associated fees.</p>
+        </div>
+        <div>
+            <a href="/Quota/Create" class="btn-orange-primary shadow-sm">
+                <i class="fas fa-plus"></i>
+                <span>Add New Quota</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Total Quotas</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">12</h3>
+                    </div>
+                    <div class="rounded-circle p-3 text-white" style="background-color: #E24D17;">
+                        <i class="fas fa-chart-pie fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Active Quotas</span>
+                        <h3 class="fw-bold text-success mb-0 mt-1">10</h3>
+                    </div>
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3 text-success">
+                        <i class="fas fa-check-circle fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Total Base Allocation</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">2,450 GB</h3>
+                    </div>
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 text-primary">
+                        <i class="fas fa-database fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Total Active Fees</span>
+                        <h3 class="fw-bold text-danger mb-0 mt-1">$1,850.00</h3>
+                    </div>
+                    <div class="rounded-circle bg-danger bg-opacity-10 p-3 text-danger">
+                        <i class="fas fa-receipt fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden p-4">
+
+        <div class="row g-3 justify-content-between align-items-center mb-4">
+            <div class="col-12 col-md-6 col-lg-5">
+                <label class="form-label text-muted small mb-1">Search</label>
+                <div class="search-bar-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="tableSearchInput" placeholder="Search by Service Provider Name...">
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-md-end align-items-end mt-3 mt-md-0">
+                <div class="w-100 w-md-auto">
+                    <label class="form-label text-muted small mb-1">Status Filter</label>
+                    <select id="statusFilter" class="form-select custom-select-filter">
+                        <option value="">All Statuses</option>
+                        <option value="Active">Active Only</option>
+                        <option value="Inactive">Inactive Only</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="quotaTable">
+                <thead class="table-light">
+                    <tr class="text-uppercase text-muted small fw-bold">
+                        <th scope="col">Service Provider</th>
+                        <th scope="col">Base Amount</th>
+                        <th scope="col">Extra Amount</th>
+                        <th scope="col">Fees</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
                     <tr>
-                        <td>@item.BaseAmount</td>
-                        <td>@item.ExtraAmount</td>
-                     
+                        <td class="fw-bold text-dark">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle bg-orange bg-opacity-10 text-danger p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="fas fa-wifi fa-sm"></i>
+                                </div>
+                                <span>Vodafone Egypt</span>
+                            </div>
+                        </td>
                         <td>
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">Details</a>
+                            <span class="amount-primary">100 GB</span>
+                        </td>
+                        <td>
+                            <span class="amount-extra">+20 GB</span>
+                        </td>
+                        <td>
+                            <span class="amount-fees">$150.00</span>
+                        </td>
+                        <td>
+                            <span class="badge-status-active availability-cell" data-active="true">
+                                <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Active
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a href="/Quota/Details/1" class="btn-view-action">
+                                <i class="fas fa-eye"></i> View
+                            </a>
                         </td>
                     </tr>
-                }
-            </tbody>
-        </table>
+
+                    <tr>
+                        <td class="fw-bold text-dark">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="fas fa-globe fa-sm"></i>
+                                </div>
+                                <span>Orange Business</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="amount-primary">250 GB</span>
+                        </td>
+                        <td>
+                            <span class="amount-extra">+50 GB</span>
+                        </td>
+                        <td>
+                            <span class="amount-fees">$320.00</span>
+                        </td>
+                        <td>
+                            <span class="badge-status-active availability-cell" data-active="true">
+                                <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Active
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a href="/Quota/Details/2" class="btn-view-action">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="fw-bold text-dark">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle bg-success bg-opacity-10 text-success p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="fas fa-signal fa-sm"></i>
+                                </div>
+                                <span>Etisalat Misr</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="amount-primary">50 GB</span>
+                        </td>
+                        <td>
+                            <span class="text-muted small">0 GB</span>
+                        </td>
+                        <td>
+                            <span class="amount-fees">$80.00</span>
+                        </td>
+                        <td>
+                            <span class="badge-status-inactive availability-cell" data-active="false">
+                                <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Inactive
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a href="/Quota/Details/3" class="btn-view-action">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById('tableSearchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const rows = document.querySelectorAll('#quotaTable tbody tr');
+
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const selectedStatus = statusFilter.value; // "Active", "Inactive", or ""
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const statusCell = row.querySelector('.availability-cell');
+                const isActive = statusCell ? statusCell.getAttribute('data-active') === 'true' : false;
+
+                // Match Search Term
+                const matchesSearch = !searchTerm || text.includes(searchTerm);
+
+                // Match Active/Inactive Filter
+                let matchesStatus = true;
+                if (selectedStatus === 'Active') {
+                    matchesStatus = isActive === true;
+                } else if (selectedStatus === 'Inactive') {
+                    matchesStatus = isActive === false;
+                }
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        statusFilter.addEventListener('change', filterTable);
+    });
+</script>
