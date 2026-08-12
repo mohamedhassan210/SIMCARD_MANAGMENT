@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using Sim_Card_Management.Models;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
@@ -12,13 +12,15 @@ namespace Sim_Card_Managment.Controllers
     [RequirePermission]
     public class DeviceStatusController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _context; // still needed for the DeviceStatusesType lookup table
+        private readonly IDeviceStatusRepo _deviceStatusRepo;
         private readonly ISIMRepo _simRepo;
         private readonly IUSBRepo _usbRepo;
 
-        public DeviceStatusController(AppDbContext context, ISIMRepo simRepo, IUSBRepo usbRepo)
+        public DeviceStatusController(AppDbContext context, IDeviceStatusRepo deviceStatusRepo, ISIMRepo simRepo, IUSBRepo usbRepo)
         {
             _context = context;
+            _deviceStatusRepo = deviceStatusRepo;
             _simRepo = simRepo;
             _usbRepo = usbRepo;
         }
@@ -26,21 +28,7 @@ namespace Sim_Card_Managment.Controllers
         // GET: /DeviceStatus
         public IActionResult Index()
         {
-            var statuses = _context.DeviceStatuses
-                .Include(ds => ds.Sim)
-                    .ThenInclude(s => s!.Subscriptions)
-                        .ThenInclude(sub => sub.Employee)
-                .Include(ds => ds.Sim)
-                    .ThenInclude(s => s!.Subscriptions)
-                        .ThenInclude(sub => sub.NonEmployee)
-                .Include(ds => ds.Usb)
-                    .ThenInclude(u => u!.Subscriptions)
-                        .ThenInclude(sub => sub.Employee)
-                .Include(ds => ds.Usb)
-                    .ThenInclude(u => u!.Subscriptions)
-                        .ThenInclude(sub => sub.NonEmployee)
-                .Include(ds => ds.StatusType)
-                .Include(ds => ds.ReportedByUser)
+            var statuses = _deviceStatusRepo.GetAllDeviceStatuses()
                 .OrderBy(ds => ds.StatusDate)
                 .ToList();
 
@@ -103,14 +91,7 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(DeviceStatusCreateViewModel model)
         {
-            if (!model.SimId.HasValue && !model.UsbId.HasValue)
-            {
-                ModelState.AddModelError("", "Please select a SIM or a USB device to report on.");
-            }
-            else if (model.SimId.HasValue && model.UsbId.HasValue)
-            {
-                ModelState.AddModelError("", "Please select only one device — a SIM or a USB, not both.");
-            }
+            ValidateDeviceSelection(model.SimId, model.UsbId);
 
             if (!ModelState.IsValid)
             {
@@ -135,41 +116,103 @@ namespace Sim_Card_Managment.Controllers
                 ReplacedByUsbId = model.ReplacedByUsbId
             };
 
-            _context.DeviceStatuses.Add(deviceStatus);
+            _deviceStatusRepo.AddDeviceStatus(deviceStatus);
 
             // Reflect this incident on the device's own live Status field too
-            if (statusType != null)
-            {
-                if (model.SimId.HasValue)
-                {
-                    var sim = _simRepo.GetById(model.SimId.Value);
-                    if (sim != null)
-                    {
-                        sim.Status = statusType.Name;
-                        _simRepo.Update(sim);
-                    }
-                }
-                else if (model.UsbId.HasValue)
-                {
-                    var usb = _usbRepo.GetById(model.UsbId.Value);
-                    if (usb != null)
-                    {
-                        usb.Status = statusType.Name;
-                        _usbRepo.Update(usb);
-                    }
-                }
-            }
-
-            _context.SaveChanges();
+            ApplyStatusToDevice(model.SimId, model.UsbId, statusType);
 
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Edit()
+        [HttpGet]
+        public IActionResult Edit(int id)
         {
+            var status = _deviceStatusRepo.GetDeviceStatusbyId(id);
+            if (status == null) return NotFound();
 
-            return View();
+            var model = new DeviceStatusEditViewModel
+            {
+                Id = status.Id,
+                SimId = status.SimId,
+                UsbId = status.UsbId,
+                StatusTypeId = status.StatusTypeId,
+                Notes = status.Notes,
+                ReplacedBySimId = status.ReplacedBySimId,
+                ReplacedByUsbId = status.ReplacedByUsbId
+            };
+
+            PopulateLookupLists(model);
+            return View(model);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(DeviceStatusEditViewModel model)
+        {
+            ValidateDeviceSelection(model.SimId, model.UsbId);
+
+            if (!ModelState.IsValid)
+            {
+                PopulateLookupLists(model);
+                return View(model);
+            }
+
+            var status = _deviceStatusRepo.GetDeviceStatusbyId(model.Id);
+            if (status == null) return NotFound();
+
+            var statusType = _context.DeviceStatusesType.FirstOrDefault(t => t.Id == model.StatusTypeId);
+
+            status.SimId = model.SimId;
+            status.UsbId = model.UsbId;
+            status.StatusTypeId = model.StatusTypeId;
+            status.Notes = model.Notes;
+            status.ReplacedBySimId = model.ReplacedBySimId;
+            status.ReplacedByUsbId = model.ReplacedByUsbId;
+
+            _deviceStatusRepo.Update(status);
+
+            // Keep the device's live Status field in sync with the (possibly changed) status type
+            ApplyStatusToDevice(model.SimId, model.UsbId, statusType);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private void ValidateDeviceSelection(int? simId, int? usbId)
+        {
+            if (!simId.HasValue && !usbId.HasValue)
+            {
+                ModelState.AddModelError("", "Please select a SIM or a USB device to report on.");
+            }
+            else if (simId.HasValue && usbId.HasValue)
+            {
+                ModelState.AddModelError("", "Please select only one device — a SIM or a USB, not both.");
+            }
+        }
+
+        private void ApplyStatusToDevice(int? simId, int? usbId, DeviceStatusType? statusType)
+        {
+            if (statusType == null) return;
+
+            if (simId.HasValue)
+            {
+                var sim = _simRepo.GetById(simId.Value);
+                if (sim != null)
+                {
+                    sim.Status = statusType.Name;
+                    _simRepo.Update(sim);
+                }
+            }
+            else if (usbId.HasValue)
+            {
+                var usb = _usbRepo.GetById(usbId.Value);
+                if (usb != null)
+                {
+                    usb.Status = statusType.Name;
+                    _usbRepo.Update(usb);
+                }
+            }
+        }
+
         private void PopulateLookupLists(DeviceStatusCreateViewModel model)
         {
             var sims = _simRepo.GetAll().ToList();

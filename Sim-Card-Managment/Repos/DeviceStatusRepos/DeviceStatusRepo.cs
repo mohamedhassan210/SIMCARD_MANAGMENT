@@ -7,7 +7,6 @@ namespace Sim_Card_Managment.Repos
     public class DeviceStatusRepo : IDeviceStatusRepo
     {
         private readonly AppDbContext _context;
-
         public DeviceStatusRepo(AppDbContext context)
         {
             _context = context;
@@ -16,8 +15,19 @@ namespace Sim_Card_Managment.Repos
         public IEnumerable<DeviceStatus> GetAllDeviceStatuses()
         {
             return _context.DeviceStatuses
-                .Include(d => d.Sim)
-                .Include(d => d.Usb)
+                .Include(d => d.Sim!)
+                    .ThenInclude(s => s.Subscriptions)
+                        .ThenInclude(sub => sub.Employee)
+                .Include(d => d.Sim!)
+                    .ThenInclude(s => s.Subscriptions)
+                        .ThenInclude(sub => sub.NonEmployee)
+                .Include(d => d.Usb!)
+                    .ThenInclude(u => u.Subscriptions)
+                        .ThenInclude(sub => sub.Employee)
+                .Include(d => d.Usb!)
+                    .ThenInclude(u => u.Subscriptions)
+                        .ThenInclude(sub => sub.NonEmployee)
+                .Include(d => d.StatusType)
                 .Include(d => d.ReportedByUser)
                 .ToList();
         }
@@ -27,6 +37,7 @@ namespace Sim_Card_Managment.Repos
             return _context.DeviceStatuses
                 .Include(d => d.Sim)
                 .Include(d => d.Usb)
+                .Include(d => d.StatusType)
                 .Include(d => d.ReportedByUser)
                 .Include(d => d.ReplacedBySim)
                 .Include(d => d.ReplacedByUsb)

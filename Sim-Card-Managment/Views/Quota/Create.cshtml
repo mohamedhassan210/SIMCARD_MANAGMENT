@@ -1,6 +1,7 @@
-﻿@model Sim_Card_Managment.Models.Quota
+@model Sim_Card_Managment.Viewmodel.QuotaViewModel
 
 @{
+    Layout = null;
     ViewData["Title"] = "Create Quota";
 }
 
@@ -138,59 +139,59 @@
     <div class="create-card shadow">
         <h2 class="title-header">Create New Quota</h2>
 
-        <form id="quotaForm" method="post">
+        <form id="quotaForm" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
 
             <div class="row g-4 mb-4">
                 <div class="col-md-12">
-                    <label class="custom-label" for="ServiceProviderId">Service Provider</label>
-                    <select name="ServiceProviderId" id="serviceProvider" class="custom-input">
+                    <label class="custom-label" asp-for="ServiceProviderId">Service Provider</label>
+                    <select asp-for="ServiceProviderId" asp-items="Model.ServiceProviders" id="serviceProvider" class="custom-input">
                         <option value="" disabled selected>Select Service Provider</option>
-                        <option value="1">Vodafone Egypt</option>
-                        <option value="2">Orange Business</option>
-                        <option value="3">Etisalat Misr</option>
-                        <option value="4">WE (Telecom Egypt)</option>
                     </select>
-                    <span class="error-msg" id="providerError"></span>
+                    <span asp-validation-for="ServiceProviderId" class="error-msg" id="providerError"></span>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label" for="BaseAmount">Base Amount (GB / Units)</label>
-                    <input type="number" step="0.01" name="BaseAmount" id="baseAmount" class="custom-input" placeholder="e.g. 100">
-                    <span class="error-msg" id="baseAmountError"></span>
+                    <label class="custom-label" asp-for="BaseAmount">Base Amount (GB / Units)</label>
+                    <input asp-for="BaseAmount" type="number" step="0.01" id="baseAmount" class="custom-input" placeholder="e.g. 100">
+                    <span asp-validation-for="BaseAmount" class="error-msg" id="baseAmountError"></span>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="custom-label" for="ExtraAmount">Extra Amount (GB / Units)</label>
-                    <input type="number" step="0.01" name="ExtraAmount" id="extraAmount" class="custom-input" placeholder="e.g. 20">
-                    <span class="error-msg" id="extraAmountError"></span>
+                    <label class="custom-label" asp-for="ExtraAmount">Extra Amount (GB / Units)</label>
+                    <input asp-for="ExtraAmount" type="number" step="0.01" id="extraAmount" class="custom-input" placeholder="e.g. 20">
+                    <span asp-validation-for="ExtraAmount" class="error-msg" id="extraAmountError"></span>
                 </div>
 
                 <div class="col-md-12">
-                    <label class="custom-label" for="Fees">Fees ($ / EGP)</label>
-                    <input type="number" step="0.01" name="Fees" id="fees" class="custom-input" placeholder="e.g. 150.00">
-                    <span class="error-msg" id="feesError"></span>
+                    <label class="custom-label" asp-for="Fees">Fees ($ / EGP)</label>
+                    <input asp-for="Fees" type="number" step="0.01" id="fees" class="custom-input" placeholder="e.g. 150.00">
+                    <span asp-validation-for="Fees" class="error-msg" id="feesError"></span>
                 </div>
 
                 <div class="col-md-12">
                     <div class="toggle-container d-flex align-items-center justify-content-between">
                         <div>
-                            <label class="custom-label mb-0" for="isActiveToggle">Active Status</label>
+                            <label class="custom-label mb-0" asp-for="IsActive">Active Status</label>
                             <small class="text-muted d-block" style="font-size: 12px;">Set whether this quota is currently active for allocations.</small>
                         </div>
                         <div class="form-check form-switch fs-4 mb-0">
-                            <input class="form-check-input" type="checkbox" id="isActiveToggle" name="IsActive" value="true" checked style="cursor: pointer;">
+                            <input asp-for="IsActive" class="form-check-input" style="cursor: pointer;">
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="d-flex justify-content-end gap-3 mt-5">
-                <a class="btn btn-cancel" href="/Quota/Index">Cancel</a>
+                <a class="btn btn-cancel" asp-action="Index">Cancel</a>
                 <button type="submit" class="btn btn-create">Create</button>
             </div>
 
         </form>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script>
         document.getElementById('quotaForm').addEventListener('submit', function (event) {
@@ -230,9 +231,3 @@
 </body>
 
 </html>
-@section Scripts {
-    @{
-        @Html.AntiForgeryToken();
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

@@ -1,4 +1,6 @@
-﻿<style>
+@model IEnumerable<Sim_Card_Managment.Viewmodel.DeviceStatusViewModel>
+
+<style>
     /* Custom Page Layout */
     .breadcrumb-custom {
         --bs-breadcrumb-divider: '>';
@@ -35,7 +37,7 @@
         font-size: 10px;
     }
 
-    /* Seamless Unified Search Bar (Matching Image 2) */
+    /* Seamless Unified Search Bar */
     .search-bar-wrapper {
         display: flex;
         align-items: center;
@@ -90,6 +92,14 @@
         }
 </style>
 
+@{
+    var statusList = Model?.ToList() ?? new List<Sim_Card_Managment.Viewmodel.DeviceStatusViewModel>();
+    int totalCount = statusList.Count;
+    int activeCount = statusList.Count(s => s.IsActive);
+    int simCount = statusList.Count(s => s.DeviceType == "SIM Card");
+    int usbCount = statusList.Count(s => s.DeviceType == "USB Modem");
+}
+
 <header>
     <div class="p-100 w-100 mx-4">
         <nav aria-label="breadcrumb">
@@ -103,13 +113,21 @@
             </ol>
         </nav>
 
-        <h1 class="fw-bold text-dark page-title mb-3">
-            Device Status Overview
-        </h1>
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <h1 class="fw-bold text-dark page-title mb-3">
+                    Device Status Overview
+                </h1>
 
-        <p class="mb-0 text-muted page-subtitle">
-            Monitor device lifecycle transitions, active assignments, and status change records across all registered hardware.
-        </p>
+                <p class="mb-0 text-muted page-subtitle">
+                    Monitor device lifecycle transitions, active assignments, and status change records across all registered hardware.
+                </p>
+            </div>
+
+            <a asp-controller="DeviceStatus" asp-action="Create" class="btn btn-primary rounded-pill px-4 fw-bold align-self-start">
+                <i class="fas fa-plus me-1"></i> Log New Status
+            </a>
+        </div>
     </div>
 </header>
 
@@ -121,7 +139,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted small fw-medium">Total Log Records</span>
-                        <h3 class="fw-bold text-dark mb-0 mt-1" id="totalRecordsCount">2</h3>
+                        <h3 class="fw-bold text-dark mb-0 mt-1" id="totalRecordsCount">@totalCount</h3>
                     </div>
                     <div class="rounded-circle bg-primary bg-opacity-10 p-3 text-primary">
                         <i class="fas fa-list-alt fa-lg"></i>
@@ -135,7 +153,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted small fw-medium">Active Items</span>
-                        <h3 class="fw-bold text-success mb-0 mt-1" id="activeRecordsCount">1</h3>
+                        <h3 class="fw-bold text-success mb-0 mt-1" id="activeRecordsCount">@activeCount</h3>
                     </div>
                     <div class="rounded-circle bg-success bg-opacity-10 p-3 text-success">
                         <i class="fas fa-check-circle fa-lg"></i>
@@ -149,7 +167,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted small fw-medium">SIM Cards</span>
-                        <h3 class="fw-bold text-danger mb-0 mt-1" id="simCount">1</h3>
+                        <h3 class="fw-bold text-danger mb-0 mt-1" id="simCount">@simCount</h3>
                     </div>
                     <div class="rounded-circle bg-danger bg-opacity-10 p-3 text-danger">
                         <i class="fas fa-sim-card fa-lg"></i>
@@ -163,7 +181,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted small fw-medium">USB Modems</span>
-                        <h3 class="fw-bold text-secondary mb-0 mt-1" id="usbCount">1</h3>
+                        <h3 class="fw-bold text-secondary mb-0 mt-1" id="usbCount">@usbCount</h3>
                     </div>
                     <div class="rounded-circle bg-secondary bg-opacity-10 p-3 text-secondary">
                         <i class="fas fa-usb fa-lg"></i>
@@ -180,7 +198,7 @@
                 <label class="form-label text-muted small mb-1">Search</label>
                 <div class="search-bar-wrapper">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="tableSearchInput" placeholder="Search by Serial, Phone, Model, Provider, or Assignee...">
+                    <input type="text" id="tableSearchInput" placeholder="Search by Serial, Status, Assignee, or Reporter...">
                 </div>
             </div>
 
@@ -217,87 +235,86 @@
                         <th scope="col">Reported By</th>
                         <th scope="col">Status Date</th>
                         <th scope="col" class="text-end">Notes</th>
+                        <th scope="col" class="text-end"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="fw-bold text-dark">
-                            <code>8901410321111851070F</code>
-                        </td>
-                        <td>
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill device-type-cell">
-                                <i class="fas fa-sim-card me-1"></i> SIM Card
-                            </span>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2 small">
-                                <span class="badge bg-light text-dark border">Unassigned</span>
-                                <i class="fas fa-arrow-right text-muted transition-arrow"></i>
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Assigned</span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge bg-success text-white px-2 py-1 rounded-pill availability-cell" data-active="true">
-                                <i class="fas fa-circle me-1 status-dot-icon"></i> Active
-                            </span>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex justify-content-center align-items-center avatar-initials fw-bold">
-                                    A
-                                </div>
-                                <span class="fw-medium text-dark">Ahmed Hassan</span>
-                            </div>
-                        </td>
-                        <td class="text-muted small">
-                            <i class="fas fa-user-edit me-1"></i> Admin.User
-                        </td>
-                        <td class="text-muted small">
-                            Aug 11, 2026 14:30
-                        </td>
-                        <td class="text-end">
-                            <button type="button" class="btn btn-sm btn-outline-secondary border-0" data-bs-toggle="tooltip" title="Reassigned after card replacement">
-                                <i class="fas fa-sticky-note"></i>
-                            </button>
-                        </td>
-                    </tr>
+                    @if (statusList.Any())
+                    {
+                        foreach (var item in statusList)
+                        {
+                            bool isSim = item.DeviceType == "SIM Card";
+                            string typeBadgeClass = isSim ? "bg-danger-subtle text-danger border-danger-subtle" : "bg-secondary-subtle text-secondary border-secondary-subtle";
+                            string typeIcon = isSim ? "fa-sim-card" : "fa-usb";
+                            string availBadgeClass = item.IsActive ? "bg-success" : "bg-secondary";
+                            string assignedInitial = (!string.IsNullOrEmpty(item.AssignedTo) && item.AssignedTo != "Unassigned")
+                                ? item.AssignedTo.Substring(0, 1).ToUpper()
+                                : "";
 
-                    <tr>
-                        <td class="fw-bold text-dark">
-                            <code>USB-MOD-984210</code>
-                        </td>
-                        <td>
-                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 rounded-pill device-type-cell">
-                                <i class="fas fa-usb me-1"></i> USB Modem
-                            </span>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2 small">
-                                <span class="badge bg-light text-dark border">Assigned</span>
-                                <i class="fas fa-arrow-right text-muted transition-arrow"></i>
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Lost</span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge bg-secondary text-white px-2 py-1 rounded-pill availability-cell" data-active="false">
-                                <i class="fas fa-circle me-1 status-dot-icon"></i> Not Active
-                            </span>
-                        </td>
-                        <td>
-                            <span class="text-muted fst-italic">Unassigned</span>
-                        </td>
-                        <td class="text-muted small">
-                            <i class="fas fa-user-edit me-1"></i> Sara.Mohamed
-                        </td>
-                        <td class="text-muted small">
-                            Aug 09, 2026 09:15
-                        </td>
-                        <td class="text-end">
-                            <button type="button" class="btn btn-sm btn-outline-secondary border-0" data-bs-toggle="tooltip" title="Device reported lost in transit">
-                                <i class="fas fa-sticky-note"></i>
-                            </button>
-                        </td>
-                    </tr>
+                            <tr>
+                                <td class="fw-bold text-dark">
+                                    <code>@item.SerialNumber</code>
+                                </td>
+                                <td>
+                                    <span class="badge @typeBadgeClass border px-2 py-1 rounded-pill device-type-cell">
+                                        <i class="fas @typeIcon me-1"></i> @item.DeviceType
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2 small">
+                                        <span class="badge bg-light text-dark border">@item.OldStatus</span>
+                                        <i class="fas fa-arrow-right text-muted transition-arrow"></i>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">@item.NewStatus</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge @availBadgeClass text-white px-2 py-1 rounded-pill availability-cell" data-active="@item.IsActive.ToString().ToLower()">
+                                        <i class="fas fa-circle me-1 status-dot-icon"></i> @item.Availability
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (assignedInitial != "")
+                                    {
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex justify-content-center align-items-center avatar-initials fw-bold">
+                                                @assignedInitial
+                                            </div>
+                                            <span class="fw-medium text-dark">@item.AssignedTo</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">Unassigned</span>
+                                    }
+                                </td>
+                                <td class="text-muted small">
+                                    <i class="fas fa-user-edit me-1"></i> @item.ReportedByUserName
+                                </td>
+                                <td class="text-muted small">
+                                    @item.StatusDate.ToString("MMM dd, yyyy HH:mm")
+                                </td>
+                                <td class="text-end">
+                                    @if (!string.IsNullOrEmpty(item.Notes))
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-secondary border-0" data-bs-toggle="tooltip" title="@item.Notes">
+                                            <i class="fas fa-sticky-note"></i>
+                                        </button>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a asp-controller="DeviceStatus" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary border-0">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">No status records yet.</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -333,13 +350,9 @@
                 const rowType = typeCell ? typeCell.textContent.toLowerCase() : '';
                 const isRowActive = availCell ? availCell.getAttribute('data-active') === 'true' : false;
 
-                // Search term matching
                 const matchesSearch = !searchTerm || text.includes(searchTerm);
-
-                // Device Type matching
                 const matchesType = !selectedType || rowType.includes(selectedType);
 
-                // Strict Active / Not Active matching using data attribute
                 let matchesAvail = true;
                 if (selectedAvail === 'Active') {
                     matchesAvail = isRowActive === true;
@@ -347,7 +360,6 @@
                     matchesAvail = isRowActive === false;
                 }
 
-                // Apply visibility
                 if (matchesSearch && matchesType && matchesAvail) {
                     row.style.display = '';
                 } else {
@@ -356,7 +368,6 @@
             });
         }
 
-        // Event listeners
         searchInput.addEventListener('input', filterTable);
         typeFilter.addEventListener('change', filterTable);
         availFilter.addEventListener('change', filterTable);

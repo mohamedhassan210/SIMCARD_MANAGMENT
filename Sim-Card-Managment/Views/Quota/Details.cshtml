@@ -1,4 +1,4 @@
-﻿@model Sim_Card_Managment.Models.Quota
+@model Sim_Card_Managment.Viewmodel.QuotaViewModel
 
 @{
     ViewData["Title"] = "Quota Details";
@@ -14,13 +14,29 @@
                 <dt class="col-sm-4">Plan ID</dt>
                 <dd class="col-sm-8 text-muted">@Model.Id</dd>
 
+                <dt class="col-sm-4">Service Provider</dt>
+                <dd class="col-sm-8">@(Model.ServiceProviderName ?? "—")</dd>
+
                 <dt class="col-sm-4">Base Amount</dt>
                 <dd class="col-sm-8">@Model.BaseAmount GB</dd>
 
                 <dt class="col-sm-4">Extra Amount</dt>
                 <dd class="col-sm-8">@Model.ExtraAmount GB</dd>
 
-             
+                <dt class="col-sm-4">Fees</dt>
+                <dd class="col-sm-8">@Model.Fees.ToString("C")</dd>
+
+                <dt class="col-sm-4">Status</dt>
+                <dd class="col-sm-8">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactive</span>
+                    }
+                </dd>
             </dl>
         </div>
         <div class="card-footer d-flex gap-2 bg-light">

@@ -1,6 +1,5 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model Sim_Card_Managment.Viewmodel.DeviceStatusCreateViewModel
+
 @{
     Layout = null;
 }
@@ -70,13 +69,22 @@
             outline: none;
         }
 
+    .custom-control.input-validation-error {
+        border-color: #dc3545;
+    }
+
+    .error-msg {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+
     /* Dynamic Conditional Fields Container */
     .conditional-field {
         display: none;
         animation: fadeIn 0.3s ease-in-out;
     }
-
- 
 
     /* Submit Button */
     .btn-submit {
@@ -101,13 +109,16 @@
         <h2 class="form-title">Create Device Status</h2>
         <p class="form-subtitle">Log status updates, replacements, and notes for devices.</p>
 
-        <form id="createDeviceStatusForm">
+        <div asp-validation-summary="ModelOnly" class="error-msg mb-3"></div>
+
+        <form id="createDeviceStatusForm" asp-controller="DeviceStatus" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
 
             <div class="form-group">
                 <label for="deviceCategory" class="form-label">
                     Device Category <span class="required-asterisk">*</span>
                 </label>
-                <select id="deviceCategory" class="custom-control" required>
+                <select id="deviceCategory" class="custom-control">
                     <option value="" disabled selected>-- Select Device Category --</option>
                     <option value="SIM">SIM Card</option>
                     <option value="USB">USB Modem</option>
@@ -115,70 +126,60 @@
             </div>
 
             <div id="simIdGroup" class="form-group conditional-field">
-                <label for="simId" class="form-label">
+                <label asp-for="SimId" class="form-label">
                     SIM Card <span class="required-asterisk">*</span>
                 </label>
-                <select id="simId" class="custom-control">
-                    <option value="" disabled selected>-- Select SIM Card --</option>
-                    <option value="1">SIM - 890141032111 (Ahmed Hassan)</option>
-                    <option value="2">SIM - 890141032112 (Sara Mohamed)</option>
+                <select asp-for="SimId" asp-items="Model.Sims" class="custom-control">
+                    <option value="">-- Select SIM Card --</option>
                 </select>
+                <span asp-validation-for="SimId" class="error-msg"></span>
             </div>
 
             <div id="usbIdGroup" class="form-group conditional-field">
-                <label for="usbId" class="form-label">
+                <label asp-for="UsbId" class="form-label">
                     USB Modem <span class="required-asterisk">*</span>
                 </label>
-                <select id="usbId" class="custom-control">
-                    <option value="" disabled selected>-- Select USB Modem --</option>
-                    <option value="101">USB - MOD-984210 (IT Pool)</option>
-                    <option value="102">USB - MOD-984211 (John Doe)</option>
+                <select asp-for="UsbId" asp-items="Model.Usbs" class="custom-control">
+                    <option value="">-- Select USB Modem --</option>
                 </select>
+                <span asp-validation-for="UsbId" class="error-msg"></span>
             </div>
 
             <div class="form-group">
-                <label for="statusTypeId" class="form-label">
+                <label asp-for="StatusTypeId" class="form-label">
                     Status Type <span class="required-asterisk">*</span>
                 </label>
-                <select id="statusTypeId" class="custom-control" required>
-                    <option value="" disabled selected>-- Select Status --</option>
-                    <option value="1">Active / Assigned</option>
-                    <option value="2">Damaged</option>
-                    <option value="3">Lost</option>
-                    <option value="4">Replaced</option>
-                    <option value="5">Unassigned</option>
+                <select asp-for="StatusTypeId" asp-items="Model.StatusTypes" class="custom-control" required>
+                    <option value="">-- Select Status --</option>
                 </select>
+                <span asp-validation-for="StatusTypeId" class="error-msg"></span>
             </div>
 
             <div id="replacedBySimGroup" class="form-group conditional-field">
-                <label for="replacedBySimId" class="form-label">
+                <label asp-for="ReplacedBySimId" class="form-label">
                     Replaced By SIM Card
                 </label>
-                <select id="replacedBySimId" class="custom-control">
-                    <option value="" selected>-- Select Replacement SIM --</option>
-                    <option value="3">SIM - 890141032999 (New Reserve)</option>
-                    <option value="4">SIM - 890141032888 (Replacement)</option>
+                <select asp-for="ReplacedBySimId" asp-items="Model.ReplacementSims" class="custom-control">
+                    <option value="">-- Select Replacement SIM --</option>
                 </select>
             </div>
 
             <div id="replacedByUsbGroup" class="form-group conditional-field">
-                <label for="replacedByUsbId" class="form-label">
+                <label asp-for="ReplacedByUsbId" class="form-label">
                     Replaced By USB Modem
                 </label>
-                <select id="replacedByUsbId" class="custom-control">
-                    <option value="" selected>-- Select Replacement USB --</option>
-                    <option value="103">USB - MOD-985000 (New Batch)</option>
-                    <option value="104">USB - MOD-985001 (Backup Unit)</option>
+                <select asp-for="ReplacedByUsbId" asp-items="Model.ReplacementUsbs" class="custom-control">
+                    <option value="">-- Select Replacement USB --</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="notes" class="form-label">Notes / Details</label>
-                <textarea id="notes" class="custom-control" rows="3" placeholder="Add optional details regarding status change..."></textarea>
+                <label asp-for="Notes" class="form-label">Notes / Details</label>
+                <textarea asp-for="Notes" class="custom-control" rows="3" placeholder="Add optional details regarding status change..."></textarea>
             </div>
 
             <div class="mt-4">
-                <button type="submit" class=" lp-btn-submit rounded-pill px-5 py-2 w-100 fw-bold ">
+                <button type="submit" class="btn-submit rounded-pill px-5 py-2 w-100 fw-bold">
                     <i class="fas fa-save me-1"></i> Save Status Record
                 </button>
             </div>
@@ -197,33 +198,42 @@
         const replacedBySimGroup = document.getElementById("replacedBySimGroup");
         const replacedByUsbGroup = document.getElementById("replacedByUsbGroup");
 
-        // Input Fields
-        const simIdSelect = document.getElementById("simId");
-        const usbIdSelect = document.getElementById("usbId");
+        // Input Fields (ids come from asp-for, e.g. asp-for="SimId" -> id="SimId")
+        const simIdSelect = document.getElementById("SimId");
+        const usbIdSelect = document.getElementById("UsbId");
 
-        deviceCategorySelect.addEventListener("change", function () {
-            const selectedCategory = this.value;
-
-            // Hide all conditional fields first
+        function showCategory(category) {
             simIdGroup.style.display = "none";
             usbIdGroup.style.display = "none";
             replacedBySimGroup.style.display = "none";
             replacedByUsbGroup.style.display = "none";
 
-            // Reset required flags
             simIdSelect.removeAttribute("required");
             usbIdSelect.removeAttribute("required");
 
-            // Show relevant fields based on selection
-            if (selectedCategory === "SIM") {
+            if (category === "SIM") {
                 simIdGroup.style.display = "block";
                 replacedBySimGroup.style.display = "block";
                 simIdSelect.setAttribute("required", "required");
-            } else if (selectedCategory === "USB") {
+            } else if (category === "USB") {
                 usbIdGroup.style.display = "block";
                 replacedByUsbGroup.style.display = "block";
                 usbIdSelect.setAttribute("required", "required");
             }
+        }
+
+        deviceCategorySelect.addEventListener("change", function () {
+            showCategory(this.value);
         });
+
+        // If the form is redisplayed after a validation error, restore whichever
+        // device type the user had picked instead of collapsing back to blank.
+        if (simIdSelect.value) {
+            deviceCategorySelect.value = "SIM";
+            showCategory("SIM");
+        } else if (usbIdSelect.value) {
+            deviceCategorySelect.value = "USB";
+            showCategory("USB");
+        }
     });
 </script>

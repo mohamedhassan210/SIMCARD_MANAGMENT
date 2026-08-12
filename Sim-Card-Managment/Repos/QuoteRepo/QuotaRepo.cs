@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿// Repos/QuoteRepo/QuotaRepo.cs
+using Microsoft.EntityFrameworkCore;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 
@@ -7,25 +8,32 @@ namespace Sim_Card_Managment.Repos.QuoteRepo
     public class QuotaRepo : IQuotaRepo
     {
         private readonly AppDbContext _context;
-
         public QuotaRepo(AppDbContext context)
         {
             _context = context;
         }
+
         public async Task<IEnumerable<Quota>> GetQuotasByProviderIdAsync(int providerId)
         {
             return await _context.Quotas
+                .Include(q => q.ServiceProvider)
                 .Where(q => q.ServiceProviderId == providerId)
                 .ToListAsync();
         }
+
         public IEnumerable<Quota> GetAll()
         {
-            return _context.Quotas.ToList();
+            return _context.Quotas
+                .Include(q => q.ServiceProvider)
+                .ToList();
         }
 
         public Quota? GetById(int id)
         {
-            return _context.Quotas.Find(id);
+            // .Find() can't Include() navigation properties — must use a query.
+            return _context.Quotas
+                .Include(q => q.ServiceProvider)
+                .FirstOrDefault(q => q.Id == id);
         }
 
         public void Add(Quota quota)
@@ -43,7 +51,6 @@ namespace Sim_Card_Managment.Repos.QuoteRepo
         public void Delete(int id)
         {
             var quota = GetById(id);
-
             if (quota != null)
             {
                 _context.Quotas.Remove(quota);

@@ -1,7 +1,12 @@
-﻿@model IEnumerable<Sim_Card_Managment.Models.Quota>
+@model IEnumerable<Sim_Card_Managment.Viewmodel.QuotaViewModel>
 
 @{
     ViewData["Title"] = "Quota List";
+    var quotaList = Model.ToList();
+    var totalQuotas = quotaList.Count;
+    var activeQuotas = quotaList.Count(q => q.IsActive);
+    var totalBaseAllocation = quotaList.Sum(q => q.BaseAmount);
+    var totalActiveFees = quotaList.Where(q => q.IsActive).Sum(q => q.Fees);
 }
 
 <style>
@@ -163,7 +168,7 @@
             <p class="page-header-subtitle mb-0">Overview of provider quota allocations, extra amounts, and associated fees.</p>
         </div>
         <div>
-            <a href="/Quota/Create" class="btn-orange-primary shadow-sm">
+            <a asp-action="Create" class="btn-orange-primary shadow-sm">
                 <i class="fas fa-plus"></i>
                 <span>Add New Quota</span>
             </a>
@@ -176,7 +181,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted small fw-medium">Total Quotas</span>
-                        <h3 class="fw-bold text-dark mb-0 mt-1">12</h3>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@totalQuotas</h3>
                     </div>
                     <div class="rounded-circle p-3 text-white" style="background-color: #E24D17;">
                         <i class="fas fa-chart-pie fa-lg"></i>
@@ -190,7 +195,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted small fw-medium">Active Quotas</span>
-                        <h3 class="fw-bold text-success mb-0 mt-1">10</h3>
+                        <h3 class="fw-bold text-success mb-0 mt-1">@activeQuotas</h3>
                     </div>
                     <div class="rounded-circle bg-success bg-opacity-10 p-3 text-success">
                         <i class="fas fa-check-circle fa-lg"></i>
@@ -204,7 +209,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted small fw-medium">Total Base Allocation</span>
-                        <h3 class="fw-bold text-dark mb-0 mt-1">2,450 GB</h3>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@totalBaseAllocation.ToString("0.##") GB</h3>
                     </div>
                     <div class="rounded-circle bg-primary bg-opacity-10 p-3 text-primary">
                         <i class="fas fa-database fa-lg"></i>
@@ -218,7 +223,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
                         <span class="text-muted small fw-medium">Total Active Fees</span>
-                        <h3 class="fw-bold text-danger mb-0 mt-1">$1,850.00</h3>
+                        <h3 class="fw-bold text-danger mb-0 mt-1">@totalActiveFees.ToString("C")</h3>
                     </div>
                     <div class="rounded-circle bg-danger bg-opacity-10 p-3 text-danger">
                         <i class="fas fa-receipt fa-lg"></i>
@@ -264,95 +269,63 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="fw-bold text-dark">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle bg-orange bg-opacity-10 text-danger p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <i class="fas fa-wifi fa-sm"></i>
-                                </div>
-                                <span>Vodafone Egypt</span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="amount-primary">100 GB</span>
-                        </td>
-                        <td>
-                            <span class="amount-extra">+20 GB</span>
-                        </td>
-                        <td>
-                            <span class="amount-fees">$150.00</span>
-                        </td>
-                        <td>
-                            <span class="badge-status-active availability-cell" data-active="true">
-                                <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Active
-                            </span>
-                        </td>
-                        <td class="text-end">
-                            <a href="/Quota/Details/1" class="btn-view-action">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td class="fw-bold text-dark">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <i class="fas fa-globe fa-sm"></i>
-                                </div>
-                                <span>Orange Business</span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="amount-primary">250 GB</span>
-                        </td>
-                        <td>
-                            <span class="amount-extra">+50 GB</span>
-                        </td>
-                        <td>
-                            <span class="amount-fees">$320.00</span>
-                        </td>
-                        <td>
-                            <span class="badge-status-active availability-cell" data-active="true">
-                                <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Active
-                            </span>
-                        </td>
-                        <td class="text-end">
-                            <a href="/Quota/Details/2" class="btn-view-action">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td class="fw-bold text-dark">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle bg-success bg-opacity-10 text-success p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <i class="fas fa-signal fa-sm"></i>
-                                </div>
-                                <span>Etisalat Misr</span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="amount-primary">50 GB</span>
-                        </td>
-                        <td>
-                            <span class="text-muted small">0 GB</span>
-                        </td>
-                        <td>
-                            <span class="amount-fees">$80.00</span>
-                        </td>
-                        <td>
-                            <span class="badge-status-inactive availability-cell" data-active="false">
-                                <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Inactive
-                            </span>
-                        </td>
-                        <td class="text-end">
-                            <a href="/Quota/Details/3" class="btn-view-action">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                        </td>
-                    </tr>
+                    @if (!quotaList.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No quotas found.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var quota in quotaList)
+                        {
+                            <tr>
+                                <td class="fw-bold text-dark">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle bg-orange bg-opacity-10 text-danger p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                            <i class="fas fa-wifi fa-sm"></i>
+                                        </div>
+                                        <span>@(quota.ServiceProviderName ?? "—")</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="amount-primary">@quota.BaseAmount GB</span>
+                                </td>
+                                <td>
+                                    @if (quota.ExtraAmount > 0)
+                                    {
+                                        <span class="amount-extra">+@quota.ExtraAmount GB</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">0 GB</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="amount-fees">@quota.Fees.ToString("C")</span>
+                                </td>
+                                <td>
+                                    @if (quota.IsActive)
+                                    {
+                                        <span class="badge-status-active availability-cell" data-active="true">
+                                            <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-status-inactive availability-cell" data-active="false">
+                                            <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Inactive
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a asp-action="Details" asp-route-id="@quota.Id" class="btn-view-action">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
