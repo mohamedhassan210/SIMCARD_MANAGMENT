@@ -13,5 +13,6 @@ namespace Sim_Card_Managment.Repos
         void Add(Usb usb);
         void Update(Usb usb);
         void Delete(int id);
+        Task<IEnumerable<Usb>> GetAssignableUsbsAsync(string query);
     }
 }

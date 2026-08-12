@@ -323,11 +323,28 @@ namespace Sim_Card_Managment.Controllers
 
                     foreach (var simDto in viewModel.Sims)
                     {
+                        // Validate phone number
+                        if (string.IsNullOrWhiteSpace(simDto.PhoneNumber) ||
+                            simDto.PhoneNumber.Length != 11 ||
+                            !simDto.PhoneNumber.StartsWith("01") ||
+                            !simDto.PhoneNumber.All(char.IsDigit))
+                        {
+                            ModelState.AddModelError("", $"Invalid phone number: '{simDto.PhoneNumber}'. Must be 11 digits and start with 01.");
+                            await PopulateDropdownsAsync(viewModel);
+                            return View(viewModel);
+                        }
+
+                        // Generate serial if empty (no serial number device)
+                        var serialNumber = string.IsNullOrWhiteSpace(simDto.SerialNumber)
+                            ? $"SYS-SIM-{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString("N")[..6].ToUpper()}"
+                            : simDto.SerialNumber.Trim();
+
                         var sim = new Sim
                         {
-                            SerialNumber = simDto.SerialNumber,
+                            SerialNumber = serialNumber,
                             PhoneNumber = simDto.PhoneNumber,
                             NetworkType = simDto.NetworkType,
+                            Status = "UnAssigned",
                             IsActive = true,
                             RegisteredAt = DateTime.Now,
                             ServiceProviderId = viewModel.ServiceProviderId.Value
@@ -336,7 +353,7 @@ namespace Sim_Card_Managment.Controllers
 
                         var serial = new Serial
                         {
-                            SerialNumber = simDto.SerialNumber,
+                            SerialNumber = serialNumber,
                             DocumentDetailsId = simDocumentDetails.Id,
                             SimId = sim.Id,
                             CreatedDate = DateTime.Now,
@@ -359,10 +376,16 @@ namespace Sim_Card_Managment.Controllers
 
                     foreach (var usbDto in viewModel.Usbs)
                     {
+                        // Generate serial if empty (no serial number device)
+                        var serialNumber = string.IsNullOrWhiteSpace(usbDto.SerialNumber)
+                            ? $"SYS-USB-{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString("N")[..6].ToUpper()}"
+                            : usbDto.SerialNumber.Trim();
+
                         var usb = new Usb
                         {
-                            SerialNumber = usbDto.SerialNumber,
+                            SerialNumber = serialNumber,
                             Model = usbDto.Model,
+                            Status = "UnAssigned",
                             IsActive = true,
                             RegisteredAt = DateTime.Now,
                             ServiceProviderId = viewModel.ServiceProviderId.Value
@@ -371,7 +394,7 @@ namespace Sim_Card_Managment.Controllers
 
                         var serial = new Serial
                         {
-                            SerialNumber = usbDto.SerialNumber,
+                            SerialNumber = serialNumber,
                             DocumentDetailsId = usbDocumentDetails.Id,
                             UsbId = usb.Id,
                             CreatedDate = DateTime.Now,

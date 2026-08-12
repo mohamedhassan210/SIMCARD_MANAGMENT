@@ -102,5 +102,15 @@ namespace Sim_Card_Managment.Repos
                 _context.SaveChanges();
             }
         }
+        public async Task<IEnumerable<Sim>> GetAssignableSimsAsync(string query)
+        {
+            return await _context.Sims
+                .Include(s => s.ServiceProvider)
+                .Where(s => s.IsActive &&
+                            !s.Subscriptions.Any(sub => sub.EndDate == null || sub.EndDate > DateTime.Now) &&
+                            (string.IsNullOrEmpty(query) || s.PhoneNumber.Contains(query) || s.SerialNumber.Contains(query)))
+                .Take(6)
+                .ToListAsync();
+        }
     }
 }

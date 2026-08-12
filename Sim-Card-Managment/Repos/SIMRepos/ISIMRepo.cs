@@ -17,5 +17,6 @@ namespace Sim_Card_Managment.Repos
         void Add(Sim sim);
         void Update(Sim sim);
         void Delete(int id);
+        Task<IEnumerable<Sim>> GetAssignableSimsAsync(string query);
     }
 }

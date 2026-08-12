@@ -408,19 +408,11 @@
 
                     
 
-                    <div class="form-check mb-5 d-flex align-items-start gap-2">
-                        <input class="form-check-input mt-1" type="checkbox" asp-for="AgreedToTerms" id="termsCheck">
-                        <label class="form-check-label terms-text" for="termsCheck">
-                            I agree to the <a href="#">Terms & Conditions</a> and privacy policy. I acknowledge that the selected recipient is solely responsible for the use of the assigned asset(s).
-                        </label>
-                    </div>
+               
 
                     <div class="d-flex justify-content-between align-items-center pt-3 border-top">
                         <a asp-action="Index" class="btn btn-action btn-outline-back text-center text-decoration-none">Back</a>
-                        <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-action btn-draft">Save Draft</button>
-                            <button type="submit" class="btn btn-action btn-activate">Activate Subscription</button>
-                        </div>
+                        <button type="submit" class="btn btn-action btn-activate">Activate Subscription</button>
                     </div>
 
                 </div>
@@ -689,7 +681,7 @@
         }
 
         // Quotas Search
-        function loadQuotasForProvider(providerId) {
+                function loadQuotasForProvider(providerId) {
             $('#quotaInstruction').hide();
             $.get('/Subscription/GetQuotasByProvider', { providerId: providerId }, function (data) {
                 let html = '';
@@ -700,9 +692,10 @@
                         const isSelected = $('#SelectedQuotaId').val() === q.id;
                         html += `
                             <div class="col-md-6">
-                                <div class="selection-card ${isSelected ? 'active' : ''}" onclick="selectQuota('${q.id}', '${q.baseAmount} GB', this)">
+                                <div class="selection-card ${isSelected ? 'active' : ''}" onclick="selectQuota('${q.id}', '${q.baseAmount} GB', ${q.fees}, this)">
                                     <div class="card-title-text">${q.baseAmount} GB Base Quota</div>
                                     <p class="card-subtitle-text">Extra Amount: $${q.extraAmount}</p>
+                                    <p class="card-subtitle-text">Default Fee: $${q.fees}</p>
                                     <i class="fas fa-check-circle check-icon"></i>
                                 </div>
                             </div>`;
@@ -712,7 +705,7 @@
             });
         }
 
-        function selectQuota(quotaId, displayVal, cardEl) {
+        function selectQuota(quotaId, displayVal, defaultFee, cardEl) {
             if (!$('#SelectedSimId').val()) {
                 alert('Please select a SIM card before picking a Quota.');
                 return;
@@ -727,6 +720,11 @@
                 $('#SelectedQuotaId').val(quotaId);
 
                 selectedQuotaDisplay = displayVal;
+
+                // Pre-fill the fee box with the quota's default — user can still overwrite it
+                $('#feezInput').val(defaultFee);
+                $('#Feez').val(defaultFee);
+
                 updateQuotaStatusText();
 
                 $('#feezContainer').slideDown();
