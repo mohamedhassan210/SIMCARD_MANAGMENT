@@ -1,7 +1,7 @@
 @model Sim_Card_Managment.Models.Employee
 
 @{
-    
+
 }
 
 <!DOCTYPE html>
@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create New Employee</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body {
@@ -22,6 +23,7 @@
             align-items: center;
             justify-content: center;
             margin: 0;
+            padding: 2rem 1rem;
         }
 
         .create-card {
@@ -36,7 +38,7 @@
             font-weight: 700;
             font-size: 32px;
             color: #000;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
         }
 
         .custom-label {
@@ -54,12 +56,13 @@
             color: #333;
             width: 100%;
             font-size: 14px;
-            transition: box-shadow 0.2s ease-in-out;
+            transition: box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
         }
 
             .custom-input:focus {
                 outline: none;
                 box-shadow: 0 0 0 2px #E24D17;
+                background-color: #e2e2e2;
             }
 
         .btn-cancel {
@@ -109,6 +112,43 @@
             margin-left: 10px;
             display: block;
         }
+
+        /* Account Toggle Section Styles */
+        .account-toggle-btn {
+            background-color: transparent;
+            border: 2px dashed #E24D17;
+            color: #E24D17;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 14px;
+            width: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+            .account-toggle-btn:hover,
+            .account-toggle-btn.active {
+                background-color: #E24D17;
+                color: #ffffff;
+                border-style: solid;
+            }
+
+        .account-fields-container {
+            display: none;
+            background-color: #f8f9fa;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid #e0e0e0;
+            margin-top: 1rem;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+       
     </style>
 </head>
 
@@ -120,7 +160,7 @@
         <form id="employeeForm" asp-controller="Employee" asp-action="Create" method="post">
             @Html.AntiForgeryToken()
 
-            <div class="row g-4 mb-5">
+            <div class="row g-4 mb-4">
                 <div class="col-md-6">
                     <label class="custom-label" asp-for="Name">Full Name</label>
                     <input type="text" asp-for="Name" id="empName" class="custom-input" placeholder="Adham Amr Mohamed">
@@ -132,9 +172,10 @@
                     <input type="text" asp-for="NationalID" id="empNid" class="custom-input" placeholder="30906070123456" maxlength="14" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     <span asp-validation-for="NationalID" class="error-msg"></span>
                 </div>
+
                 <div class="col-md-6">
                     <label class="custom-label" asp-for="EmpCode">Employee Code</label>
-                    <input type="text" asp-for="EmpCode" id="empNid" class="custom-input" placeholder="EMP001">
+                    <input type="text" asp-for="EmpCode" id="empCode" class="custom-input" placeholder="EMP001">
                     <span asp-validation-for="EmpCode" class="error-msg"></span>
                 </div>
 
@@ -145,7 +186,30 @@
                 </div>
             </div>
 
-            <div class="d-flex justify-content-end gap-3 mt-4">
+            <div class="mb-5">
+                <button type="button" id="toggleAccountBtn" class="account-toggle-btn">
+                    <i class="fa-solid fa-user-plus"></i>  User Account 
+                </button>
+
+                <div id="accountFields" class="account-fields-container">
+                    <h6 class="fw-bold mb-3 text-dark">User Account Credentials</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="custom-label" for="username">Username</label>
+                            <input type="text" name="Username" id="username" class="custom-input" placeholder="adham.amr">
+                            <span class="error-msg" id="usernameError"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="custom-label" for="password">Password</label>
+                            <input type="password" name="Password" id="password" class="custom-input" placeholder="••••••••">
+                            <span class="error-msg" id="passwordError"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-3">
                 <a class="btn btn-cancel" asp-controller="Employee" asp-action="Index">Cancel</a>
                 <button type="submit" class="btn btn-create">Create</button>
             </div>
@@ -154,31 +218,74 @@
     </div>
 
     <script>
-        document.getElementById('employeeForm').addEventListener('submit', function (event) {
-            let isValid = true;
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleBtn = document.getElementById('toggleAccountBtn');
+            const accountFields = document.getElementById('accountFields');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            let hasAccount = false;
 
-            // Clear previous errors
-            document.querySelectorAll('.is-invalid').forEach(function(el) {
-                el.classList.remove('is-invalid');
+            // Toggle logic for User Account section
+            toggleBtn.addEventListener('click', function () {
+                hasAccount = !hasAccount;
+
+                if (hasAccount) {
+                    accountFields.style.display = 'block';
+                    toggleBtn.classList.add('active');
+                    toggleBtn.innerHTML = '<i class="fa-solid fa-user-check"></i> User Account Included (Click to remove)';
+                } else {
+                    accountFields.style.display = 'none';
+                    toggleBtn.classList.remove('active');
+                    toggleBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create User Account for Employee';
+
+                    // Clear values and errors if toggled off
+                    usernameInput.value = '';
+                    passwordInput.value = '';
+                    usernameInput.classList.remove('is-invalid');
+                    passwordInput.classList.remove('is-invalid');
+                }
             });
 
-            // Validate Name
-            const name = document.getElementById('empName');
-            if (!name.value || name.value.trim() === '') {
-                name.classList.add('is-invalid');
-                isValid = false;
-            }
+            // Form Submit Validation
+            document.getElementById('employeeForm').addEventListener('submit', function (event) {
+                let isValid = true;
 
-            // Validate National ID (Must be 14 digits)
-            const nid = document.getElementById('empNid');
-            if (!nid.value || nid.value.trim().length !== 14) {
-                nid.classList.add('is-invalid');
-                isValid = false;
-            }
+                // Clear previous errors
+                document.querySelectorAll('.is-invalid').forEach(function(el) {
+                    el.classList.remove('is-invalid');
+                });
 
-            if (!isValid) {
-                event.preventDefault();
-            }
+                // Validate Name
+                const name = document.getElementById('empName');
+                if (!name.value || name.value.trim() === '') {
+                    name.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                // Validate National ID (14 digits)
+                const nid = document.getElementById('empNid');
+                if (!nid.value || nid.value.trim().length !== 14) {
+                    nid.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                // Validate Account inputs if user enabled the account section
+                if (hasAccount) {
+                    if (!usernameInput.value || usernameInput.value.trim() === '') {
+                        usernameInput.classList.add('is-invalid');
+                        isValid = false;
+                    }
+
+                    if (!passwordInput.value || passwordInput.value.trim() === '') {
+                        passwordInput.classList.add('is-invalid');
+                        isValid = false;
+                    }
+                }
+
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
         });
     </script>
 </body>

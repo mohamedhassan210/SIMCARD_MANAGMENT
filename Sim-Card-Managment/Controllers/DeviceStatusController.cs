@@ -165,6 +165,11 @@ namespace Sim_Card_Managment.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public IActionResult Edit()
+        {
+
+            return View();
+        }
         private void PopulateLookupLists(DeviceStatusCreateViewModel model)
         {
             var sims = _simRepo.GetAll().ToList();

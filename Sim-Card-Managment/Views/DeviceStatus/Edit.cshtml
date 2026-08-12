@@ -1,0 +1,229 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Device Status</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+</head>
+<style>
+    /* Layout & Styling */
+    .form-card {
+        max-width: 650px;
+        margin: 2rem auto;
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        padding: 2rem;
+    }
+
+    .form-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-subtitle {
+        font-size: 14px;
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .required-asterisk {
+        color: #dc3545;
+    }
+
+    /* Custom Input & Select Styling */
+    .custom-control {
+        width: 100%;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        color: #495057;
+        background-color: #ffffff;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .custom-control:focus {
+            border-color: #a0a0a0;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.03);
+            outline: none;
+        }
+
+    /* Dynamic Conditional Fields Container */
+    .conditional-field {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+
+
+    /* Submit Button */
+    .btn-submit {
+        background-color: #0d6efd;
+        color: #ffffff;
+        font-weight: 600;
+        padding: 10px 24px;
+        border-radius: 10px;
+        border: none;
+        width: 100%;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+        .btn-submit:hover {
+            background-color: #0b5ed7;
+        }
+</style>
+
+<div class="container p-100">
+    <div class="form-card">
+        <h2 class="form-title">Edit Device Status</h2>
+        <p class="form-subtitle">Log status updates, replacements, and notes for devices.</p>
+
+        <form id="createDeviceStatusForm">
+
+            <div class="form-group">
+                <label for="deviceCategory" class="form-label">
+                    Device Category <span class="required-asterisk">*</span>
+                </label>
+                <select id="deviceCategory" class="custom-control" required>
+                    <option value="" disabled selected>-- Select Device Category --</option>
+                    <option value="SIM">SIM Card</option>
+                    <option value="USB">USB Modem</option>
+                </select>
+            </div>
+
+            <div id="simIdGroup" class="form-group conditional-field">
+                <label for="simId" class="form-label">
+                    SIM Card <span class="required-asterisk">*</span>
+                </label>
+                <select id="simId" class="custom-control">
+                    <option value="" disabled selected>-- Select SIM Card --</option>
+                    <option value="1">SIM - 890141032111 (Ahmed Hassan)</option>
+                    <option value="2">SIM - 890141032112 (Sara Mohamed)</option>
+                </select>
+            </div>
+
+            <div id="usbIdGroup" class="form-group conditional-field">
+                <label for="usbId" class="form-label">
+                    USB Modem <span class="required-asterisk">*</span>
+                </label>
+                <select id="usbId" class="custom-control">
+                    <option value="" disabled selected>-- Select USB Modem --</option>
+                    <option value="101">USB - MOD-984210 (IT Pool)</option>
+                    <option value="102">USB - MOD-984211 (John Doe)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="statusTypeId" class="form-label">
+                    Status Type <span class="required-asterisk">*</span>
+                </label>
+                <select id="statusTypeId" class="custom-control" required>
+                    <option value="" disabled selected>-- Select Status --</option>
+                    <option value="1">Active / Assigned</option>
+                    <option value="2">Damaged</option>
+                    <option value="3">Lost</option>
+                    <option value="4">Replaced</option>
+                    <option value="5">Unassigned</option>
+                </select>
+            </div>
+
+            <div id="replacedBySimGroup" class="form-group conditional-field">
+                <label for="replacedBySimId" class="form-label">
+                    Replaced By SIM Card
+                </label>
+                <select id="replacedBySimId" class="custom-control">
+                    <option value="" selected>-- Select Replacement SIM --</option>
+                    <option value="3">SIM - 890141032999 (New Reserve)</option>
+                    <option value="4">SIM - 890141032888 (Replacement)</option>
+                </select>
+            </div>
+
+            <div id="replacedByUsbGroup" class="form-group conditional-field">
+                <label for="replacedByUsbId" class="form-label">
+                    Replaced By USB Modem
+                </label>
+                <select id="replacedByUsbId" class="custom-control">
+                    <option value="" selected>-- Select Replacement USB --</option>
+                    <option value="103">USB - MOD-985000 (New Batch)</option>
+                    <option value="104">USB - MOD-985001 (Backup Unit)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="notes" class="form-label">Notes / Details</label>
+                <textarea id="notes" class="custom-control" rows="3" placeholder="Add optional details regarding status change..."></textarea>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class=" lp-btn-submit rounded-pill px-5 py-2 w-100 fw-bold ">
+                    <i class="fas fa-save me-1"></i> Save Status Record
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const deviceCategorySelect = document.getElementById("deviceCategory");
+
+        // Element Groups
+        const simIdGroup = document.getElementById("simIdGroup");
+        const usbIdGroup = document.getElementById("usbIdGroup");
+        const replacedBySimGroup = document.getElementById("replacedBySimGroup");
+        const replacedByUsbGroup = document.getElementById("replacedByUsbGroup");
+
+        // Input Fields
+        const simIdSelect = document.getElementById("simId");
+        const usbIdSelect = document.getElementById("usbId");
+
+        deviceCategorySelect.addEventListener("change", function () {
+            const selectedCategory = this.value;
+
+            // Hide all conditional fields first
+            simIdGroup.style.display = "none";
+            usbIdGroup.style.display = "none";
+            replacedBySimGroup.style.display = "none";
+            replacedByUsbGroup.style.display = "none";
+
+            // Reset required flags
+            simIdSelect.removeAttribute("required");
+            usbIdSelect.removeAttribute("required");
+
+            // Show relevant fields based on selection
+            if (selectedCategory === "SIM") {
+                simIdGroup.style.display = "block";
+                replacedBySimGroup.style.display = "block";
+                simIdSelect.setAttribute("required", "required");
+            } else if (selectedCategory === "USB") {
+                usbIdGroup.style.display = "block";
+                replacedByUsbGroup.style.display = "block";
+                usbIdSelect.setAttribute("required", "required");
+            }
+        });
+    });
+</script>

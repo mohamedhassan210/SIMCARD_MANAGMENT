@@ -5992,9 +5992,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\sd\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+      "projectUniqueName": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
       "projectName": "SIMCARD.Test",
-      "projectPath": "C:\\Users\\sd\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+      "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
       "packagesPath": "C:\\Users\\sd\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\sd\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\obj\\",
       "projectStyle": "PackageReference",
@@ -6017,8 +6017,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\sd\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
-              "projectPath": "C:\\Users\\sd\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj"
+            "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
+              "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj"
             }
           }
         }
