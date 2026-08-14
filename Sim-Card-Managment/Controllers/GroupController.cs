@@ -142,12 +142,15 @@ namespace Sim_Card_Managment.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        
         // GET: Group/GetAllGroups — returns groups as JSON for the Swal dropdown
         [HttpGet]
-        public async Task<IActionResult> GetAllGroups()
+        public async Task<IActionResult> GetAllGroups(int? excludeGroupId = null)
         {
             var groups = await _groups.GetAllAsync();
-            var result = groups.Where(g => g.IsActive).Select(g => new { g.Id, g.Name });
+            var result = groups
+                .Where(g => g.IsActive && (!excludeGroupId.HasValue || g.Id != excludeGroupId.Value))
+                .Select(g => new { g.Id, g.Name });
             return Json(result);
         }
 

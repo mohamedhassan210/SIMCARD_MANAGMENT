@@ -109,6 +109,14 @@ namespace Sim_Card_Managment.Controllers
                     await PopulateGroupsAsync(model);
                     return View(model);
                 }
+
+                bool emailTaken = await _context.Users.AnyAsync(u => u.Email == model.Email);
+                if (emailTaken)
+                {
+                    ModelState.AddModelError(nameof(model.Email), "This email is already registered.");
+                    await PopulateGroupsAsync(model);
+                    return View(model);
+                }
             }
 
             // 1. Save the Employee row
@@ -202,7 +210,8 @@ namespace Sim_Card_Managment.Controllers
         private async Task PopulateGroupsAsync(EmployeeUserCreateViewModel model)
         {
             var groups = await _groupRepo.GetAllAsync();
-            model.Groups = new SelectList(groups, "Id", "Name", model.GroupId);
+            var activeGroups = groups.Where(g => g.IsActive);
+            model.Groups = new SelectList(activeGroups, "Id", "Name", model.GroupId);
         }
     }
 }

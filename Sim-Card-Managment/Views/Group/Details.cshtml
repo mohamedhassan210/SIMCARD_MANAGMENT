@@ -425,54 +425,54 @@
         });
 
         // Change Group Action — pulls real groups, posts real change
-        async function changeGroup(userId, userName) {
-            let groupOptions = {};
-            try {
-                const res = await fetch('/Group/GetAllGroups');
-                const groups = await res.json();
-                groups.forEach(g => groupOptions[g.id] = g.name);
-            } catch {
-                Swal.fire('Error', 'Could not load groups.', 'error');
-                return;
-            }
+            async function changeGroup(userId, userName) {
+                let groupOptions = {};
+                try {
+                    const res = await fetch(`/Group/GetAllGroups?excludeGroupId=@Model.Id`);
+                    const groups = await res.json();
+                    groups.forEach(g => groupOptions[g.id] = g.name);
+                } catch {
+                    Swal.fire('Error', 'Could not load groups.', 'error');
+                    return;
+                }
 
-            const result = await Swal.fire({
-                title: 'Change Group',
-                text: `Reassign group for ${userName}`,
-                input: 'select',
-                inputOptions: groupOptions,
-                inputPlaceholder: 'Select a new group',
-                showCancelButton: true,
-                confirmButtonColor: '#5B2D90',
-                cancelButtonColor: '#64748B',
-                confirmButtonText: 'Save Change',
-                customClass: { popup: 'rounded-4' }
-            });
-
-            if (result.isConfirmed && result.value) {
-                const formData = new FormData();
-                formData.append('userId', userId);
-                formData.append('newGroupId', result.value);
-                formData.append('__RequestVerificationToken', getAntiForgeryToken());
-
-                const res = await fetch('/Group/ChangeUserGroup', {
-                    method: 'POST',
-                    body: formData
+                const result = await Swal.fire({
+                    title: 'Change Group',
+                    text: `Reassign group for ${userName}`,
+                    input: 'select',
+                    inputOptions: groupOptions,
+                    inputPlaceholder: 'Select a new group',
+                    showCancelButton: true,
+                    confirmButtonColor: '#5B2D90',
+                    cancelButtonColor: '#64748B',
+                    confirmButtonText: 'Save Change',
+                    customClass: { popup: 'rounded-4' }
                 });
-                const data = await res.json();
 
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Updated!',
-                        text: `${userName} was moved to a new group.`,
-                        icon: 'success',
-                        customClass: { popup: 'rounded-4' }
-                    }).then(() => location.reload());
-                } else {
-                    Swal.fire('Error', data.message || 'Failed to change group.', 'error');
+                if (result.isConfirmed && result.value) {
+                    const formData = new FormData();
+                    formData.append('userId', userId);
+                    formData.append('newGroupId', result.value);
+                    formData.append('__RequestVerificationToken', getAntiForgeryToken());
+
+                    const res = await fetch('/Group/ChangeUserGroup', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Updated!',
+                            text: `${userName} was moved to a new group.`,
+                            icon: 'success',
+                            customClass: { popup: 'rounded-4' }
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to change group.', 'error');
+                    }
                 }
             }
-        }
 
                function onDeleteGroup(groupId) {
             Swal.fire({

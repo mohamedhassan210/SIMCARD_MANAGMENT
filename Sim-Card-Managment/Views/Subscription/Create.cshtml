@@ -566,12 +566,16 @@
         }
 
         // SIM Search
-        $('#simSearchInput').on('input', function () {
+        $('#simSearchInput').on('input', function() {
             loadSims($(this).val());
         });
 
         function loadSims(query) {
-            $.get('/Subscription/SearchSims', { query: query }, function (data) {
+            if (!query || !query.trim()) {
+                $('#simCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to display selection cards.</div>');
+                return;
+            }
+            $.get('/Subscription/SearchSims', { query: query }, function(data) {
                 let html = '';
                 if (!data || data.length === 0) {
                     html = '<div class="col-12 text-muted small">No available SIM cards found.</div>';
@@ -630,12 +634,16 @@
         }
 
         // USB Search
-        $('#usbSearchInput').on('input', function () {
+        $('#usbSearchInput').on('input', function() {
             loadUsbs($(this).val());
         });
 
         function loadUsbs(query) {
-            $.get('/Subscription/SearchUsbs', { query: query }, function (data) {
+            if (!query || !query.trim()) {
+                $('#usbCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to display selection cards.</div>');
+                return;
+            }
+            $.get('/Subscription/SearchUsbs', { query: query }, function(data) {
                 let html = '';
                 if (!data || data.length === 0) {
                     html = '<div class="col-12 text-muted small">No available USB modems found.</div>';
@@ -780,9 +788,7 @@
             }
         });
 
-        $(document).ready(function () {
-            loadSims('');
-            loadUsbs('');
+        $(document).ready(function() {
             updateSidebarProgress();
         });
     </script>
