@@ -242,23 +242,31 @@ namespace Sim_Card_Managment.Controllers
         [RequirePermission]
         public async Task<IActionResult> Register()
         {
-            // جلب المجموعات من قاعدة البيانات وتحويلها لـ SelectList للـ Dropdown
             var groups = await _accountRepo.GetAllGroupsAsync();
-            ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(groups, "Id", "Name");
-
+            var activeGroups = groups.Where(g => g.IsActive).ToList();
+            ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(activeGroups, "Id", "Name");
             return View(new RegisterViewModel());
         }
 
         [RequirePermission]
         [HttpPost]
-        // [Authorize(Roles = "Manager")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 var groups = await _accountRepo.GetAllGroupsAsync();
-                ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(groups, "Id", "Name");
+                ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(groups.Where(g => g.IsActive), "Id", "Name");
+                return View(model);
+            }
+
+            // ← add email check
+            var existingUser = await _accountRepo.GetUserByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError(nameof(model.Email), "This email is already registered.");
+                var groups = await _accountRepo.GetAllGroupsAsync();
+                ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(groups.Where(g => g.IsActive), "Id", "Name");
                 return View(model);
             }
 
@@ -270,9 +278,8 @@ namespace Sim_Card_Managment.Controllers
             }
 
             ModelState.AddModelError("", "Registration failed.");
-
             var groupsRetry = await _accountRepo.GetAllGroupsAsync();
-            ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(groupsRetry, "Id", "Name");
+            ViewBag.Groups = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(groupsRetry.Where(g => g.IsActive), "Id", "Name");
             return View(model);
         }
 
