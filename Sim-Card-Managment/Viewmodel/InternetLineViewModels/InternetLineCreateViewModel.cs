@@ -13,8 +13,9 @@ namespace Sim_Card_Managment.Viewmodel
         public int PaymentTypeId { get; set; }
         [Required]
         public int ServiceTypeId { get; set; }
-        public int? SimId { get; set; }
-        [StringLength(50)]
+        public int? SimId { get; set; }       
+        [StringLength(11, ErrorMessage = "Phone number cannot exceed 11 digits.")]
+        [RegularExpression(@"^\d{0,11}$", ErrorMessage = "Phone number must contain only digits, up to 11.")]
         public string? PhoneNumber { get; set; }
         [StringLength(100)]
         public string? Bandwidth { get; set; }
