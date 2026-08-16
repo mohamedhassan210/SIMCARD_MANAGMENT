@@ -21,10 +21,12 @@
         }
 
         body {
-            background-color: var(--bg-canvas);
-            color: var(--text-dark);
-            font-family: system-ui, -apple-system, sans-serif;
-            padding-bottom: 3rem;
+            background-color: #E24D17;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
         }
 
         .form-card {
@@ -213,7 +215,7 @@
                             <label class="form-label-custom">Phone Number</label>
                             <div class="input-group-custom">
                                 <i class="fa-solid fa-phone"></i>
-                                <input asp-for="PhoneNumber" class="form-control-custom" placeholder="e.g., 0221234567">
+                                <input asp-for="PhoneNumber" class="form-control-custom" placeholder="e.g., 0221234567" max="11">
                             </div>
                         </div>
 
