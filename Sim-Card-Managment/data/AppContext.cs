@@ -56,6 +56,7 @@ namespace Sim_Card_Managment.data
         public DbSet<InternetLine> InternetLines { get; set; }
         public DbSet<VpnConnectionType> VpnConnectionTypes { get; set; }
         public DbSet<VpnConnection> VpnConnections { get; set; }
+        public DbSet<FireWallType> FireWallTypes { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -389,6 +390,13 @@ namespace Sim_Card_Managment.data
                 .WithMany(ct => ct.PaymentTypes)
                 .HasForeignKey(vc => vc.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // ── branch: Firewalltype ──────────────────────────────
+            modelBuilder.Entity<Branch>()
+                .HasMany(b => b.FireWallTypes)
+                .WithMany(fw => fw.Branches);
+
+
 
         }
     }
