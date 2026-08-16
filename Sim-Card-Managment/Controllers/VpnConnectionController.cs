@@ -234,6 +234,10 @@ namespace Sim_Card_Managment.Controllers
                 .OrderBy(x => x.Id)
                 .ToList();
 
+            // Branch name -> comma-separated firewall type names, for
+            // branches with VPN over internet configured.
+            var fireWallTypesByBranch = await _branchRepo.GetFireWallTypeNamesByBranchNameAsync();
+
             // =========================================================
             // SEARCH
             // =========================================================
@@ -285,11 +289,13 @@ namespace Sim_Card_Managment.Controllers
             // 4 columns per VPN type:
             // ISP / Line Speed / NID / Status
             // VPN Over Internet
+            // Firewall Types
             // Notes
 
             int totalColumns =
                 1 +
                 (connectionTypes.Count * 4) +
+                1 +
                 1 +
                 1;
 
@@ -356,6 +362,11 @@ namespace Sim_Card_Managment.Controllers
             column++;
 
             worksheet.Cells[headerRow, column].Value =
+                "Firewall Types";
+
+            column++;
+
+            worksheet.Cells[headerRow, column].Value =
                 "Notes";
 
             // =========================================================
@@ -399,6 +410,12 @@ namespace Sim_Card_Managment.Controllers
             // =========================================================
 
             int row = 3;
+
+            // Track each branch's row range + wrapped text so we can
+            // set row heights AFTER column widths are finalized below.
+            // Merged cells don't auto-expand row height for wrapped
+            // text in Excel/EPPlus, so this has to be done manually.
+            var branchRowRanges = new List<(int StartRow, int EndRow, string FirewallText, string NotesText)>();
 
             foreach (var branch in data.OrderBy(x => x.BranchName))
             {
@@ -552,7 +569,7 @@ namespace Sim_Card_Managment.Controllers
                 // =====================================================
 
                 int vpnOverInternetColumn =
-                    lastColumn - 1;
+                    lastColumn - 2;
 
                 worksheet.Cells[
                     branchStartRow,
@@ -598,6 +615,40 @@ namespace Sim_Card_Managment.Controllers
                     vpnStatusCell.Style.Fill.BackgroundColor
                         .SetColor(Color.LightCoral);
                 }
+
+                // =====================================================
+                // FIREWALL TYPES (comma-separated)
+                // =====================================================
+
+                int firewallTypesColumn =
+                    lastColumn - 1;
+
+                worksheet.Cells[
+                    branchStartRow,
+                    firewallTypesColumn,
+                    branchEndRow,
+                    firewallTypesColumn
+                ].Merge = true;
+
+                var firewallTypesCell =
+                    worksheet.Cells[
+                        branchStartRow,
+                        firewallTypesColumn
+                    ];
+
+                firewallTypesCell.Value =
+                    fireWallTypesByBranch.TryGetValue(branch.BranchName, out var fireWallNames)
+                    && !string.IsNullOrWhiteSpace(fireWallNames)
+                        ? fireWallNames
+                        : "N/A";
+
+                firewallTypesCell.Style.HorizontalAlignment =
+                    ExcelHorizontalAlignment.Left;
+
+                firewallTypesCell.Style.VerticalAlignment =
+                    ExcelVerticalAlignment.Center;
+
+                firewallTypesCell.Style.WrapText = true;
 
                 // =====================================================
                 // NOTES
