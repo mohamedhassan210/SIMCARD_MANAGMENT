@@ -1,280 +1,383 @@
 ﻿@model IEnumerable<Sim_Card_Management.Models.PaymentType>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Types</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+@{
+    ViewData["Title"] = "Payment Types Directory";
+    var typeList = Model?.ToList() ?? new List<Sim_Card_Management.Models.PaymentType>();
+    int totalCount = typeList.Count;
+}
 
-    <style>
-        :root {
-            --brand-orange: #DF531B;
-            --brand-orange-light: #FFF8F6;
-            --brand-purple: #5B2D90;
-            --bg-canvas: #F4F5F8;
-            --text-dark: #1E293B;
-            --text-muted: #64748B;
-            --card-border: #E2E8F0;
+<style>
+    /* Theme & Layout Variables */
+    :root {
+        --primary-orange: #E24D17;
+        --primary-orange-hover: #c84111;
+        --bg-light: #f8f9fa;
+    }
+
+    /* Page Header */
+    .page-header-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+
+    .page-header-subtitle {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* Primary & Secondary Action Buttons */
+    .btn-orange-primary {
+        background-color: var(--primary-orange);
+        border: 1px solid var(--primary-orange);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+        .btn-orange-primary:hover {
+            background-color: var(--primary-orange-hover);
+            border-color: var(--primary-orange-hover);
+            color: #ffffff;
         }
 
-        body {
-            background-color: var(--bg-canvas);
-            color: var(--text-dark);
-            font-family: system-ui, -apple-system, sans-serif;
-            padding-bottom: 3rem;
+    .btn-secondary-soft {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        color: #333333;
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-secondary-soft:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
         }
 
-        .page-header {
-            background: #FFFFFF;
-            border-bottom: 1px solid var(--card-border);
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    .btn-action-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        background: #ffffff;
+        color: #6c757d;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+        .btn-action-icon:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
         }
 
-        .page-title {
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: var(--text-dark);
+    .btn-action-delete:hover {
+        background-color: #fce8e6 !important;
+        border-color: #dc3545 !important;
+        color: #dc3545 !important;
+    }
+
+    /* Search Bar Wrapper */
+    .search-bar-wrapper {
+        display: flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 6px 16px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .search-bar-wrapper:focus-within {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
         }
 
-        .table-card {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #FFFFFF;
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-            padding: 2rem;
+        .search-bar-wrapper .search-icon {
+            color: #8c8c8c;
+            font-size: 15px;
+            margin-right: 10px;
         }
 
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #FFF;
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 10px 16px;
-            transition: border-color 0.2s ease;
-        }
-
-            .search-box:focus-within {
-                border-color: var(--brand-orange);
-            }
-
-            .search-box i {
-                color: var(--text-muted);
-            }
-
-            .search-box input {
-                border: none;
-                outline: none;
-                background: transparent;
-                font-size: 0.95rem;
-                width: 100%;
-                color: var(--text-dark);
-            }
-
-        .btn-custom {
-            height: 44px;
-            padding: 0 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary-orange {
-            background-color: var(--brand-orange);
-            color: #FFFFFF;
-        }
-
-            .btn-primary-orange:hover {
-                background-color: #c94614;
-                color: #FFFFFF;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
-            }
-
-        .btn-action-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--card-border);
-            background: #FFFFFF;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-            .btn-action-icon:hover {
-                background: var(--brand-orange-light);
-                color: var(--brand-orange);
-                border-color: rgba(223, 83, 27, 0.3);
-            }
-
-        .custom-table {
+        .search-bar-wrapper input {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
             width: 100%;
-            border-collapse: collapse;
+            font-size: 0.92rem;
+            color: #333333;
+            padding: 4px 0;
         }
 
-            .custom-table thead th {
-                text-align: left;
-                font-size: 0.8rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: var(--text-muted);
-                padding: 12px 16px;
-                border-bottom: 2px solid var(--brand-orange);
-                background: #FFFFFF;
-            }
+    /* Pagination Styles */
+    .pagination-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid #e0e0e0;
+        background: #ffffff;
+        color: #6c757d;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
 
-            .custom-table tbody td {
-                font-size: 0.95rem;
-                padding: 16px;
-                border-bottom: 1px solid var(--card-border);
-                vertical-align: middle;
-            }
-
-        .btn-action-delete:hover {
-            background: #FEF2F2;
-            color: #DC2626;
-            border-color: rgba(220, 38, 38, 0.3);
+        .pagination-btn:hover:not([disabled]) {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
         }
 
+        .pagination-btn.active {
+            background: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: #ffffff;
+        }
 
+        .pagination-btn[disabled] {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+</style>
 
-    </style>
-</head>
-<body>
+<div class="container-fluid px-4 p-100">
 
-    <header class="page-header p-100">
-        <div class="container-fluid px-lg-5">
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-                <div>
-                    <h1 class="page-title m-0">Payment Types Directory</h1>
-                    <p class="text-muted m-0 small mt-1">Manage system payment classification types</p>
-                </div>
-                <div>
-                    <a asp-controller="PaymentType" asp-action="Create" class="btn-custom btn-primary-orange">
-                        <i class="fa-solid fa-plus"></i> New Type
-                    </a>
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+        <div>
+            <h1 class="page-header-title mb-1">Payment Types</h1>
+            <p class="page-header-subtitle mb-0">Manage and classify system payment types across all lines.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="InternetLine" asp-action="Index" class="btn-secondary-soft">
+                <i class="fas fa-globe"></i>
+                <span>Internet Lines</span>
+            </a>
+            <a asp-controller="ServiceType" asp-action="Index" class="btn-secondary-soft">
+                <i class="fas fa-diagram-project"></i>
+                <span>Service Types</span>
+            </a>
+            <a asp-controller="PaymentType" asp-action="Create" class="btn-orange-primary shadow-sm">
+                <i class="fas fa-plus"></i>
+                <span>New Type</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Summary Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Total Payment Types</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@totalCount</h3>
+                    </div>
+                    <div class="rounded-circle p-3 text-white" style="background-color: #E24D17;">
+                        <i class="fas fa-credit-card fa-lg"></i>
+                    </div>
                 </div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <main class="container-fluid px-lg-5">
+    <!-- Main Table Container -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden p-4">
 
-        <div class="table-card">
-
-            <div class="mb-4">
-                <div class="search-box col-12">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input id="typeSearchInput" type="text" placeholder="Search types..." autocomplete="off">
+        <!-- Search Control Header -->
+        <div class="row g-3 align-items-end mb-4">
+            <div class="col-12">
+                <label for="typeSearchInput" class="form-label text-muted small fw-medium mb-1">Search Payment Types</label>
+                <div class="search-bar-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="typeSearchInput" placeholder="Search by payment type name..." autocomplete="off">
                 </div>
             </div>
+        </div>
 
-            <div class="table-responsive">
-                <table class="custom-table" id="typeTable">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="typeTableBody">
-                        @if (Model != null && Model.Any())
+        <!-- Table View -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="typeTable">
+                <thead class="table-light">
+                    <tr class="text-uppercase text-muted small fw-bold">
+                        <th scope="col" style="width: 80%;">Type Name</th>
+                        <th scope="col" class="text-end" style="width: 20%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="typeTableBody">
+                    @if (typeList.Any())
+                    {
+                        foreach (var item in typeList)
                         {
-                            foreach (var item in Model)
-                            {
-                                <tr class="type-row">
-                                    <td><strong>@item.Name</strong></td>
-                                    <td style="text-align: right;">
-                                        <div class="d-inline-flex gap-1">
-                                            <a asp-controller="PaymentType" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit Type">
-                                                <i class="fa-solid fa-pen"></i>
-                                            </a>
-                                            <form asp-controller="PaymentType" asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
-                                                @Html.AntiForgeryToken()
-                                                <button type="button" class="btn-action-icon btn-action-delete" title="Delete Type" onclick="confirmDelete(this)">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
+                            <tr class="type-row">
+                                <td>
+                                    <span class="fw-bold text-dark fs-6">@item.Name</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1 action-buttons">
+                                        <a asp-controller="PaymentType" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit Type">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                        <form asp-controller="PaymentType" asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="button" class="btn-action-icon btn-action-delete" title="Delete Type" onclick="confirmDelete(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
                         }
-                        <tr id="noResultsRow" style="display: @(Model == null || !Model.Any() ? "" : "none");">
-                            <td colspan="2" class="text-center text-muted py-4">
-                                No matching types found.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
+                    }
+                    <tr id="noResultsRow" style="display: @(typeList.Any() ? "none" : "");">
+                        <td colspan="2" class="text-center text-muted py-4">
+                            No matching payment types found.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-    </main>
+        <!-- Footer / Pagination -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 mt-4 pt-3 border-top">
+            <span class="text-muted small" id="showingText">Showing 0 records</span>
+            <div class="d-flex align-items-center gap-1" id="paginationContainer"></div>
+        </div>
 
-    <script>
-        const searchInput = document.getElementById('typeSearchInput');
+    </div>
+</div>
 
-        searchInput.addEventListener('input', () => {
-            const query = searchInput.value.toLowerCase().trim();
-            const rows = document.querySelectorAll('#typeTableBody tr.type-row');
-            let hasVisibleRow = false;
+<!-- SweetAlert2 Script -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                if (text.includes(query)) {
-                    row.style.display = '';
-                    hasVisibleRow = true;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+<!-- Dynamic Search & Pagination Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("typeSearchInput");
+        const allRows = Array.from(document.querySelectorAll("#typeTableBody tr.type-row"));
+        const noResultsRow = document.getElementById("noResultsRow");
+        const showingText = document.getElementById("showingText");
+        const paginationContainer = document.getElementById("paginationContainer");
 
-            document.getElementById('noResultsRow').style.display = hasVisibleRow ? 'none' : '';
-        });
-    </script>
+        const itemsPerPage = 7;
+        let visibleRows = [...allRows];
+        let currentPage = 1;
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function confirmDelete(btn) {
-            Swal.fire({
-                title: 'Delete Type?',
-                text: 'This cannot be undone.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#DC2626',
-                cancelButtonColor: '#64748B',
-                confirmButtonText: 'Yes, Delete',
-                customClass: { popup: 'rounded-4' }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    btn.closest('form').submit();
-                }
-            });
+        function renderTable() {
+            const totalVisible = visibleRows.length;
+            const totalPages = Math.max(1, Math.ceil(totalVisible / itemsPerPage));
+
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = startIdx + itemsPerPage;
+
+            // Hide all rows initially
+            allRows.forEach(row => row.style.display = "none");
+
+            // Display current page slice
+            visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
+
+            // Handle empty search state
+            if (totalVisible === 0) {
+                if (noResultsRow) noResultsRow.style.display = "";
+                showingText.textContent = "Showing 0 records";
+                paginationContainer.innerHTML = "";
+                return;
+            } else {
+                if (noResultsRow) noResultsRow.style.display = "none";
+            }
+
+            // Update stats counter text
+            const actualEnd = Math.min(endIdx, totalVisible);
+            showingText.textContent = `Showing ${startIdx + 1}-${actualEnd} of ${totalVisible} records`;
+
+            // Build pagination HTML
+            let html = `<button type="button" class="pagination-btn" id="prevBtn" ${currentPage === 1 ? 'disabled' : ''}>&lsaquo;</button>`;
+
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button type="button" class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+            }
+
+            html += `<button type="button" class="pagination-btn" id="nextBtn" ${currentPage === totalPages ? 'disabled' : ''}>&rsaquo;</button>`;
+
+            paginationContainer.innerHTML = html;
         }
-    </script>
 
-</body>
-</html>
+        function applyFilters() {
+            const query = searchInput.value.trim().toLowerCase();
+
+            visibleRows = allRows.filter(row => {
+                const text = row.innerText.toLowerCase();
+                return text.includes(query);
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Attach event listener for search
+        if (searchInput) searchInput.addEventListener("input", applyFilters);
+
+        // Pagination event delegation
+        paginationContainer.addEventListener("click", function (e) {
+            const btn = e.target.closest("button");
+            if (!btn || btn.disabled) return;
+
+            if (btn.id === "prevBtn") {
+                if (currentPage > 1) currentPage--;
+            } else if (btn.id === "nextBtn") {
+                const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
+                if (currentPage < totalPages) currentPage++;
+            } else if (btn.dataset.page) {
+                currentPage = parseInt(btn.dataset.page, 10);
+            }
+
+            renderTable();
+        });
+
+        // Initial render
+        applyFilters();
+    });
+
+    // Delete Confirmation Popup
+    function confirmDelete(btn) {
+        Swal.fire({
+            title: 'Delete Payment Type?',
+            text: 'This action cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Delete',
+            customClass: { popup: 'rounded-4' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                btn.closest('form').submit();
+            }
+        });
+    }
+</script>

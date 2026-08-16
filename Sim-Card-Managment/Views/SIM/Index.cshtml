@@ -1,338 +1,336 @@
 ﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.DeviceDirectoryViewModel>
 
+@{
+    ViewData["Title"] = "Devices Directory";
+    var deviceList = Model?.ToList() ?? new List<Sim_Card_Managment.Viewmodel.DeviceDirectoryViewModel>();
+    var totalDevices = deviceList.Count;
+    var activeDevices = deviceList.Count(d => d.IsActive);
+    var simCount = deviceList.Count(d => d.DeviceType != null && d.DeviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase));
+    var usbCount = deviceList.Count(d => d.DeviceType != null && d.DeviceType.Contains("USB", StringComparison.OrdinalIgnoreCase));
+}
+
 <style>
-    /* ---------- Title ---------- */
-    .title-section {
-        margin-bottom: 24px;
+    /* Theme & Layout Variables */
+    :root {
+        --primary-orange: #E24D17;
+        --primary-orange-hover: #c84111;
+        --bg-light: #f8f9fa;
     }
 
-        .title-section h1 {
-            font-size: 34px;
-            font-weight: 800;
-            color: #1a1a1a;
-        }
-
-            .title-section h1 .num {
-                color: #e8552b;
-            }
-
-        .title-section p {
-            margin-top: 10px;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #6b6b6b;
-            max-width: 560px;
-        }
-
-    /* ---------- Buttons ---------- */
-    .create-btn-group {
-        display: flex;
-        gap: 12px;
-        margin-top: 20px;
+    /* Page Header */
+    .page-header-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
     }
 
-    .create-btn {
+    .page-header-subtitle {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* Action Buttons */
+    .btn-orange-primary {
+        background-color: var(--primary-orange);
+        border: 1px solid var(--primary-orange);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: #e8552b;
-        color: #fff;
-        border: none;
-        padding: 11px 20px;
-        border-radius: 24px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
         text-decoration: none;
-        transition: background 0.2s ease, transform 0.2s ease;
     }
 
-        .create-btn:hover {
-            background: #d64923;
-            color: #fff;
-            transform: translateY(-1px);
+        .btn-orange-primary:hover {
+            background-color: var(--primary-orange-hover);
+            border-color: var(--primary-orange-hover);
+            color: #ffffff;
         }
 
-    .create-btn-secondary {
-        background: #ffffff;
-        color: #1a1a1a;
+    .btn-outline-custom {
+        background-color: #ffffff;
         border: 1px solid #dcdcdc;
-    }
-
-        .create-btn-secondary:hover {
-            background: #f7f7f7;
-            color: #e8552b;
-            border-color: #e8552b;
-        }
-
-    /* ---------- Filters ---------- */
-    .filters {
-        margin-top: 34px;
-    }
-
-        .filters label {
-            display: block;
-            font-size: 12px;
-            color: #6b6b6b;
-            margin-bottom: 8px;
-        }
-
-    .filters-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .status-select {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: #fff;
-        border: 1px solid #dcdcdc;
-        border-radius: 10px;
-        padding: 11px 14px;
-        font-size: 13px;
         color: #1a1a1a;
-        width: 150px;
-        cursor: pointer;
-        transition: border-color 0.2s ease;
-    }
-
-        .status-select:hover {
-            border-color: #e8552b;
-        }
-
-    .search-box {
-        flex: 1;
-        display: flex;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: #fff;
-        border: 1px solid #dcdcdc;
-        border-radius: 10px;
-        padding: 11px 14px;
-        transition: border-color 0.2s ease;
-        min-width: 250px;
-    }
-
-        .search-box:focus-within {
-            border-color: #e8552b;
-        }
-
-        .search-box svg {
-            width: 15px;
-            height: 15px;
-            color: #a8a8a8;
-            flex-shrink: 0;
-        }
-
-        .search-box input {
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 13px;
-            width: 100%;
-            color: #1a1a1a;
-        }
-
-            .search-box input::placeholder {
-                color: #b3b3b3;
-            }
-
-    /* ---------- Table ---------- */
-    .table-wrap {
-        margin-top: 28px;
-        overflow-x: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    thead th {
-        text-align: left;
-        font-size: 12px;
-        font-weight: 600;
-        color: #1a1a1a;
-        padding-bottom: 12px;
-        vertical-align: top;
-    }
-
-    thead tr {
-        border-bottom: 2px solid #e8552b;
-    }
-
-    tbody td {
-        font-size: 12.5px;
-        color: #1a1a1a;
-        padding: 16px 0;
-        border-bottom: 1px solid #e2e2e2;
-        vertical-align: middle;
-    }
-
-    .badge-type {
-        display: inline-block;
-        font-size: 10px;
-        font-weight: 700;
-        padding: 2px 8px;
-        border-radius: 10px;
-        text-transform: uppercase;
-    }
-
-    .badge-sim {
-        background: #e6f4ea;
-        color: #137333;
-    }
-
-    .badge-usb {
-        background: #feefc3;
-        color: #b06000;
-    }
-
-    .view-btn {
-        display: inline-block;
-        border: 1.5px solid #e8552b;
-        color: #e8552b;
-        background: transparent;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 6px 18px;
-        border-radius: 16px;
-        cursor: pointer;
         text-decoration: none;
+    }
+
+        .btn-outline-custom:hover {
+            background-color: #fffaf8;
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+        }
+
+    .btn-view-action {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        color: #333333;
+        border-radius: 8px;
+        padding: 6px 16px;
+        font-size: 13px;
+        font-weight: 600;
         transition: all 0.2s ease;
-    }
-
-        .view-btn:hover {
-            background: #e8552b;
-            color: #fff;
-        }
-
-    th:nth-child(1), td:nth-child(1) {
-        width: 20%;
-    }
-
-    th:nth-child(2), td:nth-child(2) {
-        width: 10%;
-    }
-
-    th:nth-child(3), td:nth-child(3) {
-        width: 16%;
-    }
-
-    th:nth-child(4), td:nth-child(4) {
-        width: 12%;
-    }
-
-    th:nth-child(5), td:nth-child(5) {
-        width: 14%;
-    }
-
-    th:nth-child(6), td:nth-child(6) {
-        width: 16%;
-    }
-
-    th:nth-child(7), td:nth-child(7) {
-        width: 12%;
-        text-align: right;
-    }
-
-    /* ---------- Footer ---------- */
-    .footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 20px;
-    }
-
-        .footer .showing {
-            font-size: 12px;
-            color: #6b6b6b;
-        }
-
-    .pagination {
-        display: flex;
+        text-decoration: none;
+        display: inline-flex;
         align-items: center;
         gap: 6px;
     }
 
-        .pagination button {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 1px solid #dcdcdc;
-            background: #fff;
-            color: #6b6b6b;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .btn-view-action:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
         }
 
-            .pagination button:hover {
-                border-color: #e8552b;
-                color: #e8552b;
-            }
+    /* Search Bar & Dropdowns */
+    .search-bar-wrapper {
+        display: flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 6px 16px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
 
-            .pagination button.page-num {
-                border: none;
-                background: transparent;
-                color: #1a1a1a;
-            }
+        .search-bar-wrapper:focus-within {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
+        }
 
-                .pagination button.page-num:hover {
-                    background: #fbeae5;
-                    color: #e8552b;
-                }
+        .search-bar-wrapper .search-icon {
+            color: #8c8c8c;
+            font-size: 15px;
+            margin-right: 10px;
+        }
 
-            .pagination button.active {
-                background: #e8552b;
-                border-color: #e8552b;
-                color: #fff;
-            }
+        .search-bar-wrapper input {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            width: 100%;
+            font-size: 0.92rem;
+            color: #333333;
+            padding: 4px 0;
+        }
+
+    .custom-select-filter {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 8px 14px;
+        background-color: #ffffff;
+        font-size: 0.9rem;
+        color: #495057;
+        transition: border-color 0.2s ease;
+    }
+
+        .custom-select-filter:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
+            outline: none;
+        }
+
+    /* Type Badges */
+    .badge-type-sim {
+        background-color: #e6f4ea;
+        color: #137333;
+        border: 1px solid #ceebd6;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 11px;
+        text-transform: uppercase;
+    }
+
+    .badge-type-usb {
+        background-color: #feefc3;
+        color: #b06000;
+        border: 1px solid #fce8b2;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 11px;
+        text-transform: uppercase;
+    }
+
+    /* Status Badges */
+    .badge-status-active {
+        background-color: #d1e7dd;
+        color: #0f5132;
+        border: 1px solid #badbcc;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .badge-status-inactive {
+        background-color: #f8d7da;
+        color: #842029;
+        border: 1px solid #f5c2c7;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    /* Pagination Styles */
+    .pagination button {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        background: #fff;
+        color: #6b6b6b;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .pagination button:hover:not(:disabled) {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination button.active {
+            background: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: #fff;
+        }
 </style>
 
-<div class="page p-100 container-fluid px-4">
+<div class="container-fluid px-4 p-100">
 
-    <div class="title-section">
-        <h1><span class="num">@(Model?.Count() ?? 0)</span> Devices Directory</h1>
-        <p>Manage all active, available, and assigned SIM cards and USB modems in one place.</p>
-
-        <div class="create-btn-group">
-            <a asp-controller="SIM" asp-action="Create" class="create-btn"><span>+</span> New SIM Card</a>
-            <a asp-controller="USB" asp-action="Create" class="create-btn create-btn-secondary"><span>+</span> New USB Modem</a>
-            <a asp-controller="DeviceStatusType" asp-action="Index" class="create-btn create-btn-secondary">Status Types</a>
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="page-header-title mb-1">
+                <span id="totalCountHeader">@totalDevices</span> Devices Directory
+            </h1>
+            <p class="page-header-subtitle mb-0">Manage all active, available, and assigned SIM cards and USB modems in one place.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="SIM" asp-action="Create" class="btn-orange-primary shadow-sm">
+                <i class="fas fa-plus"></i>
+                <span>New SIM Card</span>
+            </a>
+            <a asp-controller="USB" asp-action="Create" class="btn-outline-custom shadow-sm">
+                <i class="fas fa-plus"></i>
+                <span>New USB Modem</span>
+            </a>
+            <a asp-controller="DeviceStatusType" asp-action="Index" class="btn-outline-custom shadow-sm">
+                <i class="fas fa-tags"></i>
+                <span>Status Types</span>
+            </a>
         </div>
     </div>
 
-    <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
-        <div class="filters-row">
-            <div class="filter-group">
-                <label for="status-filter">Availability</label>
-                <select id="status-filter" class="status-select">
-                    <option value="all">All</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Not Active</option>
+    <!-- Summary Metrics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Total Devices</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@totalDevices</h3>
+                    </div>
+                    <div class="rounded-circle p-3 text-white" style="background-color: var(--primary-orange);">
+                        <i class="fas fa-microchip fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Active Devices</span>
+                        <h3 class="fw-bold text-success mb-0 mt-1">@activeDevices</h3>
+                    </div>
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3 text-success">
+                        <i class="fas fa-check-circle fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">SIM Cards</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@simCount</h3>
+                    </div>
+                    <div class="rounded-circle bg-info bg-opacity-10 p-3 text-info">
+                        <i class="fas fa-sim-card fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">USB Modems</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@usbCount</h3>
+                    </div>
+                    <div class="rounded-circle bg-warning bg-opacity-10 p-3 text-warning">
+                        <i class="fas fa-dongle fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden p-4">
+
+        <!-- Filters Row -->
+        <div class="row g-3 align-items-end mb-4">
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="form-label text-muted small mb-1">Availability</label>
+                <select id="status-filter" class="form-select custom-select-filter">
+                    <option value="all">All Statuses</option>
+                    <option value="active">Active Only</option>
+                    <option value="inactive">Inactive Only</option>
                 </select>
             </div>
 
-            <div class="filter-group">
-                <label for="device-type-filter">Device Type</label>
-                <select id="device-type-filter" class="status-select">
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="form-label text-muted small mb-1">Device Type</label>
+                <select id="device-type-filter" class="form-select custom-select-filter">
                     <option value="all">All Types</option>
                     <option value="sim">SIM Card</option>
                     <option value="usb">USB Modem</option>
                 </select>
             </div>
 
-            <div class="filter-group">
-                <label for="status-type-filter">Status Type</label>
-                <select id="status-type-filter" class="status-select">
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="form-label text-muted small mb-1">Status Type</label>
+                <select id="status-type-filter" class="form-select custom-select-filter">
                     <option value="all">All Status Types</option>
                     @if (ViewBag.StatusTypes != null)
                     {
@@ -344,236 +342,270 @@
                 </select>
             </div>
 
-            <div class="filter-group" style="flex: 1;">
-                <label for="search-input">Search</label>
-                <div class="search-box">
-                    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
-                        <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                    <input id="search-input" type="text" placeholder="Search by Serial, Phone, Model, Provider, or Assignee..." autocomplete="off">
+            <div class="col-12 col-sm-6 col-md-3">
+                <label class="form-label text-muted small mb-1">Search</label>
+                <div class="search-bar-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Serial, phone, provider..." autocomplete="off">
                 </div>
             </div>
         </div>
-    </form>
 
-    <div class="table-wrap">
-        <table id="deviceTable">
-            <thead>
-                <tr>
-                    <th>Serial Number</th>
-                    <th>Type</th>
-                    <th>Details</th>
-                    <th>Availability</th>
-                    <th>Status</th>
-                    <th>Assigned To</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                @if (Model != null && Model.Any())
-                {
-                    foreach (var item in Model)
+        <!-- Data Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="deviceTable">
+                <thead class="table-light">
+                    <tr class="text-uppercase text-muted small fw-bold">
+                        <th scope="col">Serial Number</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Details</th>
+                        <th scope="col">Availability</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Assigned To</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    @if (deviceList.Any())
                     {
-                        @* FIX: normalize data-type to exactly "sim" or "usb" so it always
-                           matches the dropdown's option values, regardless of whether
-                           item.DeviceType is "SIM", "USB", or "USB Modem" etc. *@
-                        var normalizedType = (item.DeviceType != null && item.DeviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase))
-                        ? "sim"
-                        : (item.DeviceType != null && item.DeviceType.Contains("USB", StringComparison.OrdinalIgnoreCase))
-                        ? "usb"
-                        : "";
+                        foreach (var item in deviceList)
+                        {
+                            var normalizedType = (item.DeviceType != null && item.DeviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase))
+                            ? "sim"
+                            : (item.DeviceType != null && item.DeviceType.Contains("USB", StringComparison.OrdinalIgnoreCase))
+                            ? "usb"
+                            : "";
 
-                        <tr class="device-row"
-                            data-status="@(item.IsActive ? "active" : "inactive")"
-                            data-type="@normalizedType"
-                            data-status-type="@(item.Status?.ToLower() ?? "unassigned")">
-                            <td>
-                                <strong>@item.SerialNumber</strong>
-                                @if (!string.IsNullOrEmpty(item.ProviderName))
-                                {
-                                    <div style="font-size: 11px; color: #888;">@item.ProviderName</div>
-                                }
-                            </td>
-                            <td>
-                                <span class="badge-type @(item.DeviceType == "SIM" ? "badge-sim" : "badge-usb")">
-                                    @item.DeviceType
-                                </span>
-                            </td>
-                            <td>
-                                <div>@(string.IsNullOrEmpty(item.Identifier) ? "-" : item.Identifier)</div>
-                                @if (!string.IsNullOrEmpty(item.Detail))
-                                {
-                                    <div style="font-size: 11px; color: #888;">@item.Detail</div>
-                                }
-                            </td>
-                            <td>
-                                @if (item.IsActive)
-                                {
-                                    <span style="color:#137333; font-weight:700;">Active</span>
-                                }
-                                else
-                                {
-                                    <span style="color:#c5221f; font-weight:700;">Not Active</span>
-                                }
-                            </td>
-                            <td>
-                                @{
-                                    var statusColor = item.Status switch
+                            <tr class="device-row @(item.IsActive ? "" : "table-light")"
+                                data-status="@(item.IsActive ? "active" : "inactive")"
+                                data-type="@normalizedType"
+                                data-status-type="@(item.Status?.ToLower() ?? "unassigned")">
+
+                                <td class="fw-bold text-dark">
+                                    <div>@item.SerialNumber</div>
+                                    @if (!string.IsNullOrEmpty(item.ProviderName))
                                     {
-                                        "Occupied" => "#137333",
-                                        "Unassigned" => "#6b6b6b",
-                                        "Lost" => "#c5221f",
-                                        "Replaced" => "#b06000",
-                                        "Returned" => "#1a73e8",
-                                        _ => "#1a1a1a"
-                                    };
-                                }
-                                <span style="color:@statusColor; font-weight:700;">@item.Status</span>
-                            </td>
-                            <td>
-                                @if (!string.IsNullOrEmpty(item.AssignedToName))
-                                {
-                                    <div>
-                                        @item.AssignedToName
-                                        @if (!string.IsNullOrEmpty(item.AssignedToType))
+                                        <div class="text-muted small fw-normal">@item.ProviderName</div>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span class="@(normalizedType == "sim" ? "badge-type-sim" : "badge-type-usb")">
+                                        @item.DeviceType
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="text-dark">@(string.IsNullOrEmpty(item.Identifier) ? "-" : item.Identifier)</div>
+                                    @if (!string.IsNullOrEmpty(item.Detail))
+                                    {
+                                        <div class="text-muted small">@item.Detail</div>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge-status-active">
+                                            <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-status-inactive">
+                                            <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Inactive
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @{
+                                        var statusColor = item.Status switch
                                         {
-                                            <span style="font-size: 10px; color: #888;">(@item.AssignedToType)</span>
-                                        }
-                                    </div>
-                                }
-                                else
-                                {
-                                    <span style="color: #a8a8a8;">Unassigned</span>
-                                }
-                            </td>
-                            <td style="text-align: right;">
-                                @if (item.DeviceType.Contains("SIM"))
-                                {
-                                    <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
-                                }
-                                else
-                                {
-                                    <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
-                                }
-                            </td>
-                        </tr>
+                                            "Occupied" => "#137333",
+                                            "Unassigned" => "#6b6b6b",
+                                            "Lost" => "#c5221f",
+                                            "Replaced" => "#b06000",
+                                            "Returned" => "#1a73e8",
+                                            _ => "#1a1a1a"
+                                        };
+                                    }
+                                    <span class="fw-bold" style="color: @statusColor;">
+                                        @item.Status
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.AssignedToName))
+                                    {
+                                        <div>
+                                            <span class="fw-medium text-dark">@item.AssignedToName</span>
+                                            @if (!string.IsNullOrEmpty(item.AssignedToType))
+                                            {
+                                                <span class="text-muted small">(@item.AssignedToType)</span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fst-italic">Unassigned</span>
+                                    }
+                                </td>
+
+                                <td class="text-end">
+                                    @if (item.DeviceType != null && item.DeviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="btn-view-action">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="btn-view-action">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
                     }
-                }
-            </tbody>
-            <tr id="noResultsRow" style="display: none;">
-                <td colspan="7" style="text-align: center; padding: 32px; color: #888;">
-                    No matching devices found.
-                </td>
-            </tr>
-        </table>
-    </div>
+                    <tr id="noResultsRow" style="display: none;">
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-search me-1"></i> No matching devices found.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-    <div class="footer">
-        <div class="showing" id="showingText">Showing 0 records</div>
-        <div class="pagination" id="paginationContainer"></div>
-    </div>
+        <!-- Footer / Pagination -->
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mt-4 pt-2 border-top">
+            <div class="text-muted small" id="showingText">Showing 0 records</div>
+            <div class="pagination d-flex align-items-center gap-1" id="paginationContainer"></div>
+        </div>
 
+    </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const searchInput = document.getElementById("search-input");
-        const statusFilter = document.getElementById("status-filter");
-        const typeFilter = document.getElementById("device-type-filter");
-        const statusTypeFilter = document.getElementById("status-type-filter");
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("search-input");
+            const statusFilter = document.getElementById("status-filter");
+            const typeFilter = document.getElementById("device-type-filter");
+            const statusTypeFilter = document.getElementById("status-type-filter");
 
-        const allRows = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
-        const noResultsRow = document.getElementById("noResultsRow");
-        const showingText = document.getElementById("showingText");
-        const paginationContainer = document.getElementById("paginationContainer");
+            const allRows = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
+            const noResultsRow = document.getElementById("noResultsRow");
+            const totalCountHeader = document.getElementById("totalCountHeader");
+            const showingText = document.getElementById("showingText");
+            const paginationContainer = document.getElementById("paginationContainer");
 
-        const itemsPerPage = 7;
-        let visibleRows = [...allRows];
-        let currentPage = 1;
+            const itemsPerPage = 7;
+            let visibleRows = [...allRows];
+            let currentPage = 1;
 
-        function applyFilters() {
-            const query = searchInput.value.trim().toLowerCase();
-            const statusVal = statusFilter.value.toLowerCase();
-            const typeVal = typeFilter.value.toLowerCase();
-            const statusTypeVal = statusTypeFilter.value.toLowerCase();
+            function applyFilters() {
+                const query = searchInput.value.trim().toLowerCase();
+                const statusVal = statusFilter.value.toLowerCase();
+                const typeVal = typeFilter.value.toLowerCase();
+                const statusTypeVal = statusTypeFilter.value.toLowerCase();
 
-            visibleRows = allRows.filter(row => {
-                const text = row.innerText.toLowerCase();
-                const matchesSearch = text.includes(query);
+                visibleRows = allRows.filter(row => {
+                    const text = row.innerText.toLowerCase();
+                    const matchesSearch = text.includes(query);
 
-                const rowStatus = row.getAttribute("data-status");
-                const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
+                    const rowStatus = row.getAttribute("data-status");
+                    const matchesStatus = (statusVal === "all") || (rowStatus === statusVal);
 
-                const rowType = row.getAttribute("data-type");
-                const matchesType = (typeVal === "all") || (rowType === typeVal);
+                    const rowType = row.getAttribute("data-type");
+                    const matchesType = (typeVal === "all") || (rowType === typeVal);
 
-                const rowStatusType = row.getAttribute("data-status-type") ?? "";
-                const matchesStatusType = (statusTypeVal === "all") || (rowStatusType === statusTypeVal);
+                    const rowStatusType = row.getAttribute("data-status-type") ?? "";
+                    const matchesStatusType = (statusTypeVal === "all") || (rowStatusType === statusTypeVal);
 
-                return matchesSearch && matchesStatus && matchesType && matchesStatusType;
-            });
+                    return matchesSearch && matchesStatus && matchesType && matchesStatusType;
+                });
 
-            currentPage = 1;
-            renderTable();
-        }
+                currentPage = 1;
+                renderTable();
+            }
 
-        function renderTable() {
-            const totalVisible = visibleRows.length;
-            const totalPages = Math.max(1, Math.ceil(totalVisible / itemsPerPage));
+            function renderTable() {
+                const totalVisible = visibleRows.length;
+                totalCountHeader.textContent = totalVisible;
 
-            if (currentPage > totalPages) currentPage = totalPages;
+                if (totalVisible === 0) {
+                    allRows.forEach(row => row.style.display = "none");
+                    noResultsRow.style.display = "";
+                    showingText.textContent = "Showing 0 records";
+                    paginationContainer.innerHTML = "";
+                    return;
+                }
 
-            const startIdx = (currentPage - 1) * itemsPerPage;
-            const endIdx = startIdx + itemsPerPage;
-
-            allRows.forEach(row => row.style.display = "none");
-            visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
-
-            if (totalVisible === 0) {
-                noResultsRow.style.display = "";
-                showingText.textContent = "Showing 0 records";
-                paginationContainer.innerHTML = "";
-                return;
-            } else {
                 noResultsRow.style.display = "none";
+
+                const totalPages = Math.ceil(totalVisible / itemsPerPage);
+                if (currentPage > totalPages) currentPage = totalPages;
+                if (currentPage < 1) currentPage = 1;
+
+                const startIdx = (currentPage - 1) * itemsPerPage;
+                const endIdx = startIdx + itemsPerPage;
+
+                allRows.forEach(row => row.style.display = "none");
+                visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
+
+                const actualEnd = Math.min(endIdx, totalVisible);
+                showingText.textContent = `Showing ${startIdx + 1} to ${actualEnd} of ${totalVisible} records`;
+
+                renderPagination(totalPages);
             }
 
-            const actualEnd = Math.min(endIdx, totalVisible);
-            showingText.textContent = `Showing ${startIdx + 1}-${actualEnd} of ${totalVisible} records`;
+            function renderPagination(totalPages) {
+                paginationContainer.innerHTML = '';
 
-            let html = `<button type="button" class="arrow" id="prevBtn" ${currentPage === 1 ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8249;</button>`;
+                if (totalPages <= 1) return;
 
-            for (let i = 1; i <= totalPages; i++) {
-                html += `<button type="button" class="${i === currentPage ? 'active' : 'page-num'}" data-page="${i}">${i}</button>`;
+                const prevBtn = document.createElement('button');
+                prevBtn.innerHTML = '&#8249;';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderTable();
+                    }
+                });
+                paginationContainer.appendChild(prevBtn);
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `page-num ${i === currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = i;
+                    pageBtn.addEventListener('click', () => {
+                        currentPage = i;
+                        renderTable();
+                    });
+                    paginationContainer.appendChild(pageBtn);
+                }
+
+                const nextBtn = document.createElement('button');
+                nextBtn.innerHTML = '&#8250;';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderTable();
+                    }
+                });
+                paginationContainer.appendChild(nextBtn);
             }
 
-            html += `<button type="button" class="arrow" id="nextBtn" ${currentPage === totalPages ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8250;</button>`;
+            searchInput.addEventListener("input", applyFilters);
+            statusFilter.addEventListener("change", applyFilters);
+            typeFilter.addEventListener("change", applyFilters);
+            statusTypeFilter.addEventListener("change", applyFilters);
 
-            paginationContainer.innerHTML = html;
-        }
-
-        searchInput.addEventListener("input", applyFilters);
-        statusFilter.addEventListener("change", applyFilters);
-        typeFilter.addEventListener("change", applyFilters);
-        statusTypeFilter.addEventListener("change", applyFilters);
-
-        paginationContainer.addEventListener("click", function (e) {
-            const btn = e.target.closest("button");
-            if (!btn || btn.disabled) return;
-
-            if (btn.id === "prevBtn") {
-                if (currentPage > 1) currentPage--;
-            } else if (btn.id === "nextBtn") {
-                const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
-                if (currentPage < totalPages) currentPage++;
-            } else if (btn.dataset.page) {
-                currentPage = parseInt(btn.dataset.page);
-            }
-
-            renderTable();
+            applyFilters();
         });
-
-        applyFilters();
-    });
-</script>
+    </script>
+}

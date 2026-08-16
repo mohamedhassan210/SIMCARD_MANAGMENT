@@ -1,486 +1,511 @@
 ﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.InternetLineListItemViewModel>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internet Lines Index</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+@{
+    ViewData["Title"] = "Internet Lines Directory";
+    var lineList = Model?.ToList() ?? new List<Sim_Card_Managment.Viewmodel.InternetLineListItemViewModel>();
+    int totalCount = lineList.Count;
+    int activeCount = lineList.Count(x => x.Status);
+    int inactiveCount = lineList.Count(x => !x.Status);
+}
 
-    <style>
-        :root {
-            --brand-orange: #DF531B;
-            --brand-orange-light: #FFF8F6;
-            --brand-purple: #5B2D90;
-            --bg-canvas: #F4F5F8;
-            --text-dark: #1E293B;
-            --text-muted: #64748B;
-            --card-border: #E2E8F0;
+<style>
+    /* Theme & Layout Variables */
+    :root {
+        --primary-orange: #E24D17;
+        --primary-orange-hover: #c84111;
+        --bg-light: #f8f9fa;
+    }
+
+    /* Page Header */
+    .page-header-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+
+    .page-header-subtitle {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* Primary & Secondary Action Buttons */
+    .btn-orange-primary {
+        background-color: var(--primary-orange);
+        border: 1px solid var(--primary-orange);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+        .btn-orange-primary:hover {
+            background-color: var(--primary-orange-hover);
+            border-color: var(--primary-orange-hover);
+            color: #ffffff;
         }
 
-        body {
-            background-color: var(--bg-canvas);
-            color: var(--text-dark);
-            font-family: system-ui, -apple-system, sans-serif;
-            padding-bottom: 3rem;
+    .btn-secondary-soft {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        color: #333333;
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-secondary-soft:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
         }
 
-        .page-header {
-            background: #FFFFFF;
-            border-bottom: 1px solid var(--card-border);
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    .btn-action-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        background: #ffffff;
+        color: #6c757d;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+        .btn-action-icon:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
         }
 
-        .page-title {
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: var(--text-dark);
+    /* Search Bar Wrapper */
+    .search-bar-wrapper {
+        display: flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 6px 16px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .search-bar-wrapper:focus-within {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
         }
 
-        .stat-card {
-            background: #FFFFFF;
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 1.25rem 1.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        .search-bar-wrapper .search-icon {
+            color: #8c8c8c;
+            font-size: 15px;
+            margin-right: 10px;
         }
 
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-
-        .stat-icon-orange {
-            background: rgba(223, 83, 27, 0.12);
-            color: var(--brand-orange);
-        }
-
-        .stat-icon-green {
-            background: rgba(34, 197, 94, 0.12);
-            color: #16A34A;
-        }
-
-        .stat-icon-red {
-            background: rgba(220, 38, 38, 0.12);
-            color: #DC2626;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            line-height: 1.2;
-            color: var(--text-dark);
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            font-weight: 700;
-        }
-
-        .table-card {
-            background-color: #FFFFFF;
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-            padding: 2rem;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #FFF;
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 10px 16px;
-            transition: border-color 0.2s ease;
-        }
-
-            .search-box:focus-within {
-                border-color: var(--brand-orange);
-            }
-
-            .search-box i {
-                color: var(--text-muted);
-            }
-
-            .search-box input {
-                border: none;
-                outline: none;
-                background: transparent;
-                font-size: 0.95rem;
-                width: 100%;
-                color: var(--text-dark);
-            }
-
-        .filter-select {
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-            outline: none;
-            background: #FFF;
-            cursor: pointer;
-        }
-
-            .filter-select:focus {
-                border-color: var(--brand-orange);
-            }
-
-        .btn-custom {
-            height: 44px;
-            padding: 0 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary-orange {
-            background-color: var(--brand-orange);
-            color: #FFFFFF;
-        }
-
-            .btn-primary-orange:hover {
-                background-color: #c94614;
-                color: #FFFFFF;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
-            }
-
-        .btn-secondary-soft {
-            background-color: #F1F5F9;
-            color: var(--text-muted);
-            border: 1px solid var(--card-border);
-        }
-
-            .btn-secondary-soft:hover {
-                background-color: #E2E8F0;
-                color: var(--text-dark);
-            }
-
-        .btn-action-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--card-border);
-            background: #FFFFFF;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-            .btn-action-icon:hover {
-                background: var(--brand-orange-light);
-                color: var(--brand-orange);
-                border-color: rgba(223, 83, 27, 0.3);
-            }
-
-        .internet-line-table {
+        .search-bar-wrapper input {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
             width: 100%;
-            border-collapse: collapse;
+            font-size: 0.92rem;
+            color: #333333;
+            padding: 4px 0;
         }
 
-            .internet-line-table thead th {
-                text-align: left;
-                font-size: 0.8rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: var(--text-muted);
-                padding: 12px 16px;
-                border-bottom: 2px solid var(--brand-orange);
-                background: #FFFFFF;
-            }
+    /* Custom Form Selects */
+    .custom-select-control {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 8px 14px;
+        font-size: 0.92rem;
+        color: #333333;
+        background-color: #ffffff;
+        transition: border-color 0.2s ease;
+    }
 
-            .internet-line-table tbody td {
-                font-size: 0.95rem;
-                padding: 16px;
-                border-bottom: 1px solid var(--card-border);
-                vertical-align: middle;
-            }
-
-        .internet-line-row {
-            cursor: pointer;
+        .custom-select-control:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
+            outline: none;
         }
 
-            .internet-line-row:hover {
-                background-color: var(--brand-orange-light);
-            }
+    /* Badges */
+    .badge-status-active {
+        background-color: #e6f4ea;
+        color: #137333;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
 
-        .badge-status-up {
-            background-color: rgba(34, 197, 94, 0.1);
-            color: #15803D;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+    .badge-status-inactive {
+        background-color: #fce8e6;
+        color: #c5221f;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Table Interactive Rows */
+    .clickable-row {
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+    }
+
+        .clickable-row.inactive-row {
+            opacity: 0.7;
+            background-color: #fafafa;
         }
 
-        .badge-status-down {
-            background-color: rgba(220, 38, 38, 0.1);
-            color: #DC2626;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(220, 38, 38, 0.2);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+    /* Pagination Styles */
+    .pagination-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid #e0e0e0;
+        background: #ffffff;
+        color: #6c757d;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .pagination-btn:hover:not([disabled]) {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
         }
-    </style>
-</head>
-<body>
 
-    <header class="page-header p-100">
-        <div class="container-fluid px-lg-5">
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-                <div>
-                    <h1 class="page-title m-0">Internet Lines</h1>
-                    <p class="text-muted m-0 small mt-1">Manage internet connections, bandwidth, and operational status across all branches</p>
-                </div>
-                <div class="d-flex gap-2">
+        .pagination-btn.active {
+            background: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: #ffffff;
+        }
 
-                    <a asp-controller="InternetLine"
-                       asp-action="ExportToExcel"
-                       class="btn-custom btn-secondary-soft">
-                        <i class="fa-solid fa-file-excel"></i>
-                        Excel
-                    </a>
+        .pagination-btn[disabled] {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+</style>
 
-                    <a asp-controller="PaymentType"
-                       asp-action="Index"
-                       class="btn-custom btn-secondary-soft">
-                        <i class="fa-solid fa-credit-card"></i>
-                        Payment Types
-                    </a>
+<div class="container-fluid px-4 p-100">
 
-                    <a asp-controller="ServiceType"
-                       asp-action="Index"
-                       class="btn-custom btn-secondary-soft">
-                        <i class="fa-solid fa-diagram-project"></i>
-                        Service Types
-                    </a>
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+        <div>
+            <h1 class="page-header-title mb-1">Internet Lines</h1>
+            <p class="page-header-subtitle mb-0">Manage internet connections, bandwidth, and operational status across all branches.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="InternetLine" asp-action="ExportToExcel" class="btn-secondary-soft">
+                <i class="fas fa-file-excel text-success"></i>
+                <span>Excel</span>
+            </a>
+            <a asp-controller="PaymentType" asp-action="Index" class="btn-secondary-soft">
+                <i class="fas fa-credit-card"></i>
+                <span>Payment Types</span>
+            </a>
+            <a asp-controller="ServiceType" asp-action="Index" class="btn-secondary-soft">
+                <i class="fas fa-diagram-project"></i>
+                <span>Service Types</span>
+            </a>
+            <a asp-controller="InternetLine" asp-action="Create" class="btn-orange-primary shadow-sm">
+                <i class="fas fa-plus"></i>
+                <span>New Line</span>
+            </a>
+        </div>
+    </div>
 
-                    <a asp-controller="InternetLine"
-                       asp-action="Create"
-                       class="btn-custom btn-primary-orange">
-                        <i class="fa-solid fa-plus"></i>
-                        New Internet Line
-                    </a>
-
+    <!-- KPI Summary Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Total Lines</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@totalCount</h3>
+                    </div>
+                    <div class="rounded-circle p-3 text-white" style="background-color: #E24D17;">
+                        <i class="fas fa-globe fa-lg"></i>
+                    </div>
                 </div>
             </div>
         </div>
-    </header>
-
-    <main class="container-fluid px-lg-5">
-
-        <div class="row g-3 mb-4">
-            <div class="col-12 col-sm-6 col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon stat-icon-orange">
-                        <i class="fa-solid fa-globe"></i>
-                    </div>
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <div class="stat-value">@(Model?.Count() ?? 0)</div>
-                        <div class="stat-label">Total Lines</div>
+                        <span class="text-muted small fw-medium">Active (Up)</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@activeCount</h3>
                     </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon stat-icon-green">
-                        <i class="fa-solid fa-circle-check"></i>
-                    </div>
-                    <div>
-                        <div class="stat-value">@(Model?.Count(i => i.Status) ?? 0)</div>
-                        <div class="stat-label">Active (Up)</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-4">
-                <div class="stat-card">
-                    <div class="stat-icon stat-icon-red">
-                        <i class="fa-solid fa-circle-xmark"></i>
-                    </div>
-                    <div>
-                        <div class="stat-value">@(Model?.Count(i => !i.Status) ?? 0)</div>
-                        <div class="stat-label">Offline (Down)</div>
+                    <div class="rounded-circle p-3 text-white" style="background-color: #198754;">
+                        <i class="fas fa-check-circle fa-lg"></i>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="table-card">
-
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-                <div class="search-box col-12 col-md-5">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input id="lineSearchInput" type="text" placeholder="Search by branch, provider, or phone number..." autocomplete="off">
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="text-muted small fw-bold">Status:</span>
-                    <select id="statusFilter" class="filter-select">
-                        <option value="ALL">All Statuses</option>
-                        <option value="UP">Up (Active)</option>
-                        <option value="DOWN">Down (Inactive)</option>
-                    </select>
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Offline (Down)</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@inactiveCount</h3>
+                    </div>
+                    <div class="rounded-circle p-3 text-white" style="background-color: #dc3545;">
+                        <i class="fas fa-times-circle fa-lg"></i>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="table-responsive">
-                <table class="internet-line-table" id="lineTable">
-                    <thead>
-                        <tr>
-                            <th>Branch</th>
-                            <th>ISP</th>
-                            <th>Service Type</th>
-                            <th>Payment Type</th>
-                            <th>Phone Number</th>
-                            <th>Bandwidth</th>
-                            <th>Status</th>
-                            <th>Created By</th>
-                            <th style="text-align: right;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lineTableBody">
-                        @if (Model != null && Model.Any())
+    <!-- Main Table Container -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden p-4">
+
+        <!-- Controls / Filters Header -->
+        <div class="row g-3 align-items-end mb-4">
+            <div class="col-12 col-sm-6 col-md-3 col-xl-2">
+                <label for="statusFilter" class="form-label text-muted small fw-medium mb-1">Status</label>
+                <select id="statusFilter" class="form-select custom-select-control">
+                    <option value="ALL">All Statuses</option>
+                    <option value="UP">Up (Active)</option>
+                    <option value="DOWN">Down (Inactive)</option>
+                </select>
+            </div>
+
+            <div class="col-12 col-md-9 col-xl-10">
+                <label for="lineSearchInput" class="form-label text-muted small fw-medium mb-1">Search Lines</label>
+                <div class="search-bar-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="lineSearchInput" placeholder="Search by branch, provider, service, or phone number..." autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="lineTable">
+                <thead class="table-light">
+                    <tr class="text-uppercase text-muted small fw-bold">
+                        <th scope="col" style="width: 16%;">Branch</th>
+                        <th scope="col" style="width: 14%;">ISP</th>
+                        <th scope="col" style="width: 14%;">Service Type</th>
+                        <th scope="col" style="width: 14%;">Payment Type</th>
+                        <th scope="col" style="width: 14%;">Phone Number</th>
+                        <th scope="col" style="width: 10%;">Bandwidth</th>
+                        <th scope="col" style="width: 8%;">Status</th>
+                        <th scope="col" style="width: 5%;">Created By</th>
+                        <th scope="col" class="text-end" style="width: 5%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="lineTableBody">
+                    @if (lineList.Any())
+                    {
+                        foreach (var item in lineList)
                         {
-                            foreach (var item in Model)
-                            {
-                                var statusAttr = item.Status ? "UP" : "DOWN";
-                                <tr class="internet-line-row" data-status="@statusAttr" data-href="/InternetLine/Details/@item.Id">
-                                    <td><strong>@item.BranchName</strong></td>
-                                    <td>@item.ServiceProviderName</td>
-                                    <td>@item.ServiceTypeName</td>
-                                    <td>@item.PaymentTypeName</td>
-                                    <td><code class="text-dark fw-semibold">@(item.PhoneNumber ?? "N/A")</code></td>
-                                    <td>@(item.Bandwidth ?? "N/A")</td>
-                                    <td>
-                                        @if (item.Status)
-                                        {
-                                            <span class="badge-status-up">
-                                                <i class="fa-solid fa-circle"></i> Up
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge-status-down">
-                                                <i class="fa-solid fa-circle"></i> Down
-                                            </span>
-                                        }
-                                    </td>
+                            var statusAttr = item.Status ? "UP" : "DOWN";
+                            var rowClass = !item.Status ? "clickable-row inactive-row" : "clickable-row";
 
-                                    <td>
-                                        <span class="fw-semibold">@item.CreatedByUsername</span>
-                                    </td>
-
-                                    <td style="text-align: right;">
-                                        <div class="d-inline-flex gap-1 action-buttons">
-                                            <a asp-controller="InternetLine" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit Line">
-                                                <i class="fa-solid fa-pen"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
+                            <tr class="@rowClass" data-status="@statusAttr" data-href="@Url.Action("Details", "InternetLine", new { id = item.Id })">
+                                <td>
+                                    <span class="fw-bold text-dark fs-6">@item.BranchName</span>
+                                </td>
+                                <td>
+                                    <span class="text-dark small fw-medium">@item.ServiceProviderName</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">@item.ServiceTypeName</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">@item.PaymentTypeName</span>
+                                </td>
+                                <td>
+                                    <code class="text-dark fw-semibold">@(string.IsNullOrEmpty(item.PhoneNumber) ? "N/A" : item.PhoneNumber)</code>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">@(string.IsNullOrEmpty(item.Bandwidth) ? "N/A" : item.Bandwidth)</span>
+                                </td>
+                                <td>
+                                    @if (item.Status)
+                                    {
+                                        <span class="badge-status-active">
+                                            <i class="fas fa-circle style="font-size: 6px;"></i> Up
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-status-inactive">
+                                            <i class="fas fa-circle style="font-size: 6px;"></i> Down
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="text-muted small">@item.CreatedByUsername</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1 action-buttons">
+                                        <a asp-controller="InternetLine" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit Line">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                         }
-                        <tr id="noResultsRow" style="display: @(Model == null || !Model.Any() ? "" : "none");">
-                            <td colspan="9" class="text-center text-muted py-4">
-                                No matching internet lines found.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
+                    }
+                    <tr id="noResultsRow" style="display: none;">
+                        <td colspan="9" class="text-center text-muted py-4">
+                            No matching internet lines found.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-    </main>
+        <!-- Footer / Pagination -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 mt-4 pt-3 border-top">
+            <span class="text-muted small" id="showingText">Showing 0 records</span>
+            <div class="d-flex align-items-center gap-1" id="paginationContainer"></div>
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const rows = document.querySelectorAll('.internet-line-row');
+    </div>
+</div>
 
-            rows.forEach(row => {
-                row.addEventListener('click', (e) => {
-                    if (e.target.closest('.action-buttons')) {
-                        return;
-                    }
-                    const targetUrl = row.getAttribute('data-href');
-                    if (targetUrl) {
-                        window.location.href = targetUrl;
-                    }
-                });
+<!-- Dynamic Search, Filter & Pagination Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("lineSearchInput");
+        const statusFilter = document.getElementById("statusFilter");
+        const allRows = Array.from(document.querySelectorAll("#lineTableBody tr.clickable-row"));
+        const noResultsRow = document.getElementById("noResultsRow");
+        const showingText = document.getElementById("showingText");
+        const paginationContainer = document.getElementById("paginationContainer");
+
+        const itemsPerPage = 7;
+        let visibleRows = [...allRows];
+        let currentPage = 1;
+
+        // Row Click Navigation Handler
+        allRows.forEach(row => {
+            row.addEventListener('click', (e) => {
+                if (e.target.closest('.action-buttons')) {
+                    return;
+                }
+                const targetUrl = row.getAttribute('data-href');
+                if (targetUrl) {
+                    window.location.href = targetUrl;
+                }
+            });
+        });
+
+        function renderTable() {
+            const totalVisible = visibleRows.length;
+            const totalPages = Math.max(1, Math.ceil(totalVisible / itemsPerPage));
+
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = startIdx + itemsPerPage;
+
+            // Hide all rows initially
+            allRows.forEach(row => row.style.display = "none");
+
+            // Display current page slice
+            visibleRows.slice(startIdx, endIdx).forEach(row => row.style.display = "");
+
+            // Handle empty search / filter state
+            if (totalVisible === 0) {
+                if (noResultsRow) noResultsRow.style.display = "";
+                showingText.textContent = "Showing 0 records";
+                paginationContainer.innerHTML = "";
+                return;
+            } else {
+                if (noResultsRow) noResultsRow.style.display = "none";
+            }
+
+            // Update stats counter text
+            const actualEnd = Math.min(endIdx, totalVisible);
+            showingText.textContent = `Showing ${startIdx + 1}-${actualEnd} of ${totalVisible} records`;
+
+            // Build pagination HTML
+            let html = `<button type="button" class="pagination-btn" id="prevBtn" ${currentPage === 1 ? 'disabled' : ''}>&lsaquo;</button>`;
+
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button type="button" class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+            }
+
+            html += `<button type="button" class="pagination-btn" id="nextBtn" ${currentPage === totalPages ? 'disabled' : ''}>&rsaquo;</button>`;
+
+            paginationContainer.innerHTML = html;
+        }
+
+        function applyFilters() {
+            const query = searchInput.value.trim().toLowerCase();
+            const selectedStatus = statusFilter.value.toUpperCase();
+
+            visibleRows = allRows.filter(row => {
+                const text = row.innerText.toLowerCase();
+                const matchesSearch = text.includes(query);
+
+                const rowStatus = (row.getAttribute("data-status") || "UP").toUpperCase();
+                const matchesStatus = (selectedStatus === "ALL" || rowStatus === selectedStatus);
+
+                return matchesSearch && matchesStatus;
             });
 
-            const searchInput = document.getElementById('lineSearchInput');
-            const statusFilter = document.getElementById('statusFilter');
-            const noResultsRow = document.getElementById('noResultsRow');
+            currentPage = 1;
+            renderTable();
+        }
 
-            function filterTable() {sp
-                const searchTerm = searchInput.value.toLowerCase();
-                const statusValue = statusFilter.value;
-                let visibleCount = 0;
+        // Attach event listeners
+        if (searchInput) searchInput.addEventListener("input", applyFilters);
+        if (statusFilter) statusFilter.addEventListener("change", applyFilters);
 
-                rows.forEach(row => {
-                    const text = row.innerText.toLowerCase();
-                    const rowStatus = row.getAttribute('data-status');
+        // Pagination delegation
+        paginationContainer.addEventListener("click", function (e) {
+            const btn = e.target.closest("button");
+            if (!btn || btn.disabled) return;
 
-                    const matchesSearch = text.includes(searchTerm);
-                    const matchesStatus = statusValue === 'ALL' || rowStatus === statusValue;
-
-                    if (matchesSearch && matchesStatus) {
-                        row.style.display = '';
-                        visibleCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                if (noResultsRow) {
-                    noResultsRow.style.display = visibleCount === 0 ? '' : 'none';
-                }
+            if (btn.id === "prevBtn") {
+                if (currentPage > 1) currentPage--;
+            } else if (btn.id === "nextBtn") {
+                const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
+                if (currentPage < totalPages) currentPage++;
+            } else if (btn.dataset.page) {
+                currentPage = parseInt(btn.dataset.page, 10);
             }
 
-            if (searchInput) searchInput.addEventListener('input', filterTable);
-            if (statusFilter) statusFilter.addEventListener('change', filterTable);
+            renderTable();
         });
-    </script>
-</body>
-</html>
+
+        // Initial render
+        applyFilters();
+    });
+</script>

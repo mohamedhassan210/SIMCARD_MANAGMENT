@@ -1,186 +1,442 @@
 ﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.BranchListItemViewModel>
 
 @{
-   
+    ViewData["Title"] = "Branches Directory";
+    var branchList = Model?.ToList() ?? new List<Sim_Card_Managment.Viewmodel.BranchListItemViewModel>();
+    var totalBranches = branchList.Count;
+    var activeBranches = branchList.Count(b => b.IsActive);
+    var vpnEnabledCount = branchList.Count(b => b.VpnOverInternetStatus == true);
+    var vpnDisabledCount = branchList.Count(b => b.VpnOverInternetStatus == false);
 }
 
-<!DOCTYPE html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Branches </title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
-    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
+<style>
+    /* Theme & Layout Variables */
+    :root {
+        --primary-orange: #E24D17;
+        --primary-orange-hover: #c84111;
+        --bg-light: #f8f9fa;
+    }
 
+    /* Page Header */
+    .page-header-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
 
-</head>
+    .page-header-subtitle {
+        font-size: 14px;
+        color: #6c757d;
+    }
 
-<section class="bi-body">
+    /* Action Buttons */
+    .btn-orange-primary {
+        background-color: var(--primary-orange);
+        border: 1px solid var(--primary-orange);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
 
+        .btn-orange-primary:hover {
+            background-color: var(--primary-orange-hover);
+            border-color: var(--primary-orange-hover);
+            color: #ffffff;
+        }
+
+    .btn-view-action {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        color: #333333;
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .btn-view-action:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
+        }
+
+    .btn-delete-action {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        color: #dc3545;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+        .btn-delete-action:hover {
+            border-color: #dc3545;
+            background-color: #fff8f8;
+            color: #b02a37;
+        }
+
+    /* Seamless Unified Search Bar */
+    .search-bar-wrapper {
+        display: flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 6px 16px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .search-bar-wrapper:focus-within {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
+        }
+
+        .search-bar-wrapper .search-icon {
+            color: #8c8c8c;
+            font-size: 15px;
+            margin-right: 10px;
+        }
+
+        .search-bar-wrapper input {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            width: 100%;
+            font-size: 0.92rem;
+            color: #333333;
+            padding: 4px 0;
+        }
+
+    /* Custom Dropdown Filter */
+    .custom-select-filter {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 8px 36px 8px 14px;
+        background-color: #ffffff;
+        font-size: 0.9rem;
+        color: #495057;
+        transition: border-color 0.2s ease;
+    }
+
+        .custom-select-filter:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
+            outline: none;
+        }
+
+    /* Status Badges */
+    .badge-status-active {
+        background-color: #d1e7dd;
+        color: #0f5132;
+        border: 1px solid #badbcc;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .badge-status-inactive {
+        background-color: #f8d7da;
+        color: #842029;
+        border: 1px solid #f5c2c7;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .badge-vpn-enabled {
+        background-color: #cff4fc;
+        color: #055160;
+        border: 1px solid #b6effb;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .badge-vpn-disabled {
+        background-color: #e2e3e5;
+        color: #41464b;
+        border: 1px solid #d3d6d8;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+    }
+</style>
+
+<div class="container-fluid px-4 p-100">
     @Html.AntiForgeryToken()
 
-    
-    <header class="bi-page-header p-100">
-        <div class="container-fluid px-lg-5">
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-                <div>
-                    <h1 class="bi-page-title m-0">Branches Directory</h1>
-                    <p class="bi-text-muted m-0 small mt-1">Manage organization branches and VPN configuration status</p>
-                </div>
-                <div>
-                    <a asp-action="Create" class="bi-btn bi-btn-primary">
-                        <i class="fa-solid fa-plus"></i> New Branch
-                    </a>
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="page-header-title mb-1">Branches Directory</h1>
+            <p class="page-header-subtitle mb-0">Manage organization branches and VPN configuration status.</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn-orange-primary shadow-sm">
+                <i class="fas fa-plus"></i>
+                <span>New Branch</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Total Branches</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@totalBranches</h3>
+                    </div>
+                    <div class="rounded-circle p-3 text-white" style="background-color: #E24D17;">
+                        <i class="fas fa-building fa-lg"></i>
+                    </div>
                 </div>
             </div>
         </div>
-    </header>
 
-   
-    <main class="container-fluid px-lg-5">
-
-        <div class="bi-table-card">
-
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-
-                <div class="bi-search-box col-12 col-md-5">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input id="bi-search-input" type="text" placeholder="Search by branch name..." autocomplete="off">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Active Branches</span>
+                        <h3 class="fw-bold text-success mb-0 mt-1">@activeBranches</h3>
+                    </div>
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3 text-success">
+                        <i class="fas fa-check-circle fa-lg"></i>
+                    </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="d-flex align-items-center gap-2">
-                    <span class="bi-text-muted small fw-bold">Active Status:</span>
-                    <select id="bi-active-filter" class="bi-filter-select">
-                        <option value="ALL">All</option>
-                        <option value="ACTIVE">Active</option>
-                        <option value="INACTIVE">Inactive</option>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">VPN Enabled</span>
+                        <h3 class="fw-bold text-info mb-0 mt-1">@vpnEnabledCount</h3>
+                    </div>
+                    <div class="rounded-circle bg-info bg-opacity-10 p-3 text-info">
+                        <i class="fas fa-network-wired fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">VPN Disabled</span>
+                        <h3 class="fw-bold text-secondary mb-0 mt-1">@vpnDisabledCount</h3>
+                    </div>
+                    <div class="rounded-circle bg-secondary bg-opacity-10 p-3 text-secondary">
+                        <i class="fas fa-slash fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Table Container -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden p-4">
+
+        <!-- Controls Header -->
+        <div class="row g-3 justify-content-between align-items-center mb-4">
+            <div class="col-12 col-md-6 col-lg-5">
+                <label class="form-label text-muted small mb-1">Search</label>
+                <div class="search-bar-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="tableSearchInput" placeholder="Search by branch name or creator...">
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-md-end align-items-end mt-3 mt-md-0">
+                <div class="w-100 w-md-auto">
+                    <label class="form-label text-muted small mb-1">Status Filter</label>
+                    <select id="statusFilter" class="form-select custom-select-filter">
+                        <option value="">All Statuses</option>
+                        <option value="Active">Active Only</option>
+                        <option value="Inactive">Inactive Only</option>
                     </select>
                 </div>
             </div>
-
-            <div class="table-responsive">
-                <table class="bi-table" id="bi-branch-table">
-                    <thead>
-                        <tr>
-                            <th>Branch Name</th>
-                            <th>VPN Over Internet</th>
-                            <th>Is Active</th>
-                            <th>Created At</th>
-                            <th>Created By</th>
-                            <th style="text-align: right;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bi-table-body">
-                        @if (Model != null && Model.Any())
-                        {
-                            foreach (var branch in Model)
-                            {
-                                <tr class="bi-row" data-active="@(branch.IsActive ? "ACTIVE" : "INACTIVE")" data-href="/Branch/Details/@branch.Id">
-                                    <td><strong>@branch.Name</strong></td>
-                                    <td>
-                                        @if (branch.VpnOverInternetStatus == true)
-                                        {
-                                            <span class="bi-badge-enabled"><i class="fa-solid fa-circle"></i> Enabled</span>
-                                        }
-                                        else if (branch.VpnOverInternetStatus == false)
-                                        {
-                                            <span class="bi-badge-disabled"><i class="fa-solid fa-circle"></i> Disabled</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="bi-text-muted">Not Configured</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (branch.IsActive)
-                                        {
-                                            <span class="bi-badge-active">Active</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="bi-badge-inactive">Inactive</span>
-                                        }
-                                    </td>
-                                    <td><span class="bi-text-muted">@branch.CreatedAt.ToString("MMM dd, yyyy")</span></td>
-                                    <td><span class="bi-text-muted">@branch.CreatedByUsername</span></td>
-                                    <td style="text-align: right;">
-                                        <div class="d-inline-flex gap-1 bi-action-buttons">
-                                            <a href="/Branch/Edit/@branch.Id" class="bi-btn-action" title="Edit Branch"><i class="fa-solid fa-pen"></i></a>
-                                            <button type="button" class="bi-btn-action bi-btn-delete" title="Delete" onclick="biDeleteBranch(@branch.Id, '@branch.Name', event)"><i class="fa-solid fa-trash-can"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        <tr id="bi-no-results" style="display: @((Model != null && Model.Any()) ? "none" : "");">
-                            <td colspan="6" class="bi-no-results">
-                                No matching branches found.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
         </div>
 
-    </main>
+        <!-- Table View -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="branchTable">
+                <thead class="table-light">
+                    <tr class="text-uppercase text-muted small fw-bold">
+                        <th scope="col">Branch Name</th>
+                        <th scope="col">VPN Over Internet</th>
+                        <th scope="col">Is Active</th>
+                        <th scope="col">Created At</th>
+                        <th scope="col">Created By</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="branchTableBody">
+                    @if (!branchList.Any())
+                    {
+                        <tr id="noDataRow">
+                            <td colspan="6" class="text-center text-muted py-4">No branches found.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var branch in branchList)
+                        {
+                            <tr class="branch-row" data-active="@(branch.IsActive ? "Active" : "Inactive")" style="cursor: pointer;" onclick="navigateToDetails(event, '/Branch/Details/@branch.Id')">
+                                <td class="fw-bold text-dark">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle bg-orange bg-opacity-10 text-danger p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background-color: rgba(226, 77, 23, 0.1);">
+                                            <i class="fas fa-store fa-sm" style="color: #E24D17;"></i>
+                                        </div>
+                                        <span>@branch.Name</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (branch.VpnOverInternetStatus == true)
+                                    {
+                                        <span class="badge-vpn-enabled">
+                                            <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Enabled
+                                        </span>
+                                    }
+                                    else if (branch.VpnOverInternetStatus == false)
+                                    {
+                                        <span class="badge-vpn-disabled">
+                                            <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Disabled
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Not Configured</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (branch.IsActive)
+                                    {
+                                        <span class="badge-status-active availability-cell" data-active="true">
+                                            <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-status-inactive availability-cell" data-active="false">
+                                            <i class="fas fa-circle me-1" style="font-size: 7px;"></i> Inactive
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="text-muted small">@branch.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">@branch.CreatedByUsername</span>
+                                </td>
+                                <td class="text-end action-cell">
+                                    <div class="d-inline-flex gap-2">
+                                        <a href="/Branch/Edit/@branch.Id" class="btn-view-action" title="Edit Branch" onclick="stopPropagation(event)">
+                                            <i class="fas fa-pen"></i> Edit
+                                        </a>
+                                        <button type="button" class="btn-delete-action" title="Delete Branch" onclick="biDeleteBranch(@branch.Id, '@branch.Name', event)">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    <tr id="noResultsRow" style="display: none;">
+                        <td colspan="6" class="text-center text-muted py-4">No matching branches found.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
+    </div>
+</div>
 
-
-</section>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-   
     function biGetToken() {
-        return document.querySelector('input[name="__RequestVerificationToken"]').value;
+        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+        return tokenInput ? tokenInput.value : '';
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const rows = document.querySelectorAll('.bi-row');
-        rows.forEach(row => {
-            row.addEventListener('click', function (e) {
-                if (e.target.closest('.bi-action-buttons')) {
-                    return;
+    function stopPropagation(e) {
+        if (e) e.stopPropagation();
+    }
+
+    function navigateToDetails(e, url) {
+        if (e.target.closest('.action-cell')) {
+            return;
+        }
+        if (url) {
+            window.location.href = url;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById('tableSearchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const rows = document.querySelectorAll('#branchTable tbody tr.branch-row');
+        const noResultsRow = document.getElementById('noResultsRow');
+
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const selectedStatus = statusFilter.value; // "Active", "Inactive", or ""
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const statusCell = row.querySelector('.availability-cell');
+                const isActive = statusCell ? statusCell.getAttribute('data-active') === 'true' : false;
+
+                const matchesSearch = !searchTerm || text.includes(searchTerm);
+
+                let matchesStatus = true;
+                if (selectedStatus === 'Active') {
+                    matchesStatus = isActive === true;
+                } else if (selectedStatus === 'Inactive') {
+                    matchesStatus = isActive === false;
                 }
-                const targetUrl = this.getAttribute('data-href');
-                if (targetUrl) {
-                    window.location.href = targetUrl;
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
                 }
             });
-        });
-    });
 
-
-    const searchInput = document.getElementById('bi-search-input');
-    const activeFilter = document.getElementById('bi-active-filter');
-
-    function biFilterTable() {
-        const query = searchInput.value.toLowerCase().trim();
-        const selectedActive = activeFilter.value;
-        const rows = document.querySelectorAll('#bi-table-body tr.bi-row');
-        let hasVisibleRow = false;
-
-        rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            const rowActive = row.getAttribute('data-active');
-
-            const matchesQuery = text.includes(query);
-            const matchesActive = (selectedActive === 'ALL') || (rowActive === selectedActive);
-
-            if (matchesQuery && matchesActive) {
-                row.style.display = '';
-                hasVisibleRow = true;
-            } else {
-                row.style.display = 'none';
+            if (noResultsRow) {
+                noResultsRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
             }
-        });
+        }
 
-        document.getElementById('bi-no-results').style.display = hasVisibleRow ? 'none' : '';
-    }
-
-    searchInput.addEventListener('input', biFilterTable);
-    activeFilter.addEventListener('change', biFilterTable);
+        searchInput.addEventListener('input', filterTable);
+        statusFilter.addEventListener('change', filterTable);
+    });
 
     function biDeleteBranch(branchId, branchName, event) {
         if (event) event.stopPropagation();

@@ -1,444 +1,410 @@
 ﻿@model IEnumerable<Sim_Card_Managment.ViewModels.PersonListItemViewModel>
 
 @{
-    // Normalize ViewBag values to lowercase string with fallback defaults
+    ViewData["Title"] = "Directory";
+    var personList = Model?.ToList() ?? new List<Sim_Card_Managment.ViewModels.PersonListItemViewModel>();
+    int totalCount = personList.Count;
+    int employeeCount = personList.Count(x => x.PersonType == "Employee");
+    int nonEmployeeCount = personList.Count(x => x.PersonType != "Employee");
+
     string currentStatus = (ViewBag.CurrentStatus as string)?.ToLower() ?? "active";
     string currentType = (ViewBag.CurrentType as string)?.ToLower() ?? "all";
 }
 
 <style>
-    /* ---------- Title ---------- */
-    .title-section {
-        margin-bottom: 24px;
+    /* Theme & Layout Variables */
+    :root {
+        --primary-orange: #E24D17;
+        --primary-orange-hover: #c84111;
+        --bg-light: #f8f9fa;
     }
 
-        .title-section h1 {
-            font-size: 34px;
-            font-weight: 800;
-            color: #1a1a1a;
-        }
-
-            .title-section h1 .num {
-                color: #e8552b;
-            }
-
-        .title-section p {
-            margin-top: 10px;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #6b6b6b;
-            max-width: 560px;
-        }
-
-    /* ---------- Buttons ---------- */
-    .create-btn-group {
-        display: flex;
-        gap: 12px;
-        margin-top: 20px;
+    /* Page Header */
+    .page-header-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
     }
 
-    .create-btn {
+    .page-header-subtitle {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* Primary & Secondary Action Buttons */
+    .btn-orange-primary {
+        background-color: var(--primary-orange);
+        border: 1px solid var(--primary-orange);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: #e8552b;
-        color: #fff;
-        border: none;
-        padding: 11px 20px;
-        border-radius: 24px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
         text-decoration: none;
-        transition: background 0.2s ease, transform 0.2s ease;
     }
 
-        .create-btn:hover {
-            background: #d64923;
-            color: #fff;
-            transform: translateY(-1px);
+        .btn-orange-primary:hover {
+            background-color: var(--primary-orange-hover);
+            border-color: var(--primary-orange-hover);
+            color: #ffffff;
         }
 
-    .create-btn-secondary {
-        background: #ffffff;
-        color: #1a1a1a;
-        border: 1px solid #dcdcdc;
-    }
-
-        .create-btn-secondary:hover {
-            background: #f7f7f7;
-            color: #e8552b;
-            border-color: #e8552b;
-        }
-
-    /* ---------- Filters ---------- */
-    .filters {
-        margin-top: 34px;
-    }
-
-        .filters label {
-            display: block;
-            font-size: 12px;
-            color: #6b6b6b;
-            margin-bottom: 8px;
-        }
-
-    .filters-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .status-select {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: #fff;
-        border: 1px solid #dcdcdc;
-        border-radius: 10px;
-        padding: 11px 14px;
-        font-size: 13px;
-        color: #1a1a1a;
-        width: 150px;
-        cursor: pointer;
-        transition: border-color 0.2s ease;
-    }
-
-        .status-select:hover {
-            border-color: #e8552b;
-        }
-
-    .search-box {
-        flex: 1;
-        display: flex;
+    .btn-orange-outline {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        color: #333333;
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: #fff;
-        border: 1px solid #dcdcdc;
-        border-radius: 10px;
-        padding: 11px 14px;
+        text-decoration: none;
+    }
+
+        .btn-orange-outline:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
+        }
+
+    .btn-view-action {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        color: #333333;
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .btn-view-action:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
+        }
+
+    /* Seamless Search Bar Wrapper */
+    .search-bar-wrapper {
+        display: flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 6px 16px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .search-bar-wrapper:focus-within {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
+        }
+
+        .search-bar-wrapper .search-icon {
+            color: #8c8c8c;
+            font-size: 15px;
+            margin-right: 10px;
+        }
+
+        .search-bar-wrapper input {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            width: 100%;
+            font-size: 0.92rem;
+            color: #333333;
+            padding: 4px 0;
+        }
+
+    /* Custom Form Selects */
+    .custom-select-control {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 8px 14px;
+        font-size: 0.92rem;
+        color: #333333;
+        background-color: #ffffff;
         transition: border-color 0.2s ease;
     }
 
-        .search-box:focus-within {
-            border-color: #e8552b;
-        }
-
-        .search-box svg {
-            width: 15px;
-            height: 15px;
-            color: #a8a8a8;
-            flex-shrink: 0;
-        }
-
-        .search-box input {
-            border: none;
+        .custom-select-control:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
             outline: none;
-            background: transparent;
-            font-size: 13px;
-            width: 100%;
-            color: #1a1a1a;
         }
 
-            .search-box input::placeholder {
-                color: #b3b3b3;
-            }
-
-    /* ---------- Table ---------- */
-    .table-wrap {
-        margin-top: 28px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    thead th {
-        text-align: left;
-        font-size: 12px;
-        font-weight: 600;
-        color: #1a1a1a;
-        padding-bottom: 12px;
-        vertical-align: top;
-    }
-
-    thead tr {
-        border-bottom: 2px solid #e8552b;
-    }
-
-    tbody td {
-        font-size: 12.5px;
-        color: #1a1a1a;
-        padding: 16px 0;
-        border-bottom: 1px solid #e2e2e2;
-        vertical-align: middle;
-    }
-
-    /* Dim inactive records for visual clarity */
-    .person-row.inactive-row {
-        opacity: 0.65;
-        background-color: #fcfcfc;
-    }
-
-    .asset-cell {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        line-height: 1.3;
-    }
-
-        .asset-cell svg {
-            width: 14px;
-            height: 14px;
-            color: #1a1a1a;
-            flex-shrink: 0;
-        }
-
-    .badge-type {
-        display: inline-block;
-        font-size: 10px;
-        font-weight: 700;
-        padding: 2px 8px;
-        border-radius: 10px;
-        text-transform: uppercase;
-    }
-
-    .badge-employee {
-        background: #e6f4ea;
+    /* Badges */
+    .badge-type-employee {
+        background-color: #e6f4ea;
         color: #137333;
-    }
-
-    .badge-non-employee {
-        background: #feefc3;
-        color: #b06000;
-    }
-
-    .view-btn {
-        display: inline-block;
-        border: 1.5px solid #e8552b;
-        color: #e8552b;
-        background: transparent;
         font-size: 11px;
         font-weight: 700;
-        padding: 6px 18px;
-        border-radius: 16px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .badge-type-non-employee {
+        background-color: #feefc3;
+        color: #b06000;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .asset-pill {
+        background-color: #f1f3f5;
+        color: #495057;
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Inactive row visual treatment */
+    .person-row.inactive-row {
+        opacity: 0.65;
+        background-color: #fafafa;
+    }
+
+    /* Pagination Styles */
+    .pagination-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid #e0e0e0;
+        background: #ffffff;
+        color: #6c757d;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        text-decoration: none;
         transition: all 0.2s ease;
     }
 
-        .view-btn:hover {
-            background: #e8552b;
-            color: #fff;
+        .pagination-btn:hover:not([disabled]) {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+            background-color: #fffaf8;
         }
 
-    th:nth-child(1), td:nth-child(1) {
-        width: 22%;
-    }
-
-    th:nth-child(2), td:nth-child(2) {
-        width: 14%;
-    }
-
-    th:nth-child(3), td:nth-child(3) {
-        width: 18%;
-    }
-
-    th:nth-child(4), td:nth-child(4) {
-        width: 20%;
-    }
-
-    th:nth-child(5), td:nth-child(5) {
-        width: 14%;
-    }
-
-    th:nth-child(6), td:nth-child(6) {
-        width: 12%;
-        text-align: right;
-    }
-
-    /* ---------- Footer ---------- */
-    .footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 20px;
-    }
-
-        .footer .showing {
-            font-size: 12px;
-            color: #6b6b6b;
+        .pagination-btn.active {
+            background: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: #ffffff;
         }
 
-    .pagination {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-        .pagination button {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 1px solid #dcdcdc;
-            background: #fff;
-            color: #6b6b6b;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .pagination-btn[disabled] {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
-
-            .pagination button:hover {
-                border-color: #e8552b;
-                color: #e8552b;
-            }
-
-            .pagination button.page-num {
-                border: none;
-                background: transparent;
-                color: #1a1a1a;
-            }
-
-                .pagination button.page-num:hover {
-                    background: #fbeae5;
-                    color: #e8552b;
-                }
-
-            .pagination button.active {
-                background: #e8552b;
-                border-color: #e8552b;
-                color: #fff;
-            }
 </style>
 
-<div class="page p-100 container-fluid px-4">
+<div class="container-fluid px-4 p-100">
 
-    <div class="title-section">
-        <h1><span class="num">@(Model?.Count() ?? 0)</span> Directory Entries</h1>
-        <p>Manage all assigned personnel, contractors, and external device holders in one central place.</p>
-
-        <div class="create-btn-group">
-            <a asp-controller="Employee" asp-action="Create" class="create-btn"><span>+</span> New Employee</a>
-            <a asp-controller="NonEmployee" asp-action="Create" class="create-btn create-btn-secondary"><span>+</span> New Non-Employee</a>
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="page-header-title mb-1">Directory Entries</h1>
+            <p class="page-header-subtitle mb-0">Manage all assigned personnel, contractors, and external device holders in one central directory.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-controller="Employee" asp-action="Create" class="btn-orange-primary shadow-sm">
+                <i class="fas fa-plus"></i>
+                <span>New Employee</span>
+            </a>
+            <a asp-controller="NonEmployee" asp-action="Create" class="btn-orange-outline shadow-sm">
+                <i class="fas fa-plus"></i>
+                <span>New Non-Employee</span>
+            </a>
         </div>
     </div>
 
-    <div class="filters">
-        <div class="filters-row">
-            <div class="filter-group">
-                <label for="status-filter">Status</label>
-                <select id="status-filter" class="status-select">
+    <!-- KPI Summary Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Total Directory Records</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@totalCount</h3>
+                    </div>
+                    <div class="rounded-circle p-3 text-white" style="background-color: #E24D17;">
+                        <i class="fas fa-users fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Employees</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@employeeCount</h3>
+                    </div>
+                    <div class="rounded-circle p-3 text-white" style="background-color: #198754;">
+                        <i class="fas fa-user-tie fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card border-0 shadow-sm p-3 rounded-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted small fw-medium">Non-Employees / Contractors</span>
+                        <h3 class="fw-bold text-dark mb-0 mt-1">@nonEmployeeCount</h3>
+                    </div>
+                    <div class="rounded-circle p-3 text-white" style="background-color: #fd7e14;">
+                        <i class="fas fa-user-tag fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Table Container -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden p-4">
+
+        <!-- Controls / Filters Header -->
+        <div class="row g-3 align-items-end mb-4">
+            <div class="col-12 col-sm-6 col-md-3 col-xl-2">
+                <label for="status-filter" class="form-label text-muted small fw-medium mb-1">Status</label>
+                <select id="status-filter" class="form-select custom-select-control">
                     <option value="active" selected="@(currentStatus == "active")">Active</option>
                     <option value="inactive" selected="@(currentStatus == "inactive")">Inactive</option>
                     <option value="all" selected="@(currentStatus == "all")">All</option>
                 </select>
             </div>
 
-            <div class="filter-group">
-                <label for="employee-type-filter">Type</label>
-                <select id="employee-type-filter" class="status-select">
+            <div class="col-12 col-sm-6 col-md-3 col-xl-2">
+                <label for="employee-type-filter" class="form-label text-muted small fw-medium mb-1">Type</label>
+                <select id="employee-type-filter" class="form-select custom-select-control">
                     <option value="all" selected="@(currentType == "all")">All Types</option>
                     <option value="employee" selected="@(currentType == "employee")">Employee</option>
                     <option value="non-employee" selected="@(currentType == "non-employee")">Non-Employee</option>
                 </select>
             </div>
 
-            <div class="filter-group" style="flex: 1;">
-                <label for="search-input">Search (Client-Side)</label>
-                <div class="search-box">
-                    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
-                        <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                    <input id="search-input" type="text" placeholder="Type name, ID, or contact to search instantly..." autocomplete="off">
+            <div class="col-12 col-md-6 col-xl-8">
+                <label for="search-input" class="form-label text-muted small fw-medium mb-1">Search Directory</label>
+                <div class="search-bar-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Search by name, ID, or contact info..." autocomplete="off">
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="table-wrap">
-        <table id="directoryTable">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>ID / Contact</th>
-                    <th>Assigned Assets</th>
-                    <th>Start Date</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                @if (Model != null && Model.Any())
-                {
-                    foreach (var item in Model)
+        <!-- Directory Table View -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="directoryTable">
+                <thead class="table-light">
+                    <tr class="text-uppercase text-muted small fw-bold">
+                        <th scope="col" style="width: 25%;">Name</th>
+                        <th scope="col" style="width: 15%;">Type</th>
+                        <th scope="col" style="width: 18%;">ID / Contact</th>
+                        <th scope="col" style="width: 22%;">Assigned Assets</th>
+                        <th scope="col" style="width: 12%;">Start Date</th>
+                        <th scope="col" class="text-end" style="width: 8%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    @if (personList.Any())
                     {
-                        // Logic update: Employees check IsActive; Non-Employees default to active
-                        bool isRowActive = item.PersonType == "Employee" ? item.IsActive : true;
-                        var statusValue = isRowActive ? "active" : "inactive";
-                        var rawType = (item.PersonType ?? "").ToLower().Replace(" ", "-");
-                        var rowClass = !isRowActive ? "person-row inactive-row" : "person-row";
+                        foreach (var item in personList)
+                        {
+                            bool isRowActive = item.PersonType == "Employee" ? item.IsActive : true;
+                            var statusValue = isRowActive ? "active" : "inactive";
+                            var rawType = (item.PersonType ?? "").ToLower().Replace(" ", "-");
+                            var rowClass = !isRowActive ? "person-row inactive-row" : "person-row";
 
-                        <tr class="@rowClass" data-status="@statusValue" data-type="@rawType">
-                            <td class="col-name">
-                                <strong>@item.Name</strong>
-                                @if (!string.IsNullOrEmpty(item.ExtraInfo))
-                                {
-                                    <div style="font-size: 11px; color: #888;">@item.ExtraInfo</div>
-                                }
-                            </td>
-                            <td>
-                                <span class="badge-type @(item.PersonType == "Employee" ? "badge-employee" : "badge-non-employee")">
-                                    @item.PersonType
-                                </span>
-                            </td>
-                            <td class="col-identifier">@item.Identifier</td>
-                            <td>
-                                <div class="asset-cell">
-                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="3" y="2" width="14" height="20" rx="2" stroke="currentColor" stroke-width="1.5" />
-                                        <path d="M17 6H21V18H17" stroke="currentColor" stroke-width="1.5" />
-                                    </svg>
+                            <tr class="@rowClass" data-status="@statusValue" data-type="@rawType">
+                                <td>
                                     <div>
-                                        SIMs: @item.ActiveSimOnlyCount | USBs: @item.ActiveUsbCount
+                                        <span class="fw-bold text-dark fs-6 d-block">@item.Name</span>
+                                        @if (!string.IsNullOrEmpty(item.ExtraInfo))
+                                        {
+                                            <span class="text-muted small">@item.ExtraInfo</span>
+                                        }
                                     </div>
-                                </div>
-                            </td>
-                            <td>@item.StartDate.ToString("MMM dd, yyyy")</td>
-                            <td style="text-align: right;">
-                                @if (item.PersonType == "Employee")
-                                {
-                                    <a asp-controller="Employee" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
-                                }
-                                else
-                                {
-                                    <a asp-controller="NonEmployee" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
-                                }
-                            </td>
-                        </tr>
+                                </td>
+                                <td>
+                                    <span class="@(item.PersonType == "Employee" ? "badge-type-employee" : "badge-type-non-employee")">
+                                        @item.PersonType
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-dark font-monospace small">@item.Identifier</span>
+                                </td>
+                                <td>
+                                    <div class="asset-pill">
+                                        <i class="fas fa-sim-card text-muted"></i>
+                                        <span>SIMs: <strong>@item.ActiveSimOnlyCount</strong></span>
+                                        <span class="text-muted mx-1">|</span>
+                                        <i class="fas fa-usb text-muted"></i>
+                                        <span>USBs: <strong>@item.ActiveUsbCount</strong></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">@item.StartDate.ToString("MMM dd, yyyy")</span>
+                                </td>
+                                <td class="text-end">
+                                    @if (item.PersonType == "Employee")
+                                    {
+                                        <a asp-controller="Employee" asp-action="Details" asp-route-id="@item.Id" class="btn-view-action" title="View Details">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="NonEmployee" asp-action="Details" asp-route-id="@item.Id" class="btn-view-action" title="View Details">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
                     }
-                }
-                <tr id="noResultsRow" style="display: none;">
-                    <td colspan="6" style="text-align: center; padding: 32px; color: #888;">
-                        No matching personnel found.
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+                    <tr id="noResultsRow" style="display: none;">
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No matching personnel found.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-    <div class="footer">
-        <div class="showing" id="showingText">Showing 0 records</div>
-        <div class="pagination" id="paginationContainer"></div>
-    </div>
+        <!-- Footer / Pagination -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 mt-4 pt-3 border-top">
+            <span class="text-muted small" id="showingText">Showing 0 records</span>
+            <div class="d-flex align-items-center gap-1" id="paginationContainer"></div>
+        </div>
 
+    </div>
 </div>
 
+<!-- Dynamic Search & Pagination Script -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("search-input");
@@ -484,13 +450,13 @@
             showingText.textContent = `Showing ${startIdx + 1}-${actualEnd} of ${totalVisible} records`;
 
             // Build pagination HTML
-            let html = `<button type="button" class="arrow" id="prevBtn" ${currentPage === 1 ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8249;</button>`;
+            let html = `<button type="button" class="pagination-btn" id="prevBtn" ${currentPage === 1 ? 'disabled' : ''}>&lsaquo;</button>`;
 
             for (let i = 1; i <= totalPages; i++) {
-                html += `<button type="button" class="${i === currentPage ? 'active' : 'page-num'}" data-page="${i}">${i}</button>`;
+                html += `<button type="button" class="pagination-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
             }
 
-            html += `<button type="button" class="arrow" id="nextBtn" ${currentPage === totalPages ? 'disabled style="opacity:0.4;cursor:default;"' : ''}>&#8250;</button>`;
+            html += `<button type="button" class="pagination-btn" id="nextBtn" ${currentPage === totalPages ? 'disabled' : ''}>&rsaquo;</button>`;
 
             paginationContainer.innerHTML = html;
         }
@@ -501,31 +467,31 @@
             const selectedStatus = statusFilter.value.toLowerCase();
 
             visibleRows = allRows.filter(row => {
-                // 1. Full text matching (name, identifier, extra info, etc.)
+                // 1. Text Search matching
                 const text = row.innerText.toLowerCase();
                 const matchesSearch = text.includes(query);
 
-                // 2. Exact match using data-type
+                // 2. Type Filter matching
                 const rowType = (row.getAttribute("data-type") || "").toLowerCase();
                 const matchesType = (selectedType === "all" || rowType === selectedType);
 
-                // 3. Exact match using data-status ("active" vs "inactive")
+                // 3. Status Filter matching
                 const rowStatus = (row.getAttribute("data-status") || "active").toLowerCase();
                 const matchesStatus = (selectedStatus === "all" || rowStatus === selectedStatus);
 
                 return matchesSearch && matchesType && matchesStatus;
             });
 
-            currentPage = 1; // Reset to page 1 whenever filters change
+            currentPage = 1; // Reset to page 1 on filter change
             renderTable();
         }
 
-        // Event listener attachments
+        // Attach event listeners
         searchInput.addEventListener("input", applyFilters);
         typeFilter.addEventListener("change", applyFilters);
         statusFilter.addEventListener("change", applyFilters);
 
-        // Pagination button click delegate
+        // Pagination button click delegation
         paginationContainer.addEventListener("click", function (e) {
             const btn = e.target.closest("button");
             if (!btn || btn.disabled) return;
@@ -542,7 +508,7 @@
             renderTable();
         });
 
-        // Run initial filtering on DOM load
+        // Initialize display
         applyFilters();
     });
 </script>
