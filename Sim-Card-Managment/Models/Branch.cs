@@ -16,7 +16,9 @@ namespace Sim_Card_Management.Models
         public bool IsActive { get; set; } = true;
 
         public bool? VpnOverInternetStatus { get; set; }  // true = OK
-
+        public string? SiteCode{ get; set; } // HR code
+        public string? BranchCode { get; set; } // Retail code
+        public string? Note { get; set; } 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public int CreatedById { get; set; }
         // Navigation properties
@@ -24,5 +26,6 @@ namespace Sim_Card_Management.Models
         public virtual User CreatedBy { get; set; }
         public virtual ICollection<InternetLine> InternetLines { get; set; } = new List<InternetLine>();
         public virtual ICollection<VpnConnection> VpnConnections { get; set; } = new List<VpnConnection>();
+        public virtual ICollection<FireWallType> FireWallTypes { get; set; }
     }
 }
