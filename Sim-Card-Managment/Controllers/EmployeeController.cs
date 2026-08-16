@@ -213,5 +213,21 @@ namespace Sim_Card_Managment.Controllers
             var activeGroups = groups.Where(g => g.IsActive);
             model.Groups = new SelectList(activeGroups, "Id", "Name", model.GroupId);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Activate(int id)
+        {
+            var employee = _employeeRepo.GetById(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            employee.IsActive = true;
+            _employeeRepo.Update(employee);
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
     }
 }
