@@ -28,8 +28,9 @@ namespace Sim_Card_Management.Models
 
         [StringLength(100)]
         public string? Bandwidth { get; set; }  // e.g. "UP TO 30 Mbps"
+        public DateOnly? LastRenewalDate { get; set; }  
 
-        public int? RenewalDay { get; set; }  // day of month, filled when ServiceType = ADSL
+        public DateOnly? NextRenewalDate { get; set; }  
 
         [Column(TypeName = "decimal(10,2)")]
         public decimal? QuotaGB { get; set; }  // monthly quota, filled when ServiceType = 3G/4G
@@ -39,6 +40,9 @@ namespace Sim_Card_Management.Models
 
         [StringLength(500)]
         public string? Notes { get; set; }
+        public int RenewaltypeId { get; set; }
+        [ForeignKey(nameof(RenewaltypeId))]
+        public RenewalType RenewalType { get; set; }
         public int CreatedById { get; set; }
         [ForeignKey(nameof(CreatedById))]
         public virtual User CreatedBy { get; set; }

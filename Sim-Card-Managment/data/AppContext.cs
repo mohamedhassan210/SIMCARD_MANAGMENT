@@ -57,6 +57,7 @@ namespace Sim_Card_Managment.data
         public DbSet<VpnConnectionType> VpnConnectionTypes { get; set; }
         public DbSet<VpnConnection> VpnConnections { get; set; }
         public DbSet<FireWallType> FireWallTypes { get; set; }
+        public DbSet<RenewalType> RenewalTypes { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -396,7 +397,12 @@ namespace Sim_Card_Managment.data
                 .HasMany(b => b.FireWallTypes)
                 .WithMany(fw => fw.Branches);
 
-
+            // ── InternetLine: Renewaltype ──────────────────────────────
+            modelBuilder.Entity<InternetLine>()
+                .HasOne(vc => vc.RenewalType)
+                .WithMany(ct => ct.InternetLines)
+                .HasForeignKey(vc => vc.RenewaltypeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
     }

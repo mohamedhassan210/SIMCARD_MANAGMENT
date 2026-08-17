@@ -10,7 +10,7 @@ namespace Sim_Card_Management.Models
         [Required]
         [StringLength(50)]
         public string Name { get; set; } = string.Empty;  // e.g. ADSL, 3G/4G
-        public bool HasPhoneNumber { get; set; }
+        public bool HasPhoneNumber { get; set; } = false;
 
         // Navigation properties
         public virtual ICollection<InternetLine> InternetLines { get; set; } = new List<InternetLine>();
