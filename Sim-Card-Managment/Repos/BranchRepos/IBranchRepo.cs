@@ -12,5 +12,6 @@ namespace Sim_Card_Managment.Repos.BranchRepos
         Task UpdateAsync(BranchEditViewModel model);
         Task SoftDeleteAsync(int id);
         Task ActivateAsync(int id);
+        Task<Dictionary<string, string>> GetFireWallTypeNamesByBranchNameAsync();
     }
 }

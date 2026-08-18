@@ -148,6 +148,85 @@
                 background-color: #E2E8F0;
                 color: var(--text-dark);
             }
+
+        /* SIM Card selection styles */
+        .selection-card {
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            height: 100%;
+            background-color: #FFFFFF;
+        }
+
+            .selection-card:hover {
+                border-color: #C9CED8;
+            }
+
+            .selection-card.active {
+                border: 1.5px solid var(--brand-orange);
+                background-color: var(--brand-orange-light);
+            }
+
+        .sim-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .sp-logo-img {
+            height: 22px;
+            max-width: 70px;
+            object-fit: contain;
+        }
+
+        .badge-available {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #198754;
+            border: 1px solid #198754;
+            border-radius: 12px;
+            padding: 3px 8px;
+        }
+
+        .card-title-text {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            color: var(--text-dark);
+        }
+
+        .card-subtitle-text {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .check-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--brand-orange);
+            font-size: 1.4rem;
+            display: none;
+        }
+
+        .selection-card.active .check-icon {
+            display: block;
+        }
+
+        .sim-status-text {
+            font-size: 0.8rem;
+            color: var(--brand-orange);
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
@@ -211,12 +290,28 @@
                             </div>
                         </div>
 
-                        <div class="col-12 col-md-6">
-                            <label class="form-label-custom">Phone Number</label>
-                            <div class="input-group-custom">
-                                <i class="fa-solid fa-phone"></i>
-                                <input asp-for="PhoneNumber" class="form-control-custom" placeholder="e.g., 0221234567" max="11">
+                        <div class="col-12">
+                            <label class="form-label-custom">
+                                <i class="fa-solid fa-sim-card"></i> SIM Card
+                            </label>
+                            <input asp-for="PhoneNumber" type="hidden" id="PhoneNumber" />
+                            <input asp-for="SimId" type="hidden" id="SimId" />
+
+                            <div class="input-group-custom mb-3">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="simSearchInput" class="form-control-custom" placeholder="Search by phone number or serial...">
                             </div>
+
+                            <div class="row g-3" id="simCardsContainer">
+                                <div class="col-12 text-muted small fst-italic">
+                                    Search above to display available SIM cards.
+                                </div>
+                            </div>
+
+                            <div class="sim-status-text" id="simStatusText" style="display: none;">
+                                <i class="fa-solid fa-circle-info"></i> SIM: <span id="simStatusPhone">None</span> selected
+                            </div>
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -228,11 +323,31 @@
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <label class="form-label-custom">Renewal Day</label>
+                            <label class="form-label-custom">Renewal Type</label>
+                            <div class="input-group-custom">
+                                <i class="fa-solid fa-rotate"></i>
+                                <select asp-for="RenewaltypeId" asp-items="Model.RenewalTypes" id="renewalTypeSelect" class="form-select-custom">
+                                    <option value="">Select renewal type</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label-custom">Last Renewal Date</label>
                             <div class="input-group-custom">
                                 <i class="fa-solid fa-calendar-day"></i>
-                                <input asp-for="RenewalDay" type="number" min="1" max="31" class="form-control-custom" placeholder="Day of month (1-31)">
+                                <input asp-for="LastRenewalDate" type="date" id="lastRenewalInput" class="form-control-custom">
                             </div>
+                            <span class="text-muted small">Leave blank to start the cycle today.</span>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label-custom">Next Renewal Date</label>
+                            <div class="input-group-custom">
+                                <i class="fa-solid fa-calendar-check"></i>
+                                <input asp-for="NextRenewalDate" type="date" id="nextRenewalInput" class="form-control-custom">
+                            </div>
+                            <span class="text-muted small">Auto-filled from Last Renewal Date + Renewal Type — edit it directly if needed.</span>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -279,6 +394,108 @@
 
     </main>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Auto-calculate Next Renewal Date from Last Renewal Date + Renewal Type -->
+    <script>
+        (function () {
+            var durations = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RenewalTypeDurations));
+
+            var renewalTypeSelect = document.getElementById('renewalTypeSelect');
+            var lastRenewalInput = document.getElementById('lastRenewalInput');
+            var nextRenewalInput = document.getElementById('nextRenewalInput');
+
+            function addMonthsToDateString(dateStr, months) {
+                var parts = dateStr.split('-');
+                var year = parseInt(parts[0], 10);
+                var month = parseInt(parts[1], 10) - 1;
+                var day = parseInt(parts[2], 10);
+
+                var d = new Date(year, month, day);
+                d.setMonth(d.getMonth() + months);
+
+                var yyyy = d.getFullYear();
+                var mm = String(d.getMonth() + 1).padStart(2, '0');
+                var dd = String(d.getDate()).padStart(2, '0');
+                return yyyy + '-' + mm + '-' + dd;
+            }
+
+            function recalcNextRenewal() {
+                var typeId = renewalTypeSelect.value;
+                var lastDateVal = lastRenewalInput.value;
+
+                if (!typeId || !lastDateVal || !(typeId in durations)) return;
+
+                nextRenewalInput.value = addMonthsToDateString(lastDateVal, durations[typeId]);
+            }
+
+            if (renewalTypeSelect) renewalTypeSelect.addEventListener('change', recalcNextRenewal);
+            if (lastRenewalInput) lastRenewalInput.addEventListener('change', recalcNextRenewal);
+        })();
+    </script>
+
+    <!-- SIM Card Picker -->
+    <script>
+        function getProviderLogo(providerName) {
+            var name = (providerName || '').toLowerCase();
+            if (name.includes('orange')) return '/img/orange.png';
+            if (name.includes('vodafone') || name.includes('fodafone')) return '/img/fodafone.png';
+            if (name.includes('we')) return '/img/we.png';
+            if (name.includes('etisalat')) return '/img/etisalat-logo.png';
+            return '';
+        }
+
+        $('#simSearchInput').on('input', function () {
+            loadSims($(this).val());
+        });
+
+        function loadSims(query) {
+            if (!query || !query.trim()) {
+                $('#simCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to display available SIM cards.</div>');
+                return;
+            }
+            $.get('/InternetLine/SearchSims', { query: query }, function (data) {
+                var html = '';
+                if (!data || data.length === 0) {
+                    html = '<div class="col-12 text-muted small">No available SIM cards found.</div>';
+                } else {
+                    data.forEach(function (sim) {
+                        var logoSrc = getProviderLogo(sim.providerName);
+                        var logoHtml = logoSrc
+                            ? '<img src="' + logoSrc + '" alt="' + sim.providerName + '" class="sp-logo-img" />'
+                            : '<span class="fw-bold text-dark" style="font-size:0.85rem">' + sim.providerName + '</span>';
+
+                        var isSelected = $('#SimId').val() === String(sim.id);
+                        html += '<div class="col-md-6">' +
+                            '<div class="selection-card ' + (isSelected ? 'active' : '') + '" onclick="selectSim(\'' + sim.id + '\', \'' + sim.phoneNumber + '\', this)">' +
+                            '<div class="sim-card-header">' + logoHtml + '<span class="badge-available">Active</span></div>' +
+                            '<div class="card-title-text">' + sim.phoneNumber + '</div>' +
+                            '<p class="card-subtitle-text">Provider : ' + sim.providerName + '</p>' +
+                            '<p class="card-subtitle-text">Serial : ' + sim.serialNumber + '</p>' +
+                            '<i class="fas fa-check-circle check-icon"></i>' +
+                            '</div></div>';
+                    });
+                }
+                $('#simCardsContainer').html(html);
+            });
+        }
+
+        function selectSim(simId, phoneNumber, cardEl) {
+            if ($(cardEl).hasClass('active')) {
+                $(cardEl).removeClass('active');
+                $('#PhoneNumber').val('');
+                $('#SimId').val('');
+                $('#simStatusText').hide();
+            } else {
+                $('#simCardsContainer .selection-card').removeClass('active');
+                $(cardEl).addClass('active');
+                $('#PhoneNumber').val(phoneNumber);
+                $('#SimId').val(simId);
+                $('#simStatusPhone').text(phoneNumber);
+                $('#simStatusText').show();
+            }
+        }
+    </script>
 </body>
 </html>

@@ -19,17 +19,20 @@ namespace Sim_Card_Managment.Controllers
         private readonly IBranchRepo _branchRepo;
         private readonly ILookupRepo _lookupRepo;
         private readonly IServiceProviderRepository _serviceProviderRepo;
+        private readonly ISIMRepo _simRepo;
 
         public InternetLineController(
             IInternetLineRepo internetLineRepo,
             IBranchRepo branchRepo,
             ILookupRepo lookupRepo,
-            IServiceProviderRepository serviceProviderRepo)
+            IServiceProviderRepository serviceProviderRepo,
+            ISIMRepo simRepo)
         {
             _internetLineRepo = internetLineRepo;
             _branchRepo = branchRepo;
             _lookupRepo = lookupRepo;
             _serviceProviderRepo = serviceProviderRepo;
+            _simRepo = simRepo;
         }
 
         private async Task PopulateDropdowns(InternetLineCreateViewModel model)
@@ -38,6 +41,7 @@ namespace Sim_Card_Managment.Controllers
             var providers = await _serviceProviderRepo.GetAllAsync();
             var paymentTypes = await _lookupRepo.GetPaymentTypesAsync();
             var serviceTypes = await _lookupRepo.GetServiceTypesAsync();
+            var renewalTypes = await _lookupRepo.GetRenewalTypesAsync();
 
             model.Branches = branches.Where(b => b.IsActive)
                 .Select(b => new SelectListItem { Value = b.Id.ToString(), Text = b.Name });
@@ -47,6 +51,10 @@ namespace Sim_Card_Managment.Controllers
                 .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Name });
             model.ServiceTypes = serviceTypes
                 .Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Name });
+            model.RenewalTypes = renewalTypes
+                .Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Name });
+            model.RenewalTypeDurations = renewalTypes
+                .ToDictionary(r => r.Id, r => r.DurationInMonths);
         }
 
         private async Task PopulateDropdowns(InternetLineEditViewModel model)
@@ -55,6 +63,7 @@ namespace Sim_Card_Managment.Controllers
             var providers = await _serviceProviderRepo.GetAllAsync();
             var paymentTypes = await _lookupRepo.GetPaymentTypesAsync();
             var serviceTypes = await _lookupRepo.GetServiceTypesAsync();
+            var renewalTypes = await _lookupRepo.GetRenewalTypesAsync();
 
             model.Branches = branches.Where(b => b.IsActive)
                 .Select(b => new SelectListItem { Value = b.Id.ToString(), Text = b.Name });
@@ -64,6 +73,10 @@ namespace Sim_Card_Managment.Controllers
                 .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Name });
             model.ServiceTypes = serviceTypes
                 .Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Name });
+            model.RenewalTypes = renewalTypes
+                .Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Name });
+            model.RenewalTypeDurations = renewalTypes
+                .ToDictionary(r => r.Id, r => r.DurationInMonths);
         }
 
         [HttpGet]
@@ -136,6 +149,39 @@ namespace Sim_Card_Managment.Controllers
             await _internetLineRepo.UpdateAsync(model);
             TempData["Success"] = "Internet line updated successfully.";
             return RedirectToAction(nameof(Details), new { id = model.Id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Renew(int id, string? returnAction = nameof(Index))
+        {
+            var renewed = await _internetLineRepo.RenewAsync(id);
+
+            TempData[renewed ? "Success" : "Error"] = renewed
+                ? "Internet line renewed successfully."
+                : "Internet line was not found or has no renewal type set.";
+
+            return RedirectToAction(returnAction);
+        }
+        [HttpGet]
+        public async Task<IActionResult> Dashboard()
+        {
+            var lines = await _internetLineRepo.GetForDashboardAsync();
+            return View(lines);
+        }
+        [HttpGet]
+        public async Task<IActionResult> SearchSims(string query, int? currentLineId = null)
+        {
+            var sims = await _simRepo.GetAssignableSimsForInternetLineAsync(query, currentLineId);
+
+            var result = sims.Select(s => new {
+                id = s.Id,
+                phoneNumber = s.PhoneNumber,
+                serialNumber = s.SerialNumber,
+                providerName = s.ServiceProvider?.Name ?? "Unknown"
+            });
+
+            return Json(result);
         }
 
         #region Reports
@@ -371,8 +417,8 @@ namespace Sim_Card_Managment.Controllers
                         string.Join(
                             Environment.NewLine,
                             lines
-                                .Select(x => x.RenewalDay.HasValue
-                                    ? $"{x.RenewalDay}th every month"
+                                .Select(x => x.NextRenewalDate.HasValue
+                                    ? x.NextRenewalDate.Value.ToString("dd MMM yyyy")
                                     : null)
                                 .Where(x => !string.IsNullOrWhiteSpace(x))
                                 .Distinct()

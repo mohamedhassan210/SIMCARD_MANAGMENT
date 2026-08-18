@@ -1,4 +1,4 @@
-﻿@model Sim_Card_Managment.Viewmodel.BranchDetailsViewModel
+@model Sim_Card_Managment.Viewmodel.BranchDetailsViewModel
 
 @{
 }
@@ -77,6 +77,31 @@
                     <div class="col-12 col-sm-6 col-md-2">
                         <div class="bd-info-label">Created By</div>
                         <div class="bd-info-value">@Model.CreatedByUsername</div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="bd-info-label">Site Code (HR)</div>
+                        <div class="bd-info-value">@(string.IsNullOrEmpty(Model.SiteCode) ? "N/A" : Model.SiteCode)</div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="bd-info-label">Branch Code (Retail)</div>
+                        <div class="bd-info-value">@(string.IsNullOrEmpty(Model.BranchCode) ? "N/A" : Model.BranchCode)</div>
+                    </div>
+
+                    @if (Model.VpnOverInternetStatus == true)
+                    {
+                        <div class="col-12">
+                            <div class="bd-info-label">Firewall Types</div>
+                            <div class="bd-info-value">
+                                @(Model.FireWallTypeNames.Any() ? string.Join(", ", Model.FireWallTypeNames) : "N/A")
+                            </div>
+                        </div>
+                    }
+
+                    <div class="col-12">
+                        <div class="bd-info-label">Note</div>
+                        <div class="bd-info-value">@(string.IsNullOrEmpty(Model.Note) ? "N/A" : Model.Note)</div>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,5 @@
-﻿using Sim_Card_Managment.Models;
+﻿using Microsoft.VisualStudio.CodeCoverage;
+using Sim_Card_Managment.Models;
 
 
 namespace Sim_Card_Managment.Repos
@@ -18,5 +19,6 @@ namespace Sim_Card_Managment.Repos
         void Update(Sim sim);
         void Delete(int id);
         Task<IEnumerable<Sim>> GetAssignableSimsAsync(string query);
+        Task<List<Sim>> GetAssignableSimsForInternetLineAsync(string? query, int? excludeLineId = null);
     }
 }

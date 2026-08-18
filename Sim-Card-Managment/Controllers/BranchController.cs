@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Sim_Card_Managment.Repos.BranchRepos;
+using Sim_Card_Managment.Repos.FireWallTypeRepos;
 using Sim_Card_Managment.Viewmodel;
 using System.Security.Claims;
 
@@ -9,10 +11,12 @@ namespace Sim_Card_Managment.Controllers
     public class BranchController : Controller
     {
         private readonly IBranchRepo _branchRepo;
+        private readonly IFireWallTypeRepo _fireWallTypeRepo;
 
-        public BranchController(IBranchRepo branchRepo)
+        public BranchController(IBranchRepo branchRepo, IFireWallTypeRepo fireWallTypeRepo)
         {
             _branchRepo = branchRepo;
+            _fireWallTypeRepo = fireWallTypeRepo;
         }
 
         [HttpGet]
@@ -31,9 +35,13 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View(new BranchCreateViewModel());
+            var model = new BranchCreateViewModel
+            {
+                FireWallTypes = await GetFireWallTypeSelectListAsync()
+            };
+            return View(model);
         }
 
         [HttpPost]
@@ -50,10 +58,12 @@ namespace Sim_Card_Managment.Controllers
             }
 
             if (!ModelState.IsValid)
+            {
+                model.FireWallTypes = await GetFireWallTypeSelectListAsync();
                 return View(model);
+            }
 
             await _branchRepo.AddAsync(model);
-
             TempData["Success"] = "Branch created successfully.";
             return RedirectToAction(nameof(Index));
         }
@@ -63,6 +73,8 @@ namespace Sim_Card_Managment.Controllers
         {
             var model = await _branchRepo.GetForEditAsync(id);
             if (model == null) return NotFound();
+
+            model.FireWallTypes = await GetFireWallTypeSelectListAsync();
             return View(model);
         }
 
@@ -70,7 +82,11 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(BranchEditViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                model.FireWallTypes = await GetFireWallTypeSelectListAsync();
+                return View(model);
+            }
 
             await _branchRepo.UpdateAsync(model);
             TempData["Success"] = "Branch updated successfully.";
@@ -93,6 +109,16 @@ namespace Sim_Card_Managment.Controllers
             await _branchRepo.ActivateAsync(id);
             TempData["Success"] = "Branch activated successfully.";
             return RedirectToAction(nameof(Details), new { id });
+        }
+
+        private async Task<IEnumerable<SelectListItem>> GetFireWallTypeSelectListAsync()
+        {
+            var types = await _fireWallTypeRepo.GetAllAsync();
+            return types.Select(f => new SelectListItem
+            {
+                Value = f.Id.ToString(),
+                Text = f.Name
+            });
         }
     }
 }

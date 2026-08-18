@@ -26,6 +26,8 @@ namespace Sim_Card_Managment.Repos.BranchRepos
                     Name = b.Name,
                     IsActive = b.IsActive,
                     VpnOverInternetStatus = b.VpnOverInternetStatus,
+                    SiteCode = b.SiteCode,
+                    BranchCode = b.BranchCode,
                     CreatedAt = b.CreatedAt,
                     CreatedByUsername = b.CreatedBy != null ? b.CreatedBy.Username : "N/A",
                     InternetLineCount = b.InternetLines.Count,
@@ -38,6 +40,7 @@ namespace Sim_Card_Managment.Repos.BranchRepos
         {
             var branch = await _context.Branches
                 .Include(b => b.CreatedBy)
+                .Include(b => b.FireWallTypes)
                 .Include(b => b.InternetLines)
                     .ThenInclude(il => il.ServiceProvider)
                 .Include(b => b.InternetLines)
@@ -58,8 +61,15 @@ namespace Sim_Card_Managment.Repos.BranchRepos
                 Name = branch.Name,
                 IsActive = branch.IsActive,
                 VpnOverInternetStatus = branch.VpnOverInternetStatus,
+                SiteCode = branch.SiteCode,
+                BranchCode = branch.BranchCode,
+                Note = branch.Note,
                 CreatedAt = branch.CreatedAt,
                 CreatedByUsername = branch.CreatedBy?.Username ?? "N/A",
+                FireWallTypeNames = branch.FireWallTypes
+                    .Select(f => f.Name)
+                    .OrderBy(n => n)
+                    .ToList(),
                 InternetLines = branch.InternetLines.Select(il => new InternetLineListItemViewModel
                 {
                     Id = il.Id,
@@ -86,14 +96,23 @@ namespace Sim_Card_Managment.Repos.BranchRepos
 
         public async Task<BranchEditViewModel?> GetForEditAsync(int id)
         {
-            var branch = await _context.Branches.FindAsync(id);
+            // FindAsync can't Include() navigation properties, so we
+            // need a real query here now that FireWallTypes matters.
+            var branch = await _context.Branches
+                .Include(b => b.FireWallTypes)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
             if (branch == null) return null;
 
             return new BranchEditViewModel
             {
                 Id = branch.Id,
                 Name = branch.Name,
-                VpnOverInternetStatus = branch.VpnOverInternetStatus
+                VpnOverInternetStatus = branch.VpnOverInternetStatus,
+                SiteCode = branch.SiteCode,
+                BranchCode = branch.BranchCode,
+                Note = branch.Note,
+                SelectedFireWallTypeIds = branch.FireWallTypes.Select(f => f.Id).ToList()
             };
         }
 
@@ -103,21 +122,55 @@ namespace Sim_Card_Managment.Repos.BranchRepos
             {
                 Name = model.Name,
                 VpnOverInternetStatus = model.VpnOverInternetStatus,
+                SiteCode = model.SiteCode,
+                BranchCode = model.BranchCode,
+                Note = model.Note,
                 IsActive = true,
                 CreatedAt = DateTime.Now,
-                CreatedById = model.CreatedById   // <-- was missing, so every branch got CreatedById = 0
+                CreatedById = model.CreatedById
             };
+
+            if (model.SelectedFireWallTypeIds.Any())
+            {
+                var selectedFireWallTypes = await _context.FireWallTypes
+                    .Where(f => model.SelectedFireWallTypeIds.Contains(f.Id))
+                    .ToListAsync();
+
+                branch.FireWallTypes = selectedFireWallTypes;
+            }
+
             await _context.Branches.AddAsync(branch);
             await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(BranchEditViewModel model)
         {
-            var branch = await _context.Branches.FindAsync(model.Id);
+            // Same as above — need the join collection tracked, so
+            // FindAsync alone isn't enough.
+            var branch = await _context.Branches
+                .Include(b => b.FireWallTypes)
+                .FirstOrDefaultAsync(b => b.Id == model.Id);
+
             if (branch == null) return;
 
             branch.Name = model.Name;
             branch.VpnOverInternetStatus = model.VpnOverInternetStatus;
+            branch.SiteCode = model.SiteCode;
+            branch.BranchCode = model.BranchCode;
+            branch.Note = model.Note;
+
+            var selectedFireWallTypes = model.SelectedFireWallTypeIds.Any()
+                ? await _context.FireWallTypes
+                    .Where(f => model.SelectedFireWallTypeIds.Contains(f.Id))
+                    .ToListAsync()
+                : new List<FireWallType>();
+
+            branch.FireWallTypes.Clear();
+            foreach (var fireWallType in selectedFireWallTypes)
+            {
+                branch.FireWallTypes.Add(fireWallType);
+            }
+
             _context.Branches.Update(branch);
             await _context.SaveChangesAsync();
         }
@@ -142,6 +195,20 @@ namespace Sim_Card_Managment.Repos.BranchRepos
                 _context.Branches.Update(branch);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        // Used by VpnConnectionController.ExportToExcel to add a
+        // comma-separated Firewall Types column without needing to
+        // change the shape of GetForExcelAsync.
+        public async Task<Dictionary<string, string>> GetFireWallTypeNamesByBranchNameAsync()
+        {
+            var branches = await _context.Branches
+                .Include(b => b.FireWallTypes)
+                .ToListAsync();
+
+            return branches.ToDictionary(
+                b => b.Name,
+                b => string.Join(", ", b.FireWallTypes.Select(f => f.Name).OrderBy(n => n)));
         }
     }
 }

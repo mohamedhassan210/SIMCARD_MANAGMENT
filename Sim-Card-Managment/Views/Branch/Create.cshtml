@@ -1,4 +1,4 @@
-﻿@model Sim_Card_Managment.Viewmodel.BranchCreateViewModel
+@model Sim_Card_Managment.Viewmodel.BranchCreateViewModel
 
 @{
 }
@@ -68,6 +68,104 @@
                             </div>
                             <span id="bc-name-error" class="bc-error" style="display:none;">Branch name is required.</span>
                             <span asp-validation-for="Name" class="bc-error"></span>
+                        </div>
+
+                        <!-- 🏢 SITE CODE (HR) -->
+                        <div class="col-12 col-md-6">
+                            <label asp-for="SiteCode" class="bc-label">
+                                <i class="fa-solid fa-id-badge me-1"></i> Site Code (HR)
+                            </label>
+                            <div class="bc-input-group">
+                                <i class="fa-solid fa-id-badge"></i>
+                                <input asp-for="SiteCode" class="bc-input" placeholder="e.g., HR-014" maxlength="50">
+                            </div>
+                            <span asp-validation-for="SiteCode" class="bc-error"></span>
+                        </div>
+
+                        <!-- 🏢 BRANCH CODE (RETAIL) -->
+                        <div class="col-12 col-md-6">
+                            <label asp-for="BranchCode" class="bc-label">
+                                <i class="fa-solid fa-tag me-1"></i> Branch Code (Retail)
+                            </label>
+                            <div class="bc-input-group">
+                                <i class="fa-solid fa-tag"></i>
+                                <input asp-for="BranchCode" class="bc-input" placeholder="e.g., RT-014" maxlength="50">
+                            </div>
+                            <span asp-validation-for="BranchCode" class="bc-error"></span>
+                        </div>
+
+                        <!-- 🏢 VPN OVER INTERNET STATUS -->
+                        <div class="col-12">
+                            <label for="bc-vpn-select" class="bc-label">
+                                <i class="fa-solid fa-globe me-1"></i> VPN Over Internet Status
+                            </label>
+                            <select id="bc-vpn-select" asp-for="VpnOverInternetStatus" class="cs-select">
+                                <option value="">Not Configured</option>
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+
+                        <!-- 🏢 FIREWALL TYPES (only relevant when VPN over internet is enabled) -->
+                        <div class="col-12" id="bc-firewall-section" style="display: none;">
+                            <label class="bc-label">
+                                <i class="fa-solid fa-shield-halved me-1"></i> Firewall Types
+                            </label>
+                            <div class="bc-checkbox-list">
+                                @if (Model.FireWallTypes != null && Model.FireWallTypes.Any())
+                                {
+                                    foreach (var fireWallType in Model.FireWallTypes)
+                                    {
+                                        <label class="bc-checkbox-row">
+                                            <input type="checkbox" name="SelectedFireWallTypeIds" value="@fireWallType.Value">
+                                            <span>@fireWallType.Text</span>
+                                        </label>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">No firewall types configured yet.</span>
+                                }
+                            </div>
+                            <span class="text-muted small d-block mt-1">Select one or more firewall types used for this branch's VPN over internet connection.</span>
+                        </div>
+
+                        <style>
+                            .bc-checkbox-list {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 4px;
+                                border: 1px solid var(--card-border, #E2E8F0);
+                                border-radius: 12px;
+                                padding: 10px 14px;
+                                background: #FFFFFF;
+                            }
+
+                            .bc-checkbox-row {
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                padding: 6px 4px;
+                                width: 100%;
+                                cursor: pointer;
+                                font-size: 0.9rem;
+                            }
+
+                                .bc-checkbox-row input[type="checkbox"] {
+                                    width: 16px;
+                                    height: 16px;
+                                    flex-shrink: 0;
+                                    cursor: pointer;
+                                }
+                        </style>
+
+                        <!-- 🏢 NOTE -->
+                        <div class="col-12">
+                            <label asp-for="Note" class="bc-label">
+                                <i class="fa-regular fa-note-sticky me-1"></i> Note
+                            </label>
+                            <textarea asp-for="Note" class="bc-input" rows="3" placeholder="Optional notes about this branch..." maxlength="1000"></textarea>
+                            <span asp-validation-for="Note" class="bc-error"></span>
                         </div>
 
                     </div>
@@ -164,6 +262,26 @@
 
             // Initial validation
             updateSubmitButton();
+
+            // ============================================
+            // 🏢 SHOW/HIDE FIREWALL TYPES BASED ON VPN STATUS
+            // ============================================
+            const vpnSelect = document.getElementById('bc-vpn-select');
+            const firewallSection = document.getElementById('bc-firewall-section');
+
+            function toggleFirewallSection() {
+                if (vpnSelect.value === 'true') {
+                    firewallSection.style.display = '';
+                } else {
+                    firewallSection.style.display = 'none';
+                    // Uncheck any selections so they don't get posted
+                    // while the section is hidden/irrelevant.
+                    firewallSection.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                }
+            }
+
+            vpnSelect.addEventListener('change', toggleFirewallSection);
+            toggleFirewallSection();
         });
     </script>
 

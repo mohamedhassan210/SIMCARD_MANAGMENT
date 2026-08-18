@@ -1,4 +1,4 @@
-﻿@model Sim_Card_Managment.Viewmodel.BranchEditViewModel
+@model Sim_Card_Managment.Viewmodel.BranchEditViewModel
 
 @{
     Layout = null;
@@ -27,7 +27,7 @@
                 </div>
                 <div>
                     <h3 class="m-0 fs-5 fw-bold text-dark">Edit Branch Details</h3>
-                    <p class="m-0 text-muted small">Update branch name and VPN over internet connectivity status</p>
+                    <p class="m-0 text-muted small">Update branch name, codes, VPN status, and notes</p>
                 </div>
             </div>
 
@@ -64,18 +64,100 @@
                             <span id="be-name-error" class="be-error">Branch name is required.</span>
                         </div>
 
+                        <div class="col-12 col-md-6">
+                            <label asp-for="SiteCode" class="be-label">
+                                <i class="fa-solid fa-id-badge me-1"></i> Site Code (HR)
+                            </label>
+                            <div class="be-input-group">
+                                <i class="fa-solid fa-id-badge"></i>
+                                <input asp-for="SiteCode" class="be-input" placeholder="e.g., HR-014" maxlength="50">
+                            </div>
+                            <span asp-validation-for="SiteCode" class="be-error"></span>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label asp-for="BranchCode" class="be-label">
+                                <i class="fa-solid fa-tag me-1"></i> Branch Code (Retail)
+                            </label>
+                            <div class="be-input-group">
+                                <i class="fa-solid fa-tag"></i>
+                                <input asp-for="BranchCode" class="be-input" placeholder="e.g., RT-014" maxlength="50">
+                            </div>
+                            <span asp-validation-for="BranchCode" class="be-error"></span>
+                        </div>
+
                         <div class="col-12">
                             <label for="be-vpn-select" class="be-label">
                                 <i class="fa-solid fa-globe me-1"></i> VPN Over Internet Status
                             </label>
-                            <div class="be-input-group">
-                                <i class="fa-solid fa-globe"></i>
-                                <select id="be-vpn-select" asp-for="VpnOverInternetStatus" class="be-select">
-                                    <option value="">Not Configured</option>
-                                    <option value="true">Enabled</option>
-                                    <option value="false">Disabled</option>
-                                </select>
+                            <select id="be-vpn-select" asp-for="VpnOverInternetStatus" class="cs-select">
+                                <option value="">Not Configured</option>
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+
+                        <!-- 🏢 FIREWALL TYPES (only relevant when VPN over internet is enabled) -->
+                        <div class="col-12" id="be-firewall-section" style="display: none;">
+                            <label class="be-label">
+                                <i class="fa-solid fa-shield-halved me-1"></i> Firewall Types
+                            </label>
+                            <div class="be-checkbox-list">
+                                @if (Model.FireWallTypes != null && Model.FireWallTypes.Any())
+                                {
+                                    foreach (var fireWallType in Model.FireWallTypes)
+                                    {
+                                        var fireWallTypeId = int.Parse(fireWallType.Value);
+                                        var isChecked = Model.SelectedFireWallTypeIds.Contains(fireWallTypeId);
+                                        <label class="be-checkbox-row">
+                                            <input type="checkbox" name="SelectedFireWallTypeIds" value="@fireWallType.Value" checked="@(isChecked ? "checked" : null)">
+                                            <span>@fireWallType.Text</span>
+                                        </label>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">No firewall types configured yet.</span>
+                                }
                             </div>
+                            <span class="text-muted small d-block mt-1">Select one or more firewall types used for this branch's VPN over internet connection.</span>
+                        </div>
+
+                        <style>
+                            .be-checkbox-list {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 4px;
+                                border: 1px solid var(--card-border, #E2E8F0);
+                                border-radius: 12px;
+                                padding: 10px 14px;
+                                background: #FFFFFF;
+                            }
+
+                            .be-checkbox-row {
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                padding: 6px 4px;
+                                width: 100%;
+                                cursor: pointer;
+                                font-size: 0.9rem;
+                            }
+
+                                .be-checkbox-row input[type="checkbox"] {
+                                    width: 16px;
+                                    height: 16px;
+                                    flex-shrink: 0;
+                                    cursor: pointer;
+                                }
+                        </style>
+
+                        <div class="col-12">
+                            <label asp-for="Note" class="be-label">
+                                <i class="fa-regular fa-note-sticky me-1"></i> Note
+                            </label>
+                            <textarea asp-for="Note" class="be-input" rows="3" placeholder="Optional notes about this branch..." maxlength="1000"></textarea>
+                            <span asp-validation-for="Note" class="be-error"></span>
                         </div>
 
                     </div>
@@ -167,5 +249,23 @@
 
         // Initial validation
         updateSubmitButton();
+
+        // ============================================
+        // 🏢 SHOW/HIDE FIREWALL TYPES BASED ON VPN STATUS
+        // ============================================
+        const vpnSelect = document.getElementById('be-vpn-select');
+        const firewallSection = document.getElementById('be-firewall-section');
+
+        function toggleFirewallSection() {
+            if (vpnSelect.value === 'true') {
+                firewallSection.style.display = '';
+            } else {
+                firewallSection.style.display = 'none';
+                firewallSection.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            }
+        }
+
+        vpnSelect.addEventListener('change', toggleFirewallSection);
+        toggleFirewallSection();
     });
 </script>
