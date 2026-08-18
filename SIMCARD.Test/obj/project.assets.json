@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 3,
   "targets": {
     "net8.0": {
       "Azure.Core/1.38.0": {
@@ -5986,23 +5986,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\UTD\\.nuget\\packages\\": {},
+    "C:\\Users\\sd\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+      "projectUniqueName": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
       "projectName": "SIMCARD.Test",
-      "projectPath": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
-      "packagesPath": "C:\\Users\\UTD\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\obj\\",
+      "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+      "packagesPath": "C:\\Users\\sd\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\UTD\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\sd\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -6015,11 +6015,10 @@
       },
       "frameworks": {
         "net8.0": {
-          "framework": "net8.0",
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
-              "projectPath": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj"
+            "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
+              "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj"
             }
           }
         }
@@ -6034,11 +6033,10 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.400"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net8.0": {
-        "framework": "net8.0",
         "targetAlias": "net8.0",
         "dependencies": {
           "Moq": {
@@ -6081,8 +6079,16 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json."
+    }
+  ]
 }
