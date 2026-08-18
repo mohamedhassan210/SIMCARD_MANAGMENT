@@ -19,7 +19,23 @@ namespace Sim_Card_Managment.Viewmodel
         public string? PhoneNumber { get; set; }
         [StringLength(100)]
         public string? Bandwidth { get; set; }
-        public int? RenewalDay { get; set; }
+
+        [Required]
+        public int RenewaltypeId { get; set; }
+
+        // Optional - if not supplied, the repo defaults this to today.
+        // NextRenewalDate is always calculated server-side from
+        // LastRenewalDate + RenewalType.DurationInMonths.
+        [DataType(DataType.Date)]
+        public DateOnly? LastRenewalDate { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateOnly? NextRenewalDate { get; set; }
+
+        // Id -> DurationInMonths, populated by the controller so the view's JS
+        // can auto-calculate NextRenewalDate without a server round trip.
+        public Dictionary<int, int> RenewalTypeDurations { get; set; } = new();
+
         public decimal? QuotaGB { get; set; }
         public bool Status { get; set; } = true;
         [StringLength(500)]
@@ -31,6 +47,7 @@ namespace Sim_Card_Managment.Viewmodel
         public IEnumerable<SelectListItem> ServiceProviders { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> PaymentTypes { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> ServiceTypes { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> RenewalTypes { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> Sims { get; set; } = new List<SelectListItem>();
     }
 }

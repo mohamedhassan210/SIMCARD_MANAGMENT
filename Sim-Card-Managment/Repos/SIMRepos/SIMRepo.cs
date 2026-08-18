@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.CodeCoverage;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 namespace Sim_Card_Managment.Repos
@@ -110,6 +111,27 @@ namespace Sim_Card_Managment.Repos
                             !s.Subscriptions.Any(sub => sub.EndDate == null || sub.EndDate > DateTime.Now) &&
                             (string.IsNullOrEmpty(query) || s.PhoneNumber.Contains(query) || s.SerialNumber.Contains(query)))
                 .Take(6)
+                .ToListAsync();
+        }
+        public async Task<List<Sim>> GetAssignableSimsForInternetLineAsync(string? query, int? excludeLineId = null)
+        {
+            var simsQuery = _context.Sims
+                .Include(s => s.ServiceProvider)
+                .Where(s => s.IsActive &&
+                            !_context.InternetLines.Any(il =>
+                                il.SimId == s.Id &&
+                                (excludeLineId == null || il.Id != excludeLineId)));
+
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                simsQuery = simsQuery.Where(s =>
+                    s.PhoneNumber.Contains(query) ||
+                    s.SerialNumber.Contains(query));
+            }
+
+            return await simsQuery
+                .OrderBy(s => s.PhoneNumber)
+                .Take(20)
                 .ToListAsync();
         }
     }

@@ -11,5 +11,7 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
         Task AddAsync(InternetLineCreateViewModel model);
         Task UpdateAsync(InternetLineEditViewModel model);
         Task<List<InternetLineExcelViewModel>> GetForExcelAsync();
+        Task<bool> RenewAsync(int id);
+        Task<IEnumerable<InternetLineDashboardItemViewModel>> GetForDashboardAsync();
     }
 }

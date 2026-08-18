@@ -243,12 +243,44 @@
                         </div>
                     </div>
 
-                    <!-- Renewal Day -->
+                    <!-- Renewal Type -->
                     <div class="col-12 col-md-6">
-                        <div class="info-grid-label">Renewal Day</div>
+                        <div class="info-grid-label">Renewal Type</div>
+                        <div class="info-grid-value">
+                            <i class="fa-solid fa-rotate text-muted me-2"></i>
+                            @Model.RenewalTypeName
+                        </div>
+                    </div>
+
+                    <!-- Last Renewal Date -->
+                    <div class="col-12 col-md-6">
+                        <div class="info-grid-label">Last Renewal Date</div>
                         <div class="info-grid-value">
                             <i class="fa-solid fa-calendar-day text-muted me-2"></i>
-                            @(Model.RenewalDay?.ToString() ?? "N/A")
+                            @(Model.LastRenewalDate?.ToString("dd MMM yyyy") ?? "N/A")
+                        </div>
+                    </div>
+
+                    <!-- Next Renewal Date -->
+                    <div class="col-12 col-md-6">
+                        <div class="info-grid-label">Next Renewal Date</div>
+                        <div class="info-grid-value">
+                            @{
+                                bool isDue = Model.NextRenewalDate.HasValue
+                                    && Model.NextRenewalDate.Value <= DateOnly.FromDateTime(DateTime.Now);
+                            }
+                            <i class="fa-solid fa-calendar-check @(isDue ? "text-danger" : "text-muted") me-2"></i>
+                            @if (Model.NextRenewalDate.HasValue)
+                            {
+                                <span class="@(isDue ? "text-danger fw-bold" : "")">
+                                    @Model.NextRenewalDate.Value.ToString("dd MMM yyyy")
+                                    @(isDue ? " (Due)" : "")
+                                </span>
+                            }
+                            else
+                            {
+                                <span>N/A</span>
+                            }
                         </div>
                     </div>
 
@@ -314,6 +346,17 @@
                        class="btn-custom btn-secondary-soft">
                         <i class="fa-solid fa-arrow-left"></i> Back
                     </a>
+
+                    <form asp-controller="InternetLine"
+                          asp-action="Renew"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          onsubmit="return confirm('Renew this line now? This will extend the next renewal date by one renewal cycle.');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-custom btn-secondary-soft">
+                            <i class="fa-solid fa-rotate"></i> Renew Now
+                        </button>
+                    </form>
 
                     <a asp-controller="InternetLine"
                        asp-action="Edit"

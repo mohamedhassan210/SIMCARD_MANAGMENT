@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Repos\\SIMCARD.Test\\SIMCARD.Test.csproj": {}
+    "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj": {}
   },
   "projects": {
-    "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
+    "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
+        "projectUniqueName": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
         "projectName": "Sim-Card-Managment",
-        "projectPath": "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
-        "packagesPath": "C:\\Users\\m.eldokany\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\Sim-Card-Managment\\obj\\",
+        "projectPath": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj",
+        "packagesPath": "C:\\Users\\UTD\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\m.eldokany\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\UTD\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -30,6 +30,7 @@
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -44,10 +45,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.100"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
             "BCrypt.Net-Next": {
@@ -124,24 +126,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Repos\\SIMCARD.Test\\SIMCARD.Test.csproj": {
+    "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\SIMCARD.Test\\SIMCARD.Test.csproj",
+        "projectUniqueName": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
         "projectName": "SIMCARD.Test",
-        "projectPath": "D:\\Repos\\SIMCARD.Test\\SIMCARD.Test.csproj",
-        "packagesPath": "C:\\Users\\m.eldokany\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\SIMCARD.Test\\obj\\",
+        "projectPath": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+        "packagesPath": "C:\\Users\\UTD\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\m.eldokany\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\UTD\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -154,10 +156,11 @@
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
-                "projectPath": "D:\\Repos\\Sim-Card-Managment\\Sim-Card-Managment.csproj"
+              "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj": {
+                "projectPath": "C:\\Users\\UTD\\source\\repos\\SIMCARD_MANAGMENT\\Sim-Card-Managment\\Sim-Card-Managment.csproj"
               }
             }
           }
@@ -172,10 +175,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.100"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
             "Moq": {
@@ -218,7 +222,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

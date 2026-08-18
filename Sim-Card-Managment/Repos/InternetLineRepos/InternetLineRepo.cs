@@ -21,8 +21,12 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 .Include(il => il.ServiceProvider)
                 .Include(il => il.ServiceType)
                 .Include(il => il.PaymentType)
+                .Include(il => il.RenewalType)
                 .Include(il => il.CreatedBy)
-                .OrderBy(il => il.Branch.Name)
+                // Soonest-to-renew first drives the dashboard; nulls (no
+                // renewal date yet) sort to the bottom instead of the top.
+                .OrderBy(il => il.NextRenewalDate ?? DateOnly.MaxValue)
+                .ThenBy(il => il.Branch.Name)
                 .Select(il => new InternetLineListItemViewModel
                 {
                     Id = il.Id,
@@ -33,6 +37,8 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                     Bandwidth = il.Bandwidth,
                     PhoneNumber = il.PhoneNumber,
                     Status = il.Status,
+                    RenewalTypeName = il.RenewalType != null ? il.RenewalType.Name : string.Empty,
+                    NextRenewalDate = il.NextRenewalDate,
                     CreatedByUsername = il.CreatedBy.Username
                 })
                 .ToListAsync();
@@ -45,6 +51,7 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 .Include(il => il.ServiceProvider)
                 .Include(il => il.ServiceType)
                 .Include(il => il.PaymentType)
+                .Include(il => il.RenewalType)
                 .Include(il => il.Sim)
                 .Include(il => il.CreatedBy)
                 .FirstOrDefaultAsync(il => il.Id == id);
@@ -60,7 +67,9 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 PaymentTypeName = line.PaymentType.Name,
                 PhoneNumber = line.PhoneNumber,
                 Bandwidth = line.Bandwidth,
-                RenewalDay = line.RenewalDay,
+                RenewalTypeName = line.RenewalType != null ? line.RenewalType.Name : string.Empty,
+                LastRenewalDate = line.LastRenewalDate,
+                NextRenewalDate = line.NextRenewalDate,
                 QuotaGB = line.QuotaGB,
                 Status = line.Status,
                 Notes = line.Notes,
@@ -71,7 +80,11 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
 
         public async Task<InternetLineEditViewModel?> GetForEditAsync(int id)
         {
-            var line = await _context.InternetLines.FindAsync(id);
+            var line = await _context.InternetLines
+                .Include(il => il.Sim)
+                    .ThenInclude(s => s.ServiceProvider)
+                .FirstOrDefaultAsync(il => il.Id == id);
+
             if (line == null) return null;
 
             return new InternetLineEditViewModel
@@ -83,8 +96,12 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 ServiceTypeId = line.ServiceTypeId,
                 SimId = line.SimId,
                 PhoneNumber = line.PhoneNumber,
+                SimSerialNumber = line.Sim?.SerialNumber,
+                SimProviderName = line.Sim?.ServiceProvider?.Name,
                 Bandwidth = line.Bandwidth,
-                RenewalDay = line.RenewalDay,
+                RenewaltypeId = line.RenewaltypeId,
+                LastRenewalDate = line.LastRenewalDate,
+                NextRenewalDate = line.NextRenewalDate,
                 QuotaGB = line.QuotaGB,
                 Status = line.Status,
                 Notes = line.Notes
@@ -94,11 +111,14 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
         public async Task<IEnumerable<InternetLineListItemViewModel>> GetByBranchAsync(int branchId)
         {
             return await _context.InternetLines
+                .Include(il => il.Branch)
                 .Include(il => il.ServiceProvider)
                 .Include(il => il.ServiceType)
                 .Include(il => il.PaymentType)
+                .Include(il => il.RenewalType)
                 .Include(il => il.CreatedBy)
                 .Where(il => il.BranchId == branchId)
+                .OrderBy(il => il.NextRenewalDate ?? DateOnly.MaxValue)
                 .Select(il => new InternetLineListItemViewModel
                 {
                     Id = il.Id,
@@ -109,6 +129,8 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                     Bandwidth = il.Bandwidth,
                     PhoneNumber = il.PhoneNumber,
                     Status = il.Status,
+                    RenewalTypeName = il.RenewalType != null ? il.RenewalType.Name : string.Empty,
+                    NextRenewalDate = il.NextRenewalDate,
                     CreatedByUsername = il.CreatedBy.Username
                 })
                 .ToListAsync();
@@ -116,6 +138,13 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
 
         public async Task AddAsync(InternetLineCreateViewModel model)
         {
+            var renewalType = await _context.RenewalTypes.FindAsync(model.RenewaltypeId);
+            if (renewalType == null)
+                throw new InvalidOperationException($"RenewalType {model.RenewaltypeId} was not found.");
+
+            var lastRenewal = model.LastRenewalDate ?? DateOnly.FromDateTime(DateTime.Now);
+            var nextRenewal = model.NextRenewalDate ?? lastRenewal.AddMonths(renewalType.DurationInMonths);
+
             var line = new InternetLine
             {
                 BranchId = model.BranchId,
@@ -125,11 +154,12 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 SimId = model.SimId,
                 PhoneNumber = model.PhoneNumber,
                 Bandwidth = model.Bandwidth,
-                RenewalDay = model.RenewalDay,
+                RenewaltypeId = model.RenewaltypeId,
+                LastRenewalDate = lastRenewal,
+                NextRenewalDate = nextRenewal,
                 QuotaGB = model.QuotaGB,
                 Status = model.Status,
                 Notes = model.Notes,
-
                 CreatedById = model.CreatedById
             };
 
@@ -149,13 +179,45 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
             line.SimId = model.SimId;
             line.PhoneNumber = model.PhoneNumber;
             line.Bandwidth = model.Bandwidth;
-            line.RenewalDay = model.RenewalDay;
+            line.RenewaltypeId = model.RenewaltypeId;
+
+            if (model.LastRenewalDate.HasValue)
+                line.LastRenewalDate = model.LastRenewalDate;
+
+            if (model.NextRenewalDate.HasValue)
+            {
+                line.NextRenewalDate = model.NextRenewalDate;
+            }
+            else if (model.LastRenewalDate.HasValue && model.RenewaltypeId.HasValue)
+            {
+                var renewalType = await _context.RenewalTypes.FindAsync(model.RenewaltypeId.Value);
+                if (renewalType != null)
+                    line.NextRenewalDate = model.LastRenewalDate.Value.AddMonths(renewalType.DurationInMonths);
+            }
+
             line.QuotaGB = model.QuotaGB;
             line.Status = model.Status;
             line.Notes = model.Notes;
 
             _context.InternetLines.Update(line);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> RenewAsync(int id)
+        {
+            var line = await _context.InternetLines
+                .Include(il => il.RenewalType)
+                .FirstOrDefaultAsync(il => il.Id == id);
+
+            if (line == null || line.RenewalType == null) return false;
+
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            line.LastRenewalDate = today;
+            line.NextRenewalDate = today.AddMonths(line.RenewalType.DurationInMonths);
+
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<List<InternetLineExcelViewModel>> GetForExcelAsync()
@@ -165,6 +227,7 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 .Include(x => x.ServiceProvider)
                 .Include(x => x.PaymentType)
                 .Include(x => x.ServiceType)
+                .Include(x => x.RenewalType)
                 .Include(x => x.Sim)
                 .GroupBy(x => new
                 {
@@ -187,7 +250,8 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
 
                         PhoneNumber = x.PhoneNumber,
 
-                        RenewalDay = x.RenewalDay,
+                        RenewalTypeName = x.RenewalType != null ? x.RenewalType.Name : string.Empty,
+                        NextRenewalDate = x.NextRenewalDate,
 
                         QuotaGB = x.QuotaGB,
 
@@ -199,6 +263,29 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                     }).ToList()
                 })
                 .OrderBy(x => x.BranchName)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<InternetLineDashboardItemViewModel>> GetForDashboardAsync()
+        {
+            return await _context.InternetLines
+                .Include(il => il.Branch)
+                .Include(il => il.ServiceProvider)
+                .Include(il => il.PaymentType)
+                .Include(il => il.RenewalType)
+                .Where(il => il.Status) // only UP lines
+                .OrderBy(il => il.NextRenewalDate ?? DateOnly.MaxValue)
+                .ThenBy(il => il.Branch.Name)
+                .Select(il => new InternetLineDashboardItemViewModel
+                {
+                    Id = il.Id,
+                    BranchName = il.Branch.Name,
+                    ServiceProviderName = il.ServiceProvider.Name,
+                    PaymentTypeName = il.PaymentType.Name,
+                    PhoneNumber = il.PhoneNumber,
+                    LastRenewalDate = il.LastRenewalDate,
+                    NextRenewalDate = il.NextRenewalDate,
+                    RenewalTypeName = il.RenewalType != null ? il.RenewalType.Name : null
+                })
                 .ToListAsync();
         }
 
