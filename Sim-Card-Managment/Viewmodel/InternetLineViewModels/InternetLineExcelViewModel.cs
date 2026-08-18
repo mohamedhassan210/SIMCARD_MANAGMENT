@@ -14,7 +14,8 @@ public class InternetLineExcelItem
     public string? SimSerialNumber { get; set; }
     public string? PhoneNumber { get; set; }
 
-    public int? RenewalDay { get; set; }
+    public string RenewalTypeName { get; set; } = string.Empty;
+    public DateOnly? NextRenewalDate { get; set; }
     public decimal? QuotaGB { get; set; }
 
     public string? Bandwidth { get; set; }

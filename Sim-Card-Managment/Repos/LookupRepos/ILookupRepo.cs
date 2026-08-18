@@ -26,5 +26,7 @@ namespace Sim_Card_Managment.Repos.LookupRepos
         Task AddVpnConnectionTypeAsync(VpnConnectionType connectionType);
         Task UpdateVpnConnectionTypeAsync(VpnConnectionType connectionType);
         Task DeleteVpnConnectionTypeAsync(int id);
+
+        Task<IEnumerable<RenewalType>> GetRenewalTypesAsync();
     }
 }

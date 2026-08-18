@@ -38,6 +38,13 @@ namespace Sim_Card_Managment.Repos.LookupRepos
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<RenewalType>> GetRenewalTypesAsync()
+        {
+            return await _context.RenewalTypes
+                .OrderBy(r => r.Name)
+                .ToListAsync();
+        }
+
         // =========================
         // PAYMENT TYPE
         // =========================

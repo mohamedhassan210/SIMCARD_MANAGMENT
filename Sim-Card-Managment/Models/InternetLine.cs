@@ -40,9 +40,9 @@ namespace Sim_Card_Management.Models
 
         [StringLength(500)]
         public string? Notes { get; set; }
-        public int RenewaltypeId { get; set; }
+        public int? RenewaltypeId { get; set; }
         [ForeignKey(nameof(RenewaltypeId))]
-        public RenewalType RenewalType { get; set; }
+        public RenewalType? RenewalType { get; set; }
         public int CreatedById { get; set; }
         [ForeignKey(nameof(CreatedById))]
         public virtual User CreatedBy { get; set; }

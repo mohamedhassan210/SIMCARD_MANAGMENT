@@ -11,7 +11,9 @@
 
         public string? PhoneNumber { get; set; }
         public string? Bandwidth { get; set; }
-        public int? RenewalDay { get; set; }
+        public string RenewalTypeName { get; set; } = string.Empty;
+        public DateOnly? LastRenewalDate { get; set; }
+        public DateOnly? NextRenewalDate { get; set; }
         public decimal? QuotaGB { get; set; }
         public bool Status { get; set; }
         public string? Notes { get; set; }
