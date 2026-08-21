@@ -78,9 +78,48 @@ namespace Sim_Card_Managment.Controllers
             ViewBag.AllSubscriptions = subscriptions; // Passed to trace historical users
             return View(activeSubscriptions.ToList());
         }
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            return View();
+            var document = await _documentRepo.GetByIdAsync(id);
+            if (document == null)
+            {
+                return NotFound();
+            }
+
+            var serials = await _serialRepo.GetAllAsync(null, id);
+
+            var viewModel = new DocumentDetailsViewModel
+            {
+                DocumentId = document.Id,
+                DocumentNumber = document.DocumentNumber,
+                DocumentTypeName = document.DocumentType?.DisplayName ?? document.DocumentType?.Name ?? "N/A",
+                ActionDate = document.ActionDate,
+                CreatedAt = document.CreatedAt,
+                Notes = document.Notes,
+                Sims = serials
+               .Where(s => s.Sim != null)
+               .Select(s => new SimDetailViewModel
+               {
+                  Id = s.Sim.Id,
+                  PhoneNumber = s.Sim.PhoneNumber,
+                  SerialNumber = s.Sim.SerialNumber,
+                  Status = s.Sim.Status
+               })
+               .ToList(),
+                Usbs = serials
+               .Where(s => s.Usb != null)
+               .Select(s => new UsbDetailViewModel
+               {
+                  Id = s.Usb.Id,
+                  SerialNumber = s.Usb.SerialNumber,
+                  Model = s.Usb.Model,
+                  Status = s.Usb.Status
+               })
+               .ToList()
+            };
+            
+
+            return View(viewModel);
         }
         #region First Report
         [HttpGet]

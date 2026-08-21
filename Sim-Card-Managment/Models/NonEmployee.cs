@@ -16,7 +16,7 @@ namespace Sim_Card_Managment.Models
 
         [StringLength(50)]
         public string? Type { get; set; }  // e.g. Contractor, Visitor
-
+        public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation properties

@@ -124,5 +124,21 @@ namespace Sim_Card_Managment.Controllers
             _nonEmployeeRepo.Delete(id);
             return RedirectToAction("Index", "Employee");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Activate(int id)
+        {
+            var nonEmployee = _nonEmployeeRepo.GetById(id);
+            if (nonEmployee == null)
+            {
+                return NotFound();
+            }
+
+            nonEmployee.IsActive = true;
+            _nonEmployeeRepo.Update(nonEmployee);
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
     }
 }

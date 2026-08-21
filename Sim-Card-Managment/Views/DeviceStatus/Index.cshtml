@@ -331,7 +331,6 @@
                         <th scope="col">Reported By</th>
                         <th scope="col">Status Date</th>
                         <th scope="col" class="text-center">Notes</th>
-                        <th scope="col" class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -418,11 +417,7 @@
                                         <span class="text-muted small">-</span>
                                     }
                                 </td>
-                                <td class="text-end">
-                                    <a asp-controller="DeviceStatus" asp-action="Edit" asp-route-id="@item.Id" class="btn-view-action" title="Edit Status">
-                                        <i class="fas fa-pen"></i> Edit
-                                    </a>
-                                </td>
+                               
                             </tr>
                         }
                     }
