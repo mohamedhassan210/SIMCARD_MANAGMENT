@@ -46,13 +46,19 @@
     var canCreateInternetLine = Has("InternetLine", "Create");
     var canViewInternetLineDashboard = Has("InternetLine", "Dashboard");
 
+    // Device Status
+    var canViewDeviceStatuses = Has("DeviceStatus", "Index");
+
+    // Quota
+    var canViewQuotas = Has("Quota", "Index");
+
 
     // Per-section visibility (header only shows if at least one child is visible)
     var showUserSection = canManageUsers || canManagePermissions || canViewGroups;
-    var showSimSection = canCreateSim || canViewSims;
+    var showSimSection = canCreateSim || canViewSims || canViewDeviceStatuses;
     var showUsbSection = canCreateUsb || canViewUsbs;
     var showDocumentSection = canViewDocuments || canCreateDocument;
-    var showServiceProviderSection = canViewServiceProviders || canCreateServiceProvider;
+    var showServiceProviderSection = canViewServiceProviders || canCreateServiceProvider || canViewQuotas;
     var showReportSection = canViewReport;
     var showSubscriptionSection = canViewSubscription || canCreateSubscription;
     var showBranchSection = canViewBranches || canCreateBranch;
@@ -163,6 +169,15 @@
 
                     <div id="collapseSim" class="accordion-collapse collapse" data-bs-parent="#sidebarMenu">
                         <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                            @if (canViewSims)
+                            {
+                                <a asp-controller="SIM" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <img src="~/img/icon-park-outline_permissions.png" alt="Alternate Text" />
+                                    </div>
+                                    <span class="sub-item-text">Manage Devices</span>
+                                </a>
+                            }
                             @if (canCreateSim)
                             {
                                 <a asp-controller="SIM" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
@@ -181,13 +196,13 @@
                                     <span class="sub-item-text">Create new USB</span>
                                 </a>
                             }
-                            @if (canViewSims)
+                            @if (canViewDeviceStatuses)
                             {
-                                <a asp-controller="SIM" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                <a asp-controller="DeviceStatus" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
                                     <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                        <img src="~/img/icon-park-outline_permissions.png" alt="Alternate Text" />
+                                        <i class="fa-solid fa-tower-broadcast"></i>
                                     </div>
-                                    <span class="sub-item-text">Mange Devices</span>
+                                    <span class="sub-item-text">Device Status</span>
                                 </a>
                             }
                         </div>
@@ -270,6 +285,15 @@
                                         <i class="fa-solid fa-plus"></i>
                                     </div>
                                     <span class="sub-item-text">Create new ServiceProvider</span>
+                                </a>
+                            }
+                            @if (canViewQuotas)
+                            {
+                                <a asp-controller="Quota" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-database"></i>
+                                    </div>
+                                    <span class="sub-item-text">Manage Quotas</span>
                                 </a>
                             }
                         </div>
