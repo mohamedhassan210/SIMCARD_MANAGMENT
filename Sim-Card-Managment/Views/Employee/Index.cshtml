@@ -168,6 +168,28 @@
         letter-spacing: 0.3px;
     }
 
+    .badge-status-active {
+        background-color: #e6f4ea;
+        color: #137333;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .badge-status-inactive {
+        background-color: #fce8e6;
+        color: #c5221f;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
     .asset-pill {
         background-color: #f1f3f5;
         color: #495057;
@@ -323,6 +345,7 @@
                     <tr class="text-uppercase text-muted small fw-bold">
                         <th scope="col" style="width: 25%;">Name</th>
                         <th scope="col" style="width: 15%;">Type</th>
+                        <th scope="col" style="width: 10%;">Status</th>
                         <th scope="col" style="width: 18%;">ID / Contact</th>
                         <th scope="col" style="width: 22%;">Assigned Assets</th>
                         <th scope="col" style="width: 12%;">Start Date</th>
@@ -334,7 +357,7 @@
                     {
                         foreach (var item in personList)
                         {
-                            bool isRowActive = item.PersonType == "Employee" ? item.IsActive : true;
+                            bool isRowActive = item.IsActive;
                             var statusValue = isRowActive ? "active" : "inactive";
                             var rawType = (item.PersonType ?? "").ToLower().Replace(" ", "-");
                             var rowClass = !isRowActive ? "person-row inactive-row" : "person-row";
@@ -352,6 +375,11 @@
                                 <td>
                                     <span class="@(item.PersonType == "Employee" ? "badge-type-employee" : "badge-type-non-employee")">
                                         @item.PersonType
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="@(isRowActive ? "badge-status-active" : "badge-status-inactive")">
+                                        @(isRowActive ? "Active" : "Inactive")
                                     </span>
                                 </td>
                                 <td>
@@ -387,7 +415,7 @@
                         }
                     }
                     <tr id="noResultsRow" style="display: none;">
-                        <td colspan="6" class="text-center text-muted py-4">
+                        <td colspan="7" class="text-center text-muted py-4">
                             No matching personnel found.
                         </td>
                     </tr>

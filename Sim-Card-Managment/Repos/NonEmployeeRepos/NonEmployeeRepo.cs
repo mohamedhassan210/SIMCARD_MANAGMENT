@@ -58,6 +58,7 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
                     ExtraInfo = ne.Type,
                     PersonType = "Non-Employee",
                     Identifier = ne.ContactInfo,
+                    IsActive = ne.IsActive,
 
                     ActiveSimOnlyCount = ne.Subscriptions.Count(s => s.SimId != null && (s.EndDate == null || s.EndDate >= now)),
                     ActiveUsbCount = ne.Subscriptions.Count(s => s.UsbId != null && (s.EndDate == null || s.EndDate >= now)),
