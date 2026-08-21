@@ -1,4 +1,4 @@
-﻿@using Sim_Card_Managment.Services
+@using Sim_Card_Managment.Services
 @inject IUserPermissionService PermissionService
 @{
     // Get the current controller and action from the route
@@ -44,6 +44,7 @@
     // Internet Line
     var canViewInternetLines = Has("InternetLine", "Index");
     var canCreateInternetLine = Has("InternetLine", "Create");
+    var canViewInternetLineDashboard = Has("InternetLine", "Dashboard");
 
 
     // Per-section visibility (header only shows if at least one child is visible)
@@ -584,9 +585,12 @@
                         </li>
                     }
 
-                    <li class="nav-item">
-                        @await Component.InvokeAsync("NotificationBell")
-                    </li>
+                    @if (canViewInternetLineDashboard)
+                    {
+                        <li class="nav-item">
+                            @await Component.InvokeAsync("NotificationBell")
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
