@@ -31,6 +31,7 @@ namespace Sim_Card_Managment.Repositories
         public async Task<Models.ServiceProvider?> GetByIdWithDevicesAsync(int id)
         {
             return await _context.ServiceProviders
+                .Include(p => p.Quotas)
                 .Include(p => p.Sims)
                     .ThenInclude(s => s.Subscriptions)
                         .ThenInclude(sub => sub.Employee)

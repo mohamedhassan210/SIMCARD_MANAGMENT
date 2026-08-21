@@ -7,12 +7,11 @@ namespace Sim_Card_Managment.Viewmodel
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Base Amount is required")]
-        [Range(0.1, 1000, ErrorMessage = "Base Amount must be between 0.1 and 1000 GB")]
+        [Required(ErrorMessage = "Base Amount is required")]    
         [Display(Name = "Base Amount (GB)")]
         public decimal BaseAmount { get; set; }
 
-        [Range(0, 1000, ErrorMessage = "Extra Amount must be between 0 and 1000 GB")]
+        
         [Display(Name = "Extra Amount (GB)")]
         public decimal ExtraAmount { get; set; }
 

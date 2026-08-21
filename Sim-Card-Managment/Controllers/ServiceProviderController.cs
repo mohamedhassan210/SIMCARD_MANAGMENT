@@ -1,12 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sim_Card_Managment.data;
-using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
-using Sim_Card_Managment.Repositories;
-using Sim_Card_Managment.ViewModels;
 using Sim_Card_Managment.Viewmodel;
-using System;
-using System.Linq;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -115,9 +110,21 @@ namespace Sim_Card_Managment.Controllers
                 Name = provider.Name,
                 DisplayName = provider.DisplayName,
                 IsActive = provider.IsActive,
+                Quotas = provider.Quotas
+         .Select(q => new QuotaDisplayViewModel
+         {
+             Id = q.Id,
+             BaseAmount = q.BaseAmount,
+             ExtraAmount = q.ExtraAmount,
+             Fees = q.Fees,
+             IsActive = q.IsActive
+         })
+         .OrderByDescending(q => q.IsActive)
+         .ThenBy(q => q.BaseAmount)
+         .ToList(),
                 Devices = simsList.Concat(usbsList)
-                    .OrderByDescending(d => d.RegisteredAt)
-                    .ToList()
+         .OrderByDescending(d => d.RegisteredAt)
+         .ToList()
             };
 
             return View(model);
