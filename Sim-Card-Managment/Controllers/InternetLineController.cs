@@ -55,6 +55,8 @@ namespace Sim_Card_Managment.Controllers
                 .Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Name });
             model.RenewalTypeDurations = renewalTypes
                 .ToDictionary(r => r.Id, r => r.DurationInMonths);
+            model.ServiceTypeHasPhoneNumber = serviceTypes
+                .ToDictionary(s => s.Id, s => s.HasPhoneNumber);
         }
 
         private async Task PopulateDropdowns(InternetLineEditViewModel model)
@@ -77,6 +79,8 @@ namespace Sim_Card_Managment.Controllers
                 .Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Name });
             model.RenewalTypeDurations = renewalTypes
                 .ToDictionary(r => r.Id, r => r.DurationInMonths);
+            model.ServiceTypeHasPhoneNumber = serviceTypes
+                .ToDictionary(s => s.Id, s => s.HasPhoneNumber);
         }
 
         [HttpGet]
@@ -106,6 +110,22 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(InternetLineCreateViewModel model)
         {
+            var serviceTypes = await _lookupRepo.GetServiceTypesAsync();
+            var selectedType = serviceTypes.FirstOrDefault(s => s.Id == model.ServiceTypeId);
+            bool isLandline = selectedType?.HasPhoneNumber == true;
+
+            if (isLandline)
+            {
+                model.SimId = null;
+                if (string.IsNullOrWhiteSpace(model.PhoneNumber))
+                    ModelState.AddModelError(nameof(model.PhoneNumber), "Phone number is required for this service type.");
+            }
+            else
+            {
+                if (model.SimId == null)
+                    ModelState.AddModelError(nameof(model.SimId), "Please select a SIM card for this service type.");
+            }
+
             if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int currentUserId))
             {
                 model.CreatedById = currentUserId;
@@ -140,6 +160,22 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(InternetLineEditViewModel model)
         {
+            var serviceTypes = await _lookupRepo.GetServiceTypesAsync();
+            var selectedType = serviceTypes.FirstOrDefault(s => s.Id == model.ServiceTypeId);
+            bool isLandline = selectedType?.HasPhoneNumber == true;
+
+            if (isLandline)
+            {
+                model.SimId = null;
+                if (string.IsNullOrWhiteSpace(model.PhoneNumber))
+                    ModelState.AddModelError(nameof(model.PhoneNumber), "Phone number is required for this service type.");
+            }
+            else
+            {
+                if (model.SimId == null)
+                    ModelState.AddModelError(nameof(model.SimId), "Please select a SIM card for this service type.");
+            }
+
             if (!ModelState.IsValid)
             {
                 await PopulateDropdowns(model);

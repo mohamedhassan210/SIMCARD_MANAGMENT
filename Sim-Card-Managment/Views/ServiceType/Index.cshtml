@@ -191,6 +191,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Number Source</th>
                             <th style="text-align: right;">Action</th>
                         </tr>
                     </thead>
@@ -201,6 +202,16 @@
                             {
                                 <tr class="type-row">
                                     <td><strong>@item.Name</strong></td>
+                                    <td>
+                                        @if (item.HasPhoneNumber)
+                                        {
+                                            <span class="text-muted small"><i class="fa-solid fa-keyboard me-1"></i> Typed (landline)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small"><i class="fa-solid fa-sim-card me-1"></i> Picked from SIM</span>
+                                        }
+                                    </td>
                                     <td style="text-align: right;">
                                         <div class="d-inline-flex gap-1">
                                             <a asp-controller="ServiceType" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit Type" aria-label="Edit Type">
@@ -218,7 +229,7 @@
                             }
                         }
                         <tr id="noResultsRow" style="display: @(Model == null || !Model.Any() ? "" : "none");">
-                            <td colspan="2" class="text-center text-muted py-4">
+                            <td colspan="3" class="text-center text-muted py-4">
                                 No matching types found.
                             </td>
                         </tr>
