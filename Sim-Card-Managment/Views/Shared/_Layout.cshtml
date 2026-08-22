@@ -52,9 +52,11 @@
     // Quota
     var canViewQuotas = Has("Quota", "Index");
 
+    // Mail Configuration
+    var canViewMailConfigurations = Has("MailConfiguration", "Index");
 
     // Per-section visibility (header only shows if at least one child is visible)
-    var showUserSection = canManageUsers || canManagePermissions || canViewGroups;
+    var showUserSection = canManageUsers || canManagePermissions || canViewGroups || canViewMailConfigurations;
     var showSimSection = canCreateSim || canViewSims || canViewDeviceStatuses;
     var showUsbSection = canCreateUsb || canViewUsbs;
     var showDocumentSection = canViewDocuments || canCreateDocument;
@@ -138,11 +140,20 @@
                             }
                             @if (canViewGroups)
                             {
-                                <a class="d-flex align-items-center gap-3 text-decoration-none" asp-controller="Group" asp-action="Index">
+                                <a class="d-flex align-items-center gap-3 mb-3 text-decoration-none" asp-controller="Group" asp-action="Index">
                                     <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
                                         <i class="fa-solid fa-user-group"></i>
                                     </div>
                                     <span class="sub-item-text">View Groups</span>
+                                </a>
+                            }
+                            @if (canViewMailConfigurations)
+                            {
+                                <a class="d-flex align-items-center gap-3 mb-3 text-decoration-none" asp-controller="MailConfiguration" asp-action="Index">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-envelope"></i>
+                                    </div>
+                                    <span class="sub-item-text">Mail Configuration</span>
                                 </a>
                             }
                         </div>
