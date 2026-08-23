@@ -352,7 +352,7 @@
 
                         <div class="device-subsection">
                             <div class="subsection-header">
-                                <i class="fas fa-sim-card text-danger"></i> SIM Card <span class="text-danger">*</span>
+                                <i class="fas fa-sim-card text-danger"></i> SIM Card (Optional)
                             </div>
                             <div class="row g-4 mb-3">
                                 <div class="col-md-6">
@@ -771,8 +771,9 @@
         });
 
         // Form Submit Validation
-        $('#createSubscriptionForm').on('submit', function (e) {
+               $('#createSubscriptionForm').on('submit', function (e) {
             const selectedSim = $('#SelectedSimId').val();
+            const selectedUsb = $('#SelectedUsbId').val();
             const selectedRecipient = $('#SelectedEmployeeId').val();
 
             if (!selectedRecipient) {
@@ -781,9 +782,9 @@
                 return false;
             }
 
-            if (!selectedSim) {
+            if (!selectedSim && !selectedUsb) {
                 e.preventDefault();
-                alert('A SIM card is required to create a subscription.');
+                alert('Please select at least a SIM card or a USB device.');
                 return false;
             }
         });

@@ -16,10 +16,14 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
         {
             _context = context;
         }
+        // EmployeeRepo.cs
         public async Task<IEnumerable<Employee>> SearchActiveEmployeesAsync(string query)
         {
             return await _context.Employees
-                .Where(e => e.IsActive && (e.Name.Contains(query) || e.NationalID.Contains(query)))
+                .Where(e => e.IsActive &&
+                    (e.Name.Contains(query) ||
+                     e.NationalID.Contains(query) ||
+                     (e.EmpCode != null && e.EmpCode.Contains(query))))
                 .Take(6)
                 .ToListAsync();
         }

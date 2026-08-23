@@ -1,278 +1,487 @@
-﻿@model IEnumerable<Sim_Card_Managment.Models.Subscription>
+﻿@model IEnumerable<Sim_Card_Managment.ViewModels.Subscription.SubscriptionIndexVM>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subscription Management</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-        .body {
-            background-color: #EEEDED;
-        }
-
         :root {
-            --brand-orange: #E24D17;
-            --bg-light: #F0F0F0;
-            --border-gray: #D1D1D1;
+            --brand-orange: #DF531B;
+            --brand-orange-light: #FFF8F6;
+            --bg-canvas: #F4F5F8;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --card-border: #E2E8F0;
         }
 
-        .rounded {
-            border-radius: 70px !important;
-            width: 386px !important;
-            padding: 10px !important;
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding-bottom: 3rem;
         }
 
-        .r {
-            border-radius: 16px !important;
+        .page-header {
+            background: #FFFFFF;
+            border-bottom: 1px solid var(--card-border);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
         }
 
-        .main-bg {
-            background-color: var(--bg-light);
+        .page-title {
+            font-size: clamp(1.5rem, 3vw, 2.25rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-dark);
         }
 
-        .text-brand-orange {
-            color: var(--brand-orange) !important;
+        .stat-card {
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .bg-brand-orange {
-            background-color: var(--brand-orange) !important;
-        }
-
-        .btn-brand-orange {
-            background-color: var(--brand-orange) !important;
-            border-color: var(--brand-orange) !important;
-            transition: all 0.2s ease-in-out;
-        }
-
-            .btn-brand-orange:hover {
-                background-color: #c74213 !important;
-                border-color: #c74213 !important;
-                color: white !important;
-            }
-
-        .custom-search-wrapper {
-            background-color: transparent;
-            border: 1px solid var(--border-gray);
-            max-width: 400px;
-            width: 100%;
-        }
-
-            .custom-search-wrapper:focus-within {
-                border-color: var(--brand-orange);
-                background-color: white;
-            }
-
-        .custom-select {
-            background-color: #fff;
-            border: 1px solid var(--border-gray);
+        .stat-icon {
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
-            padding: 12px 18px;
-            color: #555;
-            width: 287px;
-            font-size: 14px;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon-orange {
+            background: rgba(223, 83, 27, 0.12);
+            color: var(--brand-orange);
+        }
+
+        .stat-icon-green {
+            background: rgba(34, 197, 94, 0.12);
+            color: #16A34A;
+        }
+
+        .stat-icon-red {
+            background: rgba(220, 38, 38, 0.12);
+            color: #DC2626;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--text-dark);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .table-card {
+            background-color: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            padding: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #FFF;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            transition: border-color 0.2s ease;
+        }
+
+            .search-box:focus-within {
+                border-color: var(--brand-orange);
+            }
+
+            .search-box i {
+                color: var(--text-muted);
+            }
+
+            .search-box input {
+                border: none;
+                outline: none;
+                background: transparent;
+                font-size: 0.95rem;
+                width: 100%;
+                color: var(--text-dark);
+            }
+
+        .filter-select {
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            outline: none;
+            background: #FFF;
             cursor: pointer;
         }
 
-        .custom-label {
-            font-weight: 500;
-            color: #000;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
+            .filter-select:focus {
+                border-color: var(--brand-orange);
+            }
 
-        .custom-table-container {
-            padding: 40px;
-            max-width: 100%;
-            margin: 0 auto;
-        }
-
-        .table-header-row {
-            border-bottom: 1px solid #df9d8a;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-
-        .header-title {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: #4a4a4a;
-        }
-
-        .data-row {
-            padding: 15px 0;
-            font-size: 1.05rem;
-            color: #333;
-        }
-
-        .text-quota {
-            color: #e55a20;
-            font-weight: 700;
-            font-size: 1.15rem;
-        }
-
-        .badge-active {
-            border: 1px solid #2d7a3b;
-            color: #2d7a3b;
-            background-color: transparent;
-            font-weight: 500;
-            padding: 6px 20px;
+        .btn-custom {
+            height: 44px;
+            padding: 0 24px;
+            border-radius: 50px;
+            font-weight: 600;
             font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
         }
+
+        .btn-primary-orange {
+            background-color: var(--brand-orange);
+            color: #FFFFFF;
+        }
+
+            .btn-primary-orange:hover {
+                background-color: #c94614;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
+            }
+
+        .btn-view-action {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            color: #333333;
+            border-radius: 8px;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .btn-view-action:hover {
+                border-color: var(--brand-orange);
+                color: var(--brand-orange);
+                background-color: var(--brand-orange-light);
+            }
+
+        .sub-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .sub-table thead th {
+                text-align: left;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                padding: 12px 16px;
+                border-bottom: 2px solid var(--brand-orange);
+                background: #FFFFFF;
+            }
+
+            .sub-table tbody td {
+                font-size: 0.95rem;
+                padding: 16px;
+                border-bottom: 1px solid var(--card-border);
+                vertical-align: middle;
+            }
+
+        .device-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .device-line:not(:last-child) {
+                margin-bottom: 6px;
+            }
 
         .device-icon {
-            font-size: 1.2rem;
-            color: #555;
-            margin-right: 10px;
+            font-size: 1rem;
+            color: var(--text-muted);
+            width: 16px;
+            text-align: center;
         }
 
         .line-height-tight {
             line-height: 1.3;
         }
 
-        .boxsize {
-            width: 389px !important;
+        .text-quota {
+            color: var(--brand-orange);
+            font-weight: 700;
+        }
+
+        .badge-status-up {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #15803D;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .badge-status-down {
+            background-color: rgba(220, 38, 38, 0.1);
+            color: #DC2626;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .badge-status-scheduled {
+            background-color: rgba(223, 83, 27, 0.1);
+            color: var(--brand-orange);
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(223, 83, 27, 0.2);
+            font-size: 0.75rem;
+            text-transform: uppercase;
         }
     </style>
 </head>
-
 <body>
 
-    <section class="p-100">
-        <h1 class=" fw-bold ms-3">Subscription management</h1>
+    <header class="page-header p-100">
+        <div class="container-fluid px-lg-5">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div>
+                    <h1 class="page-title m-0">Subscription Management</h1>
+                    <p class="text-muted m-0 small mt-1">Monitor enterprise asset performance and usage metrics in real-time.</p>
+                </div>
+                <div>
+                    <a asp-controller="Subscription" asp-action="Create" class="btn-custom btn-primary-orange">
+                        <i class="fa-solid fa-plus"></i> New Subscription
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
 
-        <div class="d-flex justify-content-between align-items-center">
-            <p class="ms-4 text-secondary">Monitor enterprise asset performance and usage metrics in real-time.</p>
-            <a class="btn active me-4 text-white rounded" style="background-color: #E24D17;" asp-controller="Subscription" asp-action="Create">
-                <i class="fa-solid fa-plus me-2"></i>Create new Subscription
-            </a>
+    <main class="container-fluid px-lg-5">
+
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-orange">
+                        <i class="fa-solid fa-chart-simple"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">@(ViewBag.SubscriptionCount ?? 0)</div>
+                        <div class="stat-label">Active Subscriptions</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-red">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">@(ViewBag.ExpiringCount ?? 0)</div>
+                        <div class="stat-label">Nearing Expiry (30d)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-green">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">@(Model?.Count() ?? 0)</div>
+                        <div class="stat-label">Total Records</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="d-flex flex-wrap justify-content-start align-items-center">
-            <div class="card m-4 r boxsize" style="width: 18rem;  background-color: #fff; border: 1px solid grey;">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-inline-flex justify-content-center align-items-center"
-                             style="background-color: #E24D17; border-radius: 10px; width: 40px; height: 40px;">
-                            <i class="fa-solid fa-chart-simple text-white" style="font-size: 24px;"></i>
-                        </div>
+        <div class="table-card">
 
-                        <p style="color: #115D11; font-size: 12px">+12 %</p>
-                    </div>
-
-                    <p class="card-text fs-4 text-dark mt-3" style="line-height: 1.2; font-size: 24px; font-weight: 600;">
-                        Total active <br> subscription
-                    </p>
-
-                    <p style="font-size: 64px; font-weight: 700;">@(ViewBag.SubscriptionCount ?? 0)</p>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div class="search-box col-12 col-md-5">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input id="subSearchInput" type="text" placeholder="Search by subscriber or serial..." autocomplete="off">
                 </div>
-            </div>
-
-            <div class="card m-4 r boxsize" style="width: 18rem;  background-color: #fff; border: 1px solid grey;">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div class="d-inline-flex justify-content-center align-items-center"
-                             style="border: 1px solid rgb(184, 13, 13); border-radius: 10px; width: 40px; height: 40px;">
-                            <i class="fa-solid fa-ban text-danger" style="font-size: 24px;"></i>
-                        </div>
-
-                        <p style="color: #D41212; font-size: 12px">Alert</p>
-                    </div>
-
-                    <p class="card-text fs-4 text-dark mt-3" style="line-height: 1.2; font-size: 24px; font-weight: 600;">
-                        Subscriptions nearing <br> expiry
-                    </p>
-
-                    <p style="font-size: 64px; font-weight: 700;">@(ViewBag.ExpiringCount ?? 0)</p>
-                </div>
-            </div>
-
-            <div class="d-flex align-items-center gap-3 mb-4 w-100 ms-3">
-                <div class="d-flex align-items-center px-3 py-2 rounded-pill custom-search-wrapper">
-                    <i class="fa-solid fa-magnifying-glass text-dark fw-bold me-2"></i>
-                    <input type="text" class="form-control bg-transparent border-0 text-dark shadow-none px-0"
-                           placeholder="Search by id or name">
-                </div>
-
-                <div class="col-md-8">
-                    <select id="empDept" class="custom-select">
-                        <option selected>All</option>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted small fw-bold">Status:</span>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="ALL">All Statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="Expired">Expired</option>
+                        <option value="Scheduled End">Scheduled End</option>
                     </select>
                 </div>
-                <button class="btn btn-brand-orange text-white rounded-3 px-3 py-2 shadow-sm d-flex align-items-center justify-content-center"
-                        style="height: 46px; width: 46px;">
-                    <i class="fa-solid fa-bars-staggered fs-4"></i>
-                </button>
             </div>
+
+            <div class="table-responsive">
+                <table class="sub-table" id="subTable">
+                    <thead>
+                        <tr>
+                            <th>Subscriber</th>
+                            <th>Device</th>
+                            <th>Quota</th>
+                            <th>Monthly Fees</th>
+                            <th>Status</th>
+                            <th>Start Date</th>
+                            <th>Created By</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subTableBody">
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var sub in Model)
+                            {
+                                <tr class="sub-row" data-status="@sub.Status">
+                                    <td>
+                                        <strong>@sub.SubscriberName</strong>
+                                        <div class="text-muted small">
+                                            @sub.SubscriberType
+                                            @if (!string.IsNullOrEmpty(sub.SubscriberIdentifier))
+                                            {
+                                                <span> · @sub.SubscriberIdentifier</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (sub.HasSim)
+                                        {
+                                            <div class="device-line">
+                                                <i class="fa-solid fa-sim-card device-icon"></i>
+                                                <div class="line-height-tight">
+                                                    SIM<br>#@(sub.SimSerialNumber ?? "N/A")
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (sub.HasUsb)
+                                        {
+                                            <div class="device-line">
+                                                <i class="fa-solid fa-usb device-icon"></i>
+                                                <div class="line-height-tight">
+                                                    USB<br>#@(sub.UsbSerialNumber ?? "N/A")
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (!sub.HasSim && !sub.HasUsb)
+                                        {
+                                            <span class="text-muted">No device</span>
+                                        }
+                                    </td>
+                                    <td class="text-quota">@sub.QuotaName</td>
+                                    <td>$@sub.Fees</td>
+                                    <td>
+                                        @if (sub.Status == "Active")
+                                        {
+                                            <span class="badge-status-up">Active</span>
+                                        }
+                                        else if (sub.Status == "Expired")
+                                        {
+                                            <span class="badge-status-down">Expired</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-status-scheduled">Scheduled End</span>
+                                        }
+                                    </td>
+                                    <td class="text-muted">@sub.StartDate.ToString("MMM dd, yyyy")</td>
+                                    <td>@sub.CreatedByUserName</td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex gap-1">
+                                            <a asp-controller="Subscription" asp-action="Details" asp-route-id="@sub.Id" class="btn-view-action">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                            <a asp-controller="Subscription" asp-action="Edit" asp-route-id="@sub.Id" class="btn-view-action">
+                                                <i class="fas fa-pen"></i> Edit
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        <tr id="noResultsRow" style="display: @(Model == null || !Model.Any() ? "" : "none");">
+                            <td colspan="8" class="text-center text-muted py-4">
+                                No matching subscriptions found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
 
-        <div class="custom-table-container w-100">
-            <div class="row table-header-row header-title">
-                <div class="col-2">Subscriber</div>
-                <div class="col-2">Device</div>
-                <div class="col-2">Quota</div>
-                <div class="col-2">Monthly fees</div>
-                <div class="col-2">Status</div>
-                <div class="col-2">Start date</div>
-            </div>
+    </main>
 
-            @if (Model != null && Model.Any())
-            {
-                @foreach (var sub in Model)
-                {
-                    // 1. Resolve Subscriber Name
-                    string subscriberName = sub.Employee?.Name
-                    ?? sub.NonEmployee?.Name
-                    ?? "Unassigned";
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('subSearchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const rows = document.querySelectorAll('.sub-row');
+            const noResultsRow = document.getElementById('noResultsRow');
 
-                    // 2. Resolve Device info (SIM vs USB Modem)
-                    bool isSim = sub.SimId != 0;
-                    string deviceType = isSim ? "SIM" : "USB";
-                    string deviceSerial = isSim ? sub.Sim?.SerialNumber : sub.Usb?.SerialNumber;
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const statusValue = statusFilter.value;
+                let visibleCount = 0;
 
-                    // 3. Resolve Quota + actual applied monthly fee (not the quota's base amount)
-                    string quotaDisplay = sub.Quota != null ? $"{sub.Quota.BaseAmount} GB" : "N/A";
-                    string monthlyFees = $"${sub.Fees}";
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    const rowStatus = row.getAttribute('data-status');
 
-                    <div class="row align-items-center data-row">
-                        <div class="col-2">@subscriberName</div>
-                        <div class="col-2 d-flex align-items-center">
-                            <i class="fa-regular fa-hard-drive device-icon"></i>
-                            <div class="line-height-tight">
-                                @deviceType<br>#@(string.IsNullOrEmpty(deviceSerial) ? "N/A" : deviceSerial)
-                            </div>
-                        </div>
-                        <div class="col-2 text-quota">@quotaDisplay</div>
-                        <div class="col-2">@monthlyFees</div>
-                        <div class="col-2">
-                            <span class="badge rounded-pill badge-active">Active</span>
-                        </div>
-                        <div class="col-2 line-height-tight" style="color: #666;">
-                            @sub.StartDate.ToString("MMM dd")<br>@sub.StartDate.ToString("yyyy")
-                        </div>
-                    </div>
+                    const matchesSearch = text.includes(searchTerm);
+                    const matchesStatus = statusValue === 'ALL' || rowStatus === statusValue;
+
+                    if (matchesSearch && matchesStatus) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                if (noResultsRow) {
+                    noResultsRow.style.display = visibleCount === 0 ? '' : 'none';
                 }
             }
-            else
-            {
-                <div class="row data-row text-center text-muted py-4">
-                    <div class="col-12">No active subscriptions found in the database.</div>
-                </div>
-            }
-        </div>
-    </section>
 
-    <script src="js/bootstrap.bundle.min.js"></script>
+            if (searchInput) searchInput.addEventListener('input', filterTable);
+            if (statusFilter) statusFilter.addEventListener('change', filterTable);
+        });
+    </script>
 </body>
 </html>
