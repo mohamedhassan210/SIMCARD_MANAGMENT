@@ -45,6 +45,9 @@ namespace Sim_Card_Managment.Viewmodel
         [StringLength(500)]
         public string? Notes { get; set; }
 
+        public int? SimProviderId { get; set; }
+        public string? SimAssignedTo { get; set; }
+
         // Dropdowns
         public IEnumerable<SelectListItem> Branches { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> ServiceProviders { get; set; } = new List<SelectListItem>();

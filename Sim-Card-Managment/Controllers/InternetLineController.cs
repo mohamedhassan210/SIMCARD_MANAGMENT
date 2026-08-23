@@ -206,15 +206,31 @@ namespace Sim_Card_Managment.Controllers
             return View(lines);
         }
         [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> SearchSims(string query, int? currentLineId = null)
         {
             var sims = await _simRepo.GetAssignableSimsForInternetLineAsync(query, currentLineId);
 
-            var result = sims.Select(s => new {
-                id = s.Id,
-                phoneNumber = s.PhoneNumber,
-                serialNumber = s.SerialNumber,
-                providerName = s.ServiceProvider?.Name ?? "Unknown"
+            var result = sims.Select(s =>
+            {
+                var activeSub = s.Subscriptions?
+                    .FirstOrDefault(sub => sub.EndDate == null || sub.EndDate > DateTime.Now);
+
+                string? assignedTo = activeSub?.Employee != null
+                    ? activeSub.Employee.Name
+                    : activeSub?.NonEmployee != null
+                        ? activeSub.NonEmployee.Name
+                        : null;
+
+                return new
+                {
+                    id = s.Id,
+                    phoneNumber = s.PhoneNumber,
+                    serialNumber = s.SerialNumber,
+                    providerId = s.ServiceProviderId,
+                    providerName = s.ServiceProvider?.Name ?? "Unknown",
+                    assignedTo
+                };
             });
 
             return Json(result);
