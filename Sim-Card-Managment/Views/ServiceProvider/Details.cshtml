@@ -93,12 +93,25 @@
 
         
             /*----------------Quota Cards*---------------*/
-            .quota-display-card {
-                border: 1.5px solid var(--brand-orange);
-                border-radius: 12px;
-                padding: 20px;
-                height: 100%;
-                background-color: #ffffff;
+        .quota-display-card-link {
+            display: block;
+            text-decoration: none;
+            height: 100%;
+        }
+
+        .quota-display-card {
+            border: 1.5px solid var(--brand-orange);
+            border-radius: 12px;
+            padding: 20px;
+            height: 100%;
+            background-color: #ffffff;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+            .quota-display-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 24px rgba(223, 83, 27, 0.18);
             }
 
             .quota-card-title {
@@ -328,16 +341,18 @@
                     @foreach (var quota in Model.Quotas)
                     {
                         <div class="col-md-4 col-sm-6">
-                            <div class="quota-display-card">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="quota-card-title">@quota.BaseAmount GB Base Quota</span>
-                                    <span class="@(quota.IsActive ? "badge-quota-active" : "badge-quota-inactive")">
-                                        @(quota.IsActive ? "Active" : "Inactive")
-                                    </span>
+                            <a asp-controller="Quota" asp-action="Details" asp-route-id="@quota.Id" class="quota-display-card-link">
+                                <div class="quota-display-card">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="quota-card-title">@quota.BaseAmount GB Base Quota</span>
+                                        <span class="@(quota.IsActive ? "badge-quota-active" : "badge-quota-inactive")">
+                                            @(quota.IsActive ? "Active" : "Inactive")
+                                        </span>
+                                    </div>
+                                    <p class="quota-card-subtitle">Extra Amount: @quota.ExtraAmount GB</p>
+                                    <p class="quota-card-subtitle">Fees: @quota.Fees</p>
                                 </div>
-                                <p class="quota-card-subtitle">Extra Amount: @quota.ExtraAmount GB</p>
-                                <p class="quota-card-subtitle">Fees: @quota.Fees</p>
-                            </div>
+                            </a>
                         </div>
                     }
                 </div>
