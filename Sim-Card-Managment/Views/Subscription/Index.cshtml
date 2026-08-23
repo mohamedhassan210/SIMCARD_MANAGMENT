@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Sim_Card_Managment.ViewModels.Subscription.SubscriptionIndexVM>
+@model IEnumerable<Sim_Card_Managment.ViewModels.Subscription.SubscriptionIndexVM>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -171,6 +171,17 @@
                 box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
             }
 
+        .btn-secondary-soft {
+            background-color: #F1F5F9;
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+        }
+
+            .btn-secondary-soft:hover {
+                background-color: #E2E8F0;
+                color: var(--text-dark);
+            }
+
         .btn-view-action {
             background-color: #ffffff;
             border: 1px solid #e0e0e0;
@@ -284,7 +295,10 @@
                     <h1 class="page-title m-0">Subscription Management</h1>
                     <p class="text-muted m-0 small mt-1">Monitor enterprise asset performance and usage metrics in real-time.</p>
                 </div>
-                <div>
+                <div class="d-flex gap-2">
+                    <a asp-controller="Report" asp-action="ExportSubscriptionsExcel" class="btn-custom btn-secondary-soft">
+                        <i class="fa-solid fa-file-excel"></i> Excel
+                    </a>
                     <a asp-controller="Subscription" asp-action="Create" class="btn-custom btn-primary-orange">
                         <i class="fa-solid fa-plus"></i> New Subscription
                     </a>
