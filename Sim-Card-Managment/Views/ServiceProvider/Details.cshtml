@@ -91,6 +91,50 @@
             display: inline-block;
         }
 
+        
+            /*----------------Quota Cards*---------------*/
+            .quota-display-card {
+                border: 1.5px solid var(--brand-orange);
+                border-radius: 12px;
+                padding: 20px;
+                height: 100%;
+                background-color: #ffffff;
+            }
+
+            .quota-card-title {
+                font-weight: 700;
+                font-size: 1.05rem;
+                color: var(--text-dark);
+                margin-bottom: 4px;
+            }
+
+            .quota-card-subtitle {
+                font-size: 0.85rem;
+                color: var(--text-muted);
+                margin: 0;
+            }
+
+            .badge-quota-active {
+                font-size: 0.65rem;
+                font-weight: 700;
+                color: #198754;
+                border: 1px solid #198754;
+                border-radius: 12px;
+                padding: 3px 8px;
+                text-transform: uppercase;
+            }
+
+            .badge-quota-inactive {
+                font-size: 0.65rem;
+                font-weight: 700;
+                color: #6c757d;
+                border: 1px solid #6c757d;
+                border-radius: 12px;
+                padding: 3px 8px;
+                text-transform: uppercase;
+            }
+
+
         .devices-card {
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
@@ -184,6 +228,7 @@
         .search-box input { border: none; outline: none; background: transparent; font-size: 13px; width: 100%; color: #1a1a1a; }
         .search-box input::placeholder { color: #b3b3b3; }
 
+
         /* ---------- Table (from SIM Index) ---------- */
         .table-wrap { margin-top: 28px; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
@@ -271,10 +316,43 @@
             </div>
         </div>
 
+        <div class="devices-card mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <h4 class="fw-bold fs-5 m-0 text-dark">Provider Quotas</h4>
+                <span class="emp-count-badge">@Model.Quotas.Count</span>
+            </div>
+
+            @if (Model.Quotas.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var quota in Model.Quotas)
+                    {
+                        <div class="col-md-4 col-sm-6">
+                            <div class="quota-display-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="quota-card-title">@quota.BaseAmount GB Base Quota</span>
+                                    <span class="@(quota.IsActive ? "badge-quota-active" : "badge-quota-inactive")">
+                                        @(quota.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </div>
+                                <p class="quota-card-subtitle">Extra Amount: @quota.ExtraAmount GB</p>
+                                <p class="quota-card-subtitle">Fees: @quota.Fees</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted small">No quotas configured for this provider.</p>
+            }
+        </div>
+
         <div class="devices-card">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                 <h4 class="fw-bold fs-5 m-0 text-dark">Assigned Devices</h4>
             </div>
+            <!-- existing filters, table, footer, actions bar stay here unchanged -->
 
            <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
     <div class="filters-row">

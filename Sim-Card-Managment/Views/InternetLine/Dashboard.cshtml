@@ -5,6 +5,7 @@
     var lineList = Model?.ToList() ?? new List<Sim_Card_Managment.Viewmodel.InternetLineDashboardItemViewModel>();
     int totalCount = lineList.Count;
     int dueCount = lineList.Count(x => x.IsDueForRenewal);
+    var today = DateTime.Today;
 }
 
 <style>
@@ -104,21 +105,44 @@
             padding: 4px 0;
         }
 
-    .badge-renewal-due {
-        background-color: #fce8e6;
-        color: #c5221f;
+    /* Dynamic Condition Badges with Gradients */
+    .badge-renewal-red {
+        background: linear-gradient(135deg, #ff4d4d 0%, #c5221f 100%);
+        color: #ffffff;
         font-size: 11px;
         font-weight: 700;
-        padding: 4px 10px;
+        padding: 6px 12px;
         border-radius: 20px;
         display: inline-flex;
         align-items: center;
         gap: 5px;
+        box-shadow: 0 2px 4px rgba(197, 34, 31, 0.2);
     }
 
-    .badge-renewal-ok {
+    .badge-renewal-yellow {
+        background: linear-gradient(135deg, #fff176 0%, #fbc02d 100%);
         color: #333333;
-        font-size: 0.85rem;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 2px 4px rgba(251, 192, 45, 0.2);
+    }
+
+    .badge-renewal-black {
+        background: linear-gradient(135deg, #434343 0%, #000000 100%);
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
     }
 
     .badge-no-renewal-type {
@@ -281,22 +305,31 @@
                                 </td>
                                 <td>
                                     <span class="text-muted small">
-                                        @(item.LastRenewalDate.HasValue ? item.LastRenewalDate.Value.ToString("dd MMM yyyy") : "N/A")
+                                        @(item.LastRenewalDate.HasValue? item.LastRenewalDate.Value.ToString("dd MMM yyyy") : "N/A")
                                     </span>
                                 </td>
                                 <td>
                                     @if (item.NextRenewalDate.HasValue)
                                     {
-                                        if (item.IsDueForRenewal)
+                                        int daysRemaining = item.NextRenewalDate.Value.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
+                                        if (daysRemaining < 5)
                                         {
-                                            <span class="badge-renewal-due">
+                                            <span class="badge-renewal-red" title="Critical: Less than 5 days remaining">
                                                 <i class="fas fa-triangle-exclamation"></i>
+                                                @item.NextRenewalDate.Value.ToString("dd MMM yyyy")
+                                            </span>
+                                        }
+                                        else if (daysRemaining <= 20)
+                                        {
+                                            <span class="badge-renewal-yellow" title="Warning: Between 5 and 20 days remaining">
+                                                <i class="fas fa-clock"></i>
                                                 @item.NextRenewalDate.Value.ToString("dd MMM yyyy")
                                             </span>
                                         }
                                         else
                                         {
-                                            <span class="badge-renewal-ok">
+                                            <span class="badge-renewal-black" title="Normal: More than 20 days remaining">
+                                                <i class="fas fa-check-circle"></i>
                                                 @item.NextRenewalDate.Value.ToString("dd MMM yyyy")
                                             </span>
                                         }

@@ -59,6 +59,9 @@ namespace Sim_Card_Managment.data
         public DbSet<FireWallType> FireWallTypes { get; set; }
         public DbSet<RenewalType> RenewalTypes { get; set; }
 
+        // ── System Settings ──────────────────────────────────────────────
+        public DbSet<MailConfiguration> MailConfigurations { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -86,6 +89,12 @@ namespace Sim_Card_Managment.data
 
             modelBuilder.Entity<Group>()
                 .HasIndex(g => g.Name).IsUnique();
+
+            // Only one MailConfiguration row may be active at a time.
+            modelBuilder.Entity<MailConfiguration>()
+                .HasIndex(m => m.IsActive)
+                .HasFilter("[IsActive] = 1")
+                .IsUnique();
 
 
             // ── DeviceTransfer: two FKs to Subscription ───────────────

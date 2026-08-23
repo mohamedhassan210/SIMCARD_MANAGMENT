@@ -47,6 +47,15 @@
         border: 1px solid rgba(223, 83, 27, 0.2);
     }
 
+    .badge-status-inactive {
+        background-color: #6B7280;
+        color: #FFFFFF;
+        font-size: 0.75rem;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
     .emp-id-chip {
         display: inline-flex;
         align-items: center;
@@ -307,6 +316,14 @@
                     <div class="col-12 col-sm-6 col-md-3">
                         <div class="info-grid-label">Job Title / Department</div>
                         <div class="info-grid-value">@(Model.Position ?? "Unassigned")</div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-grid-label">Status</div>
+                        <div class="info-grid-value">
+                            <span class="@(Model.IsActive ? "badge-status-active" : "badge-status-inactive")">
+                                @(Model.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </div>
                     </div>
                 </div>
 

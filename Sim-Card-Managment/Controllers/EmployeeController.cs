@@ -189,21 +189,13 @@ namespace Sim_Card_Managment.Controllers
             return View(employee);
         }
 
+
         // POST: /Employee/DeleteConfirmed/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var employee = _employeeRepo.GetById(id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            // Soft delete: Change IsActive status to false instead of removing the record from DB
-            employee.IsActive = false;
-            _employeeRepo.Update(employee);
-
+            _employeeRepo.Delete(id);
             return RedirectToAction(nameof(Index));
         }
 

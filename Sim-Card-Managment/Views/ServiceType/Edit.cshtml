@@ -162,6 +162,19 @@
                                 <input asp-for="Name" class="form-control-custom" placeholder="e.g., Fiber Optic, IPsec VPN">
                             </div>
                         </div>
+
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="HasPhoneNumber" class="form-check-input" type="checkbox">
+                                <label asp-for="HasPhoneNumber" class="form-check-label">
+                                    Has phone number (landline, no SIM)
+                                </label>
+                            </div>
+                            <span class="text-muted small">
+                                Check this for line types like ADSL where the user types the phone number in by hand.
+                                Leave unchecked for SIM-based types (3G/4G etc.) where the number is picked from the SIM inventory.
+                            </span>
+                        </div>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-end gap-3 mt-5 pt-3 border-top">

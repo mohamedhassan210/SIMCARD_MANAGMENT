@@ -463,11 +463,10 @@ namespace Sim_Card_Managment.Controllers
                 return ForceLogoutAndRedirect();
             }
 
-            var result = await _accountRepo.ChangePasswordAsync(currentUserId, model.CurrentPassword, model.NewPassword);
+            var result = await _accountRepo.ChangePasswordAsync(currentUserId,  model.NewPassword);
 
             if (!result.IsSuccess)
-            {
-                ModelState.AddModelError(nameof(model.CurrentPassword), result.ErrorMessage ?? "Unable to change password.");
+            {             
                 return View(model);
             }
 

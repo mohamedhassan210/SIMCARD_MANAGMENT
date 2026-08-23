@@ -12,7 +12,7 @@ namespace Sim_Card_Managment.Controllers
     [RequirePermission]
     public class DeviceStatusController : Controller
     {
-        private readonly AppDbContext _context; // still needed for the DeviceStatusesType lookup table
+        private readonly AppDbContext _context;
         private readonly IDeviceStatusRepo _deviceStatusRepo;
         private readonly ISIMRepo _simRepo;
         private readonly IUSBRepo _usbRepo;
@@ -33,8 +33,6 @@ namespace Sim_Card_Managment.Controllers
                 .ToList();
 
             var viewModel = new List<DeviceStatusViewModel>();
-
-            // Tracks the most recent status seen per device so we can show old -> new per row
             var lastStatus = new Dictionary<string, string>();
 
             foreach (var ds in statuses)
@@ -73,9 +71,7 @@ namespace Sim_Card_Managment.Controllers
                 });
             }
 
-            // Most recent report first
             viewModel.Reverse();
-
             return View(viewModel);
         }
 
@@ -100,7 +96,7 @@ namespace Sim_Card_Managment.Controllers
             }
 
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            int currentUserId = int.TryParse(userIdClaim, out var parsedId) ? parsedId : 1; // fallback default user
+            int currentUserId = int.TryParse(userIdClaim, out var parsedId) ? parsedId : 1;
 
             var statusType = _context.DeviceStatusesType.FirstOrDefault(t => t.Id == model.StatusTypeId);
 
@@ -118,60 +114,6 @@ namespace Sim_Card_Managment.Controllers
 
             _deviceStatusRepo.AddDeviceStatus(deviceStatus);
 
-            // Reflect this incident on the device's own live Status field too
-            ApplyStatusToDevice(model.SimId, model.UsbId, statusType);
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
-        public IActionResult Edit(int id)
-        {
-            var status = _deviceStatusRepo.GetDeviceStatusbyId(id);
-            if (status == null) return NotFound();
-
-            var model = new DeviceStatusEditViewModel
-            {
-                Id = status.Id,
-                SimId = status.SimId,
-                UsbId = status.UsbId,
-                StatusTypeId = status.StatusTypeId,
-                Notes = status.Notes,
-                ReplacedBySimId = status.ReplacedBySimId,
-                ReplacedByUsbId = status.ReplacedByUsbId
-            };
-
-            PopulateLookupLists(model);
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(DeviceStatusEditViewModel model)
-        {
-            ValidateDeviceSelection(model.SimId, model.UsbId);
-
-            if (!ModelState.IsValid)
-            {
-                PopulateLookupLists(model);
-                return View(model);
-            }
-
-            var status = _deviceStatusRepo.GetDeviceStatusbyId(model.Id);
-            if (status == null) return NotFound();
-
-            var statusType = _context.DeviceStatusesType.FirstOrDefault(t => t.Id == model.StatusTypeId);
-
-            status.SimId = model.SimId;
-            status.UsbId = model.UsbId;
-            status.StatusTypeId = model.StatusTypeId;
-            status.Notes = model.Notes;
-            status.ReplacedBySimId = model.ReplacedBySimId;
-            status.ReplacedByUsbId = model.ReplacedByUsbId;
-
-            _deviceStatusRepo.Update(status);
-
-            // Keep the device's live Status field in sync with the (possibly changed) status type
             ApplyStatusToDevice(model.SimId, model.UsbId, statusType);
 
             return RedirectToAction(nameof(Index));
@@ -218,13 +160,61 @@ namespace Sim_Card_Managment.Controllers
             var sims = _simRepo.GetAll().ToList();
             var usbs = _usbRepo.GetAll().ToList();
 
-            model.Sims = new SelectList(sims, "Id", "SerialNumber", model.SimId);
-            model.Usbs = new SelectList(usbs, "Id", "SerialNumber", model.UsbId);
+            // Carry each device's current Status so the view can show it read-only
+            model.Sims = sims
+                .Select(s => new DeviceOptionViewModel { Id = s.Id, SerialNumber = s.SerialNumber, Status = s.Status })
+                .ToList();
+
+            model.Usbs = usbs
+                .Select(u => new DeviceOptionViewModel { Id = u.Id, SerialNumber = u.SerialNumber, Status = u.Status })
+                .ToList();
+
             model.ReplacementSims = new SelectList(sims, "Id", "SerialNumber", model.ReplacedBySimId);
             model.ReplacementUsbs = new SelectList(usbs, "Id", "SerialNumber", model.ReplacedByUsbId);
+
+            // Always pulled fresh from the DeviceStatusesType table
             model.StatusTypes = new SelectList(
                 _context.DeviceStatusesType.OrderBy(t => t.Name).ToList(),
                 "Id", "Name", model.StatusTypeId);
+        }
+        [HttpGet]
+        public async Task<IActionResult> SearchSims(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Json(new List<object>());
+
+            var sims = await _simRepo.SearchAsync(query);
+
+            var result = sims.Select(s => new
+            {
+                id = s.Id,
+                phoneNumber = s.PhoneNumber,
+                serialNumber = s.SerialNumber,
+                status = s.Status,
+                providerName = s.ServiceProvider?.Name ?? "Unknown"
+            });
+
+            return Json(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchUsbs(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Json(new List<object>());
+
+            var usbs = await _usbRepo.GetAvailableUsbsAsync(query);
+
+            var result = usbs.Select(u => new
+            {
+                id = u.Id,
+                model = u.Model,
+                serialNumber = u.SerialNumber,
+                status = u.Status,
+                providerName = u.ServiceProvider?.Name ?? "Unknown"
+            });
+
+            return Json(result);
         }
     }
 }
