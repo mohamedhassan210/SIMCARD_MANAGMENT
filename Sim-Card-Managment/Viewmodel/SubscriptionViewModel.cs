@@ -22,9 +22,9 @@ namespace Sim_Card_Managment.ViewModels.Subscription
 
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public string Status => EndDate == null
-            ? "Active"
-            : EndDate < DateTime.Now ? "Expired" : "Scheduled End";
+        public string Status => EndDate.HasValue && EndDate.Value < DateTime.Now
+    ? "Expired"
+    : "Active";
 
         public string CreatedByUserName { get; set; } = string.Empty;
     }
@@ -47,7 +47,7 @@ namespace Sim_Card_Managment.ViewModels.Subscription
 
         [Required(ErrorMessage = "Quota plan is required.")]
         [Display(Name = "Quota Plan")]
-        public int QuotaId { get; set; }
+        public int? QuotaId { get; set; }
 
         [Required(ErrorMessage = "Action is required.")]
         [Display(Name = "Device Action")]

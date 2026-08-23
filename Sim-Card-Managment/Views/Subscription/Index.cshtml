@@ -273,17 +273,6 @@
             font-size: 0.75rem;
             text-transform: uppercase;
         }
-
-        .badge-status-scheduled {
-            background-color: rgba(223, 83, 27, 0.1);
-            color: var(--brand-orange);
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(223, 83, 27, 0.2);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-        }
     </style>
 </head>
 <body>
@@ -358,7 +347,6 @@
                         <option value="ALL">All Statuses</option>
                         <option value="Active">Active</option>
                         <option value="Expired">Expired</option>
-                        <option value="Scheduled End">Scheduled End</option>
                     </select>
                 </div>
             </div>
@@ -424,13 +412,9 @@
                                         {
                                             <span class="badge-status-up">Active</span>
                                         }
-                                        else if (sub.Status == "Expired")
-                                        {
-                                            <span class="badge-status-down">Expired</span>
-                                        }
                                         else
                                         {
-                                            <span class="badge-status-scheduled">Scheduled End</span>
+                                            <span class="badge-status-down">Expired</span>
                                         }
                                     </td>
                                     <td class="text-muted">@sub.StartDate.ToString("MMM dd, yyyy")</td>
