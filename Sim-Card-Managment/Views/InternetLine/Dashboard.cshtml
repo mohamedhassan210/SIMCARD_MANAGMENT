@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.InternetLineDashboardItemViewModel>
+@model IEnumerable<Sim_Card_Managment.Viewmodel.InternetLineDashboardItemViewModel>
 
 @{
     ViewData["Title"] = "Renewal Dashboard";
@@ -105,46 +105,6 @@
             padding: 4px 0;
         }
 
-    /* Dynamic Condition Badges with Gradients */
-    .badge-renewal-red {
-        background: linear-gradient(135deg, #ff4d4d 0%, #c5221f 100%);
-        color: #ffffff;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 6px 12px;
-        border-radius: 20px;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        box-shadow: 0 2px 4px rgba(197, 34, 31, 0.2);
-    }
-
-    .badge-renewal-yellow {
-        background: linear-gradient(135deg, #fff176 0%, #fbc02d 100%);
-        color: #333333;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 6px 12px;
-        border-radius: 20px;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        box-shadow: 0 2px 4px rgba(251, 192, 45, 0.2);
-    }
-
-    .badge-renewal-black {
-        background: linear-gradient(135deg, #434343 0%, #000000 100%);
-        color: #ffffff;
-        font-size: 11px;
-        font-weight: 700;
-        padding: 6px 12px;
-        border-radius: 20px;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
-    }
-
     .badge-no-renewal-type {
         background-color: #f1f3f4;
         color: #5f6368;
@@ -157,10 +117,67 @@
         gap: 5px;
     }
 
+    .days-left-text {
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
     .clickable-row {
         cursor: pointer;
         transition: background-color 0.15s ease;
     }
+
+    /* Row color gradient by renewal urgency:
+       overdue (black) -> critical (red) -> warning (yellow) -> normal (green) */
+    #lineTable tbody tr.row-renewal-overdue {
+        background: linear-gradient(90deg, rgba(20, 20, 20, 0.9) 0%, rgba(60, 60, 60, 0.9) 100%);
+    }
+
+        #lineTable tbody tr.row-renewal-overdue:hover {
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%);
+        }
+
+        #lineTable tbody tr.row-renewal-overdue td,
+        #lineTable tbody tr.row-renewal-overdue code,
+        #lineTable tbody tr.row-renewal-overdue span {
+            color: #ffffff !important;
+        }
+
+    #lineTable tbody tr.row-renewal-critical {
+        background: linear-gradient(90deg, #ff4d4d 0%, #c5221f 100%);
+    }
+
+        #lineTable tbody tr.row-renewal-critical:hover {
+            background: linear-gradient(90deg, #ff3232 0%, #a81b18 100%);
+        }
+
+        #lineTable tbody tr.row-renewal-critical td,
+        #lineTable tbody tr.row-renewal-critical code,
+        #lineTable tbody tr.row-renewal-critical span {
+            color: #ffffff !important;
+        }
+
+    #lineTable tbody tr.row-renewal-warning {
+        background: linear-gradient(90deg, #ffe066 0%, #fbc02d 100%);
+    }
+
+        #lineTable tbody tr.row-renewal-warning:hover {
+            background: linear-gradient(90deg, #ffd633 0%, #e6ac1f 100%);
+        }
+
+        #lineTable tbody tr.row-renewal-warning td,
+        #lineTable tbody tr.row-renewal-warning code,
+        #lineTable tbody tr.row-renewal-warning span {
+            color: #4a3300;
+        }
+
+    #lineTable tbody tr.row-renewal-normal {
+        background: linear-gradient(90deg, rgba(76, 175, 80, 0.22) 0%, rgba(56, 142, 60, 0.22) 100%);
+    }
+
+        #lineTable tbody tr.row-renewal-normal:hover {
+            background: linear-gradient(90deg, rgba(76, 175, 80, 0.32) 0%, rgba(56, 142, 60, 0.32) 100%);
+        }
 
     .pagination-btn {
         width: 32px;
@@ -276,12 +293,13 @@
             <table class="table table-hover align-middle mb-0" id="lineTable">
                 <thead class="table-light">
                     <tr class="text-uppercase text-muted small fw-bold">
-                        <th scope="col" style="width: 16%;">Branch</th>
-                        <th scope="col" style="width: 14%;">ISP</th>
-                        <th scope="col" style="width: 14%;">Payment Type</th>
+                        <th scope="col" style="width: 14%;">Branch</th>
+                        <th scope="col" style="width: 12%;">ISP</th>
+                        <th scope="col" style="width: 12%;">Payment Type</th>
                         <th scope="col" style="width: 14%;">Phone Number</th>
-                        <th scope="col" style="width: 12%;">Last Renewal</th>
-                        <th scope="col" style="width: 14%;">Next Renewal</th>
+                        <th scope="col" style="width: 10%;">Last Renewal</th>
+                        <th scope="col" style="width: 12%;">Next Renewal</th>
+                        <th scope="col" style="width: 10%;">Days Left</th>
                         <th scope="col" class="text-end" style="width: 16%;">Renewal</th>
                     </tr>
                 </thead>
@@ -290,7 +308,36 @@
                     {
                         foreach (var item in lineList)
                         {
-                            <tr class="clickable-row" data-href="@Url.Action("Details", "InternetLine", new { id = item.Id })">
+                            string rowClass = "clickable-row";
+                            string daysText = "N/A";
+
+                            if (item.NextRenewalDate.HasValue)
+                            {
+                                int daysRemaining = item.NextRenewalDate.Value.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
+
+                                if (daysRemaining < 0)
+                                {
+                                    rowClass += " row-renewal-overdue";
+                                    daysText = "Overdue";
+                                }
+                                else if (daysRemaining < 4)
+                                {
+                                    rowClass += " row-renewal-critical";
+                                    daysText = daysRemaining == 1 ? "a day" : $"{daysRemaining} days";
+                                }
+                                else if (daysRemaining <= 13)
+                                {
+                                    rowClass += " row-renewal-warning";
+                                    daysText = daysRemaining == 1 ? "a day" : $"{daysRemaining} days";
+                                }
+                                else
+                                {
+                                    rowClass += " row-renewal-normal";
+                                    daysText = daysRemaining == 1 ? "a day" : $"{daysRemaining} days";
+                                }
+                            }
+
+                            <tr class="@rowClass" data-href="@Url.Action("Details", "InternetLine", new { id = item.Id })">
                                 <td>
                                     <span class="fw-bold text-dark fs-6">@item.BranchName</span>
                                 </td>
@@ -305,39 +352,16 @@
                                 </td>
                                 <td>
                                     <span class="text-muted small">
-                                        @(item.LastRenewalDate.HasValue? item.LastRenewalDate.Value.ToString("dd MMM yyyy") : "N/A")
+                                        @(item.LastRenewalDate.HasValue ? item.LastRenewalDate.Value.ToString("dd MMM yyyy") : "N/A")
                                     </span>
                                 </td>
                                 <td>
-                                    @if (item.NextRenewalDate.HasValue)
-                                    {
-                                        int daysRemaining = item.NextRenewalDate.Value.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
-                                        if (daysRemaining < 5)
-                                        {
-                                            <span class="badge-renewal-red" title="Critical: Less than 5 days remaining">
-                                                <i class="fas fa-triangle-exclamation"></i>
-                                                @item.NextRenewalDate.Value.ToString("dd MMM yyyy")
-                                            </span>
-                                        }
-                                        else if (daysRemaining <= 20)
-                                        {
-                                            <span class="badge-renewal-yellow" title="Warning: Between 5 and 20 days remaining">
-                                                <i class="fas fa-clock"></i>
-                                                @item.NextRenewalDate.Value.ToString("dd MMM yyyy")
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge-renewal-black" title="Normal: More than 20 days remaining">
-                                                <i class="fas fa-check-circle"></i>
-                                                @item.NextRenewalDate.Value.ToString("dd MMM yyyy")
-                                            </span>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted small">N/A</span>
-                                    }
+                                    <span class="text-dark small">
+                                        @(item.NextRenewalDate.HasValue ? item.NextRenewalDate.Value.ToString("dd MMM yyyy") : "N/A")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="days-left-text">@daysText</span>
                                 </td>
                                 <td class="text-end">
                                     @if (item.RenewalTypeName == null)
@@ -366,7 +390,7 @@
                         }
                     }
                     <tr id="noResultsRow" style="display: none;">
-                        <td colspan="7" class="text-center text-muted py-4">
+                        <td colspan="8" class="text-center text-muted py-4">
                             No matching internet lines found.
                         </td>
                     </tr>
