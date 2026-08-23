@@ -1,7 +1,19 @@
-﻿@model Sim_Card_Managment.ViewModels.Subscription.SubscriptionEditViewModel
+@model Sim_Card_Managment.ViewModels.Subscription.SubscriptionEditViewModel
 
 @{
     ViewData["Title"] = "Edit Subscription";
+}
+
+@functions {
+    string GetProviderLogo(string? providerName)
+    {
+        var name = (providerName ?? string.Empty).ToLower();
+        if (name.Contains("orange")) return "/img/orange.png";
+        if (name.Contains("vodafone") || name.Contains("fodafone")) return "/img/fodafone.png";
+        if (name.Contains("we")) return "/img/we.png";
+        if (name.Contains("etisalat")) return "/img/etisalat-logo.png";
+        return string.Empty;
+    }
 }
 
 <style>
@@ -75,6 +87,7 @@
 
         .selection-card.active {
             border: 1.5px solid #e65319;
+            background-color: #FFF8F6;
         }
 
     .card-title-text {
@@ -104,14 +117,37 @@
         display: block;
     }
 
-    .current-badge {
+    /* Current badge — matches InternetLine/Edit styling (orange, not green) */
+    .badge-current {
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #e65319;
+        border: 1px solid #e65319;
+        border-radius: 12px;
+        padding: 3px 8px;
+        text-transform: uppercase;
+    }
+
+    .sim-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .sp-logo-img {
+        height: 24px;
+        max-width: 70px;
+        object-fit: contain;
+    }
+
+    .badge-available {
         font-size: 0.65rem;
         font-weight: 700;
         color: #198754;
         border: 1px solid #198754;
         border-radius: 12px;
         padding: 3px 8px;
-        text-transform: uppercase;
     }
 
     .device-subsection {
@@ -182,11 +218,27 @@
 
             @if (!string.IsNullOrEmpty(Model.CurrentSimSerial))
             {
-                <div class="mb-3">
-                    <div class="selection-card active" id="currentSimCard">
-                        <span class="current-badge">Current</span>
-                        <div class="card-title-text mt-2">SIM: @Model.CurrentSimSerial</div>
-                        <i class="fas fa-check-circle check-icon"></i>
+                var currentSimLogo = GetProviderLogo(Model.CurrentSimProviderName);
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="selection-card active" id="currentSimCard" onclick="reselectCurrentSim()">
+                            <div class="sim-card-header">
+                                @if (!string.IsNullOrEmpty(currentSimLogo))
+                                {
+                                    <img src="@currentSimLogo" alt="@Model.CurrentSimProviderName" class="sp-logo-img" />
+                                }
+                                else
+                                {
+                                    <span class="fw-bold text-dark" style="font-size:0.85rem">@Model.CurrentSimProviderName</span>
+                                }
+                                <span class="badge-current">Current</span>
+                            </div>
+                            <div class="card-title-text">@Model.CurrentSimNetworkType SIM (@Model.CurrentSimPhoneNumber)</div>
+                            <p class="card-subtitle-text">Provider : @Model.CurrentSimProviderName</p>
+                            <p class="card-subtitle-text">Serial : @Model.CurrentSimSerial</p>
+                            <i class="fas fa-check-circle check-icon"></i>
+                        </div>
                     </div>
                 </div>
             }
@@ -201,11 +253,18 @@
 
             @if (!string.IsNullOrEmpty(Model.CurrentUsbSerial))
             {
-                <div class="mb-3">
-                    <div class="selection-card active" id="currentUsbCard">
-                        <span class="current-badge">Current</span>
-                        <div class="card-title-text mt-2">USB: @Model.CurrentUsbSerial</div>
-                        <i class="fas fa-check-circle check-icon"></i>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="selection-card active" id="currentUsbCard" onclick="reselectCurrentUsb()">
+                            <div class="sim-card-header">
+                                <i class="fas fa-usb text-secondary" style="font-size: 1.2rem;"></i>
+                                <span class="badge-current">Current</span>
+                            </div>
+                            <div class="card-title-text">@Model.CurrentUsbModel</div>
+                            <p class="card-subtitle-text">Provider : @Model.CurrentUsbProviderName</p>
+                            <p class="card-subtitle-text">Serial : @Model.CurrentUsbSerial</p>
+                            <i class="fas fa-check-circle check-icon"></i>
+                        </div>
                     </div>
                 </div>
             }
@@ -220,11 +279,15 @@
 
             @if (!string.IsNullOrEmpty(Model.CurrentQuotaDisplay))
             {
-                <div class="mb-3">
-                    <div class="selection-card active" id="currentQuotaCard">
-                        <span class="current-badge">Current</span>
-                        <div class="card-title-text mt-2">@Model.CurrentQuotaDisplay</div>
-                        <i class="fas fa-check-circle check-icon"></i>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="selection-card active" id="currentQuotaCard" onclick="reselectCurrentQuota()">
+                            <span class="badge-current">Current</span>
+                            <div class="card-title-text mt-2">@Model.CurrentQuotaBaseAmount GB Base Quota</div>
+                            <p class="card-subtitle-text">Extra Amount: @Model.CurrentQuotaExtraAmount GB</p>
+                            <p class="card-subtitle-text">Default Fee: $@Model.CurrentQuotaFee</p>
+                            <i class="fas fa-check-circle check-icon"></i>
+                        </div>
                     </div>
                 </div>
             }
@@ -249,12 +312,36 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const simIdInput = document.getElementById('SelectedSimId');
-            const usbIdInput = document.getElementById('UsbId') || document.getElementById('SelectedUsbId');
+            const usbIdInputEl = document.getElementById('SelectedUsbId');
             const quotaIdInput = document.getElementById('SelectedQuotaId');
             const quotaSection = document.getElementById('quotaSection');
+            const feesInput = document.querySelector('input[name="Fees"]');
+
+            // Original values from the server — used to restore "current" selections
+            const originalSimId = @Html.Raw(Model.SelectedSimId.HasValue ? Model.SelectedSimId.Value.ToString() : "null");
+            const originalSimProviderId = @Html.Raw(Model.CurrentSimProviderId.HasValue ? Model.CurrentSimProviderId.Value.ToString() : "null");
+            const originalUsbId = @Html.Raw(Model.SelectedUsbId.HasValue ? Model.SelectedUsbId.Value.ToString() : "null");
+            const originalQuotaId = @Html.Raw(Model.SelectedQuotaId.HasValue ? Model.SelectedQuotaId.Value.ToString() : "null");
+            const originalFees = @Model.OriginalFees;
+
+            function getProviderLogo(providerName) {
+                const name = (providerName || '').toLowerCase();
+                if (name.includes('orange')) return '/img/orange.png';
+                if (name.includes('vodafone') || name.includes('fodafone')) return '/img/fodafone.png';
+                if (name.includes('we')) return '/img/we.png';
+                if (name.includes('etisalat')) return '/img/etisalat-logo.png';
+                return '';
+            }
 
             $('#simSearchInput').on('input', function () { loadSims($(this).val()); });
             $('#usbSearchInput').on('input', function () { loadUsbs($(this).val()); });
+
+            // Load all quotas for the CURRENT SIM's provider on page load,
+            // so the user can pick a different quota even without changing SIM.
+            if (originalSimProviderId !== null) {
+                loadQuotasForProvider(originalSimProviderId);
+                quotaSection.style.display = '';
+            }
 
             function loadSims(query) {
                 if (!query || !query.trim()) { $('#simCardsContainer').empty(); return; }
@@ -264,12 +351,21 @@
                         html = '<div class="col-12 text-muted small">No SIM cards found.</div>';
                     } else {
                         data.forEach(sim => {
+                            const logoSrc = getProviderLogo(sim.providerName);
+                            const logoHtml = logoSrc
+                                ? `<img src="${logoSrc}" alt="${sim.providerName}" class="sp-logo-img" />`
+                                : `<span class="fw-bold text-dark" style="font-size:0.85rem">${sim.providerName}</span>`;
+
                             html += `
                                 <div class="col-md-6">
                                     <div class="selection-card" onclick="selectSim(${sim.id}, '${sim.phoneNumber}', '${sim.providerId}', this)">
+                                        <div class="sim-card-header">
+                                            ${logoHtml}
+                                            <span class="badge-available">Active</span>
+                                        </div>
                                         <div class="card-title-text">${sim.networkType} SIM (${sim.phoneNumber})</div>
-                                        <p class="card-subtitle-text">Provider: ${sim.providerName}</p>
-                                        <p class="card-subtitle-text">Serial: ${sim.serialNumber}</p>
+                                        <p class="card-subtitle-text">Provider : ${sim.providerName}</p>
+                                        <p class="card-subtitle-text">Serial : ${sim.serialNumber}</p>
                                         <i class="fas fa-check-circle check-icon"></i>
                                     </div>
                                 </div>`;
@@ -288,6 +384,17 @@
                 quotaSection.style.display = '';
             };
 
+            window.reselectCurrentSim = function () {
+                if (originalSimId === null) return;
+                $('#simCardsContainer .selection-card').removeClass('active');
+                document.getElementById('currentSimCard')?.classList.add('active');
+                simIdInput.value = originalSimId;
+                if (originalSimProviderId !== null) {
+                    loadQuotasForProvider(originalSimProviderId);
+                    quotaSection.style.display = '';
+                }
+            };
+
             function loadUsbs(query) {
                 if (!query || !query.trim()) { $('#usbCardsContainer').empty(); return; }
                 $.get('/Subscription/SearchUsbs', { query: query }, function (data) {
@@ -299,9 +406,13 @@
                             html += `
                                 <div class="col-md-6">
                                     <div class="selection-card" onclick="selectUsb(${usb.id}, '${usb.serialNumber}', this)">
+                                        <div class="sim-card-header">
+                                            <i class="fas fa-usb text-secondary" style="font-size: 1.2rem;"></i>
+                                            <span class="badge-available">Active</span>
+                                        </div>
                                         <div class="card-title-text">${usb.model}</div>
-                                        <p class="card-subtitle-text">Provider: ${usb.providerName}</p>
-                                        <p class="card-subtitle-text">Serial: ${usb.serialNumber}</p>
+                                        <p class="card-subtitle-text">Provider : ${usb.providerName}</p>
+                                        <p class="card-subtitle-text">Serial : ${usb.serialNumber}</p>
                                         <i class="fas fa-check-circle check-icon"></i>
                                     </div>
                                 </div>`;
@@ -315,16 +426,27 @@
                 document.getElementById('currentUsbCard')?.classList.remove('active');
                 $('#usbCardsContainer .selection-card').removeClass('active');
                 $(cardEl).addClass('active');
-                document.getElementById('SelectedUsbId').value = usbId;
+                usbIdInputEl.value = usbId;
+            };
+
+            window.reselectCurrentUsb = function () {
+                if (originalUsbId === null) return;
+                $('#usbCardsContainer .selection-card').removeClass('active');
+                document.getElementById('currentUsbCard')?.classList.add('active');
+                usbIdInputEl.value = originalUsbId;
             };
 
             function loadQuotasForProvider(providerId) {
                 $.get('/Subscription/GetQuotasByProvider', { providerId: providerId }, function (data) {
                     let html = '';
-                    if (!data || data.length === 0) {
-                        html = '<div class="col-12 text-muted small">No quotas configured for this provider.</div>';
+                    // Skip the currently displayed "Current" quota — it's already shown above,
+                    // no need to list it a second time in the search results.
+                    const filtered = (data || []).filter(q => String(q.id) !== String(originalQuotaId));
+
+                    if (filtered.length === 0) {
+                        html = '<div class="col-12 text-muted small">No other quotas configured for this provider.</div>';
                     } else {
-                        data.forEach(q => {
+                        filtered.forEach(q => {
                             html += `
                                 <div class="col-md-6">
                                     <div class="selection-card" onclick="selectQuota(${q.id}, ${q.fees}, this)">
@@ -345,12 +467,20 @@
                 $('#quotaCardsContainer .selection-card').removeClass('active');
                 $(cardEl).addClass('active');
                 quotaIdInput.value = quotaId;
-                document.querySelector('input[name="Fees"]').value = defaultFee;
+                feesInput.value = defaultFee;
+            };
+
+            window.reselectCurrentQuota = function () {
+                if (originalQuotaId === null) return;
+                $('#quotaCardsContainer .selection-card').removeClass('active');
+                document.getElementById('currentQuotaCard')?.classList.add('active');
+                quotaIdInput.value = originalQuotaId;
+                feesInput.value = originalFees;
             };
 
             $('#editSubscriptionForm').on('submit', function (e) {
                 const sim = simIdInput.value;
-                const usb = document.getElementById('SelectedUsbId').value;
+                const usb = usbIdInputEl.value;
                 if (!sim && !usb) {
                     e.preventDefault();
                     alert('Please keep or select at least a SIM card or a USB device.');

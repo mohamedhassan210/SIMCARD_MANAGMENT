@@ -1,50 +1,49 @@
-﻿    using Microsoft.AspNetCore.Mvc;
-    using Sim_Card_Managment.Models;
-    using Sim_Card_Managment.Repos;
-    using Sim_Card_Managment.Repos.Account;
-    using Sim_Card_Managment.Repos.EmployeeRepos;
-    using Sim_Card_Managment.Repos.NonEmployeeRepos;
-    using Sim_Card_Managment.Repos.QuoteRepo;
-    using Sim_Card_Managment.Viewmodel;
-    using Sim_Card_Managment.ViewModels;
+﻿using Microsoft.AspNetCore.Mvc;
+using Sim_Card_Managment.Models;
+using Sim_Card_Managment.Repos;
+using Sim_Card_Managment.Repos.Account;
+using Sim_Card_Managment.Repos.EmployeeRepos;
+using Sim_Card_Managment.Repos.NonEmployeeRepos;
+using Sim_Card_Managment.Repos.QuoteRepo;
+using Sim_Card_Managment.Viewmodel;
+using Sim_Card_Managment.ViewModels;
 using Sim_Card_Managment.ViewModels.Subscription;
 using System.Security.Claims;
 
-    namespace Sim_Card_Managment.Controllers
+namespace Sim_Card_Managment.Controllers
+{
+    [RequirePermission]
+    public class SubscriptionController : Controller
     {
-        [RequirePermission]
-        public class SubscriptionController : Controller
+        private readonly ISubscriptionRepo _subscriptionRepo;
+        private readonly ISIMRepo _simRepo;
+        private readonly IUSBRepo _usbRepo;
+        private readonly IQuotaRepo _quotaRepo;
+        private readonly IEmployeeRepo _employeeRepo;
+        private readonly INonEmployeeRepo _nonEmployeeRepo;
+        private readonly IDeviceActionRepo _actionRepo;
+        private readonly IAccountRepo _accountRepo;
+
+        public SubscriptionController(
+            ISubscriptionRepo subscriptionRepo,
+            ISIMRepo simRepo,
+            IUSBRepo usbRepo,
+            IQuotaRepo quotaRepo,
+            IEmployeeRepo employeeRepo,
+            INonEmployeeRepo nonEmployeeRepo,
+            IDeviceActionRepo actionRepo,
+            IAccountRepo accountRepo)
         {
-            private readonly ISubscriptionRepo _subscriptionRepo;
-            private readonly ISIMRepo _simRepo;
-            private readonly IUSBRepo _usbRepo;
-            private readonly IQuotaRepo _quotaRepo;
-            private readonly IEmployeeRepo _employeeRepo;
-            private readonly INonEmployeeRepo _nonEmployeeRepo;
-            private readonly IDeviceActionRepo _actionRepo;
-            private readonly IAccountRepo _accountRepo;
+            _subscriptionRepo = subscriptionRepo;
+            _simRepo = simRepo;
+            _usbRepo = usbRepo;
+            _quotaRepo = quotaRepo;
+            _employeeRepo = employeeRepo;
+            _nonEmployeeRepo = nonEmployeeRepo;
+            _actionRepo = actionRepo;
+            _accountRepo = accountRepo;
+        }
 
-            public SubscriptionController(
-                ISubscriptionRepo subscriptionRepo,
-                ISIMRepo simRepo,
-                IUSBRepo usbRepo,
-                IQuotaRepo quotaRepo,
-                IEmployeeRepo employeeRepo,
-                INonEmployeeRepo nonEmployeeRepo,
-                IDeviceActionRepo actionRepo,
-                IAccountRepo accountRepo)
-            {
-                _subscriptionRepo = subscriptionRepo;
-                _simRepo = simRepo;
-                _usbRepo = usbRepo;
-                _quotaRepo = quotaRepo;
-                _employeeRepo = employeeRepo;
-                _nonEmployeeRepo = nonEmployeeRepo;
-                _actionRepo = actionRepo;
-                _accountRepo = accountRepo;
-            }
-
-        [HttpGet]
         [HttpGet]
         public IActionResult Index()
         {
@@ -80,15 +79,15 @@ using System.Security.Claims;
         }
 
         [HttpGet]
-            public IActionResult Create()
+        public IActionResult Create()
+        {
+            var model = new SubscriptionCreateViewModel
             {
-                var model = new SubscriptionCreateViewModel
-                {
-                    StartDate = DateTime.Today,
-                    ContractDurationYears = 1
-                };
-                return View(model);
-            }
+                StartDate = DateTime.Today,
+                ContractDurationYears = 1
+            };
+            return View(model);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -220,6 +219,43 @@ using System.Security.Claims;
             return View(vm);
         }
 
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var sub = _subscriptionRepo.GetById(id);
+            if (sub == null) return NotFound();
+
+            var vm = new SubscriptionEditViewModel
+            {
+                Id = sub.Id,
+                SubscriberName = sub.Employee?.Name ?? sub.NonEmployee?.Name ?? "Unassigned",
+                SubscriberType = sub.EmpId.HasValue ? "Employee" : "Non-Employee",
+
+                SelectedSimId = sub.SimId,
+                CurrentSimSerial = sub.Sim?.SerialNumber,
+                CurrentSimProviderId = sub.Sim?.ServiceProviderId,
+                CurrentSimProviderName = sub.Sim?.ServiceProvider?.Name,
+                CurrentSimNetworkType = sub.Sim?.NetworkType,
+                CurrentSimPhoneNumber = sub.Sim?.PhoneNumber,
+
+                SelectedUsbId = sub.UsbId,
+                CurrentUsbSerial = sub.Usb?.SerialNumber,
+                CurrentUsbModel = sub.Usb?.Model,
+                CurrentUsbProviderName = sub.Usb?.ServiceProvider?.Name,
+
+                SelectedQuotaId = sub.QuotaId,
+                CurrentQuotaDisplay = sub.Quota != null ? $"{sub.Quota.BaseAmount} GB" : null,
+                CurrentQuotaBaseAmount = sub.Quota?.BaseAmount,
+                CurrentQuotaExtraAmount = sub.Quota?.ExtraAmount,
+                CurrentQuotaFee = sub.Quota?.Fees,
+
+                Fees = sub.Fees ?? 0,
+                OriginalFees = sub.Fees ?? 0
+            };
+
+            return View(vm);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(SubscriptionEditViewModel model)
@@ -291,83 +327,83 @@ using System.Security.Claims;
             }
         }
 
-            [HttpGet]
-            public async Task<IActionResult> SearchRecipients(string query, bool isNonEmployee)
+        [HttpGet]
+        public async Task<IActionResult> SearchRecipients(string query, bool isNonEmployee)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Json(new List<object>());
+
+            if (isNonEmployee)
             {
-                if (string.IsNullOrWhiteSpace(query))
-                    return Json(new List<object>());
+                var nonEmployees = await _nonEmployeeRepo.SearchNonEmployeesAsync(query);
 
-                if (isNonEmployee)
-                {
-                    var nonEmployees = await _nonEmployeeRepo.SearchNonEmployeesAsync(query);
-
-                    var result = nonEmployees.Select(n => new {
-                        id = n.Id,
-                        name = n.Name,
-                        details = $"Non-Employee | Contact: {n.ContactInfo ?? "N/A"}"
-                    });
-
-                    return Json(result);
-                }
-                else
-                {
-                    var employees = await _employeeRepo.SearchActiveEmployeesAsync(query);
-
-                    var result = employees.Select(e => new {
-                        id = e.Id,
-                        name = e.Name,
-                        details = $"National ID: {e.NationalID}"
-                    });
-
-                    return Json(result);
-                }
-            }
-
-            [HttpGet]
-            public async Task<IActionResult> SearchSims(string query)
-            {
-                var sims = await _simRepo.GetAssignableSimsAsync(query);
-
-                var result = sims.Select(s => new {
-                    id = s.Id,
-                    phoneNumber = s.PhoneNumber,
-                    serialNumber = s.SerialNumber,
-                    networkType = s.NetworkType,
-                    providerName = s.ServiceProvider?.Name ?? "Unknown",
-                    providerId = s.ServiceProviderId
+                var result = nonEmployees.Select(n => new {
+                    id = n.Id,
+                    name = n.Name,
+                    details = $"Non-Employee | Contact: {n.ContactInfo ?? "N/A"}"
                 });
 
                 return Json(result);
             }
-
-            [HttpGet]
-            public async Task<IActionResult> SearchUsbs(string query)
+            else
             {
-                var usbs = await _usbRepo.GetAssignableUsbsAsync(query);
+                var employees = await _employeeRepo.SearchActiveEmployeesAsync(query);
 
-                var result = usbs.Select(u => new {
-                    id = u.Id,
-                    model = u.Model,
-                    serialNumber = u.SerialNumber,
-                    providerName = u.ServiceProvider?.Name ?? "Unknown"
-                });
-
-                return Json(result);
-            }
-
-            [HttpGet]
-            public async Task<IActionResult> GetQuotasByProvider(int providerId)
-            {
-                var quotas = await _quotaRepo.GetQuotasByProviderIdAsync(providerId);
-
-                var result = quotas.Select(q => new {
-                    id = q.Id,
-                    baseAmount = q.BaseAmount,
-                    extraAmount = q.ExtraAmount,
-                    fees = q.Fees
+                var result = employees.Select(e => new {
+                    id = e.Id,
+                    name = e.Name,
+                    details = $"National ID: {e.NationalID}"
                 });
 
                 return Json(result);
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchSims(string query)
+        {
+            var sims = await _simRepo.GetAssignableSimsAsync(query);
+
+            var result = sims.Select(s => new {
+                id = s.Id,
+                phoneNumber = s.PhoneNumber,
+                serialNumber = s.SerialNumber,
+                networkType = s.NetworkType,
+                providerName = s.ServiceProvider?.Name ?? "Unknown",
+                providerId = s.ServiceProviderId
+            });
+
+            return Json(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchUsbs(string query)
+        {
+            var usbs = await _usbRepo.GetAssignableUsbsAsync(query);
+
+            var result = usbs.Select(u => new {
+                id = u.Id,
+                model = u.Model,
+                serialNumber = u.SerialNumber,
+                providerName = u.ServiceProvider?.Name ?? "Unknown"
+            });
+
+            return Json(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetQuotasByProvider(int providerId)
+        {
+            var quotas = await _quotaRepo.GetQuotasByProviderIdAsync(providerId);
+
+            var result = quotas.Select(q => new {
+                id = q.Id,
+                baseAmount = q.BaseAmount,
+                extraAmount = q.ExtraAmount,
+                fees = q.Fees
+            });
+
+            return Json(result);
+        }
     }
+}
