@@ -1,9 +1,11 @@
 @model Sim_Card_Managment.Viewmodel.BranchDetailsViewModel
 
 @{
+    ViewData["Title"] = "Branch Details";
 }
 
 <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,305 +13,301 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
     <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
-
 </head>
+<body>
+    <section class="bd-body">
+        <main class="container-fluid px-lg-5 p-100">
 
-<section class="bd-body">
-
-    <main class="container-fluid px-lg-5 p-100">
-
-        
-        <div class="bd-card">
-            <div class="bd-card-header d-flex align-items-center gap-3">
-                <div class="bd-icon-wrapper">
-                    <i class="fa-solid fa-building"></i>
-                </div>
-                <div>
-                    <h3 class="m-0 fs-5 fw-bold text-dark">Branch Information</h3>
-                    <p class="m-0 text-muted small">System profile and core operational status</p>
-                </div>
-            </div>
-
-            <div class="p-4 p-md-5">
-                <div class="row g-4">
-                    <div class="col-12 col-md-3">
-                        <div class="bd-info-label">Branch Name</div>
-                        <div class="bd-info-value">@Model.Name</div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-md-2">
-                        <div class="bd-info-label">Is Active</div>
-                        <div class="bd-info-value">
-                            @if (Model.IsActive)
-                            {
-                                <span class="bd-badge-active"><i class="fa-solid fa-circle"></i> Active</span>
-                            }
-                            else
-                            {
-                                <span class="bd-badge-inactive"><i class="fa-solid fa-circle"></i> Inactive</span>
-                            }
+            <!-- Branch Profile Header Card -->
+            <div class="bd-card mb-4">
+                <div class="bd-card-header d-flex align-items-center justify-content-between p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bd-icon-wrapper">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                        <div>
+                            <h3 class="m-0 fs-5 fw-bold text-dark">@Model.Name</h3>
+                            <p class="m-0 text-muted small">System profile and core operational status</p>
                         </div>
                     </div>
+                    <div>
+                        @if (Model.IsActive)
+                        {
+                            <span class="bd-badge-active"><i class="fa-solid fa-circle"></i> Active</span>
+                        }
+                        else
+                        {
+                            <span class="bd-badge-inactive"><i class="fa-solid fa-circle"></i> Inactive</span>
+                        }
+                    </div>
+                </div>
 
-                    <div class="col-12 col-sm-6 col-md-3">
-                        <div class="bd-info-label">VPN Over Internet Status</div>
-                        <div class="bd-info-value">
-                            @if (Model.VpnOverInternetStatus == true)
-                            {
-                                <span class="bd-badge-enabled"><i class="fa-solid fa-circle"></i> Enabled</span>
-                            }
-                            else if (Model.VpnOverInternetStatus == false)
-                            {
-                                <span class="bd-badge-disabled"><i class="fa-solid fa-circle"></i> Disabled</span>
-                            }
-                            else
-                            {
-                                <span class="bd-text-muted">Not Configured</span>
-                            }
+                <div class="p-4 p-md-5 border-top">
+                    <div class="row g-4">
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div class="bd-info-label">Site Code (HR)</div>
+                            <div class="bd-info-value">@(string.IsNullOrEmpty(Model.SiteCode) ? "N/A" : Model.SiteCode)</div>
                         </div>
-                    </div>
 
-                    <div class="col-12 col-sm-6 col-md-2">
-                        <div class="bd-info-label">Created At</div>
-                        <div class="bd-info-value">@Model.CreatedAt.ToString("MMM dd, yyyy")</div>
-                    </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div class="bd-info-label">Branch Code (Retail)</div>
+                            <div class="bd-info-value">@(string.IsNullOrEmpty(Model.BranchCode) ? "N/A" : Model.BranchCode)</div>
+                        </div>
 
-                    <div class="col-12 col-sm-6 col-md-2">
-                        <div class="bd-info-label">Created By</div>
-                        <div class="bd-info-value">@Model.CreatedByUsername</div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-md-3">
-                        <div class="bd-info-label">Site Code (HR)</div>
-                        <div class="bd-info-value">@(string.IsNullOrEmpty(Model.SiteCode) ? "N/A" : Model.SiteCode)</div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-md-3">
-                        <div class="bd-info-label">Branch Code (Retail)</div>
-                        <div class="bd-info-value">@(string.IsNullOrEmpty(Model.BranchCode) ? "N/A" : Model.BranchCode)</div>
-                    </div>
-
-                    @if (Model.VpnOverInternetStatus == true)
-                    {
-                        <div class="col-12">
-                            <div class="bd-info-label">Firewall Types</div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div class="bd-info-label">VPN Over Internet Status</div>
                             <div class="bd-info-value">
-                                @(Model.FireWallTypeNames.Any() ? string.Join(", ", Model.FireWallTypeNames) : "N/A")
+                                @if (Model.VpnOverInternetStatus == true)
+                                {
+                                    <span class="bd-badge-enabled"><i class="fa-solid fa-circle"></i> Enabled</span>
+                                }
+                                else if (Model.VpnOverInternetStatus == false)
+                                {
+                                    <span class="bd-badge-disabled"><i class="fa-solid fa-circle"></i> Disabled</span>
+                                }
+                                else
+                                {
+                                    <span class="bd-text-muted">Not Configured</span>
+                                }
                             </div>
                         </div>
-                    }
 
-                    <div class="col-12">
-                        <div class="bd-info-label">Note</div>
-                        <div class="bd-info-value">@(string.IsNullOrEmpty(Model.Note) ? "N/A" : Model.Note)</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div class="bd-info-label">Firewall Types</div>
+                            <div class="bd-info-value">
+                                @(Model.FireWallTypeNames != null && Model.FireWallTypeNames.Any() ? string.Join(", ", Model.FireWallTypeNames) : "N/A")
+                            </div>
+                        </div>
 
-        
-        <div class="bd-section-card">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-                <h4 class="fw-bold fs-5 m-0 text-dark">ISP Connections</h4>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div class="bd-info-label">Created At</div>
+                            <div class="bd-info-value">@Model.CreatedAt.ToString("MMM dd, yyyy")</div>
+                        </div>
 
-                <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 col-12 col-md-7 justify-content-end">
-                    <div class="bd-search-box col-12 col-sm-7">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input id="bd-isp-search" type="text" placeholder="Search ISP records..." autocomplete="off">
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="text-muted small fw-bold">Status:</span>
-                        <select id="bd-isp-filter" class="bd-filter-select">
-                            <option value="ALL">All</option>
-                            <option value="UP">Up</option>
-                            <option value="DOWN">Down</option>
-                        </select>
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div class="bd-info-label">Created By</div>
+                            <div class="bd-info-value">@(string.IsNullOrEmpty(Model.CreatedByUsername) ? "System" : Model.CreatedByUsername)</div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="bd-info-label">Notes & Remarks</div>
+                            <div class="bd-info-value">@(string.IsNullOrEmpty(Model.Note) ? "No notes recorded." : Model.Note)</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="bd-table" id="bd-isp-table">
-                    <thead>
-                        <tr>
-                            <th>Service Provider Name</th>
-                            <th>Service Type Name</th>
-                            <th>Bandwidth</th>
-                            <th>Phone Number</th>
-                            <th>Status</th>
-                            <th style="text-align: right;">View Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bd-isp-body">
-                        @if (Model.InternetLines.Any())
-                        {
-                            foreach (var line in Model.InternetLines)
+            <!-- ISP Connections Section -->
+            <div class="bd-section-card mb-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                    <h4 class="fw-bold fs-5 m-0 text-dark">ISP Connections</h4>
+
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 col-12 col-md-7 justify-content-end">
+                        <div class="bd-search-box col-12 col-sm-7">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input id="bd-isp-search" type="text" placeholder="Search ISP records..." autocomplete="off">
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small fw-bold">Status:</span>
+                            <select id="bd-isp-filter" class="bd-filter-select">
+                                <option value="ALL">All</option>
+                                <option value="UP">Up</option>
+                                <option value="DOWN">Down</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="bd-table" id="bd-isp-table">
+                        <thead>
+                            <tr>
+                                <th>Service Provider Name</th>
+                                <th>Service Type Name</th>
+                                <th>Bandwidth</th>
+                                <th>Phone Number</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">View Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bd-isp-body">
+                            @if (Model.InternetLines != null && Model.InternetLines.Any())
                             {
-                                <tr class="bd-isp-row" data-status="@(line.Status ? "UP" : "DOWN")">
-                                    <td><strong>@line.ServiceProviderName</strong></td>
-                                    <td>@line.ServiceTypeName</td>
-                                    <td>@(line.Bandwidth ?? "N/A")</td>
-                                    <td>@(line.PhoneNumber ?? "N/A")</td>
-                                    <td>
-                                        @if (line.Status)
-                                        {
-                                            <span class="bd-badge-up"><i class="fa-solid fa-circle"></i> Up</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="bd-badge-down"><i class="fa-solid fa-circle"></i> Down</span>
-                                        }
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <a asp-controller="InternetLine" asp-action="Details" asp-route-id="@line.Id" class="bd-link-view"><i class="fa-regular fa-eye"></i> View</a>
-                                    </td>
-                                </tr>
+                                foreach (var line in Model.InternetLines)
+                                {
+                                    <tr class="bd-isp-row" data-status="@(line.Status ? "UP" : "DOWN")">
+                                        <td><strong>@line.ServiceProviderName</strong></td>
+                                        <td>@line.ServiceTypeName</td>
+                                        <td>@(line.Bandwidth ?? "N/A")</td>
+                                        <td>@(line.PhoneNumber ?? "N/A")</td>
+                                        <td>
+                                            @if (line.Status)
+                                            {
+                                                <span class="bd-badge-up"><i class="fa-solid fa-circle"></i> Up</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="bd-badge-down"><i class="fa-solid fa-circle"></i> Down</span>
+                                            }
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <a asp-controller="InternetLine" asp-action="Details" asp-route-id="@line.Id" class="bd-link-view">
+                                                <i class="fa-regular fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
                             }
-                        }
-                        <tr id="bd-isp-no-results" style="display: @(Model.InternetLines.Any() ? "none" : "");">
-                            <td colspan="6" class="bd-no-results">No matching ISP connections found.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        
-        <div class="bd-section-card">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-                <h4 class="fw-bold fs-5 m-0 text-dark">VPN Lines</h4>
-
-                <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 col-12 col-md-7 justify-content-end">
-                    <div class="bd-search-box col-12 col-sm-7">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input id="bd-vpn-search" type="text" placeholder="Search VPN lines..." autocomplete="off">
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="text-muted small fw-bold">Status:</span>
-                        <select id="bd-vpn-filter" class="bd-filter-select">
-                            <option value="ALL">All</option>
-                            <option value="UP">Up</option>
-                            <option value="DOWN">Down</option>
-                        </select>
-                    </div>
+                            <tr id="bd-isp-no-results" style="display: @(Model.InternetLines != null && Model.InternetLines.Any() ? "none" : "");">
+                                <td colspan="6" class="bd-no-results text-center py-4 text-muted">No matching ISP connections found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="bd-table" id="bd-vpn-table">
-                    <thead>
-                        <tr>
-                            <th>Connection Type Name</th>
-                            <th>Service Provider Name</th>
-                            <th>NID</th>
-                            <th>Line Speed</th>
-                            <th>Status</th>
-                            <th style="text-align: right;">View Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bd-vpn-body">
-                        @if (Model.VpnConnections.Any())
-                        {
-                            foreach (var vpn in Model.VpnConnections)
+            <!-- VPN Lines Section -->
+            <div class="bd-section-card mb-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                    <h4 class="fw-bold fs-5 m-0 text-dark">VPN Lines</h4>
+
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 col-12 col-md-7 justify-content-end">
+                        <div class="bd-search-box col-12 col-sm-7">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input id="bd-vpn-search" type="text" placeholder="Search VPN lines..." autocomplete="off">
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small fw-bold">Status:</span>
+                            <select id="bd-vpn-filter" class="bd-filter-select">
+                                <option value="ALL">All</option>
+                                <option value="UP">Up</option>
+                                <option value="DOWN">Down</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="bd-table" id="bd-vpn-table">
+                        <thead>
+                            <tr>
+                                <th>Connection Type Name</th>
+                                <th>Service Provider Name</th>
+                                <th>NID</th>
+                                <th>Line Speed</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">View Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bd-vpn-body">
+                            @if (Model.VpnConnections != null && Model.VpnConnections.Any())
                             {
-                                <tr class="bd-vpn-row" data-status="@(vpn.Status == true ? "UP" : vpn.Status == false ? "DOWN" : "")">
-                                    <td>@vpn.ConnectionTypeName</td>
-                                    <td>@vpn.ServiceProviderName</td>
-                                    <td><code class="bd-code">@(vpn.NID ?? "N/A")</code></td>
-                                    <td>@(vpn.LineSpeed ?? "N/A")</td>
-                                    <td>
-                                        @if (vpn.Status == true)
-                                        {
-                                            <span class="bd-badge-up"><i class="fa-solid fa-circle"></i> Up</span>
-                                        }
-                                        else if (vpn.Status == false)
-                                        {
-                                            <span class="bd-badge-down"><i class="fa-solid fa-circle"></i> Down</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="bd-text-muted">Unknown</span>
-                                        }
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <a asp-controller="VpnConnection" asp-action="Details" asp-route-id="@vpn.Id" class="bd-link-view"><i class="fa-regular fa-eye"></i> View</a>
-                                    </td>
-                                </tr>
+                                foreach (var vpn in Model.VpnConnections)
+                                {
+                                    <tr class="bd-vpn-row" data-status="@(vpn.Status == true ? "UP" : vpn.Status == false ? "DOWN" : "")">
+                                        <td><strong>@vpn.ConnectionTypeName</strong></td>
+                                        <td>@vpn.ServiceProviderName</td>
+                                        <td><code class="bd-code">@(vpn.NID ?? "N/A")</code></td>
+                                        <td>@(vpn.LineSpeed ?? "N/A")</td>
+                                        <td>
+                                            @if (vpn.Status == true)
+                                            {
+                                                <span class="bd-badge-up"><i class="fa-solid fa-circle"></i> Up</span>
+                                            }
+                                            else if (vpn.Status == false)
+                                            {
+                                                <span class="bd-badge-down"><i class="fa-solid fa-circle"></i> Down</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="bd-text-muted">Unknown</span>
+                                            }
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <a asp-controller="VpnConnection" asp-action="Details" asp-route-id="@vpn.Id" class="bd-link-view">
+                                                <i class="fa-regular fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
                             }
-                        }
-                        <tr id="bd-vpn-no-results" style="display: @(Model.VpnConnections.Any() ? "none" : "");">
-                            <td colspan="6" class="bd-no-results">No matching VPN lines found.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                            <tr id="bd-vpn-no-results" style="display: @(Model.VpnConnections != null && Model.VpnConnections.Any() ? "none" : "");">
+                                <td colspan="6" class="bd-no-results text-center py-4 text-muted">No matching VPN lines found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-    </main>
+        </main>
+    </section>
 
-   
+    <script>
+        // ISP Table Search & Filter Logic
+        const ispSearchInput = document.getElementById('bd-isp-search');
+        const ispStatusFilter = document.getElementById('bd-isp-filter');
 
-</section>
-<script>
-   
-    const ispSearchInput = document.getElementById('bd-isp-search');
-    const ispStatusFilter = document.getElementById('bd-isp-filter');
+        function filterIspTable() {
+            const query = ispSearchInput.value.toLowerCase().trim();
+            const selectedStatus = ispStatusFilter.value;
+            const rows = document.querySelectorAll('#bd-isp-body tr.bd-isp-row');
+            let hasVisibleRow = false;
 
-    function filterIspTable() {
-        const query = ispSearchInput.value.toLowerCase().trim();
-        const selectedStatus = ispStatusFilter.value;
-        const rows = document.querySelectorAll('#bd-isp-body tr.bd-isp-row');
-        let hasVisibleRow = false;
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                const rowStatus = row.getAttribute('data-status');
 
-        rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            const rowStatus = row.getAttribute('data-status');
+                const matchesQuery = text.includes(query);
+                const matchesStatus = (selectedStatus === 'ALL') || (rowStatus === selectedStatus);
 
-            const matchesQuery = text.includes(query);
-            const matchesStatus = (selectedStatus === 'ALL') || (rowStatus === selectedStatus);
+                if (matchesQuery && matchesStatus) {
+                    row.style.display = '';
+                    hasVisibleRow = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
 
-            if (matchesQuery && matchesStatus) {
-                row.style.display = '';
-                hasVisibleRow = true;
-            } else {
-                row.style.display = 'none';
-            }
-        });
+            document.getElementById('bd-isp-no-results').style.display = hasVisibleRow ? 'none' : '';
+        }
 
-        document.getElementById('bd-isp-no-results').style.display = hasVisibleRow ? 'none' : '';
-    }
+        if (ispSearchInput && ispStatusFilter) {
+            ispSearchInput.addEventListener('input', filterIspTable);
+            ispStatusFilter.addEventListener('change', filterIspTable);
+        }
 
-    ispSearchInput.addEventListener('input', filterIspTable);
-    ispStatusFilter.addEventListener('change', filterIspTable);
+        // VPN Table Search & Filter Logic
+        const vpnSearchInput = document.getElementById('bd-vpn-search');
+        const vpnStatusFilter = document.getElementById('bd-vpn-filter');
 
-  
-    const vpnSearchInput = document.getElementById('bd-vpn-search');
-    const vpnStatusFilter = document.getElementById('bd-vpn-filter');
+        function filterVpnTable() {
+            const query = vpnSearchInput.value.toLowerCase().trim();
+            const selectedStatus = vpnStatusFilter.value;
+            const rows = document.querySelectorAll('#bd-vpn-body tr.bd-vpn-row');
+            let hasVisibleRow = false;
 
-    function filterVpnTable() {
-        const query = vpnSearchInput.value.toLowerCase().trim();
-        const selectedStatus = vpnStatusFilter.value;
-        const rows = document.querySelectorAll('#bd-vpn-body tr.bd-vpn-row');
-        let hasVisibleRow = false;
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                const rowStatus = row.getAttribute('data-status');
 
-        rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            const rowStatus = row.getAttribute('data-status');
+                const matchesQuery = text.includes(query);
+                const matchesStatus = (selectedStatus === 'ALL') || (rowStatus === selectedStatus);
 
-            const matchesQuery = text.includes(query);
-            const matchesStatus = (selectedStatus === 'ALL') || (rowStatus === selectedStatus);
+                if (matchesQuery && matchesStatus) {
+                    row.style.display = '';
+                    hasVisibleRow = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
 
-            if (matchesQuery && matchesStatus) {
-                row.style.display = '';
-                hasVisibleRow = true;
-            } else {
-                row.style.display = 'none';
-            }
-        });
+            document.getElementById('bd-vpn-no-results').style.display = hasVisibleRow ? 'none' : '';
+        }
 
-        document.getElementById('bd-vpn-no-results').style.display = hasVisibleRow ? 'none' : '';
-    }
-
-    vpnSearchInput.addEventListener('input', filterVpnTable);
-    vpnStatusFilter.addEventListener('change', filterVpnTable);
-</script>
+        if (vpnSearchInput && vpnStatusFilter) {
+            vpnSearchInput.addEventListener('input', filterVpnTable);
+            vpnStatusFilter.addEventListener('change', filterVpnTable);
+        }
+    </script>
+</body>
+</html>
