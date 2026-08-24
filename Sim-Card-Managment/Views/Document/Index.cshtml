@@ -154,17 +154,33 @@
                 border-color: rgba(223, 83, 27, 0.3);
             }
 
-        .btn-action-delete:hover {
-            background: #FEF2F2;
-            color: #DC2626;
-            border-color: rgba(220, 38, 38, 0.3);
-        }
+      
 
         .custom-table {
             width: 100%;
             border-collapse: collapse;
         }
 
+            .btn-view-action {
+                background-color: #ffffff;
+                border: 1px solid #e0e0e0;
+                color: #333333;
+                border-radius: 8px;
+                padding: 6px 14px;
+                font-size: 13px;
+                font-weight: 600;
+                transition: all 0.2s ease;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+                .btn-view-action:hover {
+                    border-color: var(--brand-orange);
+                    color: var(--brand-orange);
+                    background-color: #fffaf8;
+                }
             .custom-table thead th {
                 text-align: left;
                 font-size: 0.8rem;
@@ -273,14 +289,13 @@
                                     </td>
                                     <td style="text-align: right;">
                                         <div class="d-inline-flex gap-1">
-                                            <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
-                                                @Html.AntiForgeryToken()
-                                                <button type="button" class="btn-action-icon btn-action-delete" title="Delete Document" onclick="confirmDelete(this)">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn-view-action" title="View Details">
+                                                <i class="fa-solid fa-eye"></i> View
+                                            </a>
+                                           
                                         </div>
                                     </td>
+                                  
                                 </tr>
                             }
                         }

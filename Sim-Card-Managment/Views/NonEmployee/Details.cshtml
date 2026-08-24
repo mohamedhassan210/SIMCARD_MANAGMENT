@@ -102,6 +102,38 @@
             box-shadow: 0 6px 16px rgba(220, 38, 38, 0.2);
         }
 
+    .btn-activate-blue {
+        background-color: #EFF6FF;
+        color: #1D4ED8;
+        border: 1px solid #93C5FD;
+    }
+
+        .btn-activate-blue:hover {
+            background-color: #1D4ED8;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(29, 78, 216, 0.2);
+        }
+
+    .badge-status-active {
+        background-color: #22C55E;
+        color: #FFFFFF;
+        font-size: 0.75rem;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-status-inactive {
+        background-color: #6B7280;
+        color: #FFFFFF;
+        font-size: 0.75rem;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
     /* Info Card */
     .main-info-card {
         background-color: #FFFFFF;
@@ -219,7 +251,7 @@
 </style>
 
 <body>
-
+    @Html.AntiForgeryToken()
     <header class="page-header p-100">
         <div class="container-fluid px-lg-5">
             <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
@@ -243,12 +275,21 @@
                         <i class="fa-solid fa-pen-to-square"></i> Edit Details
                     </a>
 
-                    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" id="deleteForm" style="display:inline;">
-                        @Html.AntiForgeryToken()
-                        <button type="button" class="btn btn-custom btn-danger-soft" onclick="confirmDelete()">
-                            <i class="fa-solid fa-trash-can"></i> Delete
+                    @if (Model.IsActive)
+                    {
+                        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" id="deleteForm" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="button" class="btn btn-custom btn-danger-soft" onclick="confirmDelete()">
+                                <i class="fa-solid fa-trash-can"></i> Delete
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-custom btn-activate-blue" onclick="confirmActivate()">
+                            <i class="fa-solid fa-circle-check"></i> Activate
                         </button>
-                    </form>
+                    }
                 </div>
 
             </div>
@@ -270,27 +311,26 @@
 
             <div class="p-4 p-md-5">
                 <div class="row g-4 mb-5">
-                    <div class="col-12 col-sm-6 col-md-4">
+                    <div class="col-12 col-sm-6 col-md-3">
                         <div class="info-grid-label">Full Name</div>
                         <div class="info-grid-value">@Model.Name</div>
                     </div>
-                    <div class="col-12 col-sm-6 col-md-4">
+                    <div class="col-12 col-sm-6 col-md-3">
                         <div class="info-grid-label">Contact Phone</div>
                         <div class="info-grid-value">@(Model.ContactInfo ?? "N/A")</div>
                     </div>
-                    <div class="col-12 col-sm-6 col-md-4">
+                    <div class="col-12 col-sm-6 col-md-3">
                         <div class="info-grid-label">Type</div>
                         <div class="info-grid-value">@(Model.Type ?? "N/A")</div>
                     </div>
-                </div>
-
-                <hr class="my-4 text-border opacity-25">
-
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h4 class="fw-bold fs-5 m-0 text-dark">Assigned Subscriptions & Assets</h4>
-                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-normal">
-                        Total Cards: @(Model.Subscriptions?.Count ?? 0)
-                    </span>
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="info-grid-label">Status</div>
+                        <div class="info-grid-value">
+                            <span class="@(Model.IsActive ? "badge-status-active" : "badge-status-inactive")">
+                                @(Model.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="d-flex gap-4 overflow-auto pb-3 pt-1">
@@ -370,5 +410,33 @@
                 }
             });
         }
+            function confirmActivate() {
+                Swal.fire({
+                    title: 'Activate Non-Employee?',
+                    text: 'This will reactivate this profile.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#1D4ED8',
+                    cancelButtonColor: '#64748B',
+                    confirmButtonText: 'Yes, Activate',
+                    customClass: { popup: 'rounded-4' }
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const formData = new FormData();
+                        formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+                        const res = await fetch(`/NonEmployee/Activate/@Model.Id`, {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (res.ok || res.redirected) {
+                            window.location.reload();
+                        } else {
+                            Swal.fire('Error', 'Failed to activate.', 'error');
+                        }
+                    }
+                });
+            }
     </script>
 </body>

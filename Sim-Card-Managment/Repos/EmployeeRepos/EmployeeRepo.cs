@@ -16,10 +16,14 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
         {
             _context = context;
         }
+        // EmployeeRepo.cs
         public async Task<IEnumerable<Employee>> SearchActiveEmployeesAsync(string query)
         {
             return await _context.Employees
-                .Where(e => e.IsActive && (e.Name.Contains(query) || e.NationalID.Contains(query)))
+                .Where(e => e.IsActive &&
+                    (e.Name.Contains(query) ||
+                     e.NationalID.Contains(query) ||
+                     (e.EmpCode != null && e.EmpCode.Contains(query))))
                 .Take(6)
                 .ToListAsync();
         }
@@ -99,7 +103,13 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
 
         public void Delete(int id)
         {
-            // Find all subscriptions associated with this employee
+            var employee = _context.Employees.Find(id);
+            if (employee == null)
+            {
+                return;
+            }
+
+            // Remove all subscriptions tied to this employee
             var subscriptions = _context.Subscriptions
                 .Where(s => s.EmpId == id)
                 .ToList();
@@ -109,12 +119,11 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
                 _context.Subscriptions.RemoveRange(subscriptions);
             }
 
-            var employee = _context.Employees.Find(id);
-            if (employee != null)
-            {
-                _context.Employees.Remove(employee);
-                _context.SaveChanges(); // Saves both subscription removals and employee deletion
-            }
+            // Soft delete the employee itself
+            employee.IsActive = false;
+            _context.Employees.Update(employee);
+
+            _context.SaveChanges(); // Saves both subscription removals and the soft delete
         }
     }
 }

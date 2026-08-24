@@ -83,9 +83,24 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
             var line = await _context.InternetLines
                 .Include(il => il.Sim)
                     .ThenInclude(s => s.ServiceProvider)
+                .Include(il => il.Sim)
+                    .ThenInclude(s => s.Subscriptions)
+                        .ThenInclude(sub => sub.Employee)
+                .Include(il => il.Sim)
+                    .ThenInclude(s => s.Subscriptions)
+                        .ThenInclude(sub => sub.NonEmployee)
                 .FirstOrDefaultAsync(il => il.Id == id);
 
             if (line == null) return null;
+
+            var activeSub = line.Sim?.Subscriptions?
+                .FirstOrDefault(sub => sub.EndDate == null || sub.EndDate > DateTime.Now);
+
+            string? simAssignedTo = activeSub?.Employee != null
+                ? activeSub.Employee.Name
+                : activeSub?.NonEmployee != null
+                    ? activeSub.NonEmployee.Name
+                    : null;
 
             return new InternetLineEditViewModel
             {
@@ -98,6 +113,8 @@ namespace Sim_Card_Managment.Repos.InternetLineRepos
                 PhoneNumber = line.PhoneNumber,
                 SimSerialNumber = line.Sim?.SerialNumber,
                 SimProviderName = line.Sim?.ServiceProvider?.Name,
+                SimProviderId = line.Sim?.ServiceProviderId,
+                SimAssignedTo = simAssignedTo,
                 Bandwidth = line.Bandwidth,
                 RenewaltypeId = line.RenewaltypeId,
                 LastRenewalDate = line.LastRenewalDate,

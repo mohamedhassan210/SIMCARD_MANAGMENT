@@ -115,12 +115,17 @@ namespace Sim_Card_Managment.Repos
         }
         public async Task<List<Sim>> GetAssignableSimsForInternetLineAsync(string? query, int? excludeLineId = null)
         {
+            var takenSimIds = _context.InternetLines
+                .Where(il => il.SimId != null && il.Id != (excludeLineId ?? -1))
+                .Select(il => il.SimId!.Value);
+
             var simsQuery = _context.Sims
                 .Include(s => s.ServiceProvider)
-                .Where(s => s.IsActive &&
-                            !_context.InternetLines.Any(il =>
-                                il.SimId == s.Id &&
-                                (excludeLineId == null || il.Id != excludeLineId)));
+                .Include(s => s.Subscriptions!)
+                    .ThenInclude(sub => sub.Employee)
+                .Include(s => s.Subscriptions!)
+                    .ThenInclude(sub => sub.NonEmployee)
+                .Where(s => s.IsActive && !takenSimIds.Contains(s.Id));
 
             if (!string.IsNullOrWhiteSpace(query))
             {

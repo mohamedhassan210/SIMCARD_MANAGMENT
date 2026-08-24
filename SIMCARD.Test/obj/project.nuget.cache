@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "EuM96XIPpdg=",
+  "dgSpecHash": "eQF6eb46Bic=",
   "success": true,
-  "projectFilePath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
+  "projectFilePath": "C:\\Users\\sd\\Documents\\EsimY\\SIMCARD.Test\\SIMCARD.Test.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\sd\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\sd\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
@@ -124,15 +124,5 @@
     "C:\\Users\\sd\\.nuget\\packages\\system.threading.tasks.extensions\\4.6.0\\system.threading.tasks.extensions.4.6.0.nupkg.sha512",
     "C:\\Users\\sd\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1900",
-      "level": "Warning",
-      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json.",
-      "projectPath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
-      "warningLevel": 1,
-      "filePath": "C:\\Users\\sd\\Source\\Repos\\SIMCARD_MANAGMENT\\SIMCARD.Test\\SIMCARD.Test.csproj",
-      "targetGraphs": []
-    }
-  ]
+  "logs": []
 }

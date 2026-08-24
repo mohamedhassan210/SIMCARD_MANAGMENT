@@ -1,7 +1,5 @@
-﻿@using Sim_Card_Managment.Services
-@using Sim_Card_Managment.Repos.InternetLineRepos
+@using Sim_Card_Managment.Services
 @inject IUserPermissionService PermissionService
-@inject IInternetLineRepo IInternetLineRepo
 @{
     // Get the current controller and action from the route
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
@@ -46,25 +44,28 @@
     // Internet Line
     var canViewInternetLines = Has("InternetLine", "Index");
     var canCreateInternetLine = Has("InternetLine", "Create");
+    var canViewInternetLineDashboard = Has("InternetLine", "Dashboard");
 
+    // Device Status
+    var canViewDeviceStatuses = Has("DeviceStatus", "Index");
+
+    // Quota
+    var canViewQuotas = Has("Quota", "Index");
+
+    // Mail Configuration
+    var canViewMailConfigurations = Has("MailConfiguration", "Index");
 
     // Per-section visibility (header only shows if at least one child is visible)
-    var showUserSection = canManageUsers || canManagePermissions || canViewGroups;
-    var showSimSection = canCreateSim || canViewSims;
+    var showUserSection = canManageUsers || canManagePermissions || canViewGroups || canViewMailConfigurations;
+    var showSimSection = canCreateSim || canViewSims || canViewDeviceStatuses;
     var showUsbSection = canCreateUsb || canViewUsbs;
     var showDocumentSection = canViewDocuments || canCreateDocument;
-    var showServiceProviderSection = canViewServiceProviders || canCreateServiceProvider;
+    var showServiceProviderSection = canViewServiceProviders || canCreateServiceProvider || canViewQuotas;
     var showReportSection = canViewReport;
     var showSubscriptionSection = canViewSubscription || canCreateSubscription;
     var showBranchSection = canViewBranches || canCreateBranch;
     var showVpnConnectionSection = canViewVpnConnections || canCreateVpnConnection;
     var showInternetLineSection = canViewInternetLines || canCreateInternetLine;
-
-
-    var notification = await IInternetLineRepo.GetForDashboardAsync();
-    var today = DateOnly.FromDateTime(DateTime.UtcNow);
-    var upcomingrenewal = notification.Where(n => n.NextRenewalDate.HasValue &&
-                                   (n.NextRenewalDate.Value.DayNumber - today.DayNumber) <= 5);
 }
 
 <!DOCTYPE html>
@@ -75,8 +76,9 @@
     <title>SimCard Managment</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/all.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/all.min.css" />
     <link href="~/favicon.ico" rel="icon" />
+    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body>
     <div class="rotate position-fixed top-50 start-0 bg-transparent z-3 d-flex justify-content-center align-items-center shadow "
@@ -138,11 +140,20 @@
                             }
                             @if (canViewGroups)
                             {
-                                <a class="d-flex align-items-center gap-3 text-decoration-none" asp-controller="Group" asp-action="Index">
+                                <a class="d-flex align-items-center gap-3 mb-3 text-decoration-none" asp-controller="Group" asp-action="Index">
                                     <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
                                         <i class="fa-solid fa-user-group"></i>
                                     </div>
                                     <span class="sub-item-text">View Groups</span>
+                                </a>
+                            }
+                            @if (canViewMailConfigurations)
+                            {
+                                <a class="d-flex align-items-center gap-3 mb-3 text-decoration-none" asp-controller="MailConfiguration" asp-action="Index">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-envelope"></i>
+                                    </div>
+                                    <span class="sub-item-text">Mail Configuration</span>
                                 </a>
                             }
                         </div>
@@ -169,6 +180,15 @@
 
                     <div id="collapseSim" class="accordion-collapse collapse" data-bs-parent="#sidebarMenu">
                         <div class="accordion-body p-0 pt-3 pb-3 ms-2">
+                            @if (canViewSims)
+                            {
+                                <a asp-controller="SIM" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <img src="~/img/icon-park-outline_permissions.png" alt="Alternate Text" />
+                                    </div>
+                                    <span class="sub-item-text">Manage Devices</span>
+                                </a>
+                            }
                             @if (canCreateSim)
                             {
                                 <a asp-controller="SIM" asp-action="Create" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
@@ -187,13 +207,13 @@
                                     <span class="sub-item-text">Create new USB</span>
                                 </a>
                             }
-                            @if (canViewSims)
+                            @if (canViewDeviceStatuses)
                             {
-                                <a asp-controller="SIM" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                <a asp-controller="DeviceStatus" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
                                     <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
-                                        <img src="~/img/icon-park-outline_permissions.png" alt="Alternate Text" />
+                                        <i class="fa-solid fa-tower-broadcast"></i>
                                     </div>
-                                    <span class="sub-item-text">Mange Devices</span>
+                                    <span class="sub-item-text">Device Status</span>
                                 </a>
                             }
                         </div>
@@ -276,6 +296,15 @@
                                         <i class="fa-solid fa-plus"></i>
                                     </div>
                                     <span class="sub-item-text">Create new ServiceProvider</span>
+                                </a>
+                            }
+                            @if (canViewQuotas)
+                            {
+                                <a asp-controller="Quota" asp-action="Index" class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-database"></i>
+                                    </div>
+                                    <span class="sub-item-text">Manage Quotas</span>
                                 </a>
                             }
                         </div>
@@ -590,72 +619,13 @@
                                asp-controller="Employee" asp-action="Index">USERS</a>
                         </li>
                     }
-                    <li class="nav-item dropdown">
-                        <!-- Dropdown Toggle Button -->
-                        <a class="nav-link text-white position-relative dropdown-toggle-no-caret"
-                           href="#"
-                           id="notificationDropdown"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false"
-                           title="Notifications">
-                            <i class="fa-solid fa-bell fs-5"></i>
 
-                            @if (upcomingrenewal != null && upcomingrenewal.Any())
-                            {
-                                <span class="position-absolute top-10 end-0 translate-middle badge rounded-pill bg-danger">
-                                    @upcomingrenewal.Count()
-                                    <span class="visually-hidden">unread notifications</span>
-                                </span>
-                            }
-                        </a>
-
-                        <!-- Dropdown Menu -->
-                        <ul class="dropdown-menu dropdown-menu-end shadow-lg py-0 mt-2" aria-labelledby="notificationDropdown" style="width: 320px; max-height: 400px; overflow-y: auto;">
-                            <li class="dropdown-header bg-light py-2 px-3 fw-bold text-dark border-bottom d-flex justify-content-between align-items-center">
-                                <span>Notifications</span>
-                                <span class="badge bg-danger rounded-pill">@(upcomingrenewal?.Count() ?? 0) Urgent</span>
-                            </li>
-
-                            @if (upcomingrenewal != null && upcomingrenewal.Any())
-                            {
-                                foreach (var item in upcomingrenewal)
-                                {
-                                    int daysRemaining = item.NextRenewalDate.Value.DayNumber - today.DayNumber;
-
-                                    <li>
-                                        <a class="dropdown-item py-2 px-3 border-bottom text-wrap" asp-controller="InternetLine" asp-action="Details" asp-route-id="@item.Id">
-                                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                                <strong class="text-dark small">@item.BranchName</strong>
-                                                <span class="badge bg-danger ms-2" style="font-size: 10px;">
-                                                    @(daysRemaining < 0 ? "Expired" : $"{daysRemaining} days left")
-                                                </span>
-                                            </div>
-                                            <div class="text-muted small">
-                                                <i class="fa-solid fa-phone me-1 fs-6"></i> @(string.IsNullOrEmpty(item.PhoneNumber) ? "N/A" : item.PhoneNumber)
-                                            </div>
-                                            <div class="text-muted small">
-                                                Due: @item.NextRenewalDate.Value.ToString("dd MMM yyyy")
-                                            </div>
-                                        </a>
-                                    </li>
-                                }
-                            }
-                            else
-                            {
-                                <li class="p-3 text-center text-muted small">
-                                    <i class="fa-solid fa-bell-slash d-block fs-4 mb-2"></i>
-                                    No upcoming renewals due within 5 days.
-                                </li>
-                            }
-
-                            <li class="bg-light text-center py-2 border-top">
-                                <a class="text-decoration-none fw-bold small" asp-controller="InternetLine" asp-action="Dashboard" style="color: var(--primary-orange, #E24D17);">
-                                    View All Lines in Dashboard &rarr;
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                    @if (canViewInternetLineDashboard)
+                    {
+                        <li class="nav-item">
+                            @await Component.InvokeAsync("NotificationBell")
+                        </li>
+                    }
                 </ul>
             </div>
         </div>

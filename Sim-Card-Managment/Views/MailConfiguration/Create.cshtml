@@ -1,0 +1,197 @@
+@model Sim_Card_Managment.Models.MailConfiguration
+
+@{
+    ViewData["Title"] = "New Mail Configuration";
+}
+
+<style>
+    :root {
+        --brand-orange: #E24D17;
+        --brand-orange-hover: #c84111;
+        --brand-orange-light: #FDF1EC;
+        --text-dark: #1a1a1a;
+        --text-muted: #6c757d;
+        --card-border: #e9ecef;
+    }
+
+    .form-label-custom {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .input-group-custom {
+        display: flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        padding: 10px 14px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .input-group-custom:focus-within {
+            border-color: var(--brand-orange);
+            box-shadow: 0 0 0 3px rgba(226, 77, 23, 0.1);
+        }
+
+        .input-group-custom i {
+            color: #8c8c8c;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+    .form-control-custom {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        width: 100%;
+        font-size: 0.92rem;
+        color: var(--text-dark);
+    }
+
+    .form-check-custom {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: #ffffff;
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        padding: 12px 14px;
+    }
+
+    .btn-orange-primary {
+        background-color: var(--brand-orange);
+        border: 1px solid var(--brand-orange);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.2s ease;
+    }
+
+        .btn-orange-primary:hover {
+            background-color: var(--brand-orange-hover);
+            border-color: var(--brand-orange-hover);
+            color: #ffffff;
+        }
+
+    .btn-secondary-soft {
+        background-color: #F1F3F5;
+        border: 1px solid #F1F3F5;
+        color: var(--text-dark);
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+        .btn-secondary-soft:hover {
+            background-color: #E2E8F0;
+            color: var(--text-dark);
+        }
+</style>
+
+<div class="container-fluid px-4 p-100" style="max-width: 800px;">
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="rounded-3 p-2" style="background-color: var(--brand-orange-light);">
+            <i class="fa-solid fa-envelope" style="color: var(--brand-orange); font-size: 20px;"></i>
+        </div>
+        <div>
+            <h1 class="mb-0" style="font-size: 22px; font-weight: 700; color: var(--text-dark);">New Mail Configuration</h1>
+            <p class="mb-0 small text-muted">Set up an SMTP relay the system can send emails through</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+        <form asp-controller="MailConfiguration" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label-custom">Configuration Name</label>
+                    <div class="input-group-custom">
+                        <i class="fa-solid fa-tag"></i>
+                        <input asp-for="Name" class="form-control-custom" placeholder="e.g., Primary Gmail Relay">
+                    </div>
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12 col-md-8">
+                    <label class="form-label-custom">SMTP Host</label>
+                    <div class="input-group-custom">
+                        <i class="fa-solid fa-server"></i>
+                        <input asp-for="SmtpHost" class="form-control-custom" placeholder="smtp.gmail.com">
+                    </div>
+                    <span asp-validation-for="SmtpHost" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label class="form-label-custom">SMTP Port</label>
+                    <div class="input-group-custom">
+                        <i class="fa-solid fa-plug"></i>
+                        <input asp-for="SmtpPort" type="number" class="form-control-custom" placeholder="587">
+                    </div>
+                    <span asp-validation-for="SmtpPort" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label class="form-label-custom">Sender Email</label>
+                    <div class="input-group-custom">
+                        <i class="fa-solid fa-at"></i>
+                        <input asp-for="SenderEmail" class="form-control-custom" placeholder="alerts@yourcompany.com">
+                    </div>
+                    <span asp-validation-for="SenderEmail" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label class="form-label-custom">Sender Display Name</label>
+                    <div class="input-group-custom">
+                        <i class="fa-solid fa-signature"></i>
+                        <input asp-for="SenderDisplayName" class="form-control-custom" placeholder="SIM & USB Management System">
+                    </div>
+                    <span asp-validation-for="SenderDisplayName" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label-custom">Sender Password / App Password</label>
+                    <div class="input-group-custom">
+                        <i class="fa-solid fa-key"></i>
+                        <input asp-for="SenderPassword" type="password" class="form-control-custom" placeholder="App password" autocomplete="new-password">
+                    </div>
+                    <span asp-validation-for="SenderPassword" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label class="form-check-custom">
+                        <input asp-for="EnableSsl" type="checkbox" class="form-check-input m-0">
+                        <span class="small fw-medium">Enable SSL</span>
+                    </label>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label class="form-check-custom">
+                        <input asp-for="IsActive" type="checkbox" class="form-check-input m-0">
+                        <span class="small fw-medium">Make this the active configuration</span>
+                    </label>
+                    <p class="small text-muted mt-1 mb-0">Checking this deactivates any other configuration.</p>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                <a asp-controller="MailConfiguration" asp-action="Index" class="btn-secondary-soft">Cancel</a>
+                <button type="submit" class="btn-orange-primary">
+                    <i class="fas fa-check me-1"></i> Save Configuration
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

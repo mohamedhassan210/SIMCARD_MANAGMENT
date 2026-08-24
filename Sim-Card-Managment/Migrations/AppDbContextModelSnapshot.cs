@@ -750,6 +750,63 @@ namespace Sim_Card_Management.Migrations
                     b.ToTable("GroupPermissions");
                 });
 
+            modelBuilder.Entity("Sim_Card_Managment.Models.MailConfiguration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("EnableSsl")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SenderDisplayName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("SenderPassword")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("SmtpHost")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("SmtpPort")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive")
+                        .IsUnique()
+                        .HasFilter("[IsActive] = 1");
+
+                    b.ToTable("MailConfigurations");
+                });
+
             modelBuilder.Entity("Sim_Card_Managment.Models.NonEmployee", b =>
                 {
                     b.Property<int>("Id")
@@ -764,6 +821,9 @@ namespace Sim_Card_Management.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1018,11 +1078,9 @@ namespace Sim_Card_Management.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<int?>("QuotaId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int?>("SimId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
@@ -1614,15 +1672,11 @@ namespace Sim_Card_Management.Migrations
 
                     b.HasOne("Sim_Card_Managment.Models.Quota", "Quota")
                         .WithMany("Subscriptions")
-                        .HasForeignKey("QuotaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("QuotaId");
 
                     b.HasOne("Sim_Card_Managment.Models.Sim", "Sim")
                         .WithMany("Subscriptions")
-                        .HasForeignKey("SimId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SimId");
 
                     b.HasOne("Sim_Card_Managment.Models.Usb", "Usb")
                         .WithMany("Subscriptions")

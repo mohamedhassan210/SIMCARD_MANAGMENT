@@ -63,8 +63,9 @@ namespace Sim_Card_Management.Controllers
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add("Subscriptions");
 
-            // Define Headers
-            string[] headers = { "Subscriber", "Device Type", "Identifier / Serial", "Quota", "Status", "Start Date" };
+            // Define Headers — separate SIM/USB columns since a subscription can have
+            // both at once, and a real Fees column (was missing entirely before).
+            string[] headers = { "Subscriber", "SIM Number", "USB Serial", "Quota (GB)", "Monthly Fees", "Status", "Start Date" };
             for (int i = 0; i < headers.Length; i++)
             {
                 var cell = worksheet.Cells[1, i + 1];
@@ -80,17 +81,27 @@ namespace Sim_Card_Management.Controllers
             foreach (var sub in subscriptions)
             {
                 string subscriberName = sub.Employee?.Name ?? sub.NonEmployee?.Name ?? "Unassigned";
-                string deviceType = sub.Sim != null ? "SIM" : (sub.Usb != null ? "USB" : "N/A");
-                string deviceNumber = sub.Sim?.PhoneNumber ?? sub.Usb?.SerialNumber ?? "N/A";
-                decimal quota = sub.Quota?.BaseAmount + sub.Quota.ExtraAmount ?? 0;
+                string simNumber = sub.Sim?.PhoneNumber ?? "N/A";
+                string usbSerial = sub.Usb?.SerialNumber ?? "N/A";
+
+                // Was: sub.Quota?.BaseAmount + sub.Quota.ExtraAmount ?? 0
+                // That threw a NullReferenceException on every subscription with no
+                // Quota, because the second access (sub.Quota.ExtraAmount) wasn't
+                // null-conditional even though the first one was.
+                decimal? quotaGb = sub.Quota != null
+                    ? sub.Quota.BaseAmount + sub.Quota.ExtraAmount
+                    : (decimal?)null;
+
+                decimal fees = sub.Fees ?? 0;
                 bool isActive = sub.EndDate == null || sub.EndDate > DateTime.Now;
 
                 worksheet.Cells[row, 1].Value = subscriberName;
-                worksheet.Cells[row, 2].Value = deviceType;
-                worksheet.Cells[row, 3].Value = deviceNumber;
-                worksheet.Cells[row, 4].Value = quota;
-                worksheet.Cells[row, 5].Value = isActive ? "Active" : "Inactive";
-                worksheet.Cells[row, 6].Value = sub.StartDate.ToString("yyyy-MM-dd");
+                worksheet.Cells[row, 2].Value = simNumber;
+                worksheet.Cells[row, 3].Value = usbSerial;
+                worksheet.Cells[row, 4].Value = quotaGb.HasValue ? (object)quotaGb.Value : "N/A";
+                worksheet.Cells[row, 5].Value = fees;
+                worksheet.Cells[row, 6].Value = isActive ? "Active" : "Inactive";
+                worksheet.Cells[row, 7].Value = sub.StartDate.ToString("yyyy-MM-dd");
                 row++;
             }
 

@@ -55,6 +55,8 @@ namespace Sim_Card_Managment.Controllers
                 .Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Name });
             model.RenewalTypeDurations = renewalTypes
                 .ToDictionary(r => r.Id, r => r.DurationInMonths);
+            model.ServiceTypeHasPhoneNumber = serviceTypes
+                .ToDictionary(s => s.Id, s => s.HasPhoneNumber);
         }
 
         private async Task PopulateDropdowns(InternetLineEditViewModel model)
@@ -77,6 +79,8 @@ namespace Sim_Card_Managment.Controllers
                 .Select(r => new SelectListItem { Value = r.Id.ToString(), Text = r.Name });
             model.RenewalTypeDurations = renewalTypes
                 .ToDictionary(r => r.Id, r => r.DurationInMonths);
+            model.ServiceTypeHasPhoneNumber = serviceTypes
+                .ToDictionary(s => s.Id, s => s.HasPhoneNumber);
         }
 
         [HttpGet]
@@ -106,6 +110,22 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(InternetLineCreateViewModel model)
         {
+            var serviceTypes = await _lookupRepo.GetServiceTypesAsync();
+            var selectedType = serviceTypes.FirstOrDefault(s => s.Id == model.ServiceTypeId);
+            bool isLandline = selectedType?.HasPhoneNumber == true;
+
+            if (isLandline)
+            {
+                model.SimId = null;
+                if (string.IsNullOrWhiteSpace(model.PhoneNumber))
+                    ModelState.AddModelError(nameof(model.PhoneNumber), "Phone number is required for this service type.");
+            }
+            else
+            {
+                if (model.SimId == null)
+                    ModelState.AddModelError(nameof(model.SimId), "Please select a SIM card for this service type.");
+            }
+
             if (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out int currentUserId))
             {
                 model.CreatedById = currentUserId;
@@ -140,6 +160,22 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(InternetLineEditViewModel model)
         {
+            var serviceTypes = await _lookupRepo.GetServiceTypesAsync();
+            var selectedType = serviceTypes.FirstOrDefault(s => s.Id == model.ServiceTypeId);
+            bool isLandline = selectedType?.HasPhoneNumber == true;
+
+            if (isLandline)
+            {
+                model.SimId = null;
+                if (string.IsNullOrWhiteSpace(model.PhoneNumber))
+                    ModelState.AddModelError(nameof(model.PhoneNumber), "Phone number is required for this service type.");
+            }
+            else
+            {
+                if (model.SimId == null)
+                    ModelState.AddModelError(nameof(model.SimId), "Please select a SIM card for this service type.");
+            }
+
             if (!ModelState.IsValid)
             {
                 await PopulateDropdowns(model);
@@ -170,15 +206,31 @@ namespace Sim_Card_Managment.Controllers
             return View(lines);
         }
         [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> SearchSims(string query, int? currentLineId = null)
         {
             var sims = await _simRepo.GetAssignableSimsForInternetLineAsync(query, currentLineId);
 
-            var result = sims.Select(s => new {
-                id = s.Id,
-                phoneNumber = s.PhoneNumber,
-                serialNumber = s.SerialNumber,
-                providerName = s.ServiceProvider?.Name ?? "Unknown"
+            var result = sims.Select(s =>
+            {
+                var activeSub = s.Subscriptions?
+                    .FirstOrDefault(sub => sub.EndDate == null || sub.EndDate > DateTime.Now);
+
+                string? assignedTo = activeSub?.Employee != null
+                    ? activeSub.Employee.Name
+                    : activeSub?.NonEmployee != null
+                        ? activeSub.NonEmployee.Name
+                        : null;
+
+                return new
+                {
+                    id = s.Id,
+                    phoneNumber = s.PhoneNumber,
+                    serialNumber = s.SerialNumber,
+                    providerId = s.ServiceProviderId,
+                    providerName = s.ServiceProvider?.Name ?? "Unknown",
+                    assignedTo
+                };
             });
 
             return Json(result);

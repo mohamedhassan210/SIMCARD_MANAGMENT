@@ -35,7 +35,7 @@ namespace Sim_Card_Managment.Viewmodel
         // Id -> DurationInMonths, populated by the controller so the view's JS
         // can auto-calculate NextRenewalDate without a server round trip.
         public Dictionary<int, int> RenewalTypeDurations { get; set; } = new();
-
+        public Dictionary<int, bool> ServiceTypeHasPhoneNumber { get; set; } = new();
         public decimal? QuotaGB { get; set; }
         public bool Status { get; set; } = true;
         [StringLength(500)]

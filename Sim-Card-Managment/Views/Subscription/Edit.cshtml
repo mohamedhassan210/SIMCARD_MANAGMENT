@@ -1,571 +1,491 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model Sim_Card_Managment.ViewModels.Subscription.SubscriptionEditViewModel
+
 @{
+    ViewData["Title"] = "Edit Subscription";
 }
 
+@functions {
+    string GetProviderLogo(string? providerName)
+    {
+        var name = (providerName ?? string.Empty).ToLower();
+        if (name.Contains("orange")) return "/img/orange.png";
+        if (name.Contains("vodafone") || name.Contains("fodafone")) return "/img/fodafone.png";
+        if (name.Contains("we")) return "/img/we.png";
+        if (name.Contains("etisalat")) return "/img/etisalat-logo.png";
+        return string.Empty;
+    }
+}
 
-    <style>
-        :root {
-            --brand-orange: #EE4623;
-            --brand-orange-dark: #D63A1B;
-            --ink: #1F2430;
-            --muted: #8A94A6;
-            --line: #E7E9EF;
-            --bg: #F4F5F8;
-            --card: #FFFFFF;
-            --success-bg: #EAF7EE;
-            --success-text: #1E9E4C;
+<style>
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 850px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin: 2rem auto;
+    }
+
+    .section-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #212529;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+        .section-title i {
+            color: #e65319;
+            font-size: 1.1rem;
         }
 
-     
-       
+    .readonly-info-box {
+        background-color: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+    }
 
-        .breadcrumb-row {
-            font-size: .8rem;
-            color: var(--muted);
+    .custom-form-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    .custom-form-control {
+        border-radius: 50px;
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+        border: 2px solid #dee2e6;
+        width: 100%;
+    }
+
+        .custom-form-control:focus {
+            border-color: #e65319;
+            outline: none;
         }
 
-            .breadcrumb-row a {
-                color: var(--muted);
-                text-decoration: none;
-            }
+    .selection-card {
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        height: 100%;
+        background-color: #ffffff;
+    }
 
-            .breadcrumb-row .current {
-                color: var(--ink);
-                font-weight: 600;
-            }
-
-        .page-title {
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin-bottom: .15rem;
+        .selection-card:hover {
+            border-color: #babbbc;
         }
 
-        .page-sub {
-            color: var(--muted);
-            font-size: .85rem;
+        .selection-card.active {
+            border: 1.5px solid #e65319;
+            background-color: #FFF8F6;
         }
 
-        /* Step sidebar */
-        .step-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            position: relative;
+    .card-title-text {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+        color: #212529;
+    }
+
+    .card-subtitle-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .check-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #e65319;
+        font-size: 1.6rem;
+        display: none;
+    }
+
+    .selection-card.active .check-icon {
+        display: block;
+    }
+
+    /* Current badge — matches InternetLine/Edit styling (orange, not green) */
+    .badge-current {
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #e65319;
+        border: 1px solid #e65319;
+        border-radius: 12px;
+        padding: 3px 8px;
+        text-transform: uppercase;
+    }
+
+    .sim-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .sp-logo-img {
+        height: 24px;
+        max-width: 70px;
+        object-fit: contain;
+    }
+
+    .badge-available {
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #198754;
+        border: 1px solid #198754;
+        border-radius: 12px;
+        padding: 3px 8px;
+    }
+
+    .device-subsection {
+        background-color: #fdfdfd;
+        border: 1px dashed #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .subsection-header {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333333;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-action {
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .btn-outline-back {
+        border: 1px solid #ced4da;
+        color: #6c757d;
+        background-color: #ffffff;
+    }
+
+    .btn-activate {
+        background-color: #e65319;
+        color: #ffffff;
+        border: none;
+    }
+
+        .btn-activate:hover {
+            background-color: #d44a15;
         }
+</style>
 
-            .step-list::before {
-                content: "";
-                position: absolute;
-                left: 13px;
-                top: 14px;
-                bottom: 14px;
-                width: 2px;
-                background: var(--line);
-                z-index: 0;
-            }
+<div class="form-container">
+    <h2 class="fw-bold mb-1">Edit Subscription</h2>
+    <p class="text-muted small mb-4">Update the assigned SIM or USB device for this subscription.</p>
 
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap: .65rem;
-            padding: .6rem 0;
-            position: relative;
-            z-index: 1;
-        }
+    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
-        .step-dot {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: .85rem;
-            flex-shrink: 0;
-            background: #fff;
-            border: 2px solid var(--line);
-            color: var(--muted);
-        }
+    <form asp-action="Edit" method="post" id="editSubscriptionForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="SelectedSimId" id="SelectedSimId" />
+        <input type="hidden" asp-for="SelectedUsbId" id="SelectedUsbId" />
+        <input type="hidden" asp-for="SelectedQuotaId" id="SelectedQuotaId" />
 
-        .step-item.done .step-dot {
-            background: var(--brand-orange);
-            border-color: var(--brand-orange);
-            color: #fff;
-        }
-
-        .step-item.active .step-label {
-            color: var(--brand-orange);
-            font-weight: 700;
-        }
-
-        .step-item.done .step-label {
-            color: var(--ink);
-            font-weight: 600;
-        }
-
-        .step-label {
-            color: var(--muted);
-            font-size: .9rem;
-        }
-
-        /* Card panel */
-        .panel {
-            background: var(--card);
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            padding: 1.5rem;
-        }
-
-        .section-heading {
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-            .section-heading i {
-                color: var(--brand-orange);
-            }
-
-        .field-label {
-            font-size: .8rem;
-            color: var(--muted);
-            margin-bottom: .35rem;
-            display: block;
-        }
-
-        .form-control, .form-select {
-            border-radius: 10px;
-            border: 1px solid var(--line);
-            padding: .55rem .8rem;
-            font-size: .88rem;
-        }
-
-            .form-control:focus, .form-select:focus {
-                border-color: var(--brand-orange);
-                box-shadow: 0 0 0 .15rem rgba(238,70,35,.15);
-            }
-
-        .search-input {
-            position: relative;
-        }
-
-            .search-input i {
-                position: absolute;
-                left: .8rem;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--muted);
-            }
-
-            .search-input input {
-                padding-left: 2.2rem;
-            }
-
-        /* Selectable cards (employee / sim) */
-        .pick-card {
-            border: 1.5px solid var(--line);
-            border-radius: 12px;
-            padding: .8rem .9rem;
-            display: flex;
-            align-items: center;
-            gap: .7rem;
-            cursor: pointer;
-            position: relative;
-            background: #fff;
-            transition: border-color .15s ease;
-        }
-
-            .pick-card:hover {
-                border-color: #F3B9AB;
-            }
-
-            .pick-card.selected {
-                border-color: var(--brand-orange);
-                background: #FFF7F5;
-            }
-
-            .pick-card .avatar {
-                width: 38px;
-                height: 38px;
-                border-radius: 50%;
-                background: #E9ECF2;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: var(--muted);
-                font-size: 1.1rem;
-                flex-shrink: 0;
-            }
-
-            .pick-card .title {
-                font-weight: 600;
-                font-size: .88rem;
-            }
-
-            .pick-card .subtitle {
-                font-size: .75rem;
-                color: var(--muted);
-            }
-
-            .pick-card .check-badge {
-                margin-left: auto;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                background: var(--brand-orange);
-                color: #fff;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: .7rem;
-            }
-
-        .change-link {
-            font-size: .78rem;
-            color: var(--brand-orange);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: .3rem;
-        }
-
-        /* Device type toggle */
-        .toggle-group {
-            display: inline-flex;
-            background: #EFF1F5;
-            border-radius: 10px;
-            padding: .25rem;
-            gap: .25rem;
-        }
-
-            .toggle-group .btn {
-                border-radius: 8px;
-                font-size: .85rem;
-                font-weight: 600;
-                padding: .45rem 1.3rem;
-                border: none;
-                color: var(--muted);
-                background: transparent;
-            }
-
-                .toggle-group .btn.active {
-                    background: var(--brand-orange);
-                    color: #fff;
-                }
-
-        /* Sim device cards */
-        .device-card {
-            border: 1.5px solid var(--line);
-            border-radius: 12px;
-            padding: .9rem;
-            position: relative;
-            cursor: pointer;
-            background: #fff;
-        }
-
-            .device-card.selected {
-                border-color: var(--brand-orange);
-                background: #FFF7F5;
-            }
-
-            .device-card .badge-avail {
-                position: absolute;
-                top: .7rem;
-                right: .7rem;
-                background: var(--success-bg);
-                color: var(--success-text);
-                font-size: .65rem;
-                font-weight: 700;
-                padding: .2rem .55rem;
-                border-radius: 999px;
-            }
-
-            .device-card .icon-wrap {
-                width: 34px;
-                height: 34px;
-                border-radius: 8px;
-                background: #F2F3F6;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: var(--brand-orange);
-                margin-bottom: .6rem;
-                font-size: 1rem;
-            }
-
-            .device-card .d-title {
-                font-weight: 700;
-                font-size: .88rem;
-                margin-bottom: .1rem;
-            }
-
-            .device-card .d-sub {
-                font-size: .75rem;
-                color: var(--muted);
-                margin-bottom: .05rem;
-            }
-
-        hr.section-divider {
-            border-color: var(--line);
-            margin: 1.75rem 0;
-        }
-
-        .terms-check label {
-            font-size: .8rem;
-            color: var(--muted);
-        }
-
-        .terms-check a {
-            color: var(--brand-orange);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .actions-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1.5rem;
-        }
-
-        .btn-outline-secondary-soft {
-            border-radius: 10px;
-            border: 1px solid var(--line);
-            background: #fff;
-            color: var(--ink);
-            font-weight: 600;
-            padding: .55rem 1.5rem;
-            font-size: .85rem;
-        }
-
-        .btn-draft {
-            border-radius: 10px;
-            border: 1px solid var(--line);
-            background: #F2F3F6;
-            color: var(--muted);
-            font-weight: 600;
-            padding: .55rem 1.5rem;
-            font-size: .85rem;
-        }
-
-        .btn-primary-brand {
-            border-radius: 10px;
-            background: var(--brand-orange);
-            border: none;
-            color: #fff;
-            font-weight: 700;
-            padding: .55rem 1.8rem;
-            font-size: .85rem;
-        }
-
-            .btn-primary-brand:hover {
-                background: var(--brand-orange-dark);
-                color: #fff;
-            }
-
-        .edit-flag {
-            font-size: .7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            color: var(--brand-orange);
-            background: #FFF1EE;
-            padding: .25rem .6rem;
-            border-radius: 6px;
-        }
-    </style>
-
-<body>
-
-   
-
-    <div class="container-fluid p-100 py-4" style="max-width:1200px;">
-
-        <!-- Breadcrumb -->
-        <div class="breadcrumb-row mb-2">
-            <a href="#">Subscription</a> &nbsp;&gt;&nbsp; <span class="current">Edit subscription</span>
+        <div class="readonly-info-box">
+            <div class="custom-form-label mb-1">Recipient</div>
+            <div class="fw-bold">@Model.SubscriberName</div>
+            <div class="text-muted small">@Model.SubscriberType</div>
         </div>
 
-        <div class="d-flex align-items-center gap-2 mb-1">
-            <h1 class="page-title mb-0">Edit Subscription</h1>
-            <span class="edit-flag">Editing</span>
-        </div>
-        <p class="page-sub mb-4">Update the details below to modify this employee's assigned system asset.</p>
+        <h2 class="section-title"><i class="fas fa-laptop-house"></i> Devices</h2>
 
-        <div class="row g-4">
-            <!-- Left step nav -->
-            <div class="col-12 col-md-3">
-                <ul class="step-list">
-                    <li class="step-item done">
-                        <span class="step-dot"><i class="bi bi-check-lg"></i></span>
-                        <span class="step-label">Employee</span>
-                    </li>
-                    <li class="step-item done">
-                        <span class="step-dot"><i class="bi bi-check-lg"></i></span>
-                        <span class="step-label">Device</span>
-                    </li>
-                    <li class="step-item active">
-                        <span class="step-dot">3</span>
-                        <span class="step-label">Quota</span>
-                    </li>
-                    <li class="step-item">
-                        <span class="step-dot">4</span>
-                        <span class="step-label">Schedule</span>
-                    </li>
-                </ul>
-            </div>
+        <div class="device-subsection">
+            <div class="subsection-header"><i class="fas fa-sim-card text-danger"></i> SIM Card (Optional)</div>
 
-            <!-- Right form panel -->
-            <div class="col-12 col-md-9">
-                <div class="panel">
+            @if (!string.IsNullOrEmpty(Model.CurrentSimSerial))
+            {
+                var currentSimLogo = GetProviderLogo(Model.CurrentSimProviderName);
 
-                    <!-- Select Employee -->
-                    <div class="section-heading">
-                        <i class="bi bi-person-circle"></i> Select Employee
-                    </div>
-                    <label class="field-label">Employee Search</label>
-                    <div class="search-input mb-3">
-                        <i class="bi bi-search"></i>
-                        <input type="text" class="form-control" placeholder="Search by name or id" value="Mohamed Hussien">
-                    </div>
-
-                    <div class="row g-3 mb-1">
-                        <div class="col-12 col-sm-6">
-                            <div class="pick-card selected">
-                                <div class="avatar"><i class="bi bi-person-fill"></i></div>
-                                <div>
-                                    <div class="title">Mohamed Hussien</div>
-                                    <div class="subtitle">HR manager · ID 2334</div>
-                                </div>
-                                <div class="check-badge"><i class="bi bi-check-lg"></i></div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="selection-card active" id="currentSimCard" onclick="reselectCurrentSim()">
+                            <div class="sim-card-header">
+                                @if (!string.IsNullOrEmpty(currentSimLogo))
+                                {
+                                    <img src="@currentSimLogo" alt="@Model.CurrentSimProviderName" class="sp-logo-img" />
+                                }
+                                else
+                                {
+                                    <span class="fw-bold text-dark" style="font-size:0.85rem">@Model.CurrentSimProviderName</span>
+                                }
+                                <span class="badge-current">Current</span>
                             </div>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="pick-card">
-                                <div class="avatar"><i class="bi bi-person-fill"></i></div>
-                                <div>
-                                    <div class="title">Mohamed Hussien</div>
-                                    <div class="subtitle">HR manager · ID 2334</div>
-                                </div>
-                            </div>
+                            <div class="card-title-text">@Model.CurrentSimNetworkType SIM (@Model.CurrentSimPhoneNumber)</div>
+                            <p class="card-subtitle-text">Provider : @Model.CurrentSimProviderName</p>
+                            <p class="card-subtitle-text">Serial : @Model.CurrentSimSerial</p>
+                            <i class="fas fa-check-circle check-icon"></i>
                         </div>
                     </div>
-                    <a href="#" class="change-link"><i class="bi bi-pencil"></i> Change selected employee</a>
-
-                    <hr class="section-divider">
-
-                    <!-- Device type -->
-                    <div class="section-heading">
-                        <i class="bi bi-sim"></i> Device type
-                    </div>
-                    <div class="toggle-group mb-3">
-                        <button type="button" class="btn active">SIM Card</button>
-                        <button type="button" class="btn">Usb</button>
-                    </div>
-
-                    <div class="row g-3 mb-2">
-                        <div class="col-12 col-md-6">
-                            <label class="field-label">SIM cards</label>
-                            <div class="search-input">
-                                <i class="bi bi-search"></i>
-                                <input type="text" class="form-control" placeholder="Search by name or id">
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="field-label">Select sim</label>
-                            <select class="form-select">
-                                <option selected>0755245787110</option>
-                                <option>0755245787111</option>
-                                <option>0755245787112</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mb-1">
-                        <div class="col-12 col-sm-6">
-                            <div class="device-card selected">
-                                <span class="badge-avail">Available</span>
-                                <div class="icon-wrap"><i class="bi bi-sim"></i></div>
-                                <div class="d-title">5G SIM</div>
-                                <div class="d-sub">Provider : We</div>
-                                <div class="d-sub">Serial : 2805649703500</div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="device-card">
-                                <span class="badge-avail">Available</span>
-                                <div class="icon-wrap"><i class="bi bi-sim"></i></div>
-                                <div class="d-title">5G SIM</div>
-                                <div class="d-sub">Provider : We</div>
-                                <div class="d-sub">Serial : 2925645103900</div>
-                            </div>
-                        </div>
-                    </div>
-                    <a href="#" class="change-link"><i class="bi bi-pencil"></i> Change selected device</a>
-
-                    <hr class="section-divider">
-
-                    <!-- Quota -->
-                    <div class="section-heading">
-                        <i class="bi bi-clock-history"></i> Quota
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-12 col-md-6">
-                            <label class="field-label">Select quota</label>
-                            <select class="form-select">
-                                <option>2GB</option>
-                                <option selected>5GB</option>
-                                <option>10GB</option>
-                                <option>20GB</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <hr class="section-divider">
-
-                    <!-- Schedule -->
-                    <div class="section-heading">
-                        <i class="bi bi-clock-history"></i> Schedule
-                    </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-md-6">
-                            <label class="field-label">Activation date</label>
-                            <input type="date" class="form-control" value="2026-08-07">
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <label class="field-label">Contract duration</label>
-                            <select class="form-select">
-                                <option>6 months</option>
-                                <option selected>1 year</option>
-                                <option>2 years</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-check terms-check mb-1">
-                        <input class="form-check-input" type="checkbox" id="termsCheck" checked>
-                        <label class="form-check-label" for="termsCheck">
-                            I agree to the <a href="#">Terms &amp; Conditions</a> and privacy policy. I acknowledge that the selected employee is solely responsible for the use of the assigned asset.
-                        </label>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="actions-bar">
-                        <button type="button" class="btn-outline-secondary-soft">Back</button>
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn-draft">Save Draft</button>
-                            <button type="button" class="btn-primary-brand">Update Subscription</button>
-                        </div>
-                    </div>
-
                 </div>
+            }
+
+            <label class="custom-form-label">Search to change SIM</label>
+            <input type="text" id="simSearchInput" class="custom-form-control mb-3" placeholder="Search by phone or serial...">
+            <div class="row g-3" id="simCardsContainer"></div>
+        </div>
+
+        <div class="device-subsection">
+            <div class="subsection-header"><i class="fas fa-usb text-secondary"></i> USB Modem (Optional)</div>
+
+            @if (!string.IsNullOrEmpty(Model.CurrentUsbSerial))
+            {
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="selection-card active" id="currentUsbCard" onclick="reselectCurrentUsb()">
+                            <div class="sim-card-header">
+                                <i class="fas fa-usb text-secondary" style="font-size: 1.2rem;"></i>
+                                <span class="badge-current">Current</span>
+                            </div>
+                            <div class="card-title-text">@Model.CurrentUsbModel</div>
+                            <p class="card-subtitle-text">Provider : @Model.CurrentUsbProviderName</p>
+                            <p class="card-subtitle-text">Serial : @Model.CurrentUsbSerial</p>
+                            <i class="fas fa-check-circle check-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <label class="custom-form-label">Search to change USB</label>
+            <input type="text" id="usbSearchInput" class="custom-form-control mb-3" placeholder="Search by model or serial...">
+            <div class="row g-3" id="usbCardsContainer"></div>
+        </div>
+
+        <div class="device-subsection" id="quotaSection" style="@(Model.SelectedSimId.HasValue ? "" : "display:none;")">
+            <div class="subsection-header"><i class="fas fa-tachometer-alt"></i> Quota</div>
+
+            @if (!string.IsNullOrEmpty(Model.CurrentQuotaDisplay))
+            {
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="selection-card active" id="currentQuotaCard" onclick="reselectCurrentQuota()">
+                            <span class="badge-current">Current</span>
+                            <div class="card-title-text mt-2">@Model.CurrentQuotaBaseAmount GB Base Quota</div>
+                            <p class="card-subtitle-text">Extra Amount: @Model.CurrentQuotaExtraAmount GB</p>
+                            <p class="card-subtitle-text">Default Fee: $@Model.CurrentQuotaFee</p>
+                            <i class="fas fa-check-circle check-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="row g-3" id="quotaCardsContainer"></div>
+
+            <div class="mt-3">
+                <label class="custom-form-label">Monthly Fees</label>
+                <input type="number" step="0.01" min="0" asp-for="Fees" class="custom-form-control" style="max-width: 260px;">
             </div>
         </div>
-    </div>
 
-</body>
+        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-action btn-outline-back text-decoration-none">Cancel</a>
+            <button type="submit" class="btn btn-action btn-activate">Save Changes</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const simIdInput = document.getElementById('SelectedSimId');
+            const usbIdInputEl = document.getElementById('SelectedUsbId');
+            const quotaIdInput = document.getElementById('SelectedQuotaId');
+            const quotaSection = document.getElementById('quotaSection');
+            const feesInput = document.querySelector('input[name="Fees"]');
+
+            // Original values from the server — used to restore "current" selections
+            const originalSimId = @Html.Raw(Model.SelectedSimId.HasValue ? Model.SelectedSimId.Value.ToString() : "null");
+            const originalSimProviderId = @Html.Raw(Model.CurrentSimProviderId.HasValue ? Model.CurrentSimProviderId.Value.ToString() : "null");
+            const originalUsbId = @Html.Raw(Model.SelectedUsbId.HasValue ? Model.SelectedUsbId.Value.ToString() : "null");
+            const originalQuotaId = @Html.Raw(Model.SelectedQuotaId.HasValue ? Model.SelectedQuotaId.Value.ToString() : "null");
+            const originalFees = @Model.OriginalFees;
+
+            function getProviderLogo(providerName) {
+                const name = (providerName || '').toLowerCase();
+                if (name.includes('orange')) return '/img/orange.png';
+                if (name.includes('vodafone') || name.includes('fodafone')) return '/img/fodafone.png';
+                if (name.includes('we')) return '/img/we.png';
+                if (name.includes('etisalat')) return '/img/etisalat-logo.png';
+                return '';
+            }
+
+            $('#simSearchInput').on('input', function () { loadSims($(this).val()); });
+            $('#usbSearchInput').on('input', function () { loadUsbs($(this).val()); });
+
+            // Load all quotas for the CURRENT SIM's provider on page load,
+            // so the user can pick a different quota even without changing SIM.
+            if (originalSimProviderId !== null) {
+                loadQuotasForProvider(originalSimProviderId);
+                quotaSection.style.display = '';
+            }
+
+            function loadSims(query) {
+                if (!query || !query.trim()) { $('#simCardsContainer').empty(); return; }
+                $.get('/Subscription/SearchSims', { query: query }, function (data) {
+                    let html = '';
+                    if (!data || data.length === 0) {
+                        html = '<div class="col-12 text-muted small">No SIM cards found.</div>';
+                    } else {
+                        data.forEach(sim => {
+                            const logoSrc = getProviderLogo(sim.providerName);
+                            const logoHtml = logoSrc
+                                ? `<img src="${logoSrc}" alt="${sim.providerName}" class="sp-logo-img" />`
+                                : `<span class="fw-bold text-dark" style="font-size:0.85rem">${sim.providerName}</span>`;
+
+                            html += `
+                                <div class="col-md-6">
+                                    <div class="selection-card" onclick="selectSim(${sim.id}, '${sim.phoneNumber}', '${sim.providerId}', this)">
+                                        <div class="sim-card-header">
+                                            ${logoHtml}
+                                            <span class="badge-available">Active</span>
+                                        </div>
+                                        <div class="card-title-text">${sim.networkType} SIM (${sim.phoneNumber})</div>
+                                        <p class="card-subtitle-text">Provider : ${sim.providerName}</p>
+                                        <p class="card-subtitle-text">Serial : ${sim.serialNumber}</p>
+                                        <i class="fas fa-check-circle check-icon"></i>
+                                    </div>
+                                </div>`;
+                        });
+                    }
+                    $('#simCardsContainer').html(html);
+                });
+            }
+
+            window.selectSim = function (simId, phoneNumber, providerId, cardEl) {
+                document.getElementById('currentSimCard')?.classList.remove('active');
+                $('#simCardsContainer .selection-card').removeClass('active');
+                $(cardEl).addClass('active');
+                simIdInput.value = simId;
+                loadQuotasForProvider(providerId);
+                quotaSection.style.display = '';
+            };
+
+            window.reselectCurrentSim = function () {
+                if (originalSimId === null) return;
+                $('#simCardsContainer .selection-card').removeClass('active');
+                document.getElementById('currentSimCard')?.classList.add('active');
+                simIdInput.value = originalSimId;
+                if (originalSimProviderId !== null) {
+                    loadQuotasForProvider(originalSimProviderId);
+                    quotaSection.style.display = '';
+                }
+            };
+
+            function loadUsbs(query) {
+                if (!query || !query.trim()) { $('#usbCardsContainer').empty(); return; }
+                $.get('/Subscription/SearchUsbs', { query: query }, function (data) {
+                    let html = '';
+                    if (!data || data.length === 0) {
+                        html = '<div class="col-12 text-muted small">No USB modems found.</div>';
+                    } else {
+                        data.forEach(usb => {
+                            html += `
+                                <div class="col-md-6">
+                                    <div class="selection-card" onclick="selectUsb(${usb.id}, '${usb.serialNumber}', this)">
+                                        <div class="sim-card-header">
+                                            <i class="fas fa-usb text-secondary" style="font-size: 1.2rem;"></i>
+                                            <span class="badge-available">Active</span>
+                                        </div>
+                                        <div class="card-title-text">${usb.model}</div>
+                                        <p class="card-subtitle-text">Provider : ${usb.providerName}</p>
+                                        <p class="card-subtitle-text">Serial : ${usb.serialNumber}</p>
+                                        <i class="fas fa-check-circle check-icon"></i>
+                                    </div>
+                                </div>`;
+                        });
+                    }
+                    $('#usbCardsContainer').html(html);
+                });
+            }
+
+            window.selectUsb = function (usbId, serialNumber, cardEl) {
+                document.getElementById('currentUsbCard')?.classList.remove('active');
+                $('#usbCardsContainer .selection-card').removeClass('active');
+                $(cardEl).addClass('active');
+                usbIdInputEl.value = usbId;
+            };
+
+            window.reselectCurrentUsb = function () {
+                if (originalUsbId === null) return;
+                $('#usbCardsContainer .selection-card').removeClass('active');
+                document.getElementById('currentUsbCard')?.classList.add('active');
+                usbIdInputEl.value = originalUsbId;
+            };
+
+            function loadQuotasForProvider(providerId) {
+                $.get('/Subscription/GetQuotasByProvider', { providerId: providerId }, function (data) {
+                    let html = '';
+                    // Skip the currently displayed "Current" quota — it's already shown above,
+                    // no need to list it a second time in the search results.
+                    const filtered = (data || []).filter(q => String(q.id) !== String(originalQuotaId));
+
+                    if (filtered.length === 0) {
+                        html = '<div class="col-12 text-muted small">No other quotas configured for this provider.</div>';
+                    } else {
+                        filtered.forEach(q => {
+                            html += `
+                                <div class="col-md-6">
+                                    <div class="selection-card" onclick="selectQuota(${q.id}, ${q.fees}, this)">
+                                        <div class="card-title-text">${q.baseAmount} GB Base Quota</div>
+                                        <p class="card-subtitle-text">Extra Amount: ${q.extraAmount} GB</p>
+                                        <p class="card-subtitle-text">Default Fee: $${q.fees}</p>
+                                        <i class="fas fa-check-circle check-icon"></i>
+                                    </div>
+                                </div>`;
+                        });
+                    }
+                    $('#quotaCardsContainer').html(html);
+                });
+            }
+
+            window.selectQuota = function (quotaId, defaultFee, cardEl) {
+                document.getElementById('currentQuotaCard')?.classList.remove('active');
+                $('#quotaCardsContainer .selection-card').removeClass('active');
+                $(cardEl).addClass('active');
+                quotaIdInput.value = quotaId;
+                feesInput.value = defaultFee;
+            };
+
+            window.reselectCurrentQuota = function () {
+                if (originalQuotaId === null) return;
+                $('#quotaCardsContainer .selection-card').removeClass('active');
+                document.getElementById('currentQuotaCard')?.classList.add('active');
+                quotaIdInput.value = originalQuotaId;
+                feesInput.value = originalFees;
+            };
+
+            $('#editSubscriptionForm').on('submit', function (e) {
+                const sim = simIdInput.value;
+                const usb = usbIdInputEl.value;
+                if (!sim && !usb) {
+                    e.preventDefault();
+                    alert('Please keep or select at least a SIM card or a USB device.');
+                }
+            });
+        });
+    </script>
+}

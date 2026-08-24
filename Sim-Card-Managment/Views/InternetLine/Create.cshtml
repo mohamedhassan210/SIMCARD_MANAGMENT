@@ -1,4 +1,4 @@
-﻿@model Sim_Card_Managment.Viewmodel.InternetLineCreateViewModel
+@model Sim_Card_Managment.Viewmodel.InternetLineCreateViewModel
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,12 +21,10 @@
         }
 
         body {
-            background-color: #E24D17;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
+            background-color: var(--bg-canvas);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding-bottom: 3rem;
         }
 
         .form-card {
@@ -274,7 +272,7 @@
                             <label class="form-label-custom">Service Type</label>
                             <div class="input-group-custom">
                                 <i class="fa-solid fa-diagram-project"></i>
-                                <select asp-for="ServiceTypeId" asp-items="Model.ServiceTypes" class="form-select-custom">
+                                <select asp-for="ServiceTypeId" asp-items="Model.ServiceTypes" id="serviceTypeSelect" class="form-select-custom">
                                     <option value="">Select service type</option>
                                 </select>
                             </div>
@@ -291,26 +289,44 @@
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label-custom">
-                                <i class="fa-solid fa-sim-card"></i> SIM Card
-                            </label>
                             <input asp-for="PhoneNumber" type="hidden" id="PhoneNumber" />
                             <input asp-for="SimId" type="hidden" id="SimId" />
 
-                            <div class="input-group-custom mb-3">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                                <input type="text" id="simSearchInput" class="form-control-custom" placeholder="Search by phone number or serial...">
-                            </div>
+                            <div id="simCardSection" style="display: none;">
+                                <label class="form-label-custom">
+                                    <i class="fa-solid fa-sim-card"></i> SIM Card
+                                </label>
 
-                            <div class="row g-3" id="simCardsContainer">
-                                <div class="col-12 text-muted small fst-italic">
-                                    Search above to display available SIM cards.
+                                <div class="input-group-custom mb-3">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="simSearchInput" class="form-control-custom" placeholder="Search by phone number or serial...">
+                                </div>
+
+                                <div class="row g-3" id="simCardsContainer">
+                                    <div class="col-12 text-muted small fst-italic">
+                                        Search above to display available SIM cards.
+                                    </div>
+                                </div>
+
+                                <div class="sim-status-text" id="simStatusText" style="display: none;">
+                                    <i class="fa-solid fa-circle-info"></i> SIM: <span id="simStatusPhone">None</span> selected
                                 </div>
                             </div>
 
-                            <div class="sim-status-text" id="simStatusText" style="display: none;">
-                                <i class="fa-solid fa-circle-info"></i> SIM: <span id="simStatusPhone">None</span> selected
+                            <div id="landlinePhoneSection" style="display: none;">
+                                <label class="form-label-custom">
+                                    <i class="fa-solid fa-phone"></i> Phone Number (رقم أرضي)
+                                </label>
+                                <div class="input-group-custom">
+                                    <i class="fa-solid fa-phone"></i>
+                                    <input type="text" id="landlinePhoneInput" class="form-control-custom" placeholder="Enter landline phone number">
+                                </div>
                             </div>
+
+                            <div id="noServiceTypeHint" class="text-muted small fst-italic">
+                                Select a service type above to choose a SIM card or enter a phone number.
+                            </div>
+
                             <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                         </div>
 
@@ -318,8 +334,10 @@
                             <label class="form-label-custom">Bandwidth</label>
                             <div class="input-group-custom">
                                 <i class="fa-solid fa-gauge-high"></i>
-                                <input asp-for="Bandwidth" class="form-control-custom" placeholder="e.g., 100 Mbps">
+                                <input type="number" id="bandwidthValueInput" class="form-control-custom" placeholder="e.g., 100" min="0" step="1">
+                                <span class="text-muted small fw-semibold" style="white-space:nowrap;">Mbps</span>
                             </div>
+                            <input asp-for="Bandwidth" type="hidden" id="Bandwidth" />
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -343,11 +361,11 @@
 
                         <div class="col-12 col-md-6">
                             <label class="form-label-custom">Next Renewal Date</label>
-                            <div class="input-group-custom">
+                            <div class="input-group-custom" style="background-color: #F1F5F9;">
                                 <i class="fa-solid fa-calendar-check"></i>
-                                <input asp-for="NextRenewalDate" type="date" id="nextRenewalInput" class="form-control-custom">
+                                <input asp-for="NextRenewalDate" type="date" id="nextRenewalInput" class="form-control-custom" readonly tabindex="-1" style="cursor: not-allowed;">
                             </div>
-                            <span class="text-muted small">Auto-filled from Last Renewal Date + Renewal Type — edit it directly if needed.</span>
+                            <span class="text-muted small">Auto-calculated from Last Renewal Date + Renewal Type.</span>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -406,6 +424,9 @@
             var lastRenewalInput = document.getElementById('lastRenewalInput');
             var nextRenewalInput = document.getElementById('nextRenewalInput');
 
+                var bandwidthValueInput = document.getElementById('bandwidthValueInput');
+                var bandwidthHidden = document.getElementById('Bandwidth');
+
             function addMonthsToDateString(dateStr, months) {
                 var parts = dateStr.split('-');
                 var year = parseInt(parts[0], 10);
@@ -430,9 +451,71 @@
                 nextRenewalInput.value = addMonthsToDateString(lastDateVal, durations[typeId]);
             }
 
+                function updateBandwidthHidden() {
+                    var val = bandwidthValueInput.value;
+                    bandwidthHidden.value = val ? val + ' Mbps' : '';
+                }
+
+                bandwidthValueInput.addEventListener('input', updateBandwidthHidden);
+
+
+                // Safety net in case 'input' didn't fire (e.g. autofill)
+                var formEl = bandwidthValueInput.closest('form');
+                if (formEl) formEl.addEventListener('submit', updateBandwidthHidden);
             if (renewalTypeSelect) renewalTypeSelect.addEventListener('change', recalcNextRenewal);
             if (lastRenewalInput) lastRenewalInput.addEventListener('change', recalcNextRenewal);
         })();
+    </script>
+
+    <!-- Service Type -> SIM vs Landline Phone Number toggle -->
+    <script>
+        var serviceTypeHasPhoneNumber = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ServiceTypeHasPhoneNumber));
+
+        var serviceTypeSelect = document.getElementById('serviceTypeSelect');
+        var simCardSection = document.getElementById('simCardSection');
+        var landlineSection = document.getElementById('landlinePhoneSection');
+        var landlineInput = document.getElementById('landlinePhoneInput');
+        var noServiceTypeHint = document.getElementById('noServiceTypeHint');
+
+        function isLandlineServiceType() {
+            var typeId = serviceTypeSelect.value;
+            return !!typeId && serviceTypeHasPhoneNumber[typeId] === true;
+        }
+
+        function toggleServiceTypeFields() {
+            var typeId = serviceTypeSelect.value;
+
+            if (!typeId) {
+                simCardSection.style.display = 'none';
+                landlineSection.style.display = 'none';
+                noServiceTypeHint.style.display = '';
+                return;
+            }
+
+            noServiceTypeHint.style.display = 'none';
+
+            if (isLandlineServiceType()) {
+                simCardSection.style.display = 'none';
+                landlineSection.style.display = '';
+
+                // Clear any previously selected SIM
+                $('#SimId').val('');
+                $('#simCardsContainer .selection-card').removeClass('active');
+                $('#simStatusText').hide();
+                $('#PhoneNumber').val(landlineInput.value);
+            } else {
+                landlineSection.style.display = 'none';
+                simCardSection.style.display = '';
+                landlineInput.value = '';
+            }
+        }
+
+        landlineInput.addEventListener('input', function () {
+            $('#PhoneNumber').val(this.value);
+        });
+
+        serviceTypeSelect.addEventListener('change', toggleServiceTypeFields);
+        document.addEventListener('DOMContentLoaded', toggleServiceTypeFields);
     </script>
 
     <!-- SIM Card Picker -->
@@ -467,12 +550,18 @@
                             : '<span class="fw-bold text-dark" style="font-size:0.85rem">' + sim.providerName + '</span>';
 
                         var isSelected = $('#SimId').val() === String(sim.id);
+
+                        var assignedHtml = sim.assignedTo
+                            ? '<p class="card-subtitle-text">Assigned to : ' + sim.assignedTo + '</p>'
+                            : '';
+
                         html += '<div class="col-md-6">' +
-                            '<div class="selection-card ' + (isSelected ? 'active' : '') + '" onclick="selectSim(\'' + sim.id + '\', \'' + sim.phoneNumber + '\', this)">' +
+                            '<div class="selection-card ' + (isSelected ? 'active' : '') + '" onclick="selectSim(\'' + sim.id + '\', \'' + sim.phoneNumber + '\', \'' + (sim.providerId != null ? sim.providerId : '') + '\', this)">' +
                             '<div class="sim-card-header">' + logoHtml + '<span class="badge-available">Active</span></div>' +
                             '<div class="card-title-text">' + sim.phoneNumber + '</div>' +
                             '<p class="card-subtitle-text">Provider : ' + sim.providerName + '</p>' +
                             '<p class="card-subtitle-text">Serial : ' + sim.serialNumber + '</p>' +
+                            assignedHtml +
                             '<i class="fas fa-check-circle check-icon"></i>' +
                             '</div></div>';
                     });
@@ -481,7 +570,7 @@
             });
         }
 
-        function selectSim(simId, phoneNumber, cardEl) {
+        function selectSim(simId, phoneNumber, providerId, cardEl) {
             if ($(cardEl).hasClass('active')) {
                 $(cardEl).removeClass('active');
                 $('#PhoneNumber').val('');
@@ -494,6 +583,11 @@
                 $('#SimId').val(simId);
                 $('#simStatusPhone').text(phoneNumber);
                 $('#simStatusText').show();
+
+                // Auto-select the SIM's own service provider (user can still change it)
+                if (providerId) {
+                    $('#ServiceProviderId').val(String(providerId));
+                }
             }
         }
     </script>

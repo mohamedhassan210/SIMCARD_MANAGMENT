@@ -58,6 +58,7 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
                     ExtraInfo = ne.Type,
                     PersonType = "Non-Employee",
                     Identifier = ne.ContactInfo,
+                    IsActive = ne.IsActive,
 
                     ActiveSimOnlyCount = ne.Subscriptions.Count(s => s.SimId != null && (s.EndDate == null || s.EndDate >= now)),
                     ActiveUsbCount = ne.Subscriptions.Count(s => s.UsbId != null && (s.EndDate == null || s.EndDate >= now)),
@@ -99,21 +100,12 @@ namespace Sim_Card_Managment.Repos.NonEmployeeRepos
 
         public void Delete(int id)
         {
-            // Find all subscriptions associated with this non-employee
-            var subscriptions = _context.Subscriptions
-                .Where(s => s.NonEmployeeId == id)
-                .ToList();
-
-            if (subscriptions.Any())
-            {
-                _context.Subscriptions.RemoveRange(subscriptions);
-            }
-
             var nonEmployee = _context.NonEmployees.Find(id);
             if (nonEmployee != null)
             {
-                _context.NonEmployees.Remove(nonEmployee);
-                _context.SaveChanges(); // Saves both subscription removals and non-employee deletion
+                nonEmployee.IsActive = false;
+                _context.NonEmployees.Update(nonEmployee);
+                _context.SaveChanges();
             }
         }
     }

@@ -38,11 +38,15 @@ namespace Sim_Card_Managment.Viewmodel
         public DateOnly? NextRenewalDate { get; set; }
 
         public Dictionary<int, int> RenewalTypeDurations { get; set; } = new();
+        public Dictionary<int, bool> ServiceTypeHasPhoneNumber { get; set; } = new();
 
         public decimal? QuotaGB { get; set; }
         public bool Status { get; set; }
         [StringLength(500)]
         public string? Notes { get; set; }
+
+        public int? SimProviderId { get; set; }
+        public string? SimAssignedTo { get; set; }
 
         // Dropdowns
         public IEnumerable<SelectListItem> Branches { get; set; } = new List<SelectListItem>();

@@ -32,7 +32,7 @@ namespace Sim_Card_Managment.Controllers
         // POST: ServiceType/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string Name)
+        public async Task<IActionResult> Create(string Name, bool HasPhoneNumber = false)
         {
             if (string.IsNullOrWhiteSpace(Name))
             {
@@ -40,7 +40,11 @@ namespace Sim_Card_Managment.Controllers
                 return View(new ServiceType());
             }
 
-            await _lookupRepo.AddServiceTypeAsync(new ServiceType { Name = Name });
+            await _lookupRepo.AddServiceTypeAsync(new ServiceType
+            {
+                Name = Name,
+                HasPhoneNumber = HasPhoneNumber
+            });
 
             TempData["Success"] = "Service type created successfully.";
             return RedirectToAction(nameof(Index));
@@ -78,6 +82,7 @@ namespace Sim_Card_Managment.Controllers
                 return NotFound();
 
             existing.Name = serviceType.Name;
+            existing.HasPhoneNumber = serviceType.HasPhoneNumber;
 
             await _lookupRepo.UpdateServiceTypeAsync(existing);
 
