@@ -2,170 +2,169 @@
 
 @{
     ViewData["Title"] = "SIM Card Details";
-    Layout = null;
     var activeSubscription = Model.Subscriptions?.FirstOrDefault(s => s.EndDate == null || s.EndDate > DateTime.Now);
     string assignedName = activeSubscription?.Employee?.Name ?? activeSubscription?.NonEmployee?.Name ?? "Unassigned";
     string assignedType = activeSubscription?.Employee != null ? "Employee" : activeSubscription?.NonEmployee != null ? "Non-Employee" : "None";
 }
 
 <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIM Card Details</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
 </head>
+<body>
+    <section class="sd-body">
 
-
-
-<section class="sd-body">
-
-    <header class="sd-page-header">
-        <div class="container-fluid px-4 px-lg-5">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                <div>
-                    <a asp-controller="SIM" asp-action="Index" asp-route-type="sim" class="sd-back-link mb-2 d-inline-block">
-                        <i class="fa-solid fa-arrow-left me-1"></i> Back to Device Directory
-                    </a>
-                    <h1 class="sd-device-title mb-1">SIM Card: @Model.PhoneNumber</h1>
-                    <p class="sd-text-muted mb-0">ICCID / Serial: @Model.SerialNumber</p>
-                </div>
-
-                <div class="d-flex align-items-center gap-2">
-                    @if (activeSubscription != null)
-                    {
-                        <a asp-controller="DeviceTransfer"
-                           asp-action="Create"
-                           asp-route-simId="@Model.Id"
-                           class="sd-btn-outline">
-                            <i class="fa-solid fa-arrow-right-arrow-left me-1"></i> Device Transfer
+        <header class="sd-page-header">
+            <div class="container-fluid px-4 px-lg-5">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                    <div>
+                        <a asp-controller="SIM" asp-action="Index" asp-route-type="sim" class="sd-back-link mb-2 d-inline-block">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Back to Device Directory
                         </a>
-                    }
-
-                    <a asp-controller="SIM" asp-action="Edit" asp-route-id="@Model.Id" class="sd-btn-outline">
-                        <i class="fa-solid fa-pen-to-square me-2"></i>Edit Details
-                    </a>
-
-                    <button type="button" class="sd-btn-danger" onclick="sdConfirmDelete()">
-                        <i class="fa-solid fa-trash me-2"></i>Delete
-                    </button>
-
-                    <form id="sd-delete-form" asp-controller="SIM" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-none">
-                        @Html.AntiForgeryToken()
-                    </form>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="container-fluid px-4 px-lg-5 pb-5">
-        <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="sd-info-card h-100">
-                    <h4 class="fw-bold mb-4 sd-brand-orange">
-                        <i class="fa-solid fa-sim-card me-2"></i>Device Information
-                    </h4>
-
-                    <div class="row g-4">
-                        <div class="col-6">
-                            <small class="sd-text-muted d-block mb-1">Phone Number</small>
-                            <strong class="fs-6 sd-text-dark">@Model.PhoneNumber</strong>
-                        </div>
-
-                        <div class="col-6">
-                            <small class="sd-text-muted d-block mb-1">Serial Number (ICCID)</small>
-                            <strong class="fs-6 sd-text-dark">@Model.SerialNumber</strong>
-                        </div>
-
-                        <div class="col-6">
-                            <small class="sd-text-muted d-block mb-1">Service Provider</small>
-                            <strong class="fs-6 sd-text-dark">@(Model.ServiceProvider?.Name ?? "N/A")</strong>
-                        </div>
-
-                        <div class="col-6">
-                            <small class="sd-text-muted d-block mb-1">Network Type</small>
-                            <strong class="fs-6 sd-text-dark">@(Model.NetworkType ?? "N/A")</strong>
-                        </div>
-
-                    <div class="col-6">
-                        <small class="text-muted d-block mb-1">Availability</small>
-                        <span class="badge-status @(Model.IsActive ? "badge-active" : "badge-inactive")">
-                            @(Model.IsActive ? "Active" : "Not Active")
-                        </span>
+                        <h1 class="sd-device-title mb-1">SIM Card: @Model.PhoneNumber</h1>
+                        <p class="sd-text-muted mb-0">ICCID / Serial: @Model.SerialNumber</p>
                     </div>
 
-                    <div class="col-6">
-                        <small class="text-muted d-block mb-1">Status</small>
-                        <span class="badge-status @(Model.Status == "Occupied" ? "badge-active" : "badge-inactive")">
-                            @Model.Status
-                        </span>
-                    </div>
-                        <div class="col-6">
-                            <small class="sd-text-muted d-block mb-1">Status</small>
-                            <span class="sd-badge-status @(Model.IsActive ? "sd-badge-active" : "sd-badge-inactive")">
-                                @(Model.IsActive ? "Active" : "Inactive")
-                            </span>
-                        </div>
-
-                        <div class="col-6">
-                            <small class="sd-text-muted d-block mb-1">Registered At</small>
-                            <span class="sd-text-dark fw-semibold">@Model.RegisteredAt.ToString("dd MMM yyyy")</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="sd-info-card h-100">
-                    <h4 class="fw-bold mb-4 sd-brand-orange">
-                        <i class="fa-solid fa-user-check me-2"></i>Assignment Details
-                    </h4>
-
-                    <div class="mb-3">
-                        <small class="sd-text-muted d-block mb-1">Currently Assigned To</small>
-                        <strong class="fs-5 sd-text-dark">@assignedName</strong>
-                        @if (assignedType != "None")
+                    <div class="d-flex align-items-center gap-2">
+                        @if (activeSubscription != null)
                         {
-                            <span class="badge bg-secondary ms-2">@assignedType</span>
+                            <a asp-controller="DeviceTransfer"
+                               asp-action="Create"
+                               asp-route-simId="@Model.Id"
+                               class="sd-btn-outline">
+                                <i class="fa-solid fa-arrow-right-arrow-left me-1"></i> Device Transfer
+                            </a>
+                        }
+
+                        <a asp-controller="SIM" asp-action="Edit" asp-route-id="@Model.Id" class="sd-btn-outline">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Edit Details
+                        </a>
+
+                        <button type="button" class="sd-btn-danger" onclick="sdConfirmDelete()">
+                            <i class="fa-solid fa-trash me-2"></i>Delete
+                        </button>
+
+                        <form id="sd-delete-form" asp-controller="SIM" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-none">
+                            @Html.AntiForgeryToken()
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="container-fluid px-4 px-lg-5 pb-5">
+            <div class="row g-4">
+
+                <!-- Device Information Card -->
+                <div class="col-lg-6">
+                    <div class="sd-info-card h-100">
+                        <h4 class="fw-bold mb-4 sd-brand-orange">
+                            <i class="fa-solid fa-sim-card me-2"></i>Device Information
+                        </h4>
+
+                        <div class="row g-4">
+                            <div class="col-6">
+                                <small class="sd-text-muted d-block mb-1">Phone Number</small>
+                                <strong class="fs-6 sd-text-dark">@Model.PhoneNumber</strong>
+                            </div>
+
+                            <div class="col-6">
+                                <small class="sd-text-muted d-block mb-1">Serial Number (ICCID)</small>
+                                <strong class="fs-6 sd-text-dark">@Model.SerialNumber</strong>
+                            </div>
+
+                            <div class="col-6">
+                                <small class="sd-text-muted d-block mb-1">Service Provider</small>
+                                <strong class="fs-6 sd-text-dark">@(Model.ServiceProvider?.Name ?? "N/A")</strong>
+                            </div>
+
+                            <div class="col-6">
+                                <small class="sd-text-muted d-block mb-1">Network Type</small>
+                                <strong class="fs-6 sd-text-dark">@(Model.NetworkType ?? "N/A")</strong>
+                            </div>
+
+                            <div class="col-6">
+                                <small class="sd-text-muted d-block mb-1">Availability</small>
+                                <span class="sd-badge-status @(Model.IsActive ? "sd-badge-active" : "sd-badge-inactive")">
+                                    @(Model.IsActive ? "Active" : "Not Active")
+                                </span>
+                            </div>
+
+                            <div class="col-6">
+                                <small class="sd-text-muted d-block mb-1">Status</small>
+                                <span class="sd-badge-status @(Model.Status == "Occupied" ? "sd-badge-active" : "sd-badge-inactive")">
+                                    @(string.IsNullOrEmpty(Model.Status) ? "N/A" : Model.Status)
+                                </span>
+                            </div>
+
+                            <div class="col-6">
+                                <small class="sd-text-muted d-block mb-1">Registered At</small>
+                                <span class="sd-text-dark fw-semibold">@Model.RegisteredAt.ToString("dd MMM yyyy")</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignment Details Card -->
+                <div class="col-lg-6">
+                    <div class="sd-info-card h-100">
+                        <h4 class="fw-bold mb-4 sd-brand-orange">
+                            <i class="fa-solid fa-user-check me-2"></i>Assignment Details
+                        </h4>
+
+                        <div class="mb-3">
+                            <small class="sd-text-muted d-block mb-1">Currently Assigned To</small>
+                            <strong class="fs-5 sd-text-dark">@assignedName</strong>
+                            @if (assignedType != "None")
+                            {
+                                <span class="badge bg-secondary ms-2">@assignedType</span>
+                            }
+                        </div>
+
+                        @if (activeSubscription != null)
+                        {
+                            <div class="mt-4 p-3 rounded-3 sd-brand-orange-light">
+                                <small class="sd-text-muted d-block mb-1">Subscription Start Date</small>
+                                <span class="fw-semibold sd-text-dark">@activeSubscription.StartDate.ToString("dd MMM yyyy")</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="sd-text-muted fst-italic mt-3 mb-0">This SIM card is currently unassigned.</p>
                         }
                     </div>
-
-                    @if (activeSubscription != null)
-                    {
-                        <div class="mt-4 p-3 rounded-3 sd-brand-orange-light">
-                            <small class="sd-text-muted d-block mb-1">Subscription Start Date</small>
-                            <span class="fw-semibold sd-text-dark">@activeSubscription.StartDate.ToString("dd MMM yyyy")</span>
-                        </div>
-                    }
-                    else
-                    {
-                        <p class="sd-text-muted fst-italic mt-3 mb-0">This SIM card is currently unassigned.</p>
-                    }
                 </div>
+
             </div>
-        </div>
-    </main>
+        </main>
 
+    </section>
 
-</section>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-
-    function sdConfirmDelete() {
-        Swal.fire({
-            title: 'Delete SIM Card?',
-            text: "This action cannot be undone.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#DC2626',
-            cancelButtonColor: '#64748B',
-            confirmButtonText: 'Yes, Delete',
-            customClass: { popup: 'rounded-4' }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('sd-delete-form').submit();
-            }
-        });
-    }
-</script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function sdConfirmDelete() {
+            Swal.fire({
+                title: 'Delete SIM Card?',
+                text: "This action cannot be undone.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Yes, Delete',
+                customClass: { popup: 'rounded-4' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('sd-delete-form').submit();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

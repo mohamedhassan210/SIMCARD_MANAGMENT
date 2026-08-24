@@ -13,6 +13,30 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
     <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
+    <style>
+        .id-btn-action {
+          
+            
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #E2E8F0;
+            background-color: #DF531B;
+            color: #FFFFFF;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+            .id-btn-action:hover {
+                background: #FFF8F6;
+                color: #DF531B;
+                border-color: rgba(223, 83, 27, 0.3);
+            }
+
+       
+    </style>
 </head>
 <body>
     <section class="bd-body">
@@ -188,7 +212,7 @@
                             </button>
                         </form>
 
-                        <a asp-controller="InternetLine" asp-action="Edit" asp-route-id="@Model.Id" class="btn bi-btn-action rounded-pill px-4">
+                        <a asp-controller="InternetLine" asp-action="Edit" asp-route-id="@Model.Id" class="btn id-btn-action px-3 rounded-pill ">
                             <i class="fa-solid fa-pen-to-square me-1"></i> Edit Line
                         </a>
                     </div>
