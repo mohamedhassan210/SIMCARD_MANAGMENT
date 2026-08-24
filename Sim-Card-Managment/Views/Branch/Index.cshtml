@@ -14,7 +14,10 @@
     :root {
         --primary-orange: #E24D17;
         --primary-orange-hover: #c84111;
+        --primary-orange-light: #FFF8F6;
         --bg-light: #f8f9fa;
+        --text-muted: #64748B;
+        --card-border: #e0e0e0;
     }
 
     /* Page Header */
@@ -29,7 +32,7 @@
         color: #6c757d;
     }
 
-    /* Action Buttons */
+    /* Primary Header Button */
     .btn-orange-primary {
         background-color: var(--primary-orange);
         border: 1px solid var(--primary-orange);
@@ -51,6 +54,7 @@
             color: #ffffff;
         }
 
+    /* Table Action Buttons with Text */
     .btn-view-action {
         background-color: #ffffff;
         border: 1px solid #e0e0e0;
@@ -77,10 +81,14 @@
         border: 1px solid #e0e0e0;
         color: #dc3545;
         border-radius: 8px;
-        padding: 6px 12px;
+        padding: 6px 14px;
         font-size: 13px;
         font-weight: 600;
         transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
     }
 
         .btn-delete-action:hover {
@@ -306,7 +314,7 @@
                     {
                         @foreach (var branch in branchList)
                         {
-                            <tr class="branch-row" data-active="@(branch.IsActive ? "Active" : "Inactive")" style="cursor: pointer;" onclick="navigateToDetails(event, '/Branch/Details/@branch.Id')">
+                            <tr class="branch-row" data-active="@(branch.IsActive ? "Active" : "Inactive")">
                                 <td class="fw-bold text-dark">
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="rounded-circle bg-orange bg-opacity-10 text-danger p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background-color: rgba(226, 77, 23, 0.1);">
@@ -361,11 +369,19 @@
                                 </td>
                                 <td class="text-end action-cell">
                                     <div class="d-inline-flex gap-2">
-                                        <a href="/Branch/Edit/@branch.Id" class="btn-view-action" title="Edit Branch" onclick="stopPropagation(event)">
+                                        <!-- View Details Button -->
+                                        <a asp-controller="Branch" asp-action="Details" asp-route-id="@branch.Id" class="btn-view-action" title="View Details">
+                                            <i class="fas fa-eye"></i> Details
+                                        </a>
+
+                                        <!-- Edit Button -->
+                                        <a asp-controller="Branch" asp-action="Edit" asp-route-id="@branch.Id" class="btn-view-action" title="Edit Branch">
                                             <i class="fas fa-pen"></i> Edit
                                         </a>
+
+                                        <!-- Delete Button -->
                                         <button type="button" class="btn-delete-action" title="Delete Branch" onclick="biDeleteBranch(@branch.Id, '@branch.Name', event)">
-                                            <i class="fas fa-trash-alt"></i>
+                                            <i class="fas fa-trash-alt"></i> Delete
                                         </button>
                                     </div>
                                 </td>
@@ -389,19 +405,6 @@
         return tokenInput ? tokenInput.value : '';
     }
 
-    function stopPropagation(e) {
-        if (e) e.stopPropagation();
-    }
-
-    function navigateToDetails(e, url) {
-        if (e.target.closest('.action-cell')) {
-            return;
-        }
-        if (url) {
-            window.location.href = url;
-        }
-    }
-
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById('tableSearchInput');
         const statusFilter = document.getElementById('statusFilter');
@@ -410,7 +413,7 @@
 
         function filterTable() {
             const searchTerm = searchInput.value.toLowerCase().trim();
-            const selectedStatus = statusFilter.value; // "Active", "Inactive", or ""
+            const selectedStatus = statusFilter.value;
             let visibleCount = 0;
 
             rows.forEach(row => {

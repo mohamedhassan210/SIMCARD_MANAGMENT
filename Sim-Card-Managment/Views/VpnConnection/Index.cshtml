@@ -183,7 +183,6 @@
                 color: var(--text-dark);
             }
 
-
         .btn-action-icon {
             width: 36px;
             height: 36px;
@@ -196,6 +195,7 @@
             color: var(--text-muted);
             transition: all 0.2s ease;
             text-decoration: none;
+            padding: 0;
         }
 
             .btn-action-icon:hover {
@@ -389,7 +389,7 @@
                             foreach (var item in Model)
                             {
                                 var statusAttr = item.Status == true ? "UP" : item.Status == false ? "DOWN" : "UNKNOWN";
-                                <tr class="vpn-row" data-status="@statusAttr" data-href="/VpnConnection/Details/@item.Id">
+                                <tr class="vpn-row" data-status="@statusAttr">
                                     <td><strong>@item.BranchName</strong></td>
                                     <td>@item.ConnectionTypeName</td>
                                     <td>@item.ServiceProviderName</td>
@@ -420,9 +420,23 @@
                                         <span class="fw-semibold">@item.CreatedByUsername</span>
                                     </td>
 
+                                   
                                     <td style="text-align: right;">
-                                        <div class="d-inline-flex gap-1 action-buttons">
-                                            <a asp-controller="VpnConnection" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit Link">
+                                        <div class="d-inline-flex align-items-center gap-2 action-buttons">
+                                            <a asp-controller="VpnConnection"
+                                               asp-action="Details"
+                                               asp-route-id="@item.Id"
+                                               class="btn-custom btn-secondary-soft text-decoration-none py-1 px-3"
+                                               style="height: 36px; font-size: 0.85rem;"
+                                               title="View Details">
+                                                <i class="fa-solid fa-eye"></i>
+                                                <span>Details</span>
+                                            </a>
+                                            <a asp-controller="VpnConnection"
+                                               asp-action="Edit"
+                                               asp-route-id="@item.Id"
+                                               class="btn-action-icon"
+                                               title="Edit Link">
                                                 <i class="fa-solid fa-pen"></i>
                                             </a>
                                         </div>
@@ -446,26 +460,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Row Click Navigation Fix
-            const rows = document.querySelectorAll('.vpn-row'); // Fixed uppercase 'V'
-
-            rows.forEach(row => {
-                row.addEventListener('click', (e) => {
-                    // Now works because we added 'action-buttons' class to the HTML
-                    if (e.target.closest('.action-buttons')) {
-                        return;
-                    }
-                    const targetUrl = row.getAttribute('data-href');
-                    if (targetUrl) {
-                        window.location.href = targetUrl;
-                    }
-                });
-            });
-
-            // 2. Search and Filter Implementation
             const searchInput = document.getElementById('vpnSearchInput');
             const statusFilter = document.getElementById('statusFilter');
             const noResultsRow = document.getElementById('noResultsRow');
+            const rows = document.querySelectorAll('.vpn-row');
 
             function filterTable() {
                 const searchTerm = searchInput.value.toLowerCase();
@@ -487,7 +485,6 @@
                     }
                 });
 
-                // Show/hide the "No results found" row
                 if (noResultsRow) {
                     noResultsRow.style.display = visibleCount === 0 ? '' : 'none';
                 }
