@@ -1,6 +1,6 @@
 ﻿@model int
 
-<a class="nav-link text-white position-relative" title="Notifications"
+<a class="nav-link text-white position-relative" title="@Model Unread"
    asp-controller="InternetLine" asp-action="Dashboard">
     <i class="fa-solid fa-bell fs-5"></i>
     @if (Model > 0)
