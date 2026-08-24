@@ -81,9 +81,9 @@
     <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body>
-    <div class="rotate position-fixed top-50 start-0 bg-transparent z-3 d-flex justify-content-center align-items-center shadow "
-         style="height: 40px; width: 40px; cursor: pointer; border-radius: 0 8px 8px 0; z-index:1000"
-         data-bs-toggle="offcanvas" data-bs-target="#leftSidebar" aria-controls="leftSidebar">
+    <div id="sidebarToggleHandle" class="rotate position-fixed top-50 start-0 bg-transparent z-3 d-flex justify-content-center align-items-center shadow "
+         style="height: 40px; width: 40px; cursor: pointer; border-radius: 0 8px 8px 0; z-index:1000; touch-action: none;"
+         aria-controls="leftSidebar">
 
         <svg class="animate-spin text-dark svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path d="M20.991,10H19.42a1.039,1.039,0,0,1-.951-.674l-.005-.013a1.04,1.04,0,0,1,.2-1.146l1.11-1.11a1.01,1.01,0,0,0,0-1.428l-1.4-1.4a1.01,1.01,0,0,0-1.428,0l-1.11,1.11a1.04,1.04,0,0,1-1.146.2l-.013,0A1.04,1.04,0,0,1,14,4.579V3.009A1.009,1.009,0,0,0,12.991,2H11.009A1.009,1.009,0,0,0,10,3.009v1.57a1.04,1.04,0,0,1-.674.952l-.013,0a1.04,1.04,0,0,1-1.146-.2l-1.11-1.11a1.01,1.01,0,0,0-1.428,0l-1.4,1.4a1.01,1.01,0,0,0,0,1.428l1.11,1.11a1.04,1.04,0,0,1,.2,1.146l0,.013A1.039,1.039,0,0,1,4.58,10H3.009A1.009,1.009,0,0,0,2,11.009v1.982A1.009,1.009,0,0,0,3.009,14H4.58a1.039,1.039,0,0,1,.951.674l0,.013a1.04,1.04,0,0,1-.2,1.146l-1.11,1.11a1.01,1.01,0,0,0,0,1.428l1.4,1.4a1.01,1.01,0,0,0,1.428,0l1.11-1.11a1.04,1.04,0,0,1,1.146-.2l.013.005A1.039,1.039,0,0,1,10,19.42v1.571A1.009,1.009,0,0,0,11.009,22h1.982A1.009,1.009,0,0,0,14,20.991V19.42a1.039,1.039,0,0,1,.674-.951l.013-.005a1.04,1.04,0,0,1,1.146.2l1.11,1.11a1.01,1.01,0,0,0,1.428,0l1.4-1.4a1.01,1.01,0,0,0,0-1.428l-1.11-1.11a1.04,1.04,0,0,1-.2-1.146l.005-.013A1.039,1.039,0,0,1,19.42,14h1.571A1.009,1.009,0,0,0,22,12.991V11.009A1.009,1.009,0,0,0,20.991,10ZM12,15a3,3,0,1,1,3-3A3,3,0,0,1,12,15Z" />
@@ -639,6 +639,104 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/highcharts.js"></script>
+    <script>
+        // Draggable sidebar-toggle handle: vertical dragging only, pinned to the
+        // left edge of the screen. Last vertical position is remembered per browser.
+        // The offcanvas is opened manually (not via data-bs-toggle) so a press that
+        // turns into a drag never also pops the sidebar open.
+        (function () {
+            var handle = document.getElementById('sidebarToggleHandle');
+            if (!handle) return;
+
+            var offcanvasEl = document.getElementById('leftSidebar');
+
+            var STORAGE_KEY = 'sidebarToggleHandleTop';
+            var DRAG_THRESHOLD = 6; // px of movement before a press counts as a drag
+
+            var isPointerDown = false;
+            var isDragging = false;
+            var startClientY = 0;
+            var startTop = 0;
+
+            function clampTop(top) {
+                var maxTop = Math.max(window.innerHeight - handle.offsetHeight, 0);
+                return Math.min(Math.max(top, 0), maxTop);
+            }
+
+            function applyTop(top) {
+                handle.style.top = top + 'px';
+                handle.classList.remove('top-50');
+            }
+
+            // Restore the last saved position, if any.
+            var savedTop = localStorage.getItem(STORAGE_KEY);
+            if (savedTop !== null && !isNaN(parseFloat(savedTop))) {
+                applyTop(clampTop(parseFloat(savedTop)));
+            }
+
+            handle.addEventListener('pointerdown', function (e) {
+                // Only respond to primary button / touch / pen.
+                if (e.button !== undefined && e.button !== 0) return;
+
+                isPointerDown = true;
+                isDragging = false;
+                startClientY = e.clientY;
+                startTop = handle.getBoundingClientRect().top;
+
+                try { handle.setPointerCapture(e.pointerId); } catch (err) { /* no-op */ }
+            });
+
+            handle.addEventListener('pointermove', function (e) {
+                if (!isPointerDown) return;
+
+                var deltaY = e.clientY - startClientY;
+
+                if (!isDragging && Math.abs(deltaY) > DRAG_THRESHOLD) {
+                    isDragging = true;
+                    handle.style.cursor = 'grabbing';
+                }
+
+                if (isDragging) {
+                    e.preventDefault();
+                    applyTop(clampTop(startTop + deltaY));
+                }
+            });
+
+            function endDrag(e) {
+                if (!isPointerDown) return;
+                isPointerDown = false;
+                handle.style.cursor = 'pointer';
+
+                if (isDragging) {
+                    // This press was a drag: save the new spot, don't open the sidebar.
+                    isDragging = false;
+
+                    var finalTop = parseFloat(handle.style.top);
+                    if (!isNaN(finalTop)) {
+                        localStorage.setItem(STORAGE_KEY, finalTop);
+                    }
+                } else if (offcanvasEl && window.bootstrap && window.bootstrap.Offcanvas) {
+                    // This press was a plain click (no meaningful movement): open it.
+                    window.bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl).show();
+                }
+            }
+
+            handle.addEventListener('pointerup', endDrag);
+            handle.addEventListener('pointercancel', function () {
+                isPointerDown = false;
+                isDragging = false;
+                handle.style.cursor = 'pointer';
+            });
+
+            // Keep the handle on-screen if the window gets resized/rotated.
+            window.addEventListener('resize', function () {
+                var currentTop = parseFloat(handle.style.top);
+                if (!isNaN(currentTop)) {
+                    applyTop(clampTop(currentTop));
+                }
+            });
+        })();
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
