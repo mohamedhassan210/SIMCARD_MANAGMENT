@@ -266,8 +266,14 @@
                         </div>
                     </div>
 
+                    @{
+                        var backController = Model.SimId.HasValue ? "Sim" : "Usb";
+                        var backId = Model.SimId ?? Model.UsbId;
+                    }
+
                     <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                        <a asp-action="Index" class="btn btn-action btn-outline-back text-center text-decoration-none">Back</a>
+                        <a asp-controller="@backController" asp-action="Details" asp-route-id="@backId"
+                           class="btn btn-action btn-outline-back text-center text-decoration-none">Back</a>
                         <div class="d-flex gap-3">
                             <button type="submit" class="btn btn-action btn-activate">Activate Transfer</button>
                         </div>
@@ -281,7 +287,6 @@
 
 @section Scripts {
     <script>
-        // Real-time Employee Search function
         $('#toEmpSearchInput').on('input', function () {
             const query = $(this).val().trim();
 
@@ -290,8 +295,11 @@
                 return;
             }
 
-            // Perform AJAX search request to Subscription search controller
-            $.get('/Subscription/SearchRecipients', { query: query, isNonEmployee: false }, function (data) {
+            $.get('/DeviceTransfer/SearchRecipients', {
+                query: query,
+                isNonEmployee: false,
+                excludeEmpId: @(Model.FromSubscription?.EmpId ?? 0)
+            }, function (data) {
                 let html = '';
                 if (!data || data.length === 0) {
                     html = '<div class="col-12 text-muted small">No target employees found matching your query.</div>';

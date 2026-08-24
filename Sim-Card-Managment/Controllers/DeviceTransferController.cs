@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
+using Sim_Card_Managment.Repos.EmployeeRepos;
+using Sim_Card_Managment.Repos.NonEmployeeRepos;
 using System.Security.Claims;
 
 namespace Sim_Card_Managment.Controllers
@@ -11,12 +14,27 @@ namespace Sim_Card_Managment.Controllers
         private readonly IDeviceTransferRepo _repo;
         private readonly ISIMRepo _simRepo;
         private readonly IUSBRepo _usbRepo;
+        private readonly IDeviceStatusRepo _deviceStatusRepo;
+        private readonly IEmployeeRepo _employeeRepo;
+        private readonly INonEmployeeRepo _nonEmployeeRepo;
+        private readonly AppDbContext _context;
 
-        public DeviceTransferController(IDeviceTransferRepo repo, ISIMRepo simRepo, IUSBRepo usbRepo)
+        public DeviceTransferController(
+            IDeviceTransferRepo repo,
+            ISIMRepo simRepo,
+            IUSBRepo usbRepo,
+            IDeviceStatusRepo deviceStatusRepo,
+            IEmployeeRepo employeeRepo,
+            INonEmployeeRepo nonEmployeeRepo,
+            AppDbContext context)
         {
             _repo = repo;
             _simRepo = simRepo;
             _usbRepo = usbRepo;
+            _deviceStatusRepo = deviceStatusRepo;
+            _employeeRepo = employeeRepo;
+            _nonEmployeeRepo = nonEmployeeRepo;
+            _context = context;
         }
 
         public IActionResult Index()
@@ -150,7 +168,27 @@ namespace Sim_Card_Managment.Controllers
                     // EF Core will save both and populate the FK automatically in 1 transaction
                     _repo.CompleteTransaction();
 
-                    return RedirectToAction(nameof(Index));
+                    // Log this transfer in DeviceStatus history, same as SubscriptionController does — status "Occupied"
+                    var occupiedStatusType = _context.DeviceStatusesType
+                        .FirstOrDefault(t => t.Name == "Occupied");
+
+                    if (occupiedStatusType != null)
+                    {
+                        var deviceStatus = new DeviceStatus
+                        {
+                            SimId = newSubscription.SimId,
+                            UsbId = newSubscription.UsbId,
+                            StatusTypeId = occupiedStatusType.Id,
+                            StatusDate = DateTime.Now,
+                            Notes = "Device transferred to new owner",
+                            ReportedBy = deviceTransfer.CreatedBy
+                        };
+
+                        // AddDeviceStatus already calls SaveChanges() internally
+                        _deviceStatusRepo.AddDeviceStatus(deviceStatus);
+                    }
+
+                    return RedirectToAction("Index", "DeviceStatus");
                 }
 
                 ModelState.AddModelError("", "Active subscription to transfer from was not found.");
@@ -159,6 +197,42 @@ namespace Sim_Card_Managment.Controllers
             // If state is invalid, re-populate navigation property
             deviceTransfer.FromSubscription = _repo.GetSubscriptionById(deviceTransfer.FromSubscriptionId)!;
             return View(deviceTransfer);
+        }
+        [HttpGet]
+        public async Task<IActionResult> SearchRecipients(string query, bool isNonEmployee, int? excludeEmpId = null)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Json(new List<object>());
+
+            if (isNonEmployee)
+            {
+                var nonEmployees = await _nonEmployeeRepo.SearchNonEmployeesAsync(query);
+
+                var result = nonEmployees.Select(n => new {
+                    id = n.Id,
+                    name = n.Name,
+                    details = $"Non-Employee | Contact: {n.ContactInfo ?? "N/A"}"
+                });
+
+                return Json(result);
+            }
+            else
+            {
+                var employees = await _employeeRepo.SearchActiveEmployeesAsync(query);
+
+                if (excludeEmpId.HasValue)
+                {
+                    employees = employees.Where(e => e.Id != excludeEmpId.Value);
+                }
+
+                var result = employees.Select(e => new {
+                    id = e.Id,
+                    name = e.Name,
+                    details = $"National ID: {e.NationalID}"
+                });
+
+                return Json(result);
+            }
         }
     }
 }
