@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Repos.GroupRepos;
@@ -13,12 +15,14 @@ namespace Sim_Card_Managment.Controllers
         private readonly IGroupRepo _groups;
         private readonly IPermissionRepo _permissions;
         private readonly IAccountRepo _accountRepo;
+        private readonly AppDbContext _context;
 
-        public GroupController(IGroupRepo groups, IPermissionRepo permissions , IAccountRepo accountRepo)
+        public GroupController(IGroupRepo groups, IPermissionRepo permissions, IAccountRepo accountRepo, AppDbContext context)
         {
             _groups = groups;
             _permissions = permissions;
             _accountRepo = accountRepo;
+            _context = context;
         }
 
         // GET: Group/Index
@@ -62,6 +66,13 @@ namespace Sim_Card_Managment.Controllers
             else
             {
                 group.CreatedById = 1; // Default fallback ID if unauthenticated in dev
+            }
+
+            // Reject duplicate group names
+            bool nameExists = await _context.Groups.AnyAsync(g => g.Name == group.Name);
+            if (nameExists)
+            {
+                ModelState.AddModelError(nameof(group.Name), "A group with this name already exists.");
             }
 
             if (ModelState.IsValid)

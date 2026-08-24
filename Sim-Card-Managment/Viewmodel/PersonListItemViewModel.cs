@@ -12,6 +12,7 @@ namespace Sim_Card_Managment.ViewModels
         public int ActiveSimOnlyCount { get; set; }
         public int ActiveUsbCount { get; set; }
         public bool IsActive { get; set; } = true;
+        public string? NationalID { get; set; }
         public DateTime StartDate { get; set; }
     }
 }

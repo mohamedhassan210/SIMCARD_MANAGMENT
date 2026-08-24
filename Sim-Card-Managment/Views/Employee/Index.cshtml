@@ -362,7 +362,7 @@
                             var rawType = (item.PersonType ?? "").ToLower().Replace(" ", "-");
                             var rowClass = !isRowActive ? "person-row inactive-row" : "person-row";
 
-                            <tr class="@rowClass" data-status="@statusValue" data-type="@rawType">
+                            <tr class="@rowClass" data-status="@statusValue" data-type="@rawType" data-nationalid="@(item.NationalID ?? "")">
                                 <td>
                                     <div>
                                         <span class="fw-bold text-dark fs-6 d-block">@item.Name</span>
@@ -414,14 +414,6 @@
                             </tr>
                         }
                     }
-                    <tr id="noResultsRow" style="display: none;">
-                        <td colspan="7" class="text-center text-muted py-4">
-                            No matching personnel found.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
 
         <!-- Footer / Pagination -->
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3 mt-4 pt-3 border-top">
@@ -489,30 +481,31 @@
             paginationContainer.innerHTML = html;
         }
 
-        function applyFilters() {
-            const query = searchInput.value.trim().toLowerCase();
-            const selectedType = typeFilter.value.toLowerCase();
-            const selectedStatus = statusFilter.value.toLowerCase();
+                    function applyFilters() {
+                const query = searchInput.value.trim().toLowerCase();
+                const selectedType = typeFilter.value.toLowerCase();
+                const selectedStatus = statusFilter.value.toLowerCase();
 
-            visibleRows = allRows.filter(row => {
-                // 1. Text Search matching
-                const text = row.innerText.toLowerCase();
-                const matchesSearch = text.includes(query);
+                visibleRows = allRows.filter(row => {
+                    // 1. Text Search matching (visible text + National ID, which isn't shown as a column)
+                    const text = row.innerText.toLowerCase();
+                    const nationalId = (row.getAttribute("data-nationalid") || "").toLowerCase();
+                    const matchesSearch = text.includes(query) || nationalId.includes(query);
 
-                // 2. Type Filter matching
-                const rowType = (row.getAttribute("data-type") || "").toLowerCase();
-                const matchesType = (selectedType === "all" || rowType === selectedType);
+                    // 2. Type Filter matching
+                    const rowType = (row.getAttribute("data-type") || "").toLowerCase();
+                    const matchesType = (selectedType === "all" || rowType === selectedType);
 
-                // 3. Status Filter matching
-                const rowStatus = (row.getAttribute("data-status") || "active").toLowerCase();
-                const matchesStatus = (selectedStatus === "all" || rowStatus === selectedStatus);
+                    // 3. Status Filter matching
+                    const rowStatus = (row.getAttribute("data-status") || "active").toLowerCase();
+                    const matchesStatus = (selectedStatus === "all" || rowStatus === selectedStatus);
 
-                return matchesSearch && matchesType && matchesStatus;
-            });
+                    return matchesSearch && matchesType && matchesStatus;
+                });
 
-            currentPage = 1; // Reset to page 1 on filter change
-            renderTable();
-        }
+                currentPage = 1;
+                renderTable();
+            }
 
         // Attach event listeners
         searchInput.addEventListener("input", applyFilters);

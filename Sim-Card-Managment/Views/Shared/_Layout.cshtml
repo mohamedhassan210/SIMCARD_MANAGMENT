@@ -615,7 +615,7 @@
                     @if (Has("Employee", "Index"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link fw-bold px-4 text-white @(currentController == "Employee" ? "active" : "")"
+                            <a class="nav-link fw-bold px-4 text-white @(currentController == "Employee" && currentAction == "Index" ? "active" : "")"
                                asp-controller="Employee" asp-action="Index">USERS</a>
                         </li>
                     }

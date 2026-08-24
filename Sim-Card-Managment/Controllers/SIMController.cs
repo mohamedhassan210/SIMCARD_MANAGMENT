@@ -136,6 +136,13 @@ namespace Sim_Card_Managment.Controllers
             ModelState.Remove(nameof(Sim.ServiceProvider));
             ModelState.Remove(nameof(Sim.ServiceProviderId));
 
+            // Reject duplicate serial numbers
+            bool serialExists = _context.Sims.Any(s => s.SerialNumber == sim.SerialNumber);
+            if (serialExists)
+            {
+                ModelState.AddModelError("SerialNumber", "This serial number is already in use by another SIM.");
+            }
+
             if (ModelState.IsValid)
             {
                 sim.RegisteredAt = DateTime.Now;
@@ -174,6 +181,13 @@ namespace Sim_Card_Managment.Controllers
 
             ModelState.Remove(nameof(Sim.ServiceProvider));
             ModelState.Remove(nameof(Sim.ServiceProviderId));
+
+            // Reject duplicate serial numbers, excluding this SIM itself
+            bool serialExists = _context.Sims.Any(s => s.SerialNumber == sim.SerialNumber && s.Id != sim.Id);
+            if (serialExists)
+            {
+                ModelState.AddModelError("SerialNumber", "This serial number is already in use by another SIM.");
+            }
 
             if (ModelState.IsValid)
             {

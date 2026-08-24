@@ -44,16 +44,24 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Usb usb)
         {
-            ModelState.Remove(nameof(Usb.ServiceProvider));
+            // ... your existing provider/validation logic stays as-is ...
+
+            // Reject duplicate serial numbers
+            bool serialExists = _context.Usbs.Any(u => u.SerialNumber == usb.SerialNumber);
+            if (serialExists)
+            {
+                ModelState.AddModelError("SerialNumber", "This serial number is already in use by another USB modem.");
+            }
+
             if (ModelState.IsValid)
             {
                 usb.RegisteredAt = DateTime.Now;
                 usb.IsActive = true;
                 usb.Status = "Unassigned";
                 _usbRepo.Add(usb);
-                return RedirectToAction("Index", "SIM", new { type = "usb" });
+                return RedirectToAction(nameof(Index));
             }
-            PopulateServiceProvidersDropDownList(usb.ServiceProviderId);
+
             return View(usb);
         }
         [HttpGet]
@@ -78,6 +86,19 @@ namespace Sim_Card_Managment.Controllers
                 return RedirectToAction(nameof(Details), new { id = usb.Id });
             }
             PopulateServiceProvidersDropDownList(usb.ServiceProviderId);
+            // Reject duplicate serial numbers, excluding this USB itself
+            bool serialExists = _context.Usbs.Any(u => u.SerialNumber == usb.SerialNumber && u.Id != usb.Id);
+            if (serialExists)
+            {
+                ModelState.AddModelError("SerialNumber", "This serial number is already in use by another USB modem.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _usbRepo.Update(usb);
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(usb);
         }
         [HttpGet]

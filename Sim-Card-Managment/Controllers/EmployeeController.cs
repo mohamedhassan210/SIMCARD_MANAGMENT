@@ -99,6 +99,27 @@ namespace Sim_Card_Managment.Controllers
                 return View(model);
             }
 
+            // Reject duplicate National ID
+            bool nationalIdExists = await _context.Employees.AnyAsync(e => e.NationalID == model.NationalID);
+            if (nationalIdExists)
+            {
+                ModelState.AddModelError(nameof(model.NationalID), "An employee with this National ID already exists.");
+                await PopulateGroupsAsync(model);
+                return View(model);
+            }
+
+            // Reject duplicate Employee Code (if provided)
+            if (!string.IsNullOrWhiteSpace(model.EmpCode))
+            {
+                bool empCodeExists = await _context.Employees.AnyAsync(e => e.EmpCode == model.EmpCode);
+                if (empCodeExists)
+                {
+                    ModelState.AddModelError(nameof(model.EmpCode), "An employee with this Employee Code already exists.");
+                    await PopulateGroupsAsync(model);
+                    return View(model);
+                }
+            }
+
             // Extra check beyond DataAnnotations: username must be free before we commit anything
             if (model.HasAccount)
             {
@@ -132,9 +153,7 @@ namespace Sim_Card_Managment.Controllers
 
             _employeeRepo.Add(employee);
 
-            // 2. If requested, save an independent User row — Employee and User
-            //    are two separate tables here; UserId on Employee is intentionally
-            //    left unset, no FK link is created between the two.
+            // 2. If requested, save an independent User row
             if (model.HasAccount)
             {
                 var user = new User

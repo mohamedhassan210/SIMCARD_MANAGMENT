@@ -1,4 +1,6 @@
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Mvc;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos.EmployeeRepos;
 using Sim_Card_Managment.Repos.NonEmployeeRepos;
@@ -11,11 +13,13 @@ namespace Sim_Card_Managment.Controllers
     {
         private readonly INonEmployeeRepo _nonEmployeeRepo;
         private readonly IEmployeeRepo _employeeRepo;
+        private readonly AppDbContext _context;
 
-        public NonEmployeeController(INonEmployeeRepo nonEmployeeRepo, IEmployeeRepo employeeRepo)
+        public NonEmployeeController(INonEmployeeRepo nonEmployeeRepo, IEmployeeRepo employeeRepo, AppDbContext context)
         {
             _nonEmployeeRepo = nonEmployeeRepo;
             _employeeRepo = employeeRepo;
+            _context = context;
         }
         // GET: /NonEmployee/Create
         public IActionResult Create()
@@ -28,17 +32,22 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(NonEmployee nonEmployee)
         {
-            if (!ModelState.IsValid)
+            // Reject duplicate contact info, if that's your uniqueness rule
+            bool contactExists = _context.NonEmployees.Any(n => n.ContactInfo == nonEmployee.ContactInfo);
+            if (contactExists)
             {
-                return View(nonEmployee);
+                ModelState.AddModelError(nameof(nonEmployee.ContactInfo), "A non-employee with this contact info already exists.");
             }
 
-            //nonEmployee.Id = int.Newint();
-            nonEmployee.CreatedAt = DateTime.Now;
+            if (ModelState.IsValid)
+            {
+                nonEmployee.CreatedAt = DateTime.Now;
+                nonEmployee.IsActive = true;
+                _nonEmployeeRepo.Add(nonEmployee);
+                return RedirectToAction(nameof(Index));
+            }
 
-            _nonEmployeeRepo.Add(nonEmployee);
-
-            return RedirectToAction("Index", "Employee");
+            return View(nonEmployee);
         }
         // GET: /NonEmployee/Details/{id}
         public IActionResult Details(int id)

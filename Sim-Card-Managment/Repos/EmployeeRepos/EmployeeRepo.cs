@@ -44,19 +44,20 @@ namespace Sim_Card_Managment.Repos.EmployeeRepos
             var now = DateTime.Now;
 
             return await query
-                .Select(e => new PersonListItemViewModel
-                {
-                    Id = e.Id,
-                    Name = e.Name,
-                    ExtraInfo = e.Position,
-                    PersonType = "Employee",
-                    Identifier = e.EmpCode,
-                    IsActive = e.IsActive, // Ensure IsActive is mapped to the view model
-                    ActiveSimOnlyCount = e.Subscriptions.Count(s => s.SimId != null && (s.EndDate == null || s.EndDate >= now)),
-                    ActiveUsbCount = e.Subscriptions.Count(s => s.UsbId != null && (s.EndDate == null || s.EndDate >= now)),
-                    StartDate = e.CreatedAt
-                })
-                .ToListAsync();
+    .Select(e => new PersonListItemViewModel
+    {
+        Id = e.Id,
+        Name = e.Name,
+        ExtraInfo = e.Position,
+        PersonType = "Employee",
+        Identifier = e.EmpCode,
+        NationalID = e.NationalID,
+        IsActive = e.IsActive,
+        ActiveSimOnlyCount = e.Subscriptions.Count(s => s.SimId != null && (s.EndDate == null || s.EndDate >= now)),
+        ActiveUsbCount = e.Subscriptions.Count(s => s.UsbId != null && (s.EndDate == null || s.EndDate >= now)),
+        StartDate = e.CreatedAt
+    })
+    .ToListAsync();
         }
         public IEnumerable<Employee> GetAll()
         {
