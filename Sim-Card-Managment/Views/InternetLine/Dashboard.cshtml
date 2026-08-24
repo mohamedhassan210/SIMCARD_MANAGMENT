@@ -194,6 +194,38 @@
             opacity: 0.4;
             cursor: not-allowed;
         }
+    /* Table Row Status Colors */
+    .clickable-row.row-critical {
+        background-color: #fde8e8 !important; /* Soft Red */
+    }
+
+        .clickable-row.row-critical:hover {
+            background-color: #fbd5d5 !important;
+        }
+
+    .clickable-row.row-warning {
+        background-color: #fffbe6 !important; /* Soft Yellow */
+    }
+
+        .clickable-row.row-warning:hover {
+            background-color: #fff1b8 !important;
+        }
+
+    .clickable-row.row-normal {
+        background-color: #ffffff !important; /* Default White */
+    }
+
+        .clickable-row.row-normal:hover {
+            background-color: #f8f9fa !important;
+        }
+
+    .clickable-row.row-no-date {
+        background-color: #f4f5f7 !important; /* Soft Gray */
+    }
+
+        .clickable-row.row-no-date:hover {
+            background-color: #e5e7eb !important;
+        }
 </style>
 
 <div class="container-fluid px-4 p-100">
@@ -290,7 +322,26 @@
                     {
                         foreach (var item in lineList)
                         {
-                            <tr class="clickable-row" data-href="@Url.Action("Details", "InternetLine", new { id = item.Id })">
+                            // Determine status class based on NextRenewalDate
+                            string rowClass = "row-normal";
+                            if (item.NextRenewalDate.HasValue)
+                            {
+                                int daysRemaining = item.NextRenewalDate.Value.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
+                                if (daysRemaining < 5)
+                                {
+                                    rowClass = "row-critical";
+                                }
+                                else if (daysRemaining <= 20)
+                                {
+                                    rowClass = "row-warning";
+                                }
+                            }
+                            else
+                            {
+                                rowClass = "row-no-date";
+                            }
+
+                            <tr class="clickable-row @rowClass" data-href="@Url.Action("Details", "InternetLine", new { id = item.Id })">
                                 <td>
                                     <span class="fw-bold text-dark fs-6">@item.BranchName</span>
                                 </td>
@@ -365,11 +416,6 @@
                             </tr>
                         }
                     }
-                    <tr id="noResultsRow" style="display: none;">
-                        <td colspan="7" class="text-center text-muted py-4">
-                            No matching internet lines found.
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </div>

@@ -1,5 +1,7 @@
 ﻿@using Sim_Card_Managment.Services
+@using Sim_Card_Managment.Repos.InternetLineRepos
 @inject IUserPermissionService PermissionService
+@inject IInternetLineRepo IInternetLineRepo
 @{
     // Get the current controller and action from the route
     var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
@@ -57,6 +59,12 @@
     var showBranchSection = canViewBranches || canCreateBranch;
     var showVpnConnectionSection = canViewVpnConnections || canCreateVpnConnection;
     var showInternetLineSection = canViewInternetLines || canCreateInternetLine;
+
+
+    var notification = await IInternetLineRepo.GetForDashboardAsync();
+    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    var upcomingrenewal = notification.Where(n => n.NextRenewalDate.HasValue &&
+                                   (n.NextRenewalDate.Value.DayNumber - today.DayNumber) <= 5);
 }
 
 <!DOCTYPE html>
@@ -67,9 +75,8 @@
     <title>SimCard Managment</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/all.min.css" asp-append-version="true" />
     <link href="~/favicon.ico" rel="icon" />
-    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body>
     <div class="rotate position-fixed top-50 start-0 bg-transparent z-3 d-flex justify-content-center align-items-center shadow "
@@ -583,16 +590,71 @@
                                asp-controller="Employee" asp-action="Index">USERS</a>
                         </li>
                     }
-
-                    <li class="nav-item">
-                        <a class="nav-link text-white position-relative "  title="Notifications"
-                           asp-controller="InternetLine" asp-action="Dashboard">
+                    <li class="nav-item dropdown">
+                        <!-- Dropdown Toggle Button -->
+                        <a class="nav-link text-white position-relative dropdown-toggle-no-caret"
+                           href="#"
+                           id="notificationDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           title="Notifications">
                             <i class="fa-solid fa-bell fs-5"></i>
-                            <span class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger">
-                                3
-                                <span class="visually-hidden">unread notifications</span>
-                            </span>
+
+                            @if (upcomingrenewal != null && upcomingrenewal.Any())
+                            {
+                                <span class="position-absolute top-10 end-0 translate-middle badge rounded-pill bg-danger">
+                                    @upcomingrenewal.Count()
+                                    <span class="visually-hidden">unread notifications</span>
+                                </span>
+                            }
                         </a>
+
+                        <!-- Dropdown Menu -->
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg py-0 mt-2" aria-labelledby="notificationDropdown" style="width: 320px; max-height: 400px; overflow-y: auto;">
+                            <li class="dropdown-header bg-light py-2 px-3 fw-bold text-dark border-bottom d-flex justify-content-between align-items-center">
+                                <span>Notifications</span>
+                                <span class="badge bg-danger rounded-pill">@(upcomingrenewal?.Count() ?? 0) Urgent</span>
+                            </li>
+
+                            @if (upcomingrenewal != null && upcomingrenewal.Any())
+                            {
+                                foreach (var item in upcomingrenewal)
+                                {
+                                    int daysRemaining = item.NextRenewalDate.Value.DayNumber - today.DayNumber;
+
+                                    <li>
+                                        <a class="dropdown-item py-2 px-3 border-bottom text-wrap" asp-controller="InternetLine" asp-action="Details" asp-route-id="@item.Id">
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <strong class="text-dark small">@item.BranchName</strong>
+                                                <span class="badge bg-danger ms-2" style="font-size: 10px;">
+                                                    @(daysRemaining < 0 ? "Expired" : $"{daysRemaining} days left")
+                                                </span>
+                                            </div>
+                                            <div class="text-muted small">
+                                                <i class="fa-solid fa-phone me-1 fs-6"></i> @(string.IsNullOrEmpty(item.PhoneNumber) ? "N/A" : item.PhoneNumber)
+                                            </div>
+                                            <div class="text-muted small">
+                                                Due: @item.NextRenewalDate.Value.ToString("dd MMM yyyy")
+                                            </div>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="p-3 text-center text-muted small">
+                                    <i class="fa-solid fa-bell-slash d-block fs-4 mb-2"></i>
+                                    No upcoming renewals due within 5 days.
+                                </li>
+                            }
+
+                            <li class="bg-light text-center py-2 border-top">
+                                <a class="text-decoration-none fw-bold small" asp-controller="InternetLine" asp-action="Dashboard" style="color: var(--primary-orange, #E24D17);">
+                                    View All Lines in Dashboard &rarr;
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>
