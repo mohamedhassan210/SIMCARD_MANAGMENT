@@ -2,57 +2,41 @@
     Layout = null;
 }
 <!DOCTYPE html>
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Access Denied</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<section class="d-flex align-items-center justify-content-center min-vh-100 p-3">
+<body class="bg-light">
 
-    <!-- 🔒 ACCESS DENIED CARD -->
-    <div class="ad-access-card">
+    <div class="min-vh-100 d-flex align-items-center justify-content-center p-3" >
+        <div class="ad-access-card text-center p-4 p-md-5 " style="max-width: 420px; width: 100%;background-color:#E24D17 ;border-radius:40px">
 
-        <!-- 🔒 LOCK ICON -->
-        <div class="ad-lock-icon d-flex justify-content-center mb-3">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <rect x="28" y="45" width="44" height="34" rx="8" fill="#DF5928" />
-                <path d="M38,45 L38,35 C38,28.5 43.5,23 50,23 C56.5,23 62,28.5 62,35 L62,45"
-                      fill="none" stroke="#DF5928" stroke-width="5.5" stroke-linecap="round" />
-                <circle cx="50" cy="58" r="6" fill="white" />
-                <rect x="47" y="58" width="6" height="12" rx="2" fill="white" />
-            </svg>
+            <!-- Icon -->
+            <div class="mb-3 d-flex flex-column justify-content-center align-items-center ">
+                <a class="navbar-brand text-white fw-bold" asp-controller="home" asp-action="home">
+                    <img src="~/images/Logo.svg" alt="LOGO" class="logo" />
+                </a>
+                <span class="d-inline-flex align-items-center justify-content-center bg-danger-subtle  rounded-circle" style="width: 120px; height: 120px; font-size: 5.75rem;">
+                    <i class="fa-solid fa-lock"></i>
+                </span>
+               
+            </div>
+
+            <!-- Content -->
+            <h1 class="h3 fw-bold text-dark mb-2">Access Denied</h1>
+            <p class="text-white small mb-4">
+                You don't have permission to view this page. If you believe this is an error, please contact your administrator.
+            </p>
+
+           
+
         </div>
-
-        <h2 class="fw-semibold text-dark" style="font-size:1.9rem; letter-spacing:-0.3px;">Access Denied!</h2>
-
-        <p class="text-secondary small mx-auto mb-4" style=" line-height:1.5;">
-            You do not have access to this area of the application. Speak to your administrator to unlock this feature.
-        </p>
-
-        <div class="ad-password-dots text-center">● ● ● ●</div>
-
-        <div class="ad-divider-light"></div>
-
-        <div class="ad-keypad-grid">
-            <div class="ad-key-btn" title="Call Your Adminstrator">1</div>
-            <div class="ad-key-btn" title="Call Your Adminstrator">2</div>
-            <div class="ad-key-btn" title="Call Your Adminstrator">3</div>
-            <div class="ad-key-btn" title="Call Your Adminstrator">4</div>
-            <div class="ad-key-btn" title="Call Your Adminstrator">5</div>
-            <div class="ad-key-btn" title="Call Your Adminstrator">6</div>
-            <div class="ad-key-btn" title="Call Your Adminstrator">7</div>
-            <div class="ad-key-btn" title="Call Your Adminstrator">8</div>
-            <div class="ad-key-btn" title="Call Your Adminstrator">0</div>
-            <div class="ad-key-btn" style="visibility:hidden;"></div>
-            <div class="ad-key-btn" title="Call Your Adminstrator">#</div>
-        </div>
-
-        <a asp-action="home" asp-controller="Home" class="ad-btn-home">Back to home</a>
-
     </div>
 
-</section>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
