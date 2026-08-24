@@ -407,7 +407,7 @@ body {
     width: 100%;
     max-width: 400px;
     background: var(--white);
-    border-radius: 40px;
+    border-radius: 40px !important;
     box-shadow: var(--shadow-light), var(--shadow-heavy);
     padding: 40px 28px 35px;
 }
