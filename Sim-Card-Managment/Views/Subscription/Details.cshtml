@@ -1,61 +1,141 @@
 ﻿@model Sim_Card_Managment.ViewModels.Subscription.SubscriptionDetailsVM
 
-@{
-    ViewData["Title"] = "Subscription Details";
-}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subscription Details</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
-    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-        /* Preserved custom button shape */
-        .btn-custom {
+        :root {
+            --brand-orange: #DF531B;
+            --brand-orange-light: #FFF8F6;
+            --brand-purple: #5B2D90;
+            --bg-canvas: #F4F5F8;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --card-border: #E2E8F0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-dark);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding-bottom: 3rem;
+        }
+
+        .details-card {
+            background-color: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            margin-top: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-header-styled {
+            border-bottom: 1px solid var(--card-border);
+            padding: 1.5rem 2rem;
+            background: linear-gradient(180deg, var(--brand-orange-light) 0%, #FFFFFF 100%);
+        }
+
+        .section-icon-wrapper {
+            width: 44px;
             height: 44px;
-            padding: 0 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            display: inline-flex;
+            border-radius: 12px;
+            background-color: rgba(223, 83, 27, 0.12);
+            color: var(--brand-orange);
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
+            font-size: 1.25rem;
         }
 
-        .btn-primary-orange {
-            background-color: var(--brand-orange, #DF531B);
-            color: #FFFFFF;
+        .info-grid-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 4px;
         }
 
-            .btn-primary-orange:hover {
-                background-color: #c94614;
-                color: #FFFFFF;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
-            }
-
-        .btn-secondary-soft {
-            background-color: #F1F5F9;
-            color: #64748B;
-            border: 1px solid #E2E8F0;
+        .info-grid-value {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-dark);
         }
 
-            .btn-secondary-soft:hover {
-                background-color: #E2E8F0;
-                color: #1E293B;
-            }
+        .badge-status-active {
+            display: inline-block;
+            font-size: 0.75rem;
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #15803D;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            text-transform: uppercase;
+        }
 
-        /* Interactive Sub-device cards */
+        .badge-status-down-pill {
+            display: inline-block;
+            font-size: 0.75rem;
+            background-color: rgba(220, 38, 38, 0.1);
+            color: #DC2626;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            text-transform: uppercase;
+        }
+
+        .badge-status-scheduled-pill {
+            display: inline-block;
+            font-size: 0.75rem;
+            background-color: rgba(223, 83, 27, 0.1);
+            color: var(--brand-orange);
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(223, 83, 27, 0.2);
+            text-transform: uppercase;
+        }
+
+        .emp-count-badge {
+            background: #E8F0FE;
+            color: #1A73E8;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .devices-card {
+            background-color: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            padding: 2rem;
+        }
+
+        .notes-box {
+            background-color: #F8FAFC;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            min-height: 70px;
+        }
+
+        /* Device cards — clickable, navigational, provider-branded */
         .device-card-link {
             display: block;
             text-decoration: none;
@@ -63,7 +143,7 @@
         }
 
         .sub-device-card {
-            border: 1.5px solid var(--brand-orange, #DF531B);
+            border: 1.5px solid var(--brand-orange);
             border-radius: 12px;
             padding: 20px;
             height: 100%;
@@ -96,7 +176,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--brand-orange, #DF531B);
+            color: var(--brand-orange);
             font-size: 1.1rem;
         }
 
@@ -122,218 +202,231 @@
             font-weight: 600;
             font-size: 0.95rem;
             margin-bottom: 4px;
-            color: #1E293B;
+            color: var(--text-dark);
         }
 
         .card-subtitle-text {
             font-size: 0.8rem;
-            color: #64748B;
+            color: var(--text-muted);
             margin: 0;
         }
+
+        .group-actions-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 1.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            height: 44px;
+            padding: 0 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-action-edit {
+            background-color: var(--brand-orange);
+            color: #FFFFFF;
+        }
+
+            .btn-action-edit:hover {
+                background-color: #c94614;
+                color: #FFFFFF;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(223, 83, 27, 0.25);
+            }
+
+        .btn-action-back {
+            background-color: #F1F5F9;
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+        }
+
+            .btn-action-back:hover {
+                background-color: #E2E8F0;
+                color: var(--text-dark);
+            }
     </style>
 </head>
 <body>
-    <section class="bd-body">
-        <main class="container-fluid px-lg-5 p-100">
 
-            <div class="bd-card mb-4">
-                <div class="bd-card-header d-flex align-items-center justify-content-between p-4">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="bd-icon-wrapper">
-                            <i class="fa-solid fa-file-contract"></i>
-                        </div>
-                        <div>
-                            <h3 class="m-0 fs-5 fw-bold text-dark">Subscription Details</h3>
-                            <p class="m-0 text-muted small">Recipient, device, and quota information</p>
-                        </div>
+    <main class="container-fluid px-lg-5 p-100">
+
+        <div class="details-card">
+            <div class="card-header-styled d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="section-icon-wrapper">
+                        <i class="fa-solid fa-file-contract"></i>
                     </div>
-
                     <div>
-                        @if (Model.Status == "Active")
-                        {
-                            <span class="bd-badge-up">
-                                <i class="fa-solid fa-circle"></i> Active
-                            </span>
-                        }
-                        else if (Model.Status == "Expired")
-                        {
-                            <span class="bd-badge-down">
-                                <i class="fa-solid fa-circle"></i> Expired
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="bd-badge-unknown">
-                                <i class="fa-solid fa-circle"></i> Scheduled End
-                            </span>
-                        }
+                        <h3 class="m-0 fs-5 fw-bold text-dark">Subscription Details</h3>
+                        <p class="m-0 text-muted small">Recipient, device, and quota information</p>
                     </div>
                 </div>
 
-                <div class="p-4 p-md-5 border-top">
-                    <div class="row g-4 mb-4">
-
-                        <!-- Subscriber -->
-                        <div class="col-12 col-sm-6 col-md-4">
-                            <div class="bd-info-label">Subscriber</div>
-                            <div class="bd-info-value">
-                                <i class="fa-solid fa-user text-muted me-2"></i>
-                                @Model.SubscriberName
-                            </div>
-                        </div>
-
-                        <!-- Type -->
-                        <div class="col-12 col-sm-6 col-md-4">
-                            <div class="bd-info-label">Type</div>
-                            <div class="bd-info-value">
-                                <i class="fa-solid fa-id-card text-muted me-2"></i>
-                                @Model.SubscriberType
-                            </div>
-                        </div>
-
-                        <!-- Quota -->
-                        <div class="col-12 col-sm-6 col-md-4">
-                            <div class="bd-info-label">Quota</div>
-                            <div class="bd-info-value">
-                                <i class="fa-solid fa-chart-pie text-muted me-2"></i>
-                                @Model.QuotaName
-                            </div>
-                        </div>
-
-                        <!-- Monthly Fees -->
-                        <div class="col-12 col-sm-6 col-md-4">
-                            <div class="bd-info-label">Monthly Fees</div>
-                            <div class="bd-info-value">
-                                <i class="fa-solid fa-dollar-sign text-muted me-2"></i>
-                                @Model.Fees
-                            </div>
-                        </div>
-
-                        <!-- Start Date -->
-                        <div class="col-12 col-sm-6 col-md-4">
-                            <div class="bd-info-label">Start Date</div>
-                            <div class="bd-info-value">
-                                <i class="fa-solid fa-calendar-day text-muted me-2"></i>
-                                @Model.StartDate.ToString("MMM dd, yyyy")
-                            </div>
-                        </div>
-
-                        <!-- End Date -->
-                        <div class="col-12 col-sm-6 col-md-4">
-                            <div class="bd-info-label">End Date</div>
-                            <div class="bd-info-value">
-                                <i class="fa-solid fa-calendar-xmark text-muted me-2"></i>
-                                @(Model.EndDate?.ToString("MMM dd, yyyy") ?? "Open ended")
-                            </div>
-                        </div>
-
-                        <!-- Created By -->
-                        <div class="col-12 col-sm-6 col-md-4">
-                            <div class="bd-info-label">Created By</div>
-                            <div class="bd-info-value">
-                                <i class="fa-solid fa-user-pen text-muted me-2"></i>
-                                @Model.CreatedByUserName
-                            </div>
-                        </div>
-
-                        <!-- Created Date -->
-                        <div class="col-12 col-sm-6 col-md-4">
-                            <div class="bd-info-label">Created Date</div>
-                            <div class="bd-info-value">
-                                <i class="fa-solid fa-clock text-muted me-2"></i>
-                                @Model.CreatedDate.ToString("MMM dd, yyyy")
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Assigned Devices -->
-                    <div class="bd-info-label mb-2">Assigned Devices</div>
-                    <div class="row g-3 mb-4">
-                        @if (Model.SimId.HasValue)
-                        {
-                            <div class="col-md-6">
-                                <a asp-controller="SIM" asp-action="Details" asp-route-id="@Model.SimId" class="device-card-link">
-                                    <div class="sub-device-card">
-                                        <div class="sub-device-card-header">
-                                            @{
-                                                var simProvider = (Model.SimProviderName ?? "").ToLower();
-                                                string simLogo = simProvider switch
-                                                {
-                                                    var p when p.Contains("we") => "/img/we.png",
-                                                    var p when p.Contains("vodafone") || p.Contains("fodafone") => "/img/fodafone.png",
-                                                    var p when p.Contains("orange") => "/img/orange.png",
-                                                    var p when p.Contains("etisalat") => "/img/etisalat-logo.png",
-                                                    _ => ""
-                                                };
-                                            }
-                                            @if (!string.IsNullOrEmpty(simLogo))
-                                            {
-                                                <img src="@simLogo" alt="@Model.SimProviderName" class="sp-logo-img" />
-                                            }
-                                            else
-                                            {
-                                                <span class="fw-bold text-dark" style="font-size:0.85rem">@(Model.SimProviderName ?? "Unknown")</span>
-                                            }
-                                            <span class="@(Model.SimIsActive ? "badge-available" : "badge-inactive-mini")">
-                                                @(Model.SimIsActive ? "Active" : "Inactive")
-                                            </span>
-                                        </div>
-                                        <div class="card-title-text">@(Model.SimNetworkType ?? "4G") SIM (@(Model.SimPhoneNumber ?? "N/A"))</div>
-                                        <p class="card-subtitle-text">Provider : @(Model.SimProviderName ?? "Unknown")</p>
-                                        <p class="card-subtitle-text">Serial : @(Model.SimNumber ?? "N/A")</p>
-                                    </div>
-                                </a>
-                            </div>
-                        }
-
-                        @if (Model.UsbId.HasValue)
-                        {
-                            <div class="col-md-6">
-                                <a asp-controller="USB" asp-action="Details" asp-route-id="@Model.UsbId" class="device-card-link">
-                                    <div class="sub-device-card">
-                                        <div class="sub-device-card-header">
-                                            <div class="usb-icon-wrap">
-                                                <i class="fa-solid fa-usb"></i>
-                                            </div>
-                                            <span class="@(Model.UsbIsActive ? "badge-available" : "badge-inactive-mini")">
-                                                @(Model.UsbIsActive ? "Active" : "Inactive")
-                                            </span>
-                                        </div>
-                                        <div class="card-title-text">@(Model.UsbModel ?? "USB Modem")</div>
-                                        <p class="card-subtitle-text">Provider : @(Model.UsbProviderName ?? "Unknown")</p>
-                                        <p class="card-subtitle-text">Serial : @(Model.UsbSerialNumber ?? "N/A")</p>
-                                    </div>
-                                </a>
-                            </div>
-                        }
-
-                        @if (!Model.SimId.HasValue && !Model.UsbId.HasValue)
-                        {
-                            <div class="col-12 text-muted small">No devices assigned.</div>
-                        }
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="bd-info-label">Notes</div>
-                    <div class="bd-info-value border rounded-3 p-3 bg-light">
-                        @(string.IsNullOrWhiteSpace(Model.Notes) ? "No notes available." : Model.Notes)
-                    </div>
-
-                    <!-- Action Footer with Preserved Button Shape -->
-                    <div class="d-flex align-items-center justify-content-end gap-3 mt-5 pt-3 border-top">
-                        <a asp-controller="Subscription" asp-action="Index" class="btn-custom btn-secondary-soft">
-                            <i class="fa-solid fa-arrow-left"></i> Back
-                        </a>
-                        <a asp-controller="Subscription" asp-action="Edit" asp-route-id="@Model.Id" class="btn-custom btn-primary-orange">
-                            <i class="fa-solid fa-pen-to-square"></i> Edit Subscription
-                        </a>
-                    </div>
-
+                <div>
+                    @if (Model.Status == "Active")
+                    {
+                        <span class="badge-status-active">Active</span>
+                    }
+                    else if (Model.Status == "Expired")
+                    {
+                        <span class="badge-status-down-pill">Expired</span>
+                    }
+                    else
+                    {
+                        <span class="badge-status-scheduled-pill">Scheduled End</span>
+                    }
                 </div>
             </div>
 
-        </main>
-    </section>
+            <div class="p-4 p-md-5">
+                <div class="row g-4">
+                    <div class="col-12 col-md-4">
+                        <div class="info-grid-label">Subscriber</div>
+                        <div class="info-grid-value">@Model.SubscriberName</div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="info-grid-label">Type</div>
+                        <div class="info-grid-value">@Model.SubscriberType</div>
+                    </div>
+
+                    <div class="col-12 col-sm-4 col-md-4">
+                        <div class="info-grid-label">Quota</div>
+                        <div class="info-grid-value">
+                            <span class="emp-count-badge">@Model.QuotaName</span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <div class="info-grid-label">Monthly Fees</div>
+                        <div class="info-grid-value">$@Model.Fees</div>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <div class="info-grid-label">Start Date</div>
+                        <div class="info-grid-value">@Model.StartDate.ToString("MMM dd, yyyy")</div>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <div class="info-grid-label">End Date</div>
+                        <div class="info-grid-value">@(Model.EndDate?.ToString("MMM dd, yyyy") ?? "Open ended")</div>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <div class="info-grid-label">Created Date</div>
+                        <div class="info-grid-value">@Model.CreatedDate.ToString("MMM dd, yyyy")</div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="info-grid-label">Created By</div>
+                        <div class="info-grid-value">@Model.CreatedByUserName</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="devices-card mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <h4 class="fw-bold fs-5 m-0 text-dark">Assigned Devices</h4>
+            </div>
+
+            <div class="row g-3">
+                @if (Model.SimId.HasValue)
+                {
+                    <div class="col-md-6">
+                        <a asp-controller="SIM" asp-action="Details" asp-route-id="@Model.SimId" class="device-card-link">
+                            <div class="sub-device-card">
+                                <div class="sub-device-card-header">
+                                    @{
+                                        var simProvider = (Model.SimProviderName ?? "").ToLower();
+                                        string simLogo = simProvider switch
+                                        {
+                                            var p when p.Contains("we") => "/img/we.png",
+                                            var p when p.Contains("vodafone") || p.Contains("fodafone") => "/img/fodafone.png",
+                                            var p when p.Contains("orange") => "/img/orange.png",
+                                            var p when p.Contains("etisalat") => "/img/etisalat-logo.png",
+                                            _ => ""
+                                        };
+                                    }
+                                    @if (!string.IsNullOrEmpty(simLogo))
+                                    {
+                                        <img src="@simLogo" alt="@Model.SimProviderName" class="sp-logo-img" />
+                                    }
+                                    else
+                                    {
+                                        <span class="fw-bold text-dark" style="font-size:0.85rem">@(Model.SimProviderName ?? "Unknown")</span>
+                                    }
+                                    <span class="@(Model.SimIsActive ? "badge-available" : "badge-inactive-mini")">
+                                        @(Model.SimIsActive ? "Active" : "Inactive")
+                                    </span>
+                                </div>
+                                <div class="card-title-text">@(Model.SimNetworkType ?? "4G") SIM (@(Model.SimPhoneNumber ?? "N/A"))</div>
+                                <p class="card-subtitle-text">Provider : @(Model.SimProviderName ?? "Unknown")</p>
+                                <p class="card-subtitle-text">Serial : @(Model.SimNumber ?? "N/A")</p>
+                            </div>
+                        </a>
+                    </div>
+                }
+                @if (Model.UsbId.HasValue)
+                {
+                    <div class="col-md-6">
+                        <a asp-controller="USB" asp-action="Details" asp-route-id="@Model.UsbId" class="device-card-link">
+                            <div class="sub-device-card">
+                                <div class="sub-device-card-header">
+                                    <div class="usb-icon-wrap">
+                                        <i class="fa-solid fa-usb"></i>
+                                    </div>
+                                    <span class="@(Model.UsbIsActive ? "badge-available" : "badge-inactive-mini")">
+                                        @(Model.UsbIsActive ? "Active" : "Inactive")
+                                    </span>
+                                </div>
+                                <div class="card-title-text">@(Model.UsbModel ?? "USB Modem")</div>
+                                <p class="card-subtitle-text">Provider : @(Model.UsbProviderName ?? "Unknown")</p>
+                                <p class="card-subtitle-text">Serial : @(Model.UsbSerialNumber ?? "N/A")</p>
+                            </div>
+                        </a>
+                    </div>
+                }
+                @if (!Model.SimId.HasValue && !Model.UsbId.HasValue)
+                {
+                    <div class="col-12 text-muted small">No devices assigned.</div>
+                }
+            </div>
+        </div>
+
+        <div class="devices-card">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <h4 class="fw-bold fs-5 m-0 text-dark">Notes</h4>
+            </div>
+
+            <div class="notes-box">
+                @(string.IsNullOrWhiteSpace(Model.Notes) ? "No notes available." : Model.Notes)
+            </div>
+
+            <div class="group-actions-bar">
+                <a asp-controller="Subscription" asp-action="Index" class="btn-action btn-action-back">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </a>
+
+                <a asp-controller="Subscription" asp-action="Edit" asp-route-id="@Model.Id" class="btn-action btn-action-edit">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit Subscription
+                </a>
+            </div>
+        </div>
+
+    </main>
 </body>
 </html>

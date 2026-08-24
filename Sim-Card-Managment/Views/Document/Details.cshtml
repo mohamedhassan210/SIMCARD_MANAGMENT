@@ -1,4 +1,8 @@
-﻿@model Sim_Card_Managment.ViewModels.DocumentDetailsViewModel
+@model Sim_Card_Managment.ViewModels.DocumentDetailsViewModel
+
+@{
+    ViewData["Title"] = "Document Details";
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -6,394 +10,199 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document Details - @Model.DocumentNumber</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <style>
-            :root {
-                --brand-orange: #DF531B;
-                --brand-orange-light: #FFF8F6;
-                --brand-purple: #5B2D90;
-                --bg-canvas: #F4F5F8;
-                --text-dark: #1E293B;
-                --text-muted: #64748B;
-                --card-border: #E2E8F0;
-            }
-
-            body {
-                background-color: var(--bg-canvas);
-                color: var(--text-dark);
-                font-family: system-ui, -apple-system, sans-serif;
-                padding-bottom: 3rem;
-            }
-
-            .page-header {
-                background: #FFFFFF;
-                border-bottom: 1px solid var(--card-border);
-                padding: 2rem 0;
-                margin-bottom: 2rem;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-            }
-
-            .page-title {
-                font-size: clamp(1.5rem, 3vw, 2rem);
-                font-weight: 800;
-                letter-spacing: -0.02em;
-                color: var(--text-dark);
-            }
-
-            .details-container {
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-
-            .info-card {
-                background-color: #FFFFFF;
-                border: 1px solid var(--card-border);
-                border-radius: 20px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-                padding: 2rem;
-                margin-bottom: 2rem;
-            }
-
-            .card-section-title {
-                font-size: 1.1rem;
-                font-weight: 700;
-                color: var(--text-dark);
-                margin-bottom: 1.25rem;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-                .card-section-title i {
-                    color: var(--brand-orange);
-                }
-
-            .info-label {
-                font-size: 0.75rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                font-weight: 600;
-                color: var(--text-muted);
-                margin-bottom: 4px;
-            }
-
-            .info-value {
-                font-size: 1rem;
-                font-weight: 600;
-                color: var(--text-dark);
-            }
-
-            .font-mono {
-                font-family: 'JetBrains Mono', monospace, SFMono-Regular, Consolas;
-            }
-
-            .search-box {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                background: #FFF;
-                border: 1px solid var(--card-border);
-                border-radius: 12px;
-                padding: 8px 14px;
-                transition: border-color 0.2s ease;
-            }
-
-                .search-box:focus-within {
-                    border-color: var(--brand-orange);
-                }
-
-                .search-box i {
-                    color: var(--text-muted);
-                }
-
-                .search-box input {
-                    border: none;
-                    outline: none;
-                    background: transparent;
-                    font-size: 0.9rem;
-                    width: 100%;
-                    color: var(--text-dark);
-                }
-
-            .stat-badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                padding: 6px 14px;
-                border-radius: 50px;
-                font-weight: 600;
-                font-size: 0.85rem;
-                background-color: var(--bg-canvas);
-                border: 1px solid var(--card-border);
-            }
-
-            .btn-custom {
-                height: 40px;
-                padding: 0 20px;
-                border-radius: 50px;
-                font-weight: 600;
-                font-size: 0.875rem;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-                transition: all 0.2s ease;
-                text-decoration: none;
-                border: none;
-            }
-
-            .btn-secondary-outline {
-                background-color: #FFFFFF;
-                color: var(--text-dark);
-                border: 1px solid var(--card-border);
-            }
-
-                .btn-secondary-outline:hover {
-                    background-color: var(--bg-canvas);
-                    color: var(--text-dark);
-                }
-
-            .custom-table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-
-                .custom-table thead th {
-                    text-align: left;
-                    font-size: 0.75rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                    color: var(--text-muted);
-                    padding: 10px 12px;
-                    border-bottom: 2px solid var(--brand-orange);
-                    background: #FFFFFF;
-                }
-
-                .custom-table tbody td {
-                    font-size: 0.9rem;
-                    padding: 12px;
-                    border-bottom: 1px solid var(--card-border);
-                    vertical-align: middle;
-                }
-
-            .data-row:hover {
-                background-color: var(--brand-orange-light);
-            }
-    </style>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
+    <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body>
+    <section class="bd-body">
+        <main class="container-fluid px-lg-5 p-100">
 
-    <header class="page-header  p-100">
-        <div class="container-fluid px-lg-5">
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-                <div>
-                    <h1 class="page-title m-0">Document Details</h1>
-                    <p class="text-muted m-0 small mt-1">
-                        Serial / Doc #: <strong class="font-mono text-dark">@(string.IsNullOrEmpty(Model.DocumentNumber) ? "N/A" : Model.DocumentNumber)</strong>
-                    </p>
-                </div>
-                <div>
-                    <a asp-action="Index" class="btn-custom btn-secondary-outline">
-                        <i class="fa-solid fa-arrow-left"></i> Back to List
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="container-fluid px-lg-5 details-container">
-
-        <!-- Top Overview Card -->
-        <div class="info-card">
-            <div class="card-section-title">
-                <i class="fa-solid fa-file-contract"></i>
-                <span>Document Information</span>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-6 col-md-3">
-                    <div class="info-label">Serial / Doc #</div>
-                    <div class="info-value font-mono">@(string.IsNullOrEmpty(Model.DocumentNumber) ? "N/A" : Model.DocumentNumber)</div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="info-label">Document Type</div>
-                    <div class="info-value">@(Model.DocumentTypeName ?? "N/A")</div>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <div class="info-label">Action Date</div>
-                    <div class="info-value">@Model.ActionDate.ToString("yyyy-MM-dd")</div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="info-label">Creation Date</div>
-                    <div class="info-value">@Model.CreatedAt.ToString("yyyy-MM-dd")</div>
-                </div>
-
-                <div class="col-6 col-md-3">
-                    <div class="info-label">Associated Items</div>
-                    <div class="d-flex gap-2 mt-1">
-                        <span class="stat-badge">
-                            <i class="fa-solid fa-sim-card text-muted"></i>
-                            <strong>@Model.SimCount</strong> SIMs
-                        </span>
-                        <span class="stat-badge">
-                            <i class="fa-solid fa-usb text-muted"></i>
-                            <strong>@Model.UsbCount</strong> USBs
-                        </span>
+            <!-- Document Profile Header Card -->
+            <div class="bd-card mb-4">
+                <div class="bd-card-header d-flex align-items-center justify-content-between p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bd-icon-wrapper">
+                            <i class="fa-solid fa-file-contract"></i>
+                        </div>
+                        <div>
+                            <h3 class="m-0 fs-5 fw-bold text-dark">@(string.IsNullOrEmpty(Model.DocumentNumber) ? "N/A" : Model.DocumentNumber)</h3>
+                            <p class="m-0 text-muted small">Document record and attached device inventory</p>
+                        </div>
+                    </div>
+                    <div>
+                        <a asp-action="Index" class="bd-link-view">
+                            <i class="fa-solid fa-arrow-left"></i> Back to List
+                        </a>
                     </div>
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="info-label">Notes</div>
-                    <div class="info-value text-muted fw-normal">
-                        @(string.IsNullOrEmpty(Model.Notes) ? "No notes recorded." : Model.Notes)
+
+                <div class="p-4 p-md-5 border-top">
+                    <div class="row g-4">
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div class="bd-info-label">Serial / Doc #</div>
+                            <div class="bd-info-value">@(string.IsNullOrEmpty(Model.DocumentNumber) ? "N/A" : Model.DocumentNumber)</div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div class="bd-info-label">Document Type</div>
+                            <div class="bd-info-value">@(Model.DocumentTypeName ?? "N/A")</div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div class="bd-info-label">Action Date</div>
+                            <div class="bd-info-value">@Model.ActionDate.ToString("yyyy-MM-dd")</div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-3">
+                            <div class="bd-info-label">Creation Date</div>
+                            <div class="bd-info-value">@Model.CreatedAt.ToString("yyyy-MM-dd")</div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-6">
+                            <div class="bd-info-label">Associated Items</div>
+                            <div class="bd-info-value">@Model.SimCount SIMs &middot; @Model.UsbCount USBs</div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="bd-info-label">Notes &amp; Remarks</div>
+                            <div class="bd-info-value">@(string.IsNullOrEmpty(Model.Notes) ? "No notes recorded." : Model.Notes)</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Section 1: Associated SIM Cards -->
-        <div class="info-card">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
-                <div class="card-section-title m-0">
-                    <i class="fa-solid fa-sim-card"></i>
-                    <span>Attached SIM Cards</span>
-                    <span class="badge bg-light text-dark border ms-2">@Model.SimCount</span>
-                </div>
-                <div class="search-box col-12 col-md-4">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input id="simSearchInput" type="text" placeholder="Search SIM cards..." autocomplete="off">
-                </div>
-            </div>
+            <!-- Attached SIM Cards Section -->
+            <div class="bd-section-card mb-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                    <h4 class="fw-bold fs-5 m-0 text-dark">Attached SIM Cards</h4>
 
-            <div class="table-responsive">
-                <table class="custom-table" id="simTable">
-                    <thead>
-                        <tr>
-                            <th>Phone Number</th>
-                            <th>Serial Number (ICCID)</th>
-                            <th>Status</th>
-                            <th style="text-align:right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="simTableBody">
-                        @if (Model.Sims != null && Model.Sims.Any())
-                        {
-                            foreach (var sim in Model.Sims)
-                            {
-                                <tr class="data-row">
-                                    <td class="font-mono"><strong>@sim.PhoneNumber</strong></td>
-                                    <td class="font-mono text-muted">@sim.SerialNumber</td>
-                                    <td><span class="badge bg-secondary">@sim.Status</span></td>
-                                    <td style="text-align:right;">
-                                        <a asp-controller="Sim" asp-action="Details" asp-route-id="@sim.Id" class="btn-view-action" title="View SIM Details">
-                                            <i class="fa-solid fa-eye"></i> View
-                                        </a>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr id="noSimsRow">
-                                <td colspan="4" class="text-center text-muted py-4">
-                                    No SIM cards attached to this document.
-                                </td>
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 col-12 col-md-7 justify-content-end">
+                        <div class="bd-search-box col-12 col-sm-7">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input id="simSearchInput" type="text" placeholder="Search SIM cards..." autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="bd-table" id="simTable">
+                        <thead>
+                            <tr>
+                                <th>Phone Number</th>
+                                <th>Serial Number (ICCID)</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">View Details</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Section 2: Associated USB Modems -->
-        <div class="info-card">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
-                <div class="card-section-title m-0">
-                    <i class="fa-solid fa-usb"></i>
-                    <span>Attached USB Modems</span>
-                    <span class="badge bg-light text-dark border ms-2">@Model.UsbCount</span>
-                </div>
-                <div class="search-box col-12 col-md-4">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input id="usbSearchInput" type="text" placeholder="Search USB modems..." autocomplete="off">
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="custom-table" id="usbTable">
-                    <thead>
-                        <tr>
-                            <th>Serial Number</th>
-                            <th>Model / Type</th>
-                            <th>Status</th>
-                            <th style="text-align:right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usbTableBody">
-                        @if (Model.Usbs != null && Model.Usbs.Any())
-                        {
-                            foreach (var usb in Model.Usbs)
+                        </thead>
+                        <tbody id="simTableBody">
+                            @if (Model.Sims != null && Model.Sims.Any())
                             {
-                                <tr class="data-row">
-                                    <td class="font-mono"><strong>@usb.SerialNumber</strong></td>
-                                    <td>@usb.Model</td>
-                                    <td><span class="badge bg-secondary">@usb.Status</span></td>
-                                    <td style="text-align:right;">
-                                        <a asp-controller="Usb" asp-action="Details" asp-route-id="@usb.Id" class="btn-view-action" title="View USB Details">
-                                            <i class="fa-solid fa-eye"></i> View
-                                        </a>
-                                    </td>
-                                </tr>
+                                foreach (var sim in Model.Sims)
+                                {
+                                    <tr class="bd-sim-row">
+                                        <td><code class="bd-code">@sim.PhoneNumber</code></td>
+                                        <td><code class="bd-code">@sim.SerialNumber</code></td>
+                                        <td><span class="badge bg-secondary">@sim.Status</span></td>
+                                        <td style="text-align: right;">
+                                            <a asp-controller="Sim" asp-action="Details" asp-route-id="@sim.Id" class="bd-link-view">
+                                                <i class="fa-regular fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
                             }
-                        }
-                        else
-                        {
-                            <tr id="noUsbRow">
-                                <td colspan="4" class="text-center text-muted py-4">
-                                    No USB modems attached to this document.
-                                </td>
+                            <tr id="noSimsRow" style="display: @(Model.Sims != null && Model.Sims.Any() ? "none" : "");">
+                                <td colspan="4" class="bd-no-results text-center py-4 text-muted">No SIM cards attached to this document.</td>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-    </main>
+            <!-- Attached USB Modems Section -->
+            <div class="bd-section-card mb-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                    <h4 class="fw-bold fs-5 m-0 text-dark">Attached USB Modems</h4>
+
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 col-12 col-md-7 justify-content-end">
+                        <div class="bd-search-box col-12 col-sm-7">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input id="usbSearchInput" type="text" placeholder="Search USB modems..." autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="bd-table" id="usbTable">
+                        <thead>
+                            <tr>
+                                <th>Serial Number</th>
+                                <th>Model / Type</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">View Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usbTableBody">
+                            @if (Model.Usbs != null && Model.Usbs.Any())
+                            {
+                                foreach (var usb in Model.Usbs)
+                                {
+                                    <tr class="bd-usb-row">
+                                        <td><code class="bd-code">@usb.SerialNumber</code></td>
+                                        <td>@usb.Model</td>
+                                        <td><span class="badge bg-secondary">@usb.Status</span></td>
+                                        <td style="text-align: right;">
+                                            <a asp-controller="Usb" asp-action="Details" asp-route-id="@usb.Id" class="bd-link-view">
+                                                <i class="fa-regular fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            <tr id="noUsbRow" style="display: @(Model.Usbs != null && Model.Usbs.Any() ? "none" : "");">
+                                <td colspan="4" class="bd-no-results text-center py-4 text-muted">No USB modems attached to this document.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </section>
 
     <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                setupSearch('simSearchInput', '#simTableBody tr.data-row', 'noSimsRow');
-                setupSearch('usbSearchInput', '#usbTableBody tr.data-row', 'noUsbRow');
-            });
+        // SIM Table Search
+        document.addEventListener('DOMContentLoaded', () => {
+            setupSearch('simSearchInput', '#simTableBody tr.bd-sim-row', 'noSimsRow');
+            setupSearch('usbSearchInput', '#usbTableBody tr.bd-usb-row', 'noUsbRow');
+        });
 
-            function setupSearch(inputId, rowSelector, noResultId) {
-                const input = document.getElementById(inputId);
-                if (!input) return;
+        function setupSearch(inputId, rowSelector, noResultId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
 
-                input.addEventListener('input', () => {
-                    const query = input.value.toLowerCase().trim();
-                    const rows = document.querySelectorAll(rowSelector);
-                    let visible = 0;
+            input.addEventListener('input', () => {
+                const query = input.value.toLowerCase().trim();
+                const rows = document.querySelectorAll(rowSelector);
+                let visible = 0;
 
-                    rows.forEach(row => {
-                        const text = row.innerText.toLowerCase();
-                        if (text.includes(query)) {
-                            row.style.display = '';
-                            visible++;
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    });
-
-                    const noRes = document.getElementById(noResultId);
-                    if (noRes && rows.length > 0) {
-                        noRes.style.display = visible === 0 ? '' : 'none';
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    if (text.includes(query)) {
+                        row.style.display = '';
+                        visible++;
+                    } else {
+                        row.style.display = 'none';
                     }
                 });
-            }
+
+                const noRes = document.getElementById(noResultId);
+                if (noRes) {
+                    noRes.style.display = visible === 0 ? '' : 'none';
+                }
+            });
+        }
     </script>
 
 </body>
