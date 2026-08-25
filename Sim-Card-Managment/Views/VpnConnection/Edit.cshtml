@@ -165,7 +165,7 @@
             </div>
 
             <form asp-controller="VpnConnection" asp-action="Edit" asp-route-id="@Model.Id" method="post">
-                <div asp-validation-summary="All" class="alert alert-danger"></div>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Id" />
                 <div class="p-4 p-md-5">
