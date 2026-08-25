@@ -173,6 +173,10 @@ namespace Sim_Card_Managment.Controllers
 
                     if (occupiedStatusType != null)
                     {
+                        // Snapshot the recipient's name — this transfer always results in an
+                        // "Occupied" state, so the log should always carry the new owner's name.
+                        string? assignedToName = _employeeRepo.GetById(deviceTransfer.ToEmpId!.Value)?.Name;
+
                         var deviceStatus = new DeviceStatus
                         {
                             SimId = newSubscription.SimId,
@@ -180,7 +184,8 @@ namespace Sim_Card_Managment.Controllers
                             StatusTypeId = occupiedStatusType.Id,
                             StatusDate = DateTime.Now,
                             Notes = "Device transferred to new owner",
-                            ReportedBy = deviceTransfer.CreatedBy
+                            ReportedBy = deviceTransfer.CreatedBy,
+                            AssignedToName = assignedToName
                         };
 
                         // AddDeviceStatus already calls SaveChanges() internally
