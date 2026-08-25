@@ -44,7 +44,7 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Usb usb)
         {
-            // ... your existing provider/validation logic stays as-is ...
+            ModelState.Remove(nameof(Usb.ServiceProvider));
 
             // Reject duplicate serial numbers
             bool serialExists = _context.Usbs.Any(u => u.SerialNumber == usb.SerialNumber);
@@ -53,16 +53,17 @@ namespace Sim_Card_Managment.Controllers
                 ModelState.AddModelError("SerialNumber", "This serial number is already in use by another USB modem.");
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                usb.RegisteredAt = DateTime.Now;
-                usb.IsActive = true;
-                usb.Status = "Unassigned";
-                _usbRepo.Add(usb);
-                return RedirectToAction(nameof(Index));
+                PopulateServiceProvidersDropDownList(usb.ServiceProviderId);
+                return View(usb);
             }
 
-            return View(usb);
+            usb.RegisteredAt = DateTime.Now;
+            usb.IsActive = true;
+            usb.Status = "Unassigned";
+            _usbRepo.Add(usb);
+            return RedirectToAction(nameof(Index));
         }
         [HttpGet]
         public IActionResult Edit(int id)

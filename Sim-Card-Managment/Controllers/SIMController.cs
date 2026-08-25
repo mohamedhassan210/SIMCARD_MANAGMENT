@@ -63,12 +63,11 @@ namespace Sim_Card_Managment.Controllers
                     .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
                     .FirstOrDefault() ?? "Unassigned"
             });
-
             var usbsList = _usbRepo.GetAll().Select(u => new DeviceDirectoryViewModel
             {
                 Id = u.Id,
                 SerialNumber = u.SerialNumber,
-                Identifier = "N/A",
+                Identifier = u.Model ?? "N/A",   // now shows/searches the model instead of a hardcoded "N/A"
                 DeviceType = "USB Modem",
                 ServiceProvider = u.ServiceProvider?.Name ?? "N/A",
                 IsActive = u.IsActive,
