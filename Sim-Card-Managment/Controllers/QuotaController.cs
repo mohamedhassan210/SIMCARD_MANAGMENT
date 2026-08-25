@@ -1,10 +1,12 @@
-﻿// Controllers/QuotaController.cs
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repos.QuoteRepo;
 using Sim_Card_Managment.Viewmodel;
+using System.Drawing;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -35,6 +37,76 @@ namespace Sim_Card_Managment.Controllers
             });
 
             return View(quotas);
+        }
+
+        // GET: Quota/ExportQuotasExcel?status=active|inactive|all — mirrors Index's Status Filter dropdown.
+        [HttpGet]
+        public IActionResult ExportQuotasExcel(string status = "all")
+        {
+            status = (status ?? "all").ToLower();
+
+            var quotas = _quotaRepo.GetAll().Select(q => new QuotaViewModel
+            {
+                Id = q.Id,
+                BaseAmount = q.BaseAmount,
+                ExtraAmount = q.ExtraAmount,
+                Fees = q.Fees,
+                ServiceProviderId = q.ServiceProviderId,
+                IsActive = q.IsActive,
+                ServiceProviderName = q.ServiceProvider?.Name
+            }).ToList();
+
+            var filtered = status switch
+            {
+                "active" => quotas.Where(q => q.IsActive).ToList(),
+                "inactive" => quotas.Where(q => !q.IsActive).ToList(),
+                _ => quotas
+            };
+
+            ExcelPackage.License.SetNonCommercialPersonal("MyName");
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Quotas");
+
+            worksheet.Cells[1, 1].Value = "Service Provider";
+            worksheet.Cells[1, 2].Value = "Base Amount (GB)";
+            worksheet.Cells[1, 3].Value = "Extra Amount (GB)";
+            worksheet.Cells[1, 4].Value = "Fees";
+            worksheet.Cells[1, 5].Value = "Status";
+
+            using (var headerRange = worksheet.Cells[1, 1, 1, 5])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightSlateGray);
+                headerRange.Style.Font.Color.SetColor(Color.White);
+            }
+
+            int row = 2;
+            foreach (var q in filtered)
+            {
+                worksheet.Cells[row, 1].Value = q.ServiceProviderName ?? "N/A";
+                worksheet.Cells[row, 2].Value = q.BaseAmount;
+                worksheet.Cells[row, 3].Value = q.ExtraAmount;
+                worksheet.Cells[row, 4].Value = q.Fees;
+                worksheet.Cells[row, 5].Value = q.IsActive ? "Active" : "Inactive";
+                row++;
+            }
+
+            if (worksheet.Dimension != null)
+            {
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            }
+
+            var fileContents = package.GetAsByteArray();
+            var suffix = status != "all" ? "_" + status : "";
+
+            return File(
+                fileContents,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"Quotas{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+            );
         }
 
         // GET: Quota/Create

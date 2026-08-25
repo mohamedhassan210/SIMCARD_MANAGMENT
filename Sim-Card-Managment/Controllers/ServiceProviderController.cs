@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Viewmodel;
+using System.Drawing;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -28,6 +32,71 @@ namespace Sim_Card_Managment.Controllers
                 IsActive = p.IsActive
             });
             return View(model);
+        }
+
+        // GET: ServiceProvider/ExportProvidersExcel?status=active|inactive|all — mirrors Index's Status Filter dropdown.
+        [HttpGet]
+        public IActionResult ExportProvidersExcel(string status = "all")
+        {
+            status = (status ?? "all").ToLower();
+
+            var query = _context.ServiceProviders
+                .Include(sp => sp.Quotas)
+                .Include(sp => sp.Sims)
+                .Include(sp => sp.Usbs)
+                .AsQueryable();
+
+            if (status == "active") query = query.Where(sp => sp.IsActive);
+            else if (status == "inactive") query = query.Where(sp => !sp.IsActive);
+
+            var providers = query.OrderBy(sp => sp.Name).ToList();
+
+            ExcelPackage.License.SetNonCommercialPersonal("MyName");
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Service Providers");
+
+            worksheet.Cells[1, 1].Value = "Name";
+            worksheet.Cells[1, 2].Value = "Display Name";
+            worksheet.Cells[1, 3].Value = "Status";
+            worksheet.Cells[1, 4].Value = "Quota Count";
+            worksheet.Cells[1, 5].Value = "SIM Count";
+            worksheet.Cells[1, 6].Value = "USB Count";
+
+            using (var headerRange = worksheet.Cells[1, 1, 1, 6])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightSlateGray);
+                headerRange.Style.Font.Color.SetColor(Color.White);
+            }
+
+            int row = 2;
+            foreach (var p in providers)
+            {
+                worksheet.Cells[row, 1].Value = p.Name;
+                worksheet.Cells[row, 2].Value = p.DisplayName ?? "N/A";
+                worksheet.Cells[row, 3].Value = p.IsActive ? "Active" : "Inactive";
+                worksheet.Cells[row, 4].Value = p.Quotas?.Count ?? 0;
+                worksheet.Cells[row, 5].Value = p.Sims?.Count ?? 0;
+                worksheet.Cells[row, 6].Value = p.Usbs?.Count ?? 0;
+                row++;
+            }
+
+            if (worksheet.Dimension != null)
+            {
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            }
+
+            var fileContents = package.GetAsByteArray();
+            var suffix = status != "all" ? "_" + status : "";
+
+            return File(
+                fileContents,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"ServiceProviders{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+            );
         }
 
         public IActionResult Create() => View(new ServiceProviderViewModel());
@@ -58,7 +127,6 @@ namespace Sim_Card_Managment.Controllers
             var provider = await _repo.GetByIdWithDevicesAsync(id);
             if (provider == null) return NotFound();
 
-            // For the "Status Type" filter dropdown
             ViewBag.StatusTypes = _context.DeviceStatusesType
                 .OrderBy(t => t.Name)
                 .Select(t => t.Name)
@@ -74,21 +142,21 @@ namespace Sim_Card_Managment.Controllers
                 IsActive = s.IsActive,
                 Status = s.Status,
                 CurrentStatusType = s.DeviceStatuses
-        .OrderByDescending(ds => ds.StatusDate)
-        .Select(ds => ds.StatusType.Name)
-        .FirstOrDefault(),
+                    .OrderByDescending(ds => ds.StatusDate)
+                    .Select(ds => ds.StatusType.Name)
+                    .FirstOrDefault(),
                 RegisteredAt = s.RegisteredAt,
                 AssignedTo = s.Subscriptions?
-        .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
-        .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
-        .FirstOrDefault() ?? "Unassigned"
+                    .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
+                    .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
+                    .FirstOrDefault() ?? "Unassigned"
             });
 
             var usbsList = provider.Usbs.Select(u => new DeviceDirectoryViewModel
             {
                 Id = u.Id,
                 SerialNumber = u.SerialNumber,
-                Identifier = "N/A",
+                Identifier = u.Model ?? "N/A",
                 DeviceType = "USB Modem",
                 ServiceProvider = provider.Name,
                 IsActive = u.IsActive,
@@ -111,20 +179,20 @@ namespace Sim_Card_Managment.Controllers
                 DisplayName = provider.DisplayName,
                 IsActive = provider.IsActive,
                 Quotas = provider.Quotas
-         .Select(q => new QuotaDisplayViewModel
-         {
-             Id = q.Id,
-             BaseAmount = q.BaseAmount,
-             ExtraAmount = q.ExtraAmount,
-             Fees = q.Fees,
-             IsActive = q.IsActive
-         })
-         .OrderByDescending(q => q.IsActive)
-         .ThenBy(q => q.BaseAmount)
-         .ToList(),
+                    .Select(q => new QuotaDisplayViewModel
+                    {
+                        Id = q.Id,
+                        BaseAmount = q.BaseAmount,
+                        ExtraAmount = q.ExtraAmount,
+                        Fees = q.Fees,
+                        IsActive = q.IsActive
+                    })
+                    .OrderByDescending(q => q.IsActive)
+                    .ThenBy(q => q.BaseAmount)
+                    .ToList(),
                 Devices = simsList.Concat(usbsList)
-         .OrderByDescending(d => d.RegisteredAt)
-         .ToList()
+                    .OrderByDescending(d => d.RegisteredAt)
+                    .ToList()
             };
 
             return View(model);

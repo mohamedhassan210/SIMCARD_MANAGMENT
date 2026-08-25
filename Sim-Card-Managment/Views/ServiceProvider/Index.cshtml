@@ -191,6 +191,10 @@
                 <i class="fas fa-database"></i>
                 <span>Manage Quotas</span>
             </a>
+            <a href="#" id="exportExcelBtn" class="btn-view-action">
+                <i class="fas fa-file-excel"></i>
+                <span>Excel</span>
+            </a>
             <a asp-controller="ServiceProvider" asp-action="Create" class="btn-orange-primary shadow-sm">
                 <i class="fas fa-plus"></i>
                 <span>New Service Provider</span>
@@ -341,17 +345,19 @@
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const rows = Array.from(document.querySelectorAll('.sp-row'));
-            const emptyRow = document.getElementById('emptyRow');
-            const searchInput = document.getElementById('search-input');
-            const statusFilter = document.getElementById('status-filter');
-            const totalCountHeader = document.getElementById('totalCountHeader');
-            const showingText = document.getElementById('showingText');
-            const paginationContainer = document.getElementById('paginationContainer');
+            document.addEventListener('DOMContentLoaded', function () {
+        const rows = Array.from(document.querySelectorAll('.sp-row'));
+        const emptyRow = document.getElementById('emptyRow');
+        const searchInput = document.getElementById('search-input');
+        const statusFilter = document.getElementById('status-filter');
+        const totalCountHeader = document.getElementById('totalCountHeader');
+        const showingText = document.getElementById('showingText');
+        const paginationContainer = document.getElementById('paginationContainer');
+        const exportExcelBtn = document.getElementById('exportExcelBtn');
 
-            const pageSize = 7;
-            let currentPage = 1;
+        const pageSize = 7;
+        let currentPage = 1;
+
 
             function updateTable() {
                 const searchTerm = searchInput.value.trim().toLowerCase();
@@ -437,15 +443,30 @@
                 paginationContainer.appendChild(nextBtn);
             }
 
-            searchInput.addEventListener('input', () => {
-                currentPage = 1;
-                updateTable();
-            });
+               searchInput.addEventListener('input', () => {
+            currentPage = 1;
+            updateTable();
+        });
 
-            statusFilter.addEventListener('change', () => {
-                currentPage = 1;
-                updateTable();
+                statusFilter.addEventListener('change', () => {
+            currentPage = 1;
+            updateTable();
+        });
+
+
+             // Excel export: read the Status Filter's current value only at click time,
+        // then build the export URL. Free-text search is intentionally excluded —
+        // it only filters already-rendered rows client-side.
+        if (exportExcelBtn) {
+            exportExcelBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const url = new URL('@Url.Action("ExportProvidersExcel", "ServiceProvider")', window.location.origin);
+                url.searchParams.set('status', statusFilter.value); // already "all"/"active"/"inactive"
+
+                window.location.href = url.toString();
             });
+        }
 
             updateTable();
         });

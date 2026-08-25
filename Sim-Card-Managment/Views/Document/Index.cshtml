@@ -154,50 +154,51 @@
                 border-color: rgba(223, 83, 27, 0.3);
             }
 
-      
+
 
         .custom-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-            .btn-view-action {
-                background-color: #ffffff;
-                border: 1px solid #e0e0e0;
-                color: #333333;
-                border-radius: 8px;
-                padding: 6px 14px;
-                font-size: 13px;
-                font-weight: 600;
-                transition: all 0.2s ease;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
+        .btn-view-action {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            color: #333333;
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .btn-view-action:hover {
+                border-color: var(--brand-orange);
+                color: var(--brand-orange);
+                background-color: #fffaf8;
             }
 
-                .btn-view-action:hover {
-                    border-color: var(--brand-orange);
-                    color: var(--brand-orange);
-                    background-color: #fffaf8;
-                }
-            .custom-table thead th {
-                text-align: left;
-                font-size: 0.8rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: var(--text-muted);
-                padding: 12px 16px;
-                border-bottom: 2px solid var(--brand-orange);
-                background: #FFFFFF;
-            }
+        .custom-table thead th {
+            text-align: left;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--brand-orange);
+            background: #FFFFFF;
+        }
 
-            .custom-table tbody td {
-                font-size: 0.95rem;
-                padding: 16px;
-                border-bottom: 1px solid var(--card-border);
-                vertical-align: middle;
-            }
+        .custom-table tbody td {
+            font-size: 0.95rem;
+            padding: 16px;
+            border-bottom: 1px solid var(--card-border);
+            vertical-align: middle;
+        }
 
         .doc-row {
             transition: background-color 0.15s ease;
@@ -226,7 +227,7 @@
                     <a asp-action="InventoryReport" class="btn-custom btn-secondary-outline">
                         <i class="fa-solid fa-laptop"></i> Hardware Report
                     </a>
-                    <a asp-action="ExportToExcel" asp-route-searchTerm="@Context.Request.Query["searchTerm"]" asp-route-documentTypeId="@Context.Request.Query["documentTypeId"]" class="btn-custom btn-secondary-outline">
+                    <a href="#" id="exportExcelBtn" class="btn-custom btn-secondary-outline">
                         <i class="fa-solid fa-file-excel"></i> Export Summary
                     </a>
                     <a asp-action="Create" class="btn-custom btn-primary-orange">
@@ -241,22 +242,17 @@
 
         <div class="table-card">
 
-            <form asp-action="Index" method="get" class="row g-3 mb-4 align-items-center">
+            <form asp-action="Index" method="get" id="documentFilterForm" class="row g-3 mb-4 align-items-center">
                 <div class="col-md-6">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <input id="docSearchInput" name="searchTerm" value="@Context.Request.Query["searchTerm"]" type="text" placeholder="Search serial, doc number, or notes..." autocomplete="off">
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <select name="documentTypeId" asp-items="ViewBag.DocumentTypes" class="form-select-custom w-100">
+                <div class="col-md-6">
+                    <select id="documentTypeFilter" name="documentTypeId" asp-items="ViewBag.DocumentTypes" class="form-select-custom w-100">
                         <option value="">-- All Document Types --</option>
                     </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn-custom btn-secondary-outline w-100">
-                        <i class="fa-solid fa-filter"></i> Filter
-                    </button>
                 </div>
             </form>
 
@@ -292,10 +288,10 @@
                                             <a asp-action="Details" asp-route-id="@item.Id" class="btn-view-action" title="View Details">
                                                 <i class="fa-solid fa-eye"></i> View
                                             </a>
-                                           
+
                                         </div>
                                     </td>
-                                  
+
                                 </tr>
                             }
                         }
@@ -318,6 +314,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('docSearchInput');
             const noResultsRow = document.getElementById('noResultsRow');
+            const documentTypeFilter = document.getElementById('documentTypeFilter');
+            const documentFilterForm = document.getElementById('documentFilterForm');
+            const exportExcelBtn = document.getElementById('exportExcelBtn');
 
             if (searchInput) {
                 searchInput.addEventListener('input', () => {
@@ -338,6 +337,32 @@
                     if (noResultsRow) {
                         noResultsRow.style.display = visibleCount === 0 ? '' : 'none';
                     }
+                });
+            }
+
+            // Dropdown filter submits the page on change (Filter button removed)
+            if (documentTypeFilter && documentFilterForm) {
+                documentTypeFilter.addEventListener('change', () => {
+                    documentFilterForm.submit();
+                });
+            }
+
+            // Excel export: read the Document Type dropdown's current value only
+            // at the moment of the click, then build the export URL. Free-text
+            // search is intentionally excluded — it only filters already-rendered
+            // rows client-side and shouldn't affect the export.
+            if (exportExcelBtn) {
+                exportExcelBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const url = new URL('@Url.Action("ExportToExcel", "Document")', window.location.origin);
+
+                    const typeVal = documentTypeFilter ? documentTypeFilter.value : '';
+                    if (typeVal) {
+                        url.searchParams.set('documentTypeId', typeVal);
+                    }
+
+                    window.location.href = url.toString();
                 });
             }
         });

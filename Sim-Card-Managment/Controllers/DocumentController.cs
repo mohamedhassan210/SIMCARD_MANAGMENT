@@ -55,7 +55,7 @@ namespace Sim_Card_Managment.Controllers
         public async Task<IActionResult> Index(string? searchTerm, int? documentTypeId)
         {
             var documents = await _documentRepo.GetAllAsync(searchTerm, documentTypeId);
-            ViewBag.DocumentTypes = new SelectList(await _documentTypeRepo.GetAllAsync(), "Id", "DisplayName");
+            ViewBag.DocumentTypes = new SelectList(await _documentTypeRepo.GetAllAsync(), "Id", "DisplayName", documentTypeId);
             return View(documents);
         }
         public async Task<IActionResult> InventoryReport(string? searchTerm)

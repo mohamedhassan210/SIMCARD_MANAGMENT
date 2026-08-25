@@ -167,7 +167,11 @@
             <h1 class="page-header-title mb-1">Quota Management</h1>
             <p class="page-header-subtitle mb-0">Overview of provider quota allocations, extra amounts, and associated fees.</p>
         </div>
-        <div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="#" id="exportExcelBtn" class="btn-view-action">
+                <i class="fas fa-file-excel"></i>
+                <span>Excel</span>
+            </a>
             <a asp-action="Create" class="btn-orange-primary shadow-sm">
                 <i class="fas fa-plus"></i>
                 <span>Add New Quota</span>
@@ -334,10 +338,11 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+       document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById('tableSearchInput');
         const statusFilter = document.getElementById('statusFilter');
         const rows = document.querySelectorAll('#quotaTable tbody tr');
+        const exportExcelBtn = document.getElementById('exportExcelBtn');
 
         function filterTable() {
             const searchTerm = searchInput.value.toLowerCase().trim();
@@ -348,10 +353,8 @@
                 const statusCell = row.querySelector('.availability-cell');
                 const isActive = statusCell ? statusCell.getAttribute('data-active') === 'true' : false;
 
-                // Match Search Term
                 const matchesSearch = !searchTerm || text.includes(searchTerm);
 
-                // Match Active/Inactive Filter
                 let matchesStatus = true;
                 if (selectedStatus === 'Active') {
                     matchesStatus = isActive === true;
@@ -369,5 +372,24 @@
 
         searchInput.addEventListener('input', filterTable);
         statusFilter.addEventListener('change', filterTable);
+
+        // Excel export: read the Status filter's current value only at click time,
+        // then build the export URL. Free-text search is intentionally excluded —
+        // it only filters already-rendered rows client-side.
+        if (exportExcelBtn) {
+            exportExcelBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const selectedStatus = statusFilter.value; // "Active", "Inactive", or ""
+                let statusParam = 'all';
+                if (selectedStatus === 'Active') statusParam = 'active';
+                else if (selectedStatus === 'Inactive') statusParam = 'inactive';
+
+                const url = new URL('@Url.Action("ExportQuotasExcel", "Quota")', window.location.origin);
+                url.searchParams.set('status', statusParam);
+
+                window.location.href = url.toString();
+            });
+        }
     });
 </script>
