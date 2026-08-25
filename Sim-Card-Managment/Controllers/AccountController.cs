@@ -3,12 +3,15 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Services;
 using Sim_Card_Managment.Viewmodel;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
@@ -336,6 +339,57 @@ namespace Sim_Card_Managment.Controllers
 
         [HttpGet]
         [RequirePermission]
+        public async Task<IActionResult> ExportUsersExcel(bool? isActive)
+        {
+            var users = await _accountRepo.GetAllUsersAsync(null, null, isActive);
+
+            ExcelPackage.License.SetNonCommercialPersonal("MyName");
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Users");
+
+            worksheet.Cells[1, 1].Value = "Name";
+            worksheet.Cells[1, 2].Value = "Email";
+            worksheet.Cells[1, 3].Value = "Group";
+            worksheet.Cells[1, 4].Value = "Status";
+
+            using (var headerRange = worksheet.Cells[1, 1, 1, 4])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            }
+
+            int row = 2;
+            foreach (var user in users)
+            {
+                worksheet.Cells[row, 1].Value = user.Username;
+                worksheet.Cells[row, 2].Value = user.Email;
+                worksheet.Cells[row, 3].Value = user.GroupName;
+                worksheet.Cells[row, 4].Value = user.IsActive ? "Active" : "Inactive";
+                row++;
+            }
+
+            if (worksheet.Dimension != null)
+            {
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            }
+
+            var fileContents = package.GetAsByteArray();
+
+            var suffix = isActive == true ? "_Active" : isActive == false ? "_Inactive" : "";
+
+            return File(
+                fileContents,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"Users{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+            );
+        }
+
+        [HttpGet]
+        [RequirePermission]
         public async Task<IActionResult> EditUser(int id)
         {
             var model = await _accountRepo.GetUserForEditAsync(id);
@@ -463,10 +517,10 @@ namespace Sim_Card_Managment.Controllers
                 return ForceLogoutAndRedirect();
             }
 
-            var result = await _accountRepo.ChangePasswordAsync(currentUserId,  model.NewPassword);
+            var result = await _accountRepo.ChangePasswordAsync(currentUserId, model.NewPassword);
 
             if (!result.IsSuccess)
-            {             
+            {
                 return View(model);
             }
 

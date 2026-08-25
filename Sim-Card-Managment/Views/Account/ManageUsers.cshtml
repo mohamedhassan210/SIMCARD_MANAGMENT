@@ -50,6 +50,28 @@
             color: #ffffff;
         }
 
+    /* Secondary (Excel) Action Button */
+    .btn-secondary-soft {
+        background-color: #F1F5F9;
+        color: #64748B;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+        .btn-secondary-soft:hover {
+            background-color: #E2E8F0;
+            color: #1a1a1a;
+        }
+
     .btn-view-action {
         background-color: #ffffff;
         border: 1px solid #e0e0e0;
@@ -205,6 +227,10 @@
             <p class="page-header-subtitle mb-0">Manage registered user accounts, assigned permission groups, and active statuses.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
+            <a href="#" id="exportExcelBtn" class="btn-secondary-soft shadow-sm">
+                <i class="fas fa-file-excel"></i>
+                <span>Excel</span>
+            </a>
             <a asp-controller="Account" asp-action="Register" class="btn-orange-primary shadow-sm">
                 <i class="fas fa-plus"></i>
                 <span>New User</span>
@@ -344,6 +370,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("search-input");
         const statusFilter = document.getElementById("status-filter");
+        const exportExcelBtn = document.getElementById("exportExcelBtn");
 
         const allRows = Array.from(document.querySelectorAll("#tableBody tr.user-row"));
         const noResultsRow = document.getElementById("noResultsRow");
@@ -423,6 +450,26 @@
 
             renderTable();
         });
+
+        // Excel export: read the Status filter's value only at the moment of
+        // the click, not on every change, then build the export URL with it.
+        if (exportExcelBtn) {
+            exportExcelBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                const status = statusFilter.value;
+                const url = new URL('@Url.Action("ExportUsersExcel", "Account")', window.location.origin);
+
+                if (status === "active") {
+                    url.searchParams.set("isActive", "true");
+                } else if (status === "inactive") {
+                    url.searchParams.set("isActive", "false");
+                }
+                // "all" -> no isActive param, export everything
+
+                window.location.href = url.toString();
+            });
+        }
 
         applyFilters();
     });

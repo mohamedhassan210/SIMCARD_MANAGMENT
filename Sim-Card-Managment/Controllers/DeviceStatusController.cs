@@ -86,7 +86,7 @@ namespace Sim_Card_Managment.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(DeviceStatusCreateViewModel model)
-        {
+         {
             ValidateDeviceSelection(model.SimId, model.UsbId);
 
             if (!ModelState.IsValid)
