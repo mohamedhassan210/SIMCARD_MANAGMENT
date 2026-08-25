@@ -51,28 +51,27 @@ namespace Sim_Card_Managment.Controllers
             return View(deviceTransfer);
         }
 
-        // GET: DeviceTransfer/Create?simId=5 OR ?usbId=3 OR ?subscriptionId=10
+        // GET: DeviceTransfer/Create?simId=5 OR ?usbId=3
         [HttpGet]
-        public IActionResult Create(int? simId)
+        public IActionResult Create(int? simId, int? usbId)
         {
             Subscription? activeSubscription = null;
-
-            // 1. Retrieve the active subscription based on passed ID
 
             if (simId.HasValue)
             {
                 activeSubscription = _repo.GetActiveSubscriptionBySimId(simId.Value);
             }
+            else if (usbId.HasValue)
+            {
+                activeSubscription = _repo.GetActiveSubscriptionByUsbId(usbId.Value);
+            }
 
-
-            // ✅ CORRECT: Only rejects if null OR if EndDate is in the past
             if (activeSubscription == null || (activeSubscription.EndDate.HasValue && activeSubscription.EndDate.Value <= DateTime.Now))
             {
                 TempData["ErrorMessage"] = "The device is not currently assigned to an active subscription or could not be found.";
                 return RedirectToAction("Index");
             }
 
-            // 3. Pre-populate the transfer model
             var transferModel = new DeviceTransfer
             {
                 FromSubscriptionId = activeSubscription.Id,

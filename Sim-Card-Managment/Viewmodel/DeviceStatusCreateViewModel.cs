@@ -6,7 +6,7 @@ namespace Sim_Card_Managment.Viewmodel
     {
         public int? SimId { get; set; }
         public int? UsbId { get; set; }
-        public int StatusTypeId { get; set; }
+        public int? StatusTypeId { get; set; }
         public string? Notes { get; set; }
         public int? ReplacedBySimId { get; set; }
         public int? ReplacedByUsbId { get; set; }
@@ -14,9 +14,7 @@ namespace Sim_Card_Managment.Viewmodel
         public List<DeviceOptionViewModel> Sims { get; set; } = new();
         public List<DeviceOptionViewModel> Usbs { get; set; } = new();
 
-        public SelectList ReplacementSims { get; set; }
-        public SelectList ReplacementUsbs { get; set; }
-        public SelectList StatusTypes { get; set; }
+        public SelectList? StatusTypes { get; set; }
     }
 
     public class DeviceOptionViewModel

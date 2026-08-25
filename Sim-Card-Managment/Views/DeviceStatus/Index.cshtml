@@ -222,6 +222,10 @@
                 <i class="fas fa-tags"></i>
                 <span>Status Types</span>
             </a>
+            <a href="#" id="exportExcelBtn" class="btn-view-action">
+                <i class="fas fa-file-excel"></i>
+                <span>Excel</span>
+            </a>
             <a asp-controller="DeviceStatus" asp-action="Create" class="btn-orange-primary shadow-sm">
                 <i class="fas fa-plus"></i>
                 <span>Log New Status</span>
@@ -496,5 +500,32 @@
         searchInput.addEventListener('input', filterTable);
         typeFilter.addEventListener('change', filterTable);
         availFilter.addEventListener('change', filterTable);
+
+    // Excel export: read both dropdown filters only at the moment of the
+        // click, then build the export URL. Free-text search is intentionally
+        // excluded since it only filters already-rendered rows client-side.
+        const exportExcelBtn = document.getElementById('exportExcelBtn');
+        if (exportExcelBtn) {
+            exportExcelBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const availVal = availFilter.value; // "", "Active", "Not Active"
+                const typeVal = typeFilter.value;    // "", "SIM Card", "USB Modem"
+
+                const url = new URL('@Url.Action("ExportDeviceStatusExcel", "DeviceStatus")', window.location.origin);
+
+                if (availVal === 'Active') {
+                    url.searchParams.set('isActive', 'true');
+                } else if (availVal === 'Not Active') {
+                    url.searchParams.set('isActive', 'false');
+                }
+
+                if (typeVal) {
+                    url.searchParams.set('deviceType', typeVal);
+                }
+
+                window.location.href = url.toString();
+            });
+        }
     });
 </script>

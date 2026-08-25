@@ -32,10 +32,15 @@ namespace Sim_Card_Managment.Repos
 
         public Subscription? GetActiveSubscriptionByUsbId(int usbId)
         {
+            if (usbId <= 0) return null;
+
             return _context.Subscriptions
                 .Include(s => s.Employee)
+                .Include(s => s.NonEmployee)
                 .Include(s => s.Usb)
-                .FirstOrDefault(s => s.UsbId == usbId && s.EndDate == null);
+                .Where(s => s.UsbId == usbId && (s.EndDate == null || s.EndDate > DateTime.Now))
+                .OrderByDescending(s => s.StartDate)
+                .FirstOrDefault();
         }
 
         public DeviceTransfer? GetDeviceTransferbyId(int id)

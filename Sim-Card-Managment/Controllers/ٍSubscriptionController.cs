@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Repos.Account;
@@ -23,6 +24,8 @@ namespace Sim_Card_Managment.Controllers
         private readonly INonEmployeeRepo _nonEmployeeRepo;
         private readonly IDeviceActionRepo _actionRepo;
         private readonly IAccountRepo _accountRepo;
+        private readonly IDeviceStatusRepo _deviceStatusRepo;
+        private readonly AppDbContext _context;
 
         public SubscriptionController(
             ISubscriptionRepo subscriptionRepo,
@@ -32,7 +35,9 @@ namespace Sim_Card_Managment.Controllers
             IEmployeeRepo employeeRepo,
             INonEmployeeRepo nonEmployeeRepo,
             IDeviceActionRepo actionRepo,
-            IAccountRepo accountRepo)
+            IAccountRepo accountRepo,
+            IDeviceStatusRepo deviceStatusRepo,
+            AppDbContext context)
         {
             _subscriptionRepo = subscriptionRepo;
             _simRepo = simRepo;
@@ -42,6 +47,8 @@ namespace Sim_Card_Managment.Controllers
             _nonEmployeeRepo = nonEmployeeRepo;
             _actionRepo = actionRepo;
             _accountRepo = accountRepo;
+            _deviceStatusRepo = deviceStatusRepo;
+            _context = context;
         }
 
         [HttpGet]
@@ -116,20 +123,7 @@ namespace Sim_Card_Managment.Controllers
                 return View(model);
             }
 
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdClaim, out int currentUserId))
-            {
-                var defaultUser = _accountRepo.GetAllUsersAsync(null, null, true).Result.FirstOrDefault();
-                if (defaultUser != null)
-                {
-                    currentUserId = defaultUser.Id;
-                }
-                else
-                {
-                    ModelState.AddModelError("", "User authentication error. Please log in again.");
-                    return View(model);
-                }
-            }
+            int currentUserId = GetCurrentUserId();
 
             var createAction = _actionRepo.GetAllDeviceActions().FirstOrDefault(a => a.Name == "CreateSubscription")
                           ?? _actionRepo.GetAllDeviceActions().FirstOrDefault();
@@ -161,16 +155,19 @@ namespace Sim_Card_Managment.Controllers
 
             _subscriptionRepo.Add(subscription);
 
-            // Newly assigned devices become Occupied
+            // Newly assigned devices become Occupied — update the live Status field
+            // AND log the change to DeviceStatus history, same as DeviceTransferController does.
             if (hasSim)
             {
                 var sim = _simRepo.GetById(model.SelectedSimId!.Value);
                 if (sim != null) { sim.Status = "Occupied"; _simRepo.Update(sim); }
+                LogDeviceStatus(model.SelectedSimId, null, "Occupied", "Assigned via new subscription", currentUserId);
             }
             if (hasUsb)
             {
                 var usb = _usbRepo.GetById(model.SelectedUsbId!.Value);
                 if (usb != null) { usb.Status = "Occupied"; _usbRepo.Update(usb); }
+                LogDeviceStatus(null, model.SelectedUsbId, "Occupied", "Assigned via new subscription", currentUserId);
             }
 
             return RedirectToAction(nameof(Index));
@@ -291,12 +288,13 @@ namespace Sim_Card_Managment.Controllers
 
             _subscriptionRepo.Update(sub);
 
-            ApplyDeviceStatusChangeOnEdit(oldSimId, sub.SimId, oldUsbId, sub.UsbId);
+            int currentUserId = GetCurrentUserId();
+            ApplyDeviceStatusChangeOnEdit(oldSimId, sub.SimId, oldUsbId, sub.UsbId, currentUserId);
 
             return RedirectToAction(nameof(Details), new { id = sub.Id });
         }
 
-        private void ApplyDeviceStatusChangeOnEdit(int? oldSimId, int? newSimId, int? oldUsbId, int? newUsbId)
+        private void ApplyDeviceStatusChangeOnEdit(int? oldSimId, int? newSimId, int? oldUsbId, int? newUsbId, int reportedBy)
         {
             if (oldSimId != newSimId)
             {
@@ -304,11 +302,13 @@ namespace Sim_Card_Managment.Controllers
                 {
                     var oldSim = _simRepo.GetById(oldSimId.Value);
                     if (oldSim != null) { oldSim.Status = "Unassigned"; _simRepo.Update(oldSim); }
+                    LogDeviceStatus(oldSimId, null, "Unassigned", "Removed from subscription during edit", reportedBy);
                 }
                 if (newSimId.HasValue)
                 {
                     var newSim = _simRepo.GetById(newSimId.Value);
                     if (newSim != null) { newSim.Status = "Occupied"; _simRepo.Update(newSim); }
+                    LogDeviceStatus(newSimId, null, "Occupied", "Assigned to subscription during edit", reportedBy);
                 }
             }
 
@@ -318,13 +318,53 @@ namespace Sim_Card_Managment.Controllers
                 {
                     var oldUsb = _usbRepo.GetById(oldUsbId.Value);
                     if (oldUsb != null) { oldUsb.Status = "Unassigned"; _usbRepo.Update(oldUsb); }
+                    LogDeviceStatus(null, oldUsbId, "Unassigned", "Removed from subscription during edit", reportedBy);
                 }
                 if (newUsbId.HasValue)
                 {
                     var newUsb = _usbRepo.GetById(newUsbId.Value);
                     if (newUsb != null) { newUsb.Status = "Occupied"; _usbRepo.Update(newUsb); }
+                    LogDeviceStatus(null, newUsbId, "Occupied", "Assigned to subscription during edit", reportedBy);
                 }
             }
+        }
+
+        /// <summary>
+        /// Writes a DeviceStatus history record for a SIM or USB device — mirrors the
+        /// pattern DeviceTransferController already uses for transfer-driven status changes,
+        /// so subscription-driven status changes (create/edit) show up in the same log.
+        /// </summary>
+        private void LogDeviceStatus(int? simId, int? usbId, string statusName, string notes, int reportedBy)
+        {
+            if (!simId.HasValue && !usbId.HasValue) return;
+
+            var statusType = _context.DeviceStatusesType.FirstOrDefault(t => t.Name == statusName);
+            if (statusType == null) return;
+
+            var deviceStatus = new DeviceStatus
+            {
+                SimId = simId,
+                UsbId = usbId,
+                StatusTypeId = statusType.Id,
+                StatusDate = DateTime.Now,
+                Notes = notes,
+                ReportedBy = reportedBy
+            };
+
+            // AddDeviceStatus already calls SaveChanges() internally
+            _deviceStatusRepo.AddDeviceStatus(deviceStatus);
+        }
+
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                return userId;
+            }
+
+            var defaultUser = _accountRepo.GetAllUsersAsync(null, null, true).Result.FirstOrDefault();
+            return defaultUser?.Id ?? 1;
         }
 
         [HttpGet]
