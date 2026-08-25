@@ -155,19 +155,23 @@ namespace Sim_Card_Managment.Controllers
 
             _subscriptionRepo.Add(subscription);
 
-            // Newly assigned devices become Occupied — update the live Status field
-            // AND log the change to DeviceStatus history, same as DeviceTransferController does.
+            // Resolve the assignee's name once, since both device types (if both are set)
+            // were just handed to the same subscriber
+            string? assignedToName = !model.IsNonEmployee
+                ? _employeeRepo.GetById(model.SelectedEmployeeId!.Value)?.Name
+                : _nonEmployeeRepo.GetById(model.SelectedEmployeeId!.Value)?.Name;
+
             if (hasSim)
             {
                 var sim = _simRepo.GetById(model.SelectedSimId!.Value);
                 if (sim != null) { sim.Status = "Occupied"; _simRepo.Update(sim); }
-                LogDeviceStatus(model.SelectedSimId, null, "Occupied", "Assigned via new subscription", currentUserId);
+                LogDeviceStatus(model.SelectedSimId, null, "Occupied", "Assigned via new subscription", currentUserId, assignedToName);
             }
             if (hasUsb)
             {
                 var usb = _usbRepo.GetById(model.SelectedUsbId!.Value);
                 if (usb != null) { usb.Status = "Occupied"; _usbRepo.Update(usb); }
-                LogDeviceStatus(null, model.SelectedUsbId, "Occupied", "Assigned via new subscription", currentUserId);
+                LogDeviceStatus(null, model.SelectedUsbId, "Occupied", "Assigned via new subscription", currentUserId, assignedToName);
             }
 
             return RedirectToAction(nameof(Index));
@@ -289,12 +293,12 @@ namespace Sim_Card_Managment.Controllers
             _subscriptionRepo.Update(sub);
 
             int currentUserId = GetCurrentUserId();
-            ApplyDeviceStatusChangeOnEdit(oldSimId, sub.SimId, oldUsbId, sub.UsbId, currentUserId);
-
+            string? assignedToName = sub.Employee?.Name ?? sub.NonEmployee?.Name;
+            ApplyDeviceStatusChangeOnEdit(oldSimId, sub.SimId, oldUsbId, sub.UsbId, currentUserId, assignedToName);
             return RedirectToAction(nameof(Details), new { id = sub.Id });
         }
 
-        private void ApplyDeviceStatusChangeOnEdit(int? oldSimId, int? newSimId, int? oldUsbId, int? newUsbId, int reportedBy)
+        private void ApplyDeviceStatusChangeOnEdit(int? oldSimId, int? newSimId, int? oldUsbId, int? newUsbId, int reportedBy, string? assignedToName)
         {
             if (oldSimId != newSimId)
             {
@@ -308,7 +312,7 @@ namespace Sim_Card_Managment.Controllers
                 {
                     var newSim = _simRepo.GetById(newSimId.Value);
                     if (newSim != null) { newSim.Status = "Occupied"; _simRepo.Update(newSim); }
-                    LogDeviceStatus(newSimId, null, "Occupied", "Assigned to subscription during edit", reportedBy);
+                    LogDeviceStatus(newSimId, null, "Occupied", "Assigned to subscription during edit", reportedBy, assignedToName);
                 }
             }
 
@@ -324,7 +328,7 @@ namespace Sim_Card_Managment.Controllers
                 {
                     var newUsb = _usbRepo.GetById(newUsbId.Value);
                     if (newUsb != null) { newUsb.Status = "Occupied"; _usbRepo.Update(newUsb); }
-                    LogDeviceStatus(null, newUsbId, "Occupied", "Assigned to subscription during edit", reportedBy);
+                    LogDeviceStatus(null, newUsbId, "Occupied", "Assigned to subscription during edit", reportedBy, assignedToName);
                 }
             }
         }
@@ -334,7 +338,7 @@ namespace Sim_Card_Managment.Controllers
         /// pattern DeviceTransferController already uses for transfer-driven status changes,
         /// so subscription-driven status changes (create/edit) show up in the same log.
         /// </summary>
-        private void LogDeviceStatus(int? simId, int? usbId, string statusName, string notes, int reportedBy)
+        private void LogDeviceStatus(int? simId, int? usbId, string statusName, string notes, int reportedBy, string? assignedToName = null)
         {
             if (!simId.HasValue && !usbId.HasValue) return;
 
@@ -348,7 +352,8 @@ namespace Sim_Card_Managment.Controllers
                 StatusTypeId = statusType.Id,
                 StatusDate = DateTime.Now,
                 Notes = notes,
-                ReportedBy = reportedBy
+                ReportedBy = reportedBy,
+                AssignedToName = assignedToName
             };
 
             // AddDeviceStatus already calls SaveChanges() internally
