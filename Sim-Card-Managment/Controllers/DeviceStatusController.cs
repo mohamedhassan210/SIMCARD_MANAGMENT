@@ -19,13 +19,20 @@ namespace Sim_Card_Managment.Controllers
         private readonly IDeviceStatusRepo _deviceStatusRepo;
         private readonly ISIMRepo _simRepo;
         private readonly IUSBRepo _usbRepo;
+        private readonly ISubscriptionRepo _subscriptionRepo;
 
-        public DeviceStatusController(AppDbContext context, IDeviceStatusRepo deviceStatusRepo, ISIMRepo simRepo, IUSBRepo usbRepo)
+        public DeviceStatusController(
+            AppDbContext context,
+            IDeviceStatusRepo deviceStatusRepo,
+            ISIMRepo simRepo,
+            IUSBRepo usbRepo,
+            ISubscriptionRepo subscriptionRepo)
         {
             _context = context;
             _deviceStatusRepo = deviceStatusRepo;
             _simRepo = simRepo;
             _usbRepo = usbRepo;
+            _subscriptionRepo = subscriptionRepo;
         }
 
         // GET: /DeviceStatus
@@ -76,15 +83,16 @@ namespace Sim_Card_Managment.Controllers
 
                 worksheet.Cells[1, 1].Value = "Serial Number";
                 worksheet.Cells[1, 2].Value = "Device Type";
-                worksheet.Cells[1, 3].Value = "Old Status";
-                worksheet.Cells[1, 4].Value = "New Status";
-                worksheet.Cells[1, 5].Value = "Availability";
-                worksheet.Cells[1, 6].Value = "Assigned To";
-                worksheet.Cells[1, 7].Value = "Reported By";
-                worksheet.Cells[1, 8].Value = "Status Date";
-                worksheet.Cells[1, 9].Value = "Notes";
+                worksheet.Cells[1, 3].Value = "Phone Number / USB Model";
+                worksheet.Cells[1, 4].Value = "Old Status";
+                worksheet.Cells[1, 5].Value = "New Status";
+                worksheet.Cells[1, 6].Value = "Availability";
+                worksheet.Cells[1, 7].Value = "Assigned To";
+                worksheet.Cells[1, 8].Value = "Reported By";
+                worksheet.Cells[1, 9].Value = "Status Date";
+                worksheet.Cells[1, 10].Value = "Notes";
 
-                using (var range = worksheet.Cells[1, 1, 1, 9])
+                using (var range = worksheet.Cells[1, 1, 1, 10])
                 {
                     range.Style.Font.Bold = true;
                     range.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -97,13 +105,14 @@ namespace Sim_Card_Managment.Controllers
                 {
                     worksheet.Cells[row, 1].Value = r.SerialNumber;
                     worksheet.Cells[row, 2].Value = r.DeviceType;
-                    worksheet.Cells[row, 3].Value = r.OldStatus;
-                    worksheet.Cells[row, 4].Value = r.NewStatus;
-                    worksheet.Cells[row, 5].Value = r.Availability;
-                    worksheet.Cells[row, 6].Value = r.AssignedTo;
-                    worksheet.Cells[row, 7].Value = r.ReportedByUserName;
-                    worksheet.Cells[row, 8].Value = r.StatusDate.ToString("yyyy-MM-dd HH:mm");
-                    worksheet.Cells[row, 9].Value = r.Notes ?? "";
+                    worksheet.Cells[row, 3].Value = r.Identifier ?? "N/A";
+                    worksheet.Cells[row, 4].Value = r.OldStatus;
+                    worksheet.Cells[row, 5].Value = r.NewStatus;
+                    worksheet.Cells[row, 6].Value = r.Availability;
+                    worksheet.Cells[row, 7].Value = r.AssignedTo;
+                    worksheet.Cells[row, 8].Value = r.ReportedByUserName;
+                    worksheet.Cells[row, 9].Value = r.StatusDate.ToString("yyyy-MM-dd HH:mm");
+                    worksheet.Cells[row, 10].Value = r.Notes ?? "";
                     row++;
                 }
 
@@ -135,6 +144,7 @@ namespace Sim_Card_Managment.Controllers
 
                 string serialNumber = ds.Sim?.SerialNumber ?? ds.Usb?.SerialNumber ?? "N/A";
                 string deviceType = ds.SimId.HasValue ? "SIM Card" : "USB Modem";
+                string? identifier = ds.Sim?.PhoneNumber ?? ds.Usb?.Model;
                 bool isActive = ds.Sim?.IsActive ?? ds.Usb?.IsActive ?? false;
 
                 string? assignedTo = ds.Sim != null
@@ -152,6 +162,7 @@ namespace Sim_Card_Managment.Controllers
                     Id = ds.Id,
                     SerialNumber = serialNumber,
                     DeviceType = deviceType,
+                    Identifier = identifier,
                     Notes = ds.Notes,
                     OldStatus = oldStatus,
                     NewStatus = newStatus,
@@ -248,6 +259,49 @@ namespace Sim_Card_Managment.Controllers
                     _usbRepo.Update(usb);
                 }
             }
+
+            // Any status other than "Occupied" means the device is no longer
+            // actively assigned. Without this, the device's Status field could
+            // say "Unassigned"/"Lost"/etc. while an active Subscription still
+            // links it to an employee/non-employee — which is exactly the glitch
+            // where AssignedTo kept showing a person after picking "Unassigned".
+            if (!string.Equals(statusType.Name, "Occupied", StringComparison.OrdinalIgnoreCase))
+            {
+                DetachDeviceFromActiveSubscription(simId, usbId);
+            }
+        }
+
+        /// <summary>
+        /// Removes this device from whatever active subscription currently holds it.
+        /// A subscription can hold a SIM and a USB at once, so we only clear the
+        /// matching slot — the subscription is fully closed (EndDate set) only once
+        /// neither slot is occupied anymore.
+        /// </summary>
+        private void DetachDeviceFromActiveSubscription(int? simId, int? usbId)
+        {
+            var activeSubscription = _subscriptionRepo.GetAll()
+                .FirstOrDefault(s =>
+                    (s.EndDate == null || s.EndDate > DateTime.Now) &&
+                    ((simId.HasValue && s.SimId == simId) || (usbId.HasValue && s.UsbId == usbId)));
+
+            if (activeSubscription == null) return;
+
+            if (simId.HasValue && activeSubscription.SimId == simId)
+            {
+                activeSubscription.SimId = null;
+            }
+
+            if (usbId.HasValue && activeSubscription.UsbId == usbId)
+            {
+                activeSubscription.UsbId = null;
+            }
+
+            if (activeSubscription.SimId == null && activeSubscription.UsbId == null)
+            {
+                activeSubscription.EndDate = DateTime.Now;
+            }
+
+            _subscriptionRepo.Update(activeSubscription);
         }
 
         private void PopulateLookupLists(DeviceStatusCreateViewModel model)
