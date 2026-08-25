@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.GroupListItemViewModel>
+@model IEnumerable<Sim_Card_Managment.Viewmodel.GroupListItemViewModel>
 
 @{
     ViewData["Title"] = "Groups Directory";
@@ -50,6 +50,27 @@
             background-color: var(--primary-orange-hover);
             border-color: var(--primary-orange-hover);
             color: #ffffff;
+        }
+
+    .btn-secondary-soft {
+        background-color: #F1F5F9;
+        color: #64748B;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+        .btn-secondary-soft:hover {
+            background-color: #E2E8F0;
+            color: #1a1a1a;
         }
 
     .btn-view-action {
@@ -207,7 +228,11 @@
             <h1 class="page-header-title mb-1">System Groups</h1>
             <p class="page-header-subtitle mb-0">Manage user permission groups, role descriptions, and track employee assignments.</p>
         </div>
-        <div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="#" id="exportExcelBtn" class="btn-secondary-soft shadow-sm">
+                <i class="fas fa-file-excel"></i>
+                <span>Excel</span>
+            </a>
             <a asp-controller="Group" asp-action="Create" class="btn-orange-primary shadow-sm">
                 <i class="fas fa-plus"></i>
                 <span>New Group</span>
@@ -354,6 +379,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("search-input");
         const statusFilter = document.getElementById("status-filter");
+        const exportExcelBtn = document.getElementById("exportExcelBtn");
 
         const allRows = Array.from(document.querySelectorAll("#tableBody tr.group-row"));
         const noResultsRow = document.getElementById("noResultsRow");
@@ -445,6 +471,26 @@
 
             renderTable();
         });
+
+        // Excel export: read the Status filter's value only at the moment of
+        // the click, not on every change, then build the export URL with it.
+        if (exportExcelBtn) {
+            exportExcelBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                const status = statusFilter.value;
+                const url = new URL('@Url.Action("ExportGroupsExcel", "Group")', window.location.origin);
+
+                if (status === "active") {
+                    url.searchParams.set("isActive", "true");
+                } else if (status === "inactive") {
+                    url.searchParams.set("isActive", "false");
+                }
+                // "all" -> no isActive param, export everything
+
+                window.location.href = url.toString();
+            });
+        }
 
         // Initialize display
         applyFilters();

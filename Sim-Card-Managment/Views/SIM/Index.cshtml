@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Sim_Card_Managment.Viewmodel.DeviceDirectoryViewModel>
+@model IEnumerable<Sim_Card_Managment.Viewmodel.DeviceDirectoryViewModel>
 
 @{
     ViewData["Title"] = "Devices Directory";
@@ -64,6 +64,7 @@
         align-items: center;
         gap: 8px;
         text-decoration: none;
+        cursor: pointer;
     }
 
         .btn-outline-custom:hover {
@@ -239,7 +240,10 @@
                 <i class="fas fa-plus"></i>
                 <span>New USB Modem</span>
             </a>
-           
+            <a href="#" id="exportExcelBtn" class="btn-outline-custom shadow-sm">
+                <i class="fas fa-file-excel"></i>
+                <span>Excel</span>
+            </a>
         </div>
     </div>
 
@@ -491,6 +495,7 @@
             const statusFilter = document.getElementById("status-filter");
             const typeFilter = document.getElementById("device-type-filter");
             const statusTypeFilter = document.getElementById("status-type-filter");
+            const exportExcelBtn = document.getElementById("exportExcelBtn");
 
             const allRows = Array.from(document.querySelectorAll("#tableBody tr.device-row"));
             const noResultsRow = document.getElementById("noResultsRow");
@@ -601,6 +606,22 @@
             statusFilter.addEventListener("change", applyFilters);
             typeFilter.addEventListener("change", applyFilters);
             statusTypeFilter.addEventListener("change", applyFilters);
+
+            // Excel export: read all three filters only at the moment of the
+            // click (never on every filter change), then build the export URL.
+            // Any combination — one, two, or all three filters — is supported.
+            if (exportExcelBtn) {
+                exportExcelBtn.addEventListener("click", function (e) {
+                    e.preventDefault();
+
+                    const url = new URL('@Url.Action("ExportDevicesExcel", "SIM")', window.location.origin);
+                    url.searchParams.set("status", statusFilter.value);
+                    url.searchParams.set("type", typeFilter.value);
+                    url.searchParams.set("statusType", statusTypeFilter.value);
+
+                    window.location.href = url.toString();
+                });
+            }
 
             applyFilters();
         });

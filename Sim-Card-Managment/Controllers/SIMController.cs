@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Sim_Card_Managment.Authorization;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
@@ -7,6 +9,7 @@ using Sim_Card_Managment.Repos;
 using Sim_Card_Managment.Viewmodel;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace Sim_Card_Managment.Controllers
@@ -42,20 +45,9 @@ namespace Sim_Card_Managment.Controllers
                 .FirstOrDefault(sp => sp.Name.ToLower() == targetProviderName.ToLower());
         }
 
-      
-        // GET: /SIM or /SIM/Index
-        public IActionResult Index(string status = "all", string type = "all")
+        // Shared by Index and ExportDevicesExcel so both always see the same data.
+        private List<DeviceDirectoryViewModel> BuildDeviceDirectory()
         {
-            ViewBag.CurrentStatus = status.ToLower();
-            ViewBag.CurrentType = type.ToLower();
-
-            // Pull every status type defined in the DeviceStatusType lookup table,
-            // rather than only the ones currently in use on Sim/Usb rows.
-            ViewBag.StatusTypes = _context.DeviceStatusesType
-                .Select(t => t.Name.ToString())
-                .OrderBy(n => n)
-                .ToList();
-
             var simsList = _simRepo.GetAll().Select(s => new DeviceDirectoryViewModel
             {
                 Id = s.Id,
@@ -88,11 +80,111 @@ namespace Sim_Card_Managment.Controllers
                     .FirstOrDefault() ?? "Unassigned"
             });
 
-            var combinedDirectory = simsList.Concat(usbsList)
-                                            .OrderByDescending(d => d.RegisteredAt)
-                                            .ToList();
+            return simsList.Concat(usbsList)
+                            .OrderByDescending(d => d.RegisteredAt)
+                            .ToList();
+        }
+
+        private static string NormalizeDeviceType(string? deviceType)
+        {
+            if (deviceType != null && deviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase)) return "sim";
+            if (deviceType != null && deviceType.Contains("USB", StringComparison.OrdinalIgnoreCase)) return "usb";
+            return "";
+        }
+
+        // GET: /SIM or /SIM/Index
+        public IActionResult Index(string status = "all", string type = "all")
+        {
+            ViewBag.CurrentStatus = status.ToLower();
+            ViewBag.CurrentType = type.ToLower();
+
+            // Pull every status type defined in the DeviceStatusType lookup table,
+            // rather than only the ones currently in use on Sim/Usb rows.
+            ViewBag.StatusTypes = _context.DeviceStatusesType
+                .Select(t => t.Name.ToString())
+                .OrderBy(n => n)
+                .ToList();
+
+            var combinedDirectory = BuildDeviceDirectory();
 
             return View(combinedDirectory);
+        }
+
+        // GET: /SIM/ExportDevicesExcel — mirrors the Index page's three filters
+        // (Availability, Device Type, Status Type), any combination of them.
+        [HttpGet]
+        public IActionResult ExportDevicesExcel(string status = "all", string type = "all", string statusType = "all")
+        {
+            status = (status ?? "all").ToLower();
+            type = (type ?? "all").ToLower();
+            statusType = (statusType ?? "all").ToLower();
+
+            var deviceList = BuildDeviceDirectory();
+
+            var filtered = deviceList.Where(d =>
+            {
+                var normalizedType = NormalizeDeviceType(d.DeviceType);
+
+                bool matchesStatus = status == "all" || (d.IsActive ? "active" : "inactive") == status;
+                bool matchesType = type == "all" || normalizedType == type;
+                bool matchesStatusType = statusType == "all" || (d.Status?.ToLower() ?? "unassigned") == statusType;
+
+                return matchesStatus && matchesType && matchesStatusType;
+            }).ToList();
+
+            ExcelPackage.License.SetNonCommercialPersonal("MyName");
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Devices");
+
+            worksheet.Cells[1, 1].Value = "Serial Number";
+            worksheet.Cells[1, 2].Value = "Type";
+            worksheet.Cells[1, 3].Value = "Provider";
+            worksheet.Cells[1, 4].Value = "Identifier";
+            worksheet.Cells[1, 5].Value = "Availability";
+            worksheet.Cells[1, 6].Value = "Status";
+            worksheet.Cells[1, 7].Value = "Assigned To";
+
+            using (var headerRange = worksheet.Cells[1, 1, 1, 7])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            }
+
+            int row = 2;
+            foreach (var d in filtered)
+            {
+                worksheet.Cells[row, 1].Value = d.SerialNumber;
+                worksheet.Cells[row, 2].Value = d.DeviceType;
+                worksheet.Cells[row, 3].Value = d.ServiceProvider;
+                worksheet.Cells[row, 4].Value = string.IsNullOrEmpty(d.Identifier) ? "-" : d.Identifier;
+                worksheet.Cells[row, 5].Value = d.IsActive ? "Active" : "Inactive";
+                worksheet.Cells[row, 6].Value = d.Status;
+                worksheet.Cells[row, 7].Value = string.IsNullOrEmpty(d.AssignedTo) ? "Unassigned" : d.AssignedTo;
+                row++;
+            }
+
+            if (worksheet.Dimension != null)
+            {
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            }
+
+            var fileContents = package.GetAsByteArray();
+
+            var suffixParts = new List<string>();
+            if (status != "all") suffixParts.Add(status);
+            if (type != "all") suffixParts.Add(type);
+            if (statusType != "all") suffixParts.Add(statusType);
+            var suffix = suffixParts.Any() ? "_" + string.Join("_", suffixParts) : "";
+
+            return File(
+                fileContents,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"Devices{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+            );
         }
 
         public IActionResult Details(int id)

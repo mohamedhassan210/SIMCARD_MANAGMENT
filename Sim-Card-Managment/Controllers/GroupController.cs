@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Sim_Card_Managment.data;
 using Sim_Card_Managment.Models;
 using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Repos.GroupRepos;
 using Sim_Card_Managment.Viewmodel;
+using System.Drawing;
 using System.Security.Claims;
 
 namespace Sim_Card_Managment.Controllers
@@ -41,6 +44,76 @@ namespace Sim_Card_Managment.Controllers
             }).ToList();
 
             return View(viewModel);
+        }
+
+        // GET: Group/ExportGroupsExcel
+        [HttpGet]
+        public async Task<IActionResult> ExportGroupsExcel(bool? isActive)
+        {
+            var groups = await _groups.GetAllAsync();
+
+            var viewModel = groups.Select(g => new GroupListItemViewModel
+            {
+                Id = g.Id,
+                Name = g.Name,
+                Description = g.Description,
+                CreatedAt = g.CreatedAt,
+                IsActive = g.IsActive,
+                EmployeeCount = g.Users?.Count ?? 0
+            });
+
+            if (isActive.HasValue)
+            {
+                viewModel = viewModel.Where(g => g.IsActive == isActive.Value);
+            }
+
+            var rows = viewModel.ToList();
+
+            ExcelPackage.License.SetNonCommercialPersonal("MyName");
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Groups");
+
+            worksheet.Cells[1, 1].Value = "Group Name";
+            worksheet.Cells[1, 2].Value = "Description";
+            worksheet.Cells[1, 3].Value = "Created At";
+            worksheet.Cells[1, 4].Value = "Status";
+            worksheet.Cells[1, 5].Value = "Employees";
+
+            using (var headerRange = worksheet.Cells[1, 1, 1, 5])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            }
+
+            int row = 2;
+            foreach (var group in rows)
+            {
+                worksheet.Cells[row, 1].Value = group.Name;
+                worksheet.Cells[row, 2].Value = string.IsNullOrEmpty(group.Description) ? "No description provided." : group.Description;
+                worksheet.Cells[row, 3].Value = group.CreatedAt.ToString("MMM dd, yyyy");
+                worksheet.Cells[row, 4].Value = group.IsActive ? "Active" : "Inactive";
+                worksheet.Cells[row, 5].Value = group.EmployeeCount;
+                row++;
+            }
+
+            if (worksheet.Dimension != null)
+            {
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            }
+
+            var fileContents = package.GetAsByteArray();
+
+            var suffix = isActive == true ? "_Active" : isActive == false ? "_Inactive" : "";
+
+            return File(
+                fileContents,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"Groups{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+            );
         }
 
         // GET: Group/Create
@@ -153,7 +226,7 @@ namespace Sim_Card_Managment.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        
+
         // GET: Group/GetAllGroups — returns groups as JSON for the Swal dropdown
         [HttpGet]
         public async Task<IActionResult> GetAllGroups(int? excludeGroupId = null)
