@@ -11,6 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
 
 namespace Sim_Card_Managment.Controllers
 {
@@ -240,5 +243,78 @@ namespace Sim_Card_Managment.Controllers
 
             return RedirectToAction(nameof(Details), new { id });
         }
+
+        
+        // GET: /Employee/ExportEmployeeExcel
+        [HttpGet]
+        public async Task<IActionResult> ExportEmployeeExcel(string status = "all", string type = "all")
+        {
+            var resultList = new List<PersonListItemViewModel>();
+
+            if (type == "all" || type == "employee")
+            {
+                var employees = await _employeeRepo.GetPeopleListAsync(status);
+                resultList.AddRange(employees);
+            }
+
+            if (type == "all" || type == "non-employee")
+            {
+                var nonEmployees = await _nonEmployeeRepo.GetPeopleListAsync();
+                if (status == "active")
+                    nonEmployees = nonEmployees.Where(x => x.IsActive).ToList();
+                else if (status == "inactive")
+                    nonEmployees = nonEmployees.Where(x => !x.IsActive).ToList();
+
+                resultList.AddRange(nonEmployees);
+            }
+
+            var orderedModel = resultList.OrderBy(x => x.Name).ToList();
+
+            ExcelPackage.License.SetNonCommercialPersonal("MyName");
+
+            using var package = new ExcelPackage();
+            var sheet = package.Workbook.Worksheets.Add("Directory");
+
+            string[] headers = { "Name", "Type", "Status", "ID / Contact", "SIMs", "USBs", "Start Date" };
+            for (int i = 0; i < headers.Length; i++)
+                sheet.Cells[1, i + 1].Value = headers[i];
+
+            using (var headerRange = sheet.Cells[1, 1, 1, headers.Length])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(230, 230, 230));
+            }
+
+            int row = 2;
+            foreach (var item in orderedModel)
+            {
+                sheet.Cells[row, 1].Value = item.Name;
+                sheet.Cells[row, 2].Value = item.PersonType;
+                sheet.Cells[row, 3].Value = item.IsActive ? "Active" : "Inactive";
+                sheet.Cells[row, 4].Value = item.Identifier;
+                sheet.Cells[row, 5].Value = item.ActiveSimOnlyCount;
+                sheet.Cells[row, 6].Value = item.ActiveUsbCount;
+                sheet.Cells[row, 7].Value = item.StartDate.ToString("yyyy-MM-dd");
+                row++;
+            }
+
+            if (sheet.Dimension != null)
+                sheet.Cells[sheet.Dimension.Address].AutoFitColumns();
+
+            var bytes = package.GetAsByteArray();
+
+            var suffixParts = new List<string>();
+            if (!string.IsNullOrEmpty(status) && status != "all")
+                suffixParts.Add(char.ToUpper(status[0]) + status.Substring(1));
+            if (!string.IsNullOrEmpty(type) && type != "all")
+                suffixParts.Add(type == "employee" ? "Employees" : "NonEmployees");
+
+            string suffix = suffixParts.Count > 0 ? "_" + string.Join("_", suffixParts) : "";
+            string fileName = $"Directory{suffix}_{DateTime.Now:yyyyMMdd}.xlsx";
+
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
     }
 }
