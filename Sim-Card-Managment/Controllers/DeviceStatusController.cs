@@ -199,14 +199,9 @@ namespace Sim_Card_Managment.Controllers
 
             var statusType = _context.DeviceStatusesType.FirstOrDefault(t => t.Id == model.StatusTypeId!.Value);
 
-            // Snapshot who currently holds the device BEFORE anything changes — needed either
-            // way, since detaching the subscription depends on it.
+            // Snapshot who currently holds the device BEFORE anything changes.
             var activeSubscription = GetActiveSubscriptionForDevice(model.SimId, model.UsbId);
 
-            // Only record an assignee on the log entry if the NEW status keeps the device
-            // assigned ("Occupied"). If the device is being freed up (Unassigned, Lost,
-            // Returned, etc.), the log should reflect that it's no longer assigned to anyone —
-            // showing the previous owner here would be misleading.
             bool staysAssigned = string.Equals(statusType?.Name, "Occupied", StringComparison.OrdinalIgnoreCase);
             string? assignedToName = staysAssigned
                 ? (activeSubscription?.Employee?.Name ?? activeSubscription?.NonEmployee?.Name)
@@ -229,7 +224,82 @@ namespace Sim_Card_Managment.Controllers
 
             ApplyStatusToDevice(model.SimId, model.UsbId, statusType, activeSubscription);
 
+            // If a replacement device was specified, hand it to the same subscriber the
+            // original device belonged to: create a fresh subscription for it, mark it
+            // Occupied, and log that as its own DeviceStatus entry.
+            if (model.ReplacedBySimId.HasValue || model.ReplacedByUsbId.HasValue)
+            {
+                HandleReplacementDevice(model.ReplacedBySimId, model.ReplacedByUsbId, activeSubscription, currentUserId);
+            }
+
             return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>
+        /// Assigns the replacement SIM/USB to whoever held the original device, opening a
+        /// new subscription for it, marking it Occupied, and logging that as a DeviceStatus
+        /// entry with AssignedToName set — mirrors how DeviceTransferController and
+        /// SubscriptionController log new assignments.
+        /// </summary>
+        private void HandleReplacementDevice(int? replacedBySimId, int? replacedByUsbId, Subscription? originalSubscription, int reportedBy)
+        {
+            if (originalSubscription == null) return; // nobody to assign the replacement to
+
+            var occupiedStatusType = _context.DeviceStatusesType
+                .FirstOrDefault(t => t.Name == "Occupied");
+            if (occupiedStatusType == null) return;
+
+            string? assignedToName = originalSubscription.Employee?.Name ?? originalSubscription.NonEmployee?.Name;
+
+            var newSubscription = new Subscription
+            {
+                EmpId = originalSubscription.EmpId,
+                NonEmployeeId = originalSubscription.NonEmployeeId,
+                SimId = replacedBySimId,
+                UsbId = replacedByUsbId,
+                QuotaId = replacedBySimId.HasValue ? originalSubscription.QuotaId : null,
+                ActionId = originalSubscription.ActionId,
+                CreatedBy = reportedBy,
+                CreatedDate = DateTime.Now,
+                StartDate = DateTime.Now,
+                EndDate = null,
+                Fees = originalSubscription.Fees
+            };
+
+            _subscriptionRepo.Add(newSubscription);
+
+            if (replacedBySimId.HasValue)
+            {
+                var replacementSim = _simRepo.GetById(replacedBySimId.Value);
+                if (replacementSim != null)
+                {
+                    replacementSim.Status = "Occupied";
+                    _simRepo.Update(replacementSim);
+                }
+            }
+
+            if (replacedByUsbId.HasValue)
+            {
+                var replacementUsb = _usbRepo.GetById(replacedByUsbId.Value);
+                if (replacementUsb != null)
+                {
+                    replacementUsb.Status = "Occupied";
+                    _usbRepo.Update(replacementUsb);
+                }
+            }
+
+            var replacementStatus = new DeviceStatus
+            {
+                SimId = replacedBySimId,
+                UsbId = replacedByUsbId,
+                StatusTypeId = occupiedStatusType.Id,
+                StatusDate = DateTime.Now,
+                Notes = "Assigned as replacement device",
+                ReportedBy = reportedBy,
+                AssignedToName = assignedToName
+            };
+
+            _deviceStatusRepo.AddDeviceStatus(replacementStatus);
         }
 
         private void ValidateDeviceSelection(int? simId, int? usbId)

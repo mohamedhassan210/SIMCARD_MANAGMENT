@@ -175,7 +175,7 @@ namespace Sim_Card_Managment.Controllers
                     {
                         // Snapshot the recipient's name — this transfer always results in an
                         // "Occupied" state, so the log should always carry the new owner's name.
-                        string? assignedToName = _employeeRepo.GetById(deviceTransfer.ToEmpId!.Value)?.Name;
+                        string? assignedToName = _employeeRepo.GetById(deviceTransfer.ToEmpId)?.Name;
 
                         var deviceStatus = new DeviceStatus
                         {
