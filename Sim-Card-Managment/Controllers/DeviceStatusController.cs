@@ -199,11 +199,18 @@ namespace Sim_Card_Managment.Controllers
 
             var statusType = _context.DeviceStatusesType.FirstOrDefault(t => t.Id == model.StatusTypeId!.Value);
 
-            // Snapshot who currently holds the device BEFORE anything changes. This is
-            // what makes the log entry permanently show the right assignee — a live
-            // lookup would go blank the moment this same action closes the subscription.
+            // Snapshot who currently holds the device BEFORE anything changes — needed either
+            // way, since detaching the subscription depends on it.
             var activeSubscription = GetActiveSubscriptionForDevice(model.SimId, model.UsbId);
-            string? assignedToName = activeSubscription?.Employee?.Name ?? activeSubscription?.NonEmployee?.Name;
+
+            // Only record an assignee on the log entry if the NEW status keeps the device
+            // assigned ("Occupied"). If the device is being freed up (Unassigned, Lost,
+            // Returned, etc.), the log should reflect that it's no longer assigned to anyone —
+            // showing the previous owner here would be misleading.
+            bool staysAssigned = string.Equals(statusType?.Name, "Occupied", StringComparison.OrdinalIgnoreCase);
+            string? assignedToName = staysAssigned
+                ? (activeSubscription?.Employee?.Name ?? activeSubscription?.NonEmployee?.Name)
+                : null;
 
             var deviceStatus = new DeviceStatus
             {
