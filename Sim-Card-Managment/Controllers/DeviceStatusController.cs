@@ -147,16 +147,6 @@ namespace Sim_Card_Managment.Controllers
                 string? identifier = ds.Sim?.PhoneNumber ?? ds.Usb?.Model;
                 bool isActive = ds.Sim?.IsActive ?? ds.Usb?.IsActive ?? false;
 
-                string? assignedTo = ds.Sim != null
-                    ? ds.Sim.Subscriptions?
-                        .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
-                        .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
-                        .FirstOrDefault()
-                    : ds.Usb?.Subscriptions?
-                        .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
-                        .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
-                        .FirstOrDefault();
-
                 viewModel.Add(new DeviceStatusViewModel
                 {
                     Id = ds.Id,
@@ -167,7 +157,10 @@ namespace Sim_Card_Managment.Controllers
                     OldStatus = oldStatus,
                     NewStatus = newStatus,
                     IsActive = isActive,
-                    AssignedTo = assignedTo ?? "Unassigned",
+                    // Read the snapshot taken at write time instead of computing it live —
+                    // that's exactly what made past rows lose their assignee once the
+                    // subscription behind them was closed.
+                    AssignedTo = ds.AssignedToName ?? "Unassigned",
                     ReportedByUserName = ds.ReportedByUser?.Username ?? "N/A",
                     StatusDate = ds.StatusDate
                 });
@@ -206,6 +199,12 @@ namespace Sim_Card_Managment.Controllers
 
             var statusType = _context.DeviceStatusesType.FirstOrDefault(t => t.Id == model.StatusTypeId!.Value);
 
+            // Snapshot who currently holds the device BEFORE anything changes. This is
+            // what makes the log entry permanently show the right assignee — a live
+            // lookup would go blank the moment this same action closes the subscription.
+            var activeSubscription = GetActiveSubscriptionForDevice(model.SimId, model.UsbId);
+            string? assignedToName = activeSubscription?.Employee?.Name ?? activeSubscription?.NonEmployee?.Name;
+
             var deviceStatus = new DeviceStatus
             {
                 SimId = model.SimId,
@@ -215,12 +214,13 @@ namespace Sim_Card_Managment.Controllers
                 Notes = model.Notes,
                 ReportedBy = currentUserId,
                 ReplacedBySimId = model.ReplacedBySimId,
-                ReplacedByUsbId = model.ReplacedByUsbId
+                ReplacedByUsbId = model.ReplacedByUsbId,
+                AssignedToName = assignedToName
             };
 
             _deviceStatusRepo.AddDeviceStatus(deviceStatus);
 
-            ApplyStatusToDevice(model.SimId, model.UsbId, statusType);
+            ApplyStatusToDevice(model.SimId, model.UsbId, statusType, activeSubscription);
 
             return RedirectToAction(nameof(Index));
         }
@@ -237,7 +237,7 @@ namespace Sim_Card_Managment.Controllers
             }
         }
 
-        private void ApplyStatusToDevice(int? simId, int? usbId, DeviceStatusType? statusType)
+        private void ApplyStatusToDevice(int? simId, int? usbId, DeviceStatusType? statusType, Subscription? activeSubscription)
         {
             if (statusType == null) return;
 
@@ -261,13 +261,11 @@ namespace Sim_Card_Managment.Controllers
             }
 
             // Any status other than "Occupied" means the device is no longer
-            // actively assigned. Without this, the device's Status field could
-            // say "Unassigned"/"Lost"/etc. while an active Subscription still
-            // links it to an employee/non-employee — which is exactly the glitch
-            // where AssignedTo kept showing a person after picking "Unassigned".
+            // actively assigned, so detach it from whatever subscription
+            // currently holds it (already fetched above, before this call).
             if (!string.Equals(statusType.Name, "Occupied", StringComparison.OrdinalIgnoreCase))
             {
-                DetachDeviceFromActiveSubscription(simId, usbId);
+                DetachDeviceFromActiveSubscription(simId, usbId, activeSubscription);
             }
         }
 
@@ -277,13 +275,8 @@ namespace Sim_Card_Managment.Controllers
         /// matching slot — the subscription is fully closed (EndDate set) only once
         /// neither slot is occupied anymore.
         /// </summary>
-        private void DetachDeviceFromActiveSubscription(int? simId, int? usbId)
+        private void DetachDeviceFromActiveSubscription(int? simId, int? usbId, Subscription? activeSubscription)
         {
-            var activeSubscription = _subscriptionRepo.GetAll()
-                .FirstOrDefault(s =>
-                    (s.EndDate == null || s.EndDate > DateTime.Now) &&
-                    ((simId.HasValue && s.SimId == simId) || (usbId.HasValue && s.UsbId == usbId)));
-
             if (activeSubscription == null) return;
 
             if (simId.HasValue && activeSubscription.SimId == simId)
@@ -302,6 +295,14 @@ namespace Sim_Card_Managment.Controllers
             }
 
             _subscriptionRepo.Update(activeSubscription);
+        }
+
+        private Subscription? GetActiveSubscriptionForDevice(int? simId, int? usbId)
+        {
+            return _subscriptionRepo.GetAll()
+                .FirstOrDefault(s =>
+                    (s.EndDate == null || s.EndDate > DateTime.Now) &&
+                    ((simId.HasValue && s.SimId == simId) || (usbId.HasValue && s.UsbId == usbId)));
         }
 
         private void PopulateLookupLists(DeviceStatusCreateViewModel model)

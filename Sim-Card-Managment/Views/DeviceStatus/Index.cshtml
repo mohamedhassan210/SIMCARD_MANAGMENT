@@ -301,7 +301,7 @@
                 <label class="form-label text-muted small mb-1">Search</label>
                 <div class="search-bar-wrapper">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="tableSearchInput" placeholder="Search by Serial, Status, Assignee, or Reporter...">
+                    <input type="text" id="tableSearchInput" placeholder="Search by Serial, Phone/Model, Status, Assignee, or Reporter...">
                 </div>
             </div>
 
@@ -333,6 +333,7 @@
                     <tr class="text-uppercase text-muted small fw-bold">
                         <th scope="col">Serial Number</th>
                         <th scope="col">Device Type</th>
+                        <th scope="col">Phone / USB Model</th>
                         <th scope="col">Status Transition</th>
                         <th scope="col">Availability</th>
                         <th scope="col">Assigned To</th>
@@ -368,6 +369,9 @@
                                             <i class="fas fa-usb me-1"></i> USB Modem
                                         </span>
                                     }
+                                </td>
+                                <td>
+                                    <span class="text-dark small">@(string.IsNullOrEmpty(item.Identifier) ? "N/A" : item.Identifier)</span>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2 small">
