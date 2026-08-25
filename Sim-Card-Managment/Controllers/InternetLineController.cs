@@ -353,7 +353,21 @@ namespace Sim_Card_Managment.Controllers
 
                 foreach (var line in filteredLines)
                 {
-                    // ... same 11-column row-writing code as before ...
+                    worksheet.Cells[row, 1].Value = branch.BranchName;
+                    worksheet.Cells[row, 2].Value = line.ServiceProviderName;
+                    worksheet.Cells[row, 3].Value = line.PaymentTypeName;
+                    worksheet.Cells[row, 4].Value = line.ServiceTypeName;
+                    worksheet.Cells[row, 5].Value = line.SimSerialNumber ?? "N/A";
+                    worksheet.Cells[row, 6].Value = line.PhoneNumber ?? "N/A";
+                    worksheet.Cells[row, 7].Value = line.NextRenewalDate.HasValue
+                        ? line.NextRenewalDate.Value.ToString("dd MMM yyyy")
+                        : "N/A";
+                    worksheet.Cells[row, 8].Value = line.QuotaGB.HasValue ? $"{line.QuotaGB} GB" : "N/A";
+                    worksheet.Cells[row, 9].Value = line.Bandwidth ?? "N/A";
+                    worksheet.Cells[row, 10].Value = line.Status ? "UP" : "DOWN";
+                    worksheet.Cells[row, 11].Value = line.Notes ?? "";
+
+                    row++;
                 }
             }
 
@@ -377,13 +391,13 @@ namespace Sim_Card_Managment.Controllers
                     var statusCell = worksheet.Cells[r, statusColumn];
                     statusCell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-                     status = statusCell.Value?.ToString() ?? "";
-                    if (status == "UP")
+                    var cellStatus = statusCell.Value?.ToString() ?? "";   // <-- new local, not `status`
+                    if (cellStatus == "UP")
                     {
                         statusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
                         statusCell.Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
                     }
-                    else if (status == "DOWN")
+                    else if (cellStatus == "DOWN")
                     {
                         statusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
                         statusCell.Style.Fill.BackgroundColor.SetColor(Color.LightCoral);
