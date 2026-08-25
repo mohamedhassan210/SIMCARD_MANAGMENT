@@ -295,9 +295,7 @@
                         Firewall Types
                     </a>
 
-                    <a asp-controller="VpnConnection"
-                       asp-action="ExportToExcel"
-                       class="btn-custom btn-secondary-soft">
+                    <a href="#" id="exportVpnExcelBtn" class="btn-custom btn-secondary-soft">
                         <i class="fa-solid fa-file-excel"></i>
                         Excel
                     </a>
@@ -459,6 +457,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+                const exportVpnExcelBtn = document.getElementById('exportVpnExcelBtn');
+        if (exportVpnExcelBtn) {
+            exportVpnExcelBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const url = new URL('@Url.Action("ExportToExcel", "VpnConnection")', window.location.origin);
+                const statusVal = document.getElementById('statusFilter').value; // "ALL", "UP", or "DOWN"
+                if (statusVal && statusVal !== 'ALL') {
+                    url.searchParams.set('status', statusVal.toLowerCase());
+                }
+                window.location.href = url.toString();
+            });
+        }
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('vpnSearchInput');
             const statusFilter = document.getElementById('statusFilter');

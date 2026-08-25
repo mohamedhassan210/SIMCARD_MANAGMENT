@@ -285,7 +285,7 @@
                     <p class="text-muted m-0 small mt-1">Monitor enterprise asset performance and usage metrics in real-time.</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a asp-controller="Report" asp-action="ExportSubscriptionsExcel" class="btn-custom btn-secondary-soft">
+                    <a href="#" id="exportExcelBtn" class="btn-custom btn-secondary-soft">
                         <i class="fa-solid fa-file-excel"></i> Excel
                     </a>
                     <a asp-controller="Subscription" asp-action="Create" class="btn-custom btn-primary-orange">
@@ -451,6 +451,7 @@
             const statusFilter = document.getElementById('statusFilter');
             const rows = document.querySelectorAll('.sub-row');
             const noResultsRow = document.getElementById('noResultsRow');
+            const exportExcelBtn = document.getElementById('exportExcelBtn');
 
             function filterTable() {
                 const searchTerm = searchInput.value.toLowerCase();
@@ -479,6 +480,24 @@
 
             if (searchInput) searchInput.addEventListener('input', filterTable);
             if (statusFilter) statusFilter.addEventListener('change', filterTable);
+
+            // Excel export: read the Status filter's current value only at click
+            // time, then build the export URL. Free-text search is intentionally
+            // excluded — it only filters already-rendered rows client-side.
+            if (exportExcelBtn) {
+                exportExcelBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const url = new URL('@Url.Action("ExportSubscriptionsExcel", "Report")', window.location.origin);
+
+                    const statusVal = statusFilter.value; // "ALL", "Active", "Expired"
+                    if (statusVal && statusVal !== 'ALL') {
+                        url.searchParams.set('status', statusVal);
+                    }
+
+                    window.location.href = url.toString();
+                });
+            }
         });
     </script>
 </body>

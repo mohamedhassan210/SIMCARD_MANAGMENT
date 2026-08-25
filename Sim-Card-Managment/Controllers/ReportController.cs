@@ -40,25 +40,45 @@ namespace Sim_Card_Management.Controllers
 
         #region --- Subscriptions Excel Report ---
 
-        // Download Excel Report
-        public async Task<IActionResult> ExportSubscriptionsExcel()
+        // Download Excel Report — status: "Active" | "Expired" | null/"ALL" for everything.
+        // Mirrors Subscription/Index.cshtml's Status filter dropdown.
+        public async Task<IActionResult> ExportSubscriptionsExcel(string? status)
         {
-            byte[] fileContents = await GenerateSubscriptionsExcelBytes();
-            string fileName = $"Subscriptions_Report_{DateTime.Now:yyyyMMdd}.xlsx";
+            byte[] fileContents = await GenerateSubscriptionsExcelBytes(status);
+
+            var suffix = !string.IsNullOrWhiteSpace(status) && !string.Equals(status, "ALL", StringComparison.OrdinalIgnoreCase)
+                ? "_" + status
+                : "";
+
+            string fileName = $"Subscriptions_Report{suffix}_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         // View Online (Inline Content-Disposition)
-        public async Task<IActionResult> ViewSubscriptionsOnline()
+        public async Task<IActionResult> ViewSubscriptionsOnline(string? status)
         {
-            byte[] fileContents = await GenerateSubscriptionsExcelBytes();
+            byte[] fileContents = await GenerateSubscriptionsExcelBytes(status);
             Response.Headers.Add("Content-Disposition", "inline; filename=Subscriptions_Report.xlsx");
             return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 
-        private async Task<byte[]> GenerateSubscriptionsExcelBytes()
+        private async Task<byte[]> GenerateSubscriptionsExcelBytes(string? status)
         {
             var subscriptions = await _subscriptionRepo.GetAllSubscriptionsWithDetailsAsync(); // Ensure your repo loads Sim, Usb, Employee, Quota
+
+            var query = subscriptions.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(status) && !string.Equals(status, "ALL", StringComparison.OrdinalIgnoreCase))
+            {
+                bool wantActive = string.Equals(status, "Active", StringComparison.OrdinalIgnoreCase);
+                query = query.Where(sub =>
+                {
+                    bool isActive = sub.EndDate == null || sub.EndDate > DateTime.Now;
+                    return isActive == wantActive;
+                });
+            }
+
+            var filteredSubscriptions = query.ToList();
 
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add("Subscriptions");
@@ -78,16 +98,12 @@ namespace Sim_Card_Management.Controllers
 
             // Fill Data
             int row = 2;
-            foreach (var sub in subscriptions)
+            foreach (var sub in filteredSubscriptions)
             {
                 string subscriberName = sub.Employee?.Name ?? sub.NonEmployee?.Name ?? "Unassigned";
                 string simNumber = sub.Sim?.PhoneNumber ?? "N/A";
                 string usbSerial = sub.Usb?.SerialNumber ?? "N/A";
 
-                // Was: sub.Quota?.BaseAmount + sub.Quota.ExtraAmount ?? 0
-                // That threw a NullReferenceException on every subscription with no
-                // Quota, because the second access (sub.Quota.ExtraAmount) wasn't
-                // null-conditional even though the first one was.
                 decimal? quotaGb = sub.Quota != null
                     ? sub.Quota.BaseAmount + sub.Quota.ExtraAmount
                     : (decimal?)null;
@@ -100,7 +116,7 @@ namespace Sim_Card_Management.Controllers
                 worksheet.Cells[row, 3].Value = usbSerial;
                 worksheet.Cells[row, 4].Value = quotaGb.HasValue ? (object)quotaGb.Value : "N/A";
                 worksheet.Cells[row, 5].Value = fees;
-                worksheet.Cells[row, 6].Value = isActive ? "Active" : "Inactive";
+                worksheet.Cells[row, 6].Value = isActive ? "Active" : "Expired";
                 worksheet.Cells[row, 7].Value = sub.StartDate.ToString("yyyy-MM-dd");
                 row++;
             }
@@ -113,25 +129,40 @@ namespace Sim_Card_Management.Controllers
 
         #region --- Employees Excel Report ---
 
-        // Download Excel Report
-        public async Task<IActionResult> ExportEmployeesExcel()
+        // Download Excel Report — status: "active" | "inactive" | null/"all" for everything.
+        // Mirrors Employee/Index.cshtml's Status filter dropdown.
+        public async Task<IActionResult> ExportEmployeesExcel(string? status)
         {
-            byte[] fileContents = await GenerateEmployeesExcelBytes();
-            string fileName = $"Employees_Report_{DateTime.Now:yyyyMMdd}.xlsx";
+            byte[] fileContents = await GenerateEmployeesExcelBytes(status);
+
+            var normalizedStatus = status?.ToLower();
+            var suffix = !string.IsNullOrWhiteSpace(normalizedStatus) && normalizedStatus != "all"
+                ? "_" + normalizedStatus
+                : "";
+
+            string fileName = $"Employees_Report{suffix}_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         // View Online
-        public async Task<IActionResult> ViewEmployeesOnline()
+        public async Task<IActionResult> ViewEmployeesOnline(string? status)
         {
-            byte[] fileContents = await GenerateEmployeesExcelBytes();
+            byte[] fileContents = await GenerateEmployeesExcelBytes(status);
             Response.Headers.Add("Content-Disposition", "inline; filename=Employees_Report.xlsx");
             return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 
-        private async Task<byte[]> GenerateEmployeesExcelBytes()
+        private async Task<byte[]> GenerateEmployeesExcelBytes(string? status)
         {
             var employees = await _employeeRepo.GetPeopleListAsync("all"); // Ensure Subscriptions, Sims, and Usbs are loaded
+
+            var normalizedStatus = status?.ToLower();
+            var filteredEmployees = normalizedStatus switch
+            {
+                "active" => employees.Where(e => e.IsActive).ToList(),
+                "inactive" => employees.Where(e => !e.IsActive).ToList(),
+                _ => employees
+            };
 
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add("Employees");
@@ -150,7 +181,7 @@ namespace Sim_Card_Management.Controllers
 
             // Fill Data
             int row = 2;
-            foreach (var emp in employees)
+            foreach (var emp in filteredEmployees)
             {
                 worksheet.Cells[row, 1].Value = emp.Name;
                 worksheet.Cells[row, 2].Value = emp.Identifier;
