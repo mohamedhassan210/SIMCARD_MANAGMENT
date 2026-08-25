@@ -217,10 +217,17 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            _employeeRepo.Delete(id);
+            var employee = _employeeRepo.GetById(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            employee.IsActive = false;
+            _employeeRepo.Update(employee);
+
             return RedirectToAction(nameof(Index));
         }
-
         private async Task PopulateGroupsAsync(EmployeeUserCreateViewModel model)
         {
             var groups = await _groupRepo.GetAllAsync();
