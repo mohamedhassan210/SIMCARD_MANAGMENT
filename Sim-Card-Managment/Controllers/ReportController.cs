@@ -95,7 +95,9 @@ namespace Sim_Card_Management.Controllers
                 query = query.Where(sub => sub.StartDate.Date <= to.Value.Date);
             }
 
-            var filteredSubscriptions = query.ToList();
+            var filteredSubscriptions = query
+                .OrderByDescending(sub => sub.StartDate)
+                .ToList();
 
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add("Subscriptions");
