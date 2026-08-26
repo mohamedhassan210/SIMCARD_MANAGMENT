@@ -306,6 +306,20 @@
                             </select>
                         </div>
                     </div>
+                    <div class="card-filter-row">
+                        <div class="card-filter-field">
+                            <label class="card-filter-label">Device Status</label>
+                            @* Values must match d.Status?.ToLower() in SIMController.ExportDevicesExcel *@
+                            <select id="dev-status-type" class="card-filter-input">
+                                <option value="all">All</option>
+                                <option value="occupied">Occupied</option>
+                                <option value="unassigned">Unassigned</option>
+                                <option value="lost">Lost</option>
+                                <option value="replaced">Replaced</option>
+                                <option value="returned">Returned</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card-actions">
@@ -629,8 +643,9 @@
 
         // ---- Device Directory ----
         wireExport('export-devices', '@Url.Action("ExportDevicesExcel", "SIM")', [
-            { id: 'dev-status', param: 'status' },
-            { id: 'dev-type',   param: 'type'   }
+            { id: 'dev-status',      param: 'status'     },
+            { id: 'dev-type',        param: 'type'       },
+            { id: 'dev-status-type', param: 'statusType' }
         ]);
 
         // ---- Device Status Log ----
