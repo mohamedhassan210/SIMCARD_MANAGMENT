@@ -218,6 +218,27 @@
                 box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
             }
 
+        .btn-action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            color: #6c757d;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+            .btn-action-icon:hover {
+                border-color: var(--brand-orange);
+                color: var(--brand-orange);
+                background-color: #fffaf8;
+            }
+
+
         /* ---------- Filters (from SIM Index) ---------- */
         .filters { margin-top: 8px; }
         .filters label { display: block; font-size: 12px; color: #6b6b6b; margin-bottom: 8px; }
@@ -498,16 +519,24 @@
                                 <span style="color: #a8a8a8;">Unassigned</span>
                             }
                         </td>
-                        <td style="text-align: right;">
-                            @if (normalizedType == "sim")
-                            {
-                                <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
-                            }
-                            else
-                            {
-                                <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
-                            }
-                        </td>
+                                    <td style="text-align: right;">
+                                        <div class="d-inline-flex align-items-center gap-2">
+                                            @if (normalizedType == "sim")
+                                            {
+                                                <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                                                <a asp-controller="SIM" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit SIM">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                                                <a asp-controller="USB" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit USB">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
                     </tr>
                 }
             }

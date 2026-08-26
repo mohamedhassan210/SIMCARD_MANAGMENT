@@ -91,5 +91,17 @@ namespace Sim_Card_Managment.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<bool> ExistsByNameAsync(string name, int? excludeId = null)
+        {
+            var normalized = name.Trim();
+            var query = _context.ServiceProviders
+                .Where(p => p.Name.ToLower() == normalized.ToLower());
+
+            if (excludeId.HasValue)
+                query = query.Where(p => p.Id != excludeId.Value);
+
+            return await query.AnyAsync();
+        }
+
     }
 }

@@ -196,7 +196,21 @@
 @* Fix #7: removed duplicate Bootstrap + Bootstrap Icons CDN <link>/<script> tags *@
 
 <div class="container py-4  p-100">
-    
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     <div class="mb-5">
         <h1 class="page-title">Reports</h1>

@@ -23,7 +23,7 @@ namespace Sim_Card_Managment.Controllers
         }
 
         // GET: Quota
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var quotas = _quotaRepo.GetAll().Select(q => new QuotaViewModel
             {
@@ -36,12 +36,14 @@ namespace Sim_Card_Managment.Controllers
                 ServiceProviderName = q.ServiceProvider?.Name
             });
 
+            ViewBag.ActiveServiceProviders = await GetActiveProvidersForFilterAsync();
+
             return View(quotas);
         }
 
         // GET: Quota/ExportQuotasExcel?status=active|inactive|all — mirrors Index's Status Filter dropdown.
         [HttpGet]
-        public IActionResult ExportQuotasExcel(string status = "all")
+        public IActionResult ExportQuotasExcel(string status = "all", int? providerId = null)
         {
             status = (status ?? "all").ToLower();
 
@@ -62,6 +64,11 @@ namespace Sim_Card_Managment.Controllers
                 "inactive" => quotas.Where(q => !q.IsActive).ToList(),
                 _ => quotas
             };
+
+            if (providerId.HasValue)
+            {
+                filtered = filtered.Where(q => q.ServiceProviderId == providerId.Value).ToList();
+            }
 
             ExcelPackage.License.SetNonCommercialPersonal("MyName");
 
@@ -100,7 +107,15 @@ namespace Sim_Card_Managment.Controllers
             }
 
             var fileContents = package.GetAsByteArray();
-            var suffix = status != "all" ? "_" + status : "";
+
+            var suffixParts = new List<string>();
+            if (status != "all") suffixParts.Add(status);
+            if (providerId.HasValue)
+            {
+                var providerName = quotas.FirstOrDefault(q => q.ServiceProviderId == providerId.Value)?.ServiceProviderName;
+                suffixParts.Add(!string.IsNullOrWhiteSpace(providerName) ? providerName.Replace(" ", "") : $"Provider{providerId.Value}");
+            }
+            var suffix = suffixParts.Any() ? "_" + string.Join("_", suffixParts) : "";
 
             return File(
                 fileContents,
@@ -217,7 +232,27 @@ namespace Sim_Card_Managment.Controllers
         private async Task<SelectList> GetProvidersSelectListAsync(int? selectedId = null)
         {
             var providers = await _serviceProviderRepo.GetAllAsync();
-            return new SelectList(providers, "Id", "DisplayName", selectedId);
+            var activeProviders = providers.Where(p => p.IsActive).ToList();
+
+            // If editing a quota whose provider was deactivated after the quota was created,
+            // keep that provider in the list so the existing selection doesn't silently disappear.
+            if (selectedId.HasValue && !activeProviders.Any(p => p.Id == selectedId.Value))
+            {
+                var currentProvider = providers.FirstOrDefault(p => p.Id == selectedId.Value);
+                if (currentProvider != null)
+                {
+                    activeProviders.Add(currentProvider);
+                }
+            }
+
+            return new SelectList(activeProviders.OrderBy(p => p.DisplayName ?? p.Name), "Id", "DisplayName", selectedId);
         }
+
+        private async Task<List<Sim_Card_Managment.Models.ServiceProvider>> GetActiveProvidersForFilterAsync()
+        {
+            var providers = await _serviceProviderRepo.GetAllAsync();
+            return providers.Where(p => p.IsActive).OrderBy(p => p.DisplayName ?? p.Name).ToList();
+        }
+
     }
 }

@@ -105,6 +105,11 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ServiceProviderViewModel model)
         {
+            if (await _repo.ExistsByNameAsync(model.Name))
+            {
+                ModelState.AddModelError(nameof(model.Name), "Service Provider Name Already Exist , Pick Another Name.");
+            }
+
             if (ModelState.IsValid)
             {
                 var provider = new Models.ServiceProvider
@@ -218,6 +223,11 @@ namespace Sim_Card_Managment.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ServiceProviderEditViewModel model)
         {
+            if (await _repo.ExistsByNameAsync(model.Name, model.Id))
+            {
+                ModelState.AddModelError(nameof(model.Name), "Service Provider Name Already Exist , Pick Another Name.");
+            }
+
             if (!ModelState.IsValid) return View(model);
 
             var existing = await _repo.GetByIdAsync(model.Id);

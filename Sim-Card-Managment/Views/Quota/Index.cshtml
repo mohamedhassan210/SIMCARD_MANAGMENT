@@ -162,6 +162,22 @@
 
 <div class="container-fluid px-4 p-100">
 
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
             <h1 class="page-header-title mb-1">Quota Management</h1>
@@ -240,7 +256,7 @@
     <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden p-4">
 
         <div class="row g-3 justify-content-between align-items-center mb-4">
-            <div class="col-12 col-md-6 col-lg-5">
+            <div class="col-12 col-md-6 col-lg-4">
                 <label class="form-label text-muted small mb-1">Search</label>
                 <div class="search-bar-wrapper">
                     <i class="fas fa-search search-icon"></i>
@@ -248,7 +264,21 @@
                 </div>
             </div>
 
-            <div class="col-12 col-md-6 col-lg-4 d-flex justify-content-md-end align-items-end mt-3 mt-md-0">
+            <div class="col-12 col-md-3 col-lg-3">
+                <label class="form-label text-muted small mb-1">Service Provider</label>
+                <select id="providerFilter" class="form-select custom-select-filter">
+                    <option value="">All Providers</option>
+                    @if (ViewBag.ActiveServiceProviders != null)
+                    {
+                        foreach (var p in (List<Sim_Card_Managment.Models.ServiceProvider>)ViewBag.ActiveServiceProviders)
+                        {
+                            <option value="@p.Id">@(p.DisplayName ?? p.Name)</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-12 col-md-3 col-lg-4 d-flex justify-content-md-end align-items-end mt-3 mt-md-0">
                 <div class="w-100 w-md-auto">
                     <label class="form-label text-muted small mb-1">Status Filter</label>
                     <select id="statusFilter" class="form-select custom-select-filter">
@@ -283,7 +313,8 @@
                     {
                         @foreach (var quota in quotaList)
                         {
-                            <tr>
+
+                            <tr data-provider ="@quota.ServiceProviderId">
                                 <td class="fw-bold text-dark">
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="rounded-circle bg-orange bg-opacity-10 text-danger p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
@@ -341,17 +372,20 @@
        document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById('tableSearchInput');
         const statusFilter = document.getElementById('statusFilter');
+        const providerFilter = document.getElementById('providerFilter');
         const rows = document.querySelectorAll('#quotaTable tbody tr');
         const exportExcelBtn = document.getElementById('exportExcelBtn');
 
         function filterTable() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             const selectedStatus = statusFilter.value; // "Active", "Inactive", or ""
+            const selectedProvider = providerFilter.value; // provider id as string, or ""
 
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
                 const statusCell = row.querySelector('.availability-cell');
                 const isActive = statusCell ? statusCell.getAttribute('data-active') === 'true' : false;
+                const rowProviderId = row.getAttribute('data-provider') || "";
 
                 const matchesSearch = !searchTerm || text.includes(searchTerm);
 
@@ -362,7 +396,9 @@
                     matchesStatus = isActive === false;
                 }
 
-                if (matchesSearch && matchesStatus) {
+                const matchesProvider = !selectedProvider || rowProviderId === selectedProvider;
+
+                if (matchesSearch && matchesStatus && matchesProvider) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
@@ -372,10 +408,11 @@
 
         searchInput.addEventListener('input', filterTable);
         statusFilter.addEventListener('change', filterTable);
+        providerFilter.addEventListener('change', filterTable);
 
-        // Excel export: read the Status filter's current value only at click time,
-        // then build the export URL. Free-text search is intentionally excluded —
-        // it only filters already-rendered rows client-side.
+        // Excel export: read the Status and Service Provider filters' current values
+        // only at click time, then build the export URL. Free-text search is
+        // intentionally excluded — it only filters already-rendered rows client-side.
         if (exportExcelBtn) {
             exportExcelBtn.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -387,6 +424,11 @@
 
                 const url = new URL('@Url.Action("ExportQuotasExcel", "Quota")', window.location.origin);
                 url.searchParams.set('status', statusParam);
+
+                const selectedProvider = providerFilter.value;
+                if (selectedProvider) {
+                    url.searchParams.set('providerId', selectedProvider);
+                }
 
                 window.location.href = url.toString();
             });
