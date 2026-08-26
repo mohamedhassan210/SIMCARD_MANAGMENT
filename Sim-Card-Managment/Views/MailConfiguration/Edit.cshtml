@@ -166,9 +166,9 @@
                     <label class="form-label-custom">Sender Password / App Password</label>
                     <div class="input-group-custom">
                         <i class="fa-solid fa-key"></i>
-                        <input asp-for="SenderPassword" type="password" class="form-control-custom" placeholder="Leave blank to keep the current password" autocomplete="new-password">
+                        <input asp-for="SenderPassword" type="password" id="senderPasswordField" class="form-control-custom" placeholder="App password" autocomplete="new-password">
+                        <i class="fa-solid fa-eye" id="toggleSenderPassword" style="cursor:pointer; margin-left:8px;" title="Show password"></i>
                     </div>
-                    <p class="small text-muted mt-1 mb-0">Only fill this in if you want to change the stored password.</p>
                     <span asp-validation-for="SenderPassword" class="text-danger small"></span>
                 </div>
 
@@ -195,5 +195,14 @@
                 </button>
             </div>
         </form>
+        <script>
+            document.getElementById('toggleSenderPassword').addEventListener('click', function () {
+                const field = document.getElementById('senderPasswordField');
+                const isHidden = field.type === 'password';
+                field.type = isHidden ? 'text' : 'password';
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        </script>
     </div>
 </div>

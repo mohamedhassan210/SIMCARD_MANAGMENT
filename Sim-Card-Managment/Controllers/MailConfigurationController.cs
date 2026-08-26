@@ -46,9 +46,6 @@ namespace Sim_Card_Managment.Controllers
             var config = await _mailConfigurationRepo.GetByIdAsync(id);
             if (config == null) return NotFound();
 
-            // Don't round-trip the real password to the browser; the Edit view
-            // treats a blank password field as "leave it unchanged".
-            config.SenderPassword = string.Empty;
             return View(config);
         }
 
