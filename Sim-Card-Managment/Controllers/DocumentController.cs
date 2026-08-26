@@ -446,7 +446,7 @@ namespace Sim_Card_Managment.Controllers
         #endregion
         #region Second Report
         [HttpGet]
-        public async Task<IActionResult> ExportInventoryToExcel(string? searchTerm, string deviceType = "all")
+        public async Task<IActionResult> ExportInventoryToExcel(string? searchTerm, string deviceType = "all", DateTime? from = null, DateTime? to = null)
         {
             ExcelPackage.License.SetNonCommercialPersonal("MyName");
             deviceType = (deviceType ?? "all").ToLower();
@@ -467,6 +467,20 @@ namespace Sim_Card_Managment.Controllers
 
             if (deviceType == "sim") items = items.Where(i => i.DeviceType == "sim").ToList();
             else if (deviceType == "usb") items = items.Where(i => i.DeviceType == "usb").ToList();
+
+            if (from.HasValue)
+            {
+                items = items.Where(i => i.TransferDate.Date >= from.Value.Date).ToList();
+            }
+
+            if (to.HasValue)
+            {
+                // Inclusive of the whole "to" day.
+                items = items.Where(i => i.TransferDate.Date <= to.Value.Date).ToList();
+            }
+
+            // Keep newest-to-oldest even after filtering.
+            items = items.OrderByDescending(i => i.TransferDate).ToList();
 
             using (var package = new ExcelPackage())
             {
@@ -490,7 +504,7 @@ namespace Sim_Card_Managment.Controllers
                 }
 
                 int row = 2;
-                foreach (var item in items) // already ordered desc by TransferDate
+                foreach (var item in items)
                 {
                     worksheet.Cells[row, 1].Value = item.CurrentHolderName;
                     worksheet.Cells[row, 2].Value = item.AccountType;
@@ -506,13 +520,22 @@ namespace Sim_Card_Managment.Controllers
                 if (worksheet.Dimension != null)
                     worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
-                var suffix = deviceType != "all" ? "_" + (deviceType == "sim" ? "SIM" : "USB") : "";
+                var suffixParts = new List<string>();
+                if (deviceType != "all") suffixParts.Add(deviceType == "sim" ? "SIM" : "USB");
+                if (from.HasValue || to.HasValue)
+                {
+                    var fromPart = from.HasValue ? from.Value.ToString("yyyyMMdd") : "Start";
+                    var toPart = to.HasValue ? to.Value.ToString("yyyyMMdd") : "Now";
+                    suffixParts.Add($"{fromPart}-{toPart}");
+                }
+                var suffix = suffixParts.Any() ? "_" + string.Join("_", suffixParts) : "";
+
                 var fileContents = package.GetAsByteArray();
 
                 return File(
                     fileContents,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    $"Hardware_Lifecycle{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+                    $"Device_Transfer_Log{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
                 );
             }
         }

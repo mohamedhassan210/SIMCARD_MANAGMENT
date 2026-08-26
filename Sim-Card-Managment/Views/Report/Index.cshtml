@@ -604,6 +604,52 @@
             </div>
         </div>
 
+        <!-- ============================================= -->
+        <!-- DEVICE TRANSFER LOG -->
+        <!-- ============================================= -->
+        <div class="col-md-4">
+            <div class="report-card">
+                <div class="icon-box"><i class="fa-solid fa-right-left"></i></div>
+                <h3 class="card-title">Device Transfer Log</h3>
+                <p class="card-text">Every device transfer — current vs. previous holder, and when it happened.</p>
+
+                <div class="card-filters">
+                    <div class="card-filter-row">
+                        <div class="card-filter-field">
+                            <label class="card-filter-label">Search</label>
+                            <input type="text" id="transfer-search" class="card-filter-input" placeholder="Holder, phone, serial...">
+                        </div>
+                    </div>
+                    <div class="card-filter-row">
+                        <div class="card-filter-field">
+                            <label class="card-filter-label">Device Type</label>
+                            <select id="transfer-device-type" class="card-filter-input">
+                                <option value="all">All</option>
+                                <option value="sim">SIM</option>
+                                <option value="usb">USB</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-filter-row">
+                        <div class="card-filter-field">
+                            <label class="card-filter-label">From</label>
+                            <input type="date" id="transfer-from" class="card-filter-input">
+                        </div>
+                        <div class="card-filter-field">
+                            <label class="card-filter-label">To</label>
+                            <input type="date" id="transfer-to" class="card-filter-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <a href="#" id="export-transfers" class="btn-download-full"><i class="fa-solid fa-file-excel"></i> Download Excel</a>
+                </div>
+            </div>
+        </div>
+
+             
+
     </div>
 </div>
 
@@ -711,6 +757,15 @@
             { id: 'doc-from',   param: 'from'       },
             { id: 'doc-to',     param: 'to'         }
         ]);
+
+            // ---- Device Transfer Log ----
+    wireExport('export-transfers', '@Url.Action("ExportInventoryToExcel", "Document")', [
+        { id: 'transfer-search',      param: 'searchTerm' },
+        { id: 'transfer-device-type', param: 'deviceType' },
+        { id: 'transfer-from',        param: 'from'       },
+        { id: 'transfer-to',          param: 'to'         }
+    ]);
+
 
     });
 </script>
