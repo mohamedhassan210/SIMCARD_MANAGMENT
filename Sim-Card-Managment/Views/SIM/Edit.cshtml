@@ -84,6 +84,18 @@
                     </select>
                     <span asp-validation-for="NetworkType" class="es-error" id="es-network-error"></span>
                 </div>
+
+                <div class="col-md-6">
+                    <label class="es-label" asp-for="ServiceProviderId">
+                        <i class="fas fa-building"></i> Service Provider <span class="text-danger">*</span>
+                    </label>
+                    <select class="es-select" id="es-provider-select" asp-for="ServiceProviderId" asp-items="ViewBag.ServiceProviders" required>
+                        <option value="">-- Select Service Provider --</option>
+                    </select>
+                    <span asp-validation-for="ServiceProviderId" class="es-error" id="es-provider-error"></span>
+                </div>
+
+
             </div>
 
             <div class="d-flex justify-content-end gap-3 mt-4">
@@ -258,15 +270,16 @@
 
 
 
-    function updateSaveButton() {
+        function updateSaveButton() {
         const serialValid = validateSerialField();
         const phoneValid = validatePhoneField();
         const networkValid = validateNetworkField();
+        const providerValid = validateProviderField();
 
         const saveBtn = document.getElementById('es-save-btn');
         const formErrors = document.getElementById('es-form-errors');
 
-        const allValid = serialValid && phoneValid && networkValid;
+        const allValid = serialValid && phoneValid && networkValid && providerValid;
 
         saveBtn.disabled = !allValid;
 
@@ -284,9 +297,10 @@
         const serialValid = validateSerialField();
         const phoneValid = validatePhoneField();
         const networkValid = validateNetworkField();
+         const providerValid = validateProviderField();
 
-        if (!serialValid || !phoneValid || !networkValid) {
-            e.preventDefault();
+        if (!serialValid || !phoneValid || !networkValid || !providerValid) {
+        e.preventDefault();
 
             const formErrors = document.getElementById('es-form-errors');
             formErrors.style.display = 'block';
@@ -301,6 +315,9 @@
             if (!networkValid) {
                 errorMessages.push('Network Type: ' + document.getElementById('es-network-error').textContent);
             }
+             if (!providerValid) {
+            errorMessages.push('Service Provider: ' + document.getElementById('es-provider-error').textContent);
+        }
 
             document.getElementById('es-form-error-text').textContent = errorMessages.join(' | ');
 
@@ -320,10 +337,11 @@
 
 
 
-    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
         validateSerialField();
         validatePhoneField();
         validateNetworkField();
+        validateProviderField();
         updateSaveButton();
     });
 
@@ -343,5 +361,29 @@
     document.getElementById('es-serial-input').addEventListener('input', function () {
         let value = this.value.replace(/[^a-zA-Z0-9\-_]/g, '');
         this.value = value;
+    });
+
+        function validateProviderField() {
+        const select = document.getElementById('es-provider-select');
+        const error = document.getElementById('es-provider-error');
+        const value = select.value;
+
+        select.classList.remove('is-valid', 'is-invalid');
+        error.classList.remove('show');
+
+        if (!value) {
+            select.classList.add('is-invalid');
+            error.textContent = 'Please select a service provider.';
+            error.classList.add('show');
+            return false;
+        } else {
+            select.classList.add('is-valid');
+            return true;
+        }
+    }
+
+    document.getElementById('es-provider-select').addEventListener('change', function () {
+        validateProviderField();
+        updateSaveButton();
     });
 </script>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -19,12 +20,14 @@ namespace Sim_Card_Managment.Controllers
     {
         private readonly ISIMRepo _simRepo;
         private readonly IUSBRepo _usbRepo;
+        private readonly IServiceProviderRepository _serviceProviderRepo;
         private readonly AppDbContext _context;
 
-        public SIMController(ISIMRepo simRepo, IUSBRepo usbRepo, AppDbContext context)
+        public SIMController(ISIMRepo simRepo, IUSBRepo usbRepo, IServiceProviderRepository serviceProviderRepo, AppDbContext context)
         {
             _simRepo = simRepo;
             _usbRepo = usbRepo;
+            _serviceProviderRepo = serviceProviderRepo;
             _context = context;
         }
 
@@ -247,31 +250,27 @@ namespace Sim_Card_Managment.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var sim = _simRepo.GetById(id);
             if (sim == null) return NotFound();
 
+            ViewBag.ServiceProviders = await GetProvidersSelectListAsync(sim.ServiceProviderId);
             return View(sim);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Sim sim)
+        public async Task<IActionResult> Edit(Sim sim)
         {
-            var provider = DetectServiceProvider(sim.PhoneNumber);
-            if (provider != null)
-            {
-                sim.ServiceProviderId = provider.Id;
-                sim.ServiceProvider = provider;
-            }
-            else
-            {
-                ModelState.AddModelError("PhoneNumber", "Could not detect a valid Service Provider for this phone number prefix.");
-            }
-
+            // ServiceProviderId now comes from the dropdown the user submitted — no
+            // longer auto-detected/overwritten from the phone number on Edit.
             ModelState.Remove(nameof(Sim.ServiceProvider));
-            ModelState.Remove(nameof(Sim.ServiceProviderId));
+
+            if (sim.ServiceProviderId <= 0)
+            {
+                ModelState.AddModelError("ServiceProviderId", "Please select a service provider.");
+            }
 
             // Reject duplicate serial numbers, excluding this SIM itself
             bool serialExists = _context.Sims.Any(s => s.SerialNumber == sim.SerialNumber && s.Id != sim.Id);
@@ -286,6 +285,7 @@ namespace Sim_Card_Managment.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            ViewBag.ServiceProviders = await GetProvidersSelectListAsync(sim.ServiceProviderId);
             return View(sim);
         }
 
@@ -312,6 +312,23 @@ namespace Sim_Card_Managment.Controllers
             _simRepo.Update(sim);
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<SelectList> GetProvidersSelectListAsync(int? selectedId = null)
+        {
+            var providers = (await _serviceProviderRepo.GetAllAsync()).ToList();
+            var activeProviders = providers.Where(p => p.IsActive).ToList();
+
+            if (selectedId.HasValue && !activeProviders.Any(p => p.Id == selectedId.Value))
+            {
+                var currentProvider = providers.FirstOrDefault(p => p.Id == selectedId.Value);
+                if (currentProvider != null)
+                {
+                    activeProviders.Add(currentProvider);
+                }
+            }
+
+            return new SelectList(activeProviders.OrderBy(p => p.DisplayName ?? p.Name), "Id", "DisplayName", selectedId);
         }
     }
 }
