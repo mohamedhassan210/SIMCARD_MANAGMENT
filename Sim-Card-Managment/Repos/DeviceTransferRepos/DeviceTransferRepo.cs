@@ -67,5 +67,18 @@ namespace Sim_Card_Managment.Repos
         {
             _context.SaveChanges();
         }
+        public async Task<List<DeviceTransfer>> GetAllWithDetailsAsync()
+        {
+            return await _context.DeviceTransfers
+                .Include(dt => dt.Sim)
+                .Include(dt => dt.Usb)
+                .Include(dt => dt.ToEmployee)
+                .Include(dt => dt.FromSubscription)
+                    .ThenInclude(fs => fs.Employee)
+                .Include(dt => dt.FromSubscription)
+                    .ThenInclude(fs => fs.NonEmployee)
+                .OrderByDescending(dt => dt.TransferDate)
+                .ToListAsync();
+        }
     }
 }

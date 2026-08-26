@@ -13,7 +13,6 @@
         :root {
             --brand-orange: #DF531B;
             --brand-orange-light: #FFF8F6;
-            --brand-purple: #5B2D90;
             --bg-canvas: #F4F5F8;
             --text-dark: #1E293B;
             --text-muted: #64748B;
@@ -42,9 +41,58 @@
             color: var(--text-dark);
         }
 
+        .stat-card {
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon-orange {
+            background: rgba(223, 83, 27, 0.12);
+            color: var(--brand-orange);
+        }
+
+        .stat-icon-green {
+            background: rgba(34, 197, 94, 0.12);
+            color: #16A34A;
+        }
+
+        .stat-icon-red {
+            background: rgba(220, 38, 38, 0.12);
+            color: #DC2626;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--text-dark);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
         .table-card {
-            max-width: 1200px;
-            margin: 0 auto;
             background-color: #FFFFFF;
             border: 1px solid var(--card-border);
             border-radius: 20px;
@@ -80,18 +128,18 @@
                 color: var(--text-dark);
             }
 
-        .form-select-custom {
-            height: 44px;
+        .filter-select {
             border: 1px solid var(--card-border);
             border-radius: 12px;
-            padding: 0 16px;
+            padding: 10px 16px;
             font-size: 0.95rem;
             color: var(--text-dark);
             outline: none;
-            transition: border-color 0.2s ease;
+            background: #FFF;
+            cursor: pointer;
         }
 
-            .form-select-custom:focus {
+            .filter-select:focus {
                 border-color: var(--brand-orange);
             }
 
@@ -123,50 +171,23 @@
                 box-shadow: 0 6px 16px rgba(223, 83, 27, 0.25);
             }
 
-        .btn-secondary-outline {
-            background-color: #FFFFFF;
-            color: var(--text-dark);
+        .btn-secondary-soft {
+            background-color: #F1F5F9;
+            color: var(--text-muted);
             border: 1px solid var(--card-border);
         }
 
-            .btn-secondary-outline:hover {
-                background-color: var(--bg-canvas);
+            .btn-secondary-soft:hover {
+                background-color: #E2E8F0;
                 color: var(--text-dark);
             }
-
-        .btn-action-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--card-border);
-            background: #FFFFFF;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-            .btn-action-icon:hover {
-                background: var(--brand-orange-light);
-                color: var(--brand-orange);
-                border-color: rgba(223, 83, 27, 0.3);
-            }
-
-
-
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
 
         .btn-view-action {
             background-color: #ffffff;
             border: 1px solid #e0e0e0;
             color: #333333;
             border-radius: 8px;
-            padding: 6px 14px;
+            padding: 6px 16px;
             font-size: 13px;
             font-weight: 600;
             transition: all 0.2s ease;
@@ -179,26 +200,31 @@
             .btn-view-action:hover {
                 border-color: var(--brand-orange);
                 color: var(--brand-orange);
-                background-color: #fffaf8;
+                background-color: var(--brand-orange-light);
             }
 
-        .custom-table thead th {
-            text-align: left;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            padding: 12px 16px;
-            border-bottom: 2px solid var(--brand-orange);
-            background: #FFFFFF;
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .custom-table tbody td {
-            font-size: 0.95rem;
-            padding: 16px;
-            border-bottom: 1px solid var(--card-border);
-            vertical-align: middle;
-        }
+            .doc-table thead th {
+                text-align: left;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                padding: 12px 16px;
+                border-bottom: 2px solid var(--brand-orange);
+                background: #FFFFFF;
+            }
+
+            .doc-table tbody td {
+                font-size: 0.95rem;
+                padding: 16px;
+                border-bottom: 1px solid var(--card-border);
+                vertical-align: middle;
+            }
 
         .doc-row {
             transition: background-color 0.15s ease;
@@ -216,10 +242,14 @@
 </head>
 <body>
 
+    @{
+        var docList = Model?.ToList() ?? new List<Sim_Card_Managment.Models.Document>();
+        var totalDocuments = docList.Count;
+        var distinctTypes = docList.Select(d => d.DocumentType?.DisplayName).Where(n => !string.IsNullOrEmpty(n)).Distinct().Count();
+        var addedThisMonth = docList.Count(d => d.CreatedAt.Month == DateTime.Now.Month && d.CreatedAt.Year == DateTime.Now.Year);
+    }
+
     <header class="page-header p-100">
-
-
-
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -235,10 +265,6 @@
             </div>
         }
 
-
-
-
-
         <div class="container-fluid px-lg-5">
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
                 <div>
@@ -246,10 +272,10 @@
                     <p class="text-muted m-0 small mt-1">View, filter, and export document records</p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
-                    <a asp-action="InventoryReport" class="btn-custom btn-secondary-outline">
+                    <a asp-action="InventoryReport" class="btn-custom btn-secondary-soft">
                         <i class="fa-solid fa-laptop"></i> Hardware Report
                     </a>
-                    <a href="#" id="exportExcelBtn" class="btn-custom btn-secondary-outline">
+                    <a href="#" id="exportExcelBtn" class="btn-custom btn-secondary-soft">
                         <i class="fa-solid fa-file-excel"></i> Export Summary
                     </a>
                     <a asp-action="Create" class="btn-custom btn-primary-orange">
@@ -262,24 +288,58 @@
 
     <main class="container-fluid px-lg-5">
 
-        <div class="table-card">
-
-            <form asp-action="Index" method="get" id="documentFilterForm" class="row g-3 mb-4 align-items-center">
-                <div class="col-md-6">
-                    <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input id="docSearchInput" name="searchTerm" value="@Context.Request.Query["searchTerm"]" type="text" placeholder="Search serial, doc number, or notes..." autocomplete="off">
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-orange">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">@totalDocuments</div>
+                        <div class="stat-label">Total Documents</div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <select id="documentTypeFilter" name="documentTypeId" asp-items="ViewBag.DocumentTypes" class="form-select-custom w-100">
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-green">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">@distinctTypes</div>
+                        <div class="stat-label">Document Types</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-red">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">@addedThisMonth</div>
+                        <div class="stat-label">Added This Month</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card">
+
+            <form asp-action="Index" method="get" id="documentFilterForm" class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div class="search-box col-12 col-md-6">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input id="docSearchInput" name="searchTerm" value="@Context.Request.Query["searchTerm"]" type="text" placeholder="Search serial, doc number, or notes..." autocomplete="off">
+                </div>
+                <div class="col-12 col-md-6 d-flex justify-content-md-end">
+                    <select id="documentTypeFilter" name="documentTypeId" asp-items="ViewBag.DocumentTypes" class="filter-select w-100">
                         <option value="">-- All Document Types --</option>
                     </select>
                 </div>
             </form>
 
             <div class="table-responsive">
-                <table class="custom-table" id="documentTable">
+                <table class="doc-table" id="documentTable">
                     <thead>
                         <tr>
                             <th>Serial / Doc #</th>
@@ -287,13 +347,13 @@
                             <th>Action Date</th>
                             <th>Creation Date</th>
                             <th>Notes</th>
-                            <th style="text-align: right;">Action</th>
+                            <th class="text-end">Action</th>
                         </tr>
                     </thead>
                     <tbody id="documentTableBody">
-                        @if (Model != null && Model.Any())
+                        @if (docList.Any())
                         {
-                            foreach (var item in Model)
+                            foreach (var item in docList)
                             {
                                 <tr class="doc-row">
                                     <td class="font-mono">
@@ -305,19 +365,17 @@
                                     <td class="text-muted text-truncate" style="max-width: 200px;" title="@item.Notes">
                                         @(string.IsNullOrEmpty(item.Notes) ? "-" : item.Notes)
                                     </td>
-                                    <td style="text-align: right;">
+                                    <td class="text-end">
                                         <div class="d-inline-flex gap-1">
-                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn-view-action" title="View Details">
-                                                <i class="fa-solid fa-eye"></i> View
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn-view-action">
+                                                <i class="fas fa-eye"></i> View
                                             </a>
-
                                         </div>
                                     </td>
-
                                 </tr>
                             }
                         }
-                        <tr id="noResultsRow" style="display: @(Model == null || !Model.Any() ? "" : "none");">
+                        <tr id="noResultsRow" style="display: @(docList.Any() ? "none" : "");">
                             <td colspan="6" class="text-center text-muted py-5">
                                 <i class="fa-regular fa-folder-open fa-2x mb-3 d-block text-secondary"></i>
                                 No matching documents found.

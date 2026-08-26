@@ -30,18 +30,20 @@ namespace Sim_Card_Managment.Controllers
         private readonly ISerialRepo _serialRepo;
         private readonly ISubscriptionRepo _subscriptionRepo;
         private readonly AppDbContext _context;
+        private readonly IDeviceTransferRepo _deviceTransferRepo;
 
         public DocumentController(
-            IDocumentRepo documentRepo,
-            IDocumentTypeRepo documentTypeRepo,
-            IServiceProviderRepository serviceProviderRepo,
-            IItemTypeRepo itemTypeRepo,
-            IDocumentDetailsRepo documentDetailsRepo,
-            ISIMRepo simRepo,
-            IUSBRepo usbRepo,
-            ISerialRepo serialRepo,
-            ISubscriptionRepo subscriptionRepo,
-            AppDbContext context)
+     IDocumentRepo documentRepo,
+     IDocumentTypeRepo documentTypeRepo,
+     IServiceProviderRepository serviceProviderRepo,
+     IItemTypeRepo itemTypeRepo,
+     IDocumentDetailsRepo documentDetailsRepo,
+     ISIMRepo simRepo,
+     IUSBRepo usbRepo,
+     ISerialRepo serialRepo,
+     ISubscriptionRepo subscriptionRepo,
+     IDeviceTransferRepo deviceTransferRepo,
+     AppDbContext context)
         {
             _documentRepo = documentRepo;
             _documentTypeRepo = documentTypeRepo;
@@ -52,6 +54,7 @@ namespace Sim_Card_Managment.Controllers
             _usbRepo = usbRepo;
             _serialRepo = serialRepo;
             _subscriptionRepo = subscriptionRepo;
+            _deviceTransferRepo = deviceTransferRepo;
             _context = context;
         }
 
@@ -62,24 +65,51 @@ namespace Sim_Card_Managment.Controllers
             return View(documents);
         }
 
-        public async Task<IActionResult> InventoryReport(string? searchTerm)
+        public async Task<IActionResult> InventoryReport(string? searchTerm, string deviceType = "all")
         {
-            var subscriptions = await _subscriptionRepo.GetAllWithHardwareDetailsAsync();
+            deviceType = (deviceType ?? "all").ToLower();
 
-            var activeSubscriptions = subscriptions.Where(s => s.EndDate == null).AsQueryable();
+            var transfers = await _deviceTransferRepo.GetAllWithDetailsAsync(); // already ordered desc by TransferDate
+            var items = transfers.Select(BuildHardwareLifecycleItem).ToList();
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                activeSubscriptions = activeSubscriptions.Where(s =>
-                    (s.Employee != null && s.Employee.Name.Contains(searchTerm)) ||
-                    (s.NonEmployee != null && s.NonEmployee.Name.Contains(searchTerm)) ||
-                    (s.Sim != null && (s.Sim.PhoneNumber.Contains(searchTerm) || s.Sim.SerialNumber.Contains(searchTerm))) ||
-                    (s.Usb != null && s.Usb.SerialNumber.Contains(searchTerm))
-                );
+                items = items.Where(i =>
+                    (i.CurrentHolderName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.PreviousHolderName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.PhoneNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.SimSerialNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.UsbSerialNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true)
+                ).ToList();
             }
 
-            ViewBag.AllSubscriptions = subscriptions;
-            return View(activeSubscriptions.ToList());
+            if (deviceType == "sim") items = items.Where(i => i.DeviceType == "sim").ToList();
+            else if (deviceType == "usb") items = items.Where(i => i.DeviceType == "usb").ToList();
+
+            ViewBag.DeviceTypeFilter = deviceType;
+            return View(items);
+        }
+
+        private static HardwareLifecycleItemViewModel BuildHardwareLifecycleItem(DeviceTransfer dt)
+        {
+            var fromSub = dt.FromSubscription;
+            var previousHolder = fromSub?.Employee?.Name ?? fromSub?.NonEmployee?.Name ?? "None (First Owner)";
+            var currentHolder = dt.ToEmployee?.Name ?? "Unassigned";
+            var deviceType = dt.SimId.HasValue ? "sim" : (dt.UsbId.HasValue ? "usb" : "");
+
+            return new HardwareLifecycleItemViewModel
+            {
+                Id = dt.Id,
+                CurrentHolderName = currentHolder,
+                AccountType = "Internal Employee", // transfers currently only support Employee recipients (ToEmpId)
+                PhoneNumber = dt.Sim?.PhoneNumber,
+                SimSerialNumber = dt.Sim?.SerialNumber,
+                UsbSerialNumber = dt.Usb?.SerialNumber,
+                PreviousHolderName = previousHolder,
+                Notes = dt.Reason,
+                TransferDate = dt.TransferDate,
+                DeviceType = deviceType
+            };
         }
 
         private async Task<(Document? document, List<SimDetailViewModel> sims, List<UsbDetailViewModel> usbs)> BuildDocumentDeviceListsAsync(int id)
@@ -416,11 +446,27 @@ namespace Sim_Card_Managment.Controllers
         #endregion
         #region Second Report
         [HttpGet]
-        public async Task<IActionResult> ExportInventoryToExcel()
+        public async Task<IActionResult> ExportInventoryToExcel(string? searchTerm, string deviceType = "all")
         {
             ExcelPackage.License.SetNonCommercialPersonal("MyName");
+            deviceType = (deviceType ?? "all").ToLower();
 
-            var subscriptions = await _subscriptionRepo.GetAllWithHardwareDetailsAsync();
+            var transfers = await _deviceTransferRepo.GetAllWithDetailsAsync(); // already ordered desc by TransferDate
+            var items = transfers.Select(BuildHardwareLifecycleItem).ToList();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                items = items.Where(i =>
+                    (i.CurrentHolderName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.PreviousHolderName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.PhoneNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.SimSerialNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.UsbSerialNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true)
+                ).ToList();
+            }
+
+            if (deviceType == "sim") items = items.Where(i => i.DeviceType == "sim").ToList();
+            else if (deviceType == "usb") items = items.Where(i => i.DeviceType == "usb").ToList();
 
             using (var package = new ExcelPackage())
             {
@@ -432,9 +478,10 @@ namespace Sim_Card_Managment.Controllers
                 worksheet.Cells[1, 4].Value = "SIM Serial Number";
                 worksheet.Cells[1, 5].Value = "USB Serial Number";
                 worksheet.Cells[1, 6].Value = "Previous User";
-                worksheet.Cells[1, 7].Value = "Notes";
+                worksheet.Cells[1, 7].Value = "Transfer Date";
+                worksheet.Cells[1, 8].Value = "Notes";
 
-                using (var range = worksheet.Cells[1, 1, 1, 7])
+                using (var range = worksheet.Cells[1, 1, 1, 8])
                 {
                     range.Style.Font.Bold = true;
                     range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -443,37 +490,30 @@ namespace Sim_Card_Managment.Controllers
                 }
 
                 int row = 2;
-                var activeSubscriptions = subscriptions.Where(s => s.EndDate == null).ToList();
-
-                foreach (var sub in activeSubscriptions)
+                foreach (var item in items) // already ordered desc by TransferDate
                 {
-                    string currentHolder = sub.Employee != null ? sub.Employee.Name : (sub.NonEmployee != null ? sub.NonEmployee.Name : "Unassigned");
-                    worksheet.Cells[row, 1].Value = currentHolder;
-
-                    string accountType = sub.Employee != null ? "Internal Employee" : $"External ({sub.NonEmployee?.Type ?? "Contractor"})";
-                    worksheet.Cells[row, 2].Value = accountType;
-
-                    worksheet.Cells[row, 3].Value = sub.Sim?.PhoneNumber ?? "N/A";
-                    worksheet.Cells[row, 4].Value = sub.Sim?.SerialNumber ?? "N/A";
-                    worksheet.Cells[row, 5].Value = sub.Usb?.SerialNumber ?? "N/A";
-
-                    var historicalRecord = subscriptions.FirstOrDefault(h => h.SimId == sub.SimId && h.Id != sub.Id && h.EndDate != null);
-                    string previousHolder = "";
-                    if (historicalRecord != null)
-                    {
-                        previousHolder = historicalRecord.Employee != null ? historicalRecord.Employee.Name : (historicalRecord.NonEmployee?.Name ?? "");
-                    }
-                    worksheet.Cells[row, 6].Value = string.IsNullOrEmpty(previousHolder) ? "None (First Owner)" : previousHolder;
-
-                    worksheet.Cells[row, 7].Value = sub.Notes ?? "";
-
+                    worksheet.Cells[row, 1].Value = item.CurrentHolderName;
+                    worksheet.Cells[row, 2].Value = item.AccountType;
+                    worksheet.Cells[row, 3].Value = item.PhoneNumber ?? "N/A";
+                    worksheet.Cells[row, 4].Value = item.SimSerialNumber ?? "N/A";
+                    worksheet.Cells[row, 5].Value = item.UsbSerialNumber ?? "N/A";
+                    worksheet.Cells[row, 6].Value = item.PreviousHolderName;
+                    worksheet.Cells[row, 7].Value = item.TransferDate.ToString("yyyy-MM-dd HH:mm");
+                    worksheet.Cells[row, 8].Value = string.IsNullOrEmpty(item.Notes) ? "" : item.Notes;
                     row++;
                 }
 
-                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+                if (worksheet.Dimension != null)
+                    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
+                var suffix = deviceType != "all" ? "_" + (deviceType == "sim" ? "SIM" : "USB") : "";
                 var fileContents = package.GetAsByteArray();
-                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Hardware_Lifecycle_{DateTime.Now:yyyyMMdd}.xlsx");
+
+                return File(
+                    fileContents,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"Hardware_Lifecycle{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+                );
             }
         }
         #endregion
@@ -665,7 +705,7 @@ namespace Sim_Card_Managment.Controllers
 
         private int GetCurrentUserId()
         {
-            var claimValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var claimValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;  
             return int.TryParse(claimValue, out var userId) ? userId : 1;
         }
 
