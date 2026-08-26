@@ -260,5 +260,123 @@ namespace Sim_Card_Managment.Controllers
             TempData["Success"] = "Service provider activated successfully.";
             return RedirectToAction(nameof(Details), new { id });
         }
+        // GET: ServiceProvider/ExportProviderDevicesExcel — mirrors the Assigned Devices
+        // section's three filters (Availability, Device Type, Status Type), any combination.
+        [HttpGet]
+        public async Task<IActionResult> ExportProviderDevicesExcel(int providerId, string status = "all", string type = "all", string statusType = "all")
+        {
+            status = (status ?? "all").ToLower();
+            type = (type ?? "all").ToLower();
+            statusType = (statusType ?? "all").ToLower();
+
+            var provider = await _repo.GetByIdWithDevicesAsync(providerId);
+            if (provider == null) return NotFound();
+
+            var simsList = provider.Sims.Select(s => new DeviceDirectoryViewModel
+            {
+                Id = s.Id,
+                SerialNumber = s.SerialNumber,
+                Identifier = s.PhoneNumber,
+                DeviceType = "SIM Card",
+                ServiceProvider = provider.Name,
+                IsActive = s.IsActive,
+                Status = s.Status,
+                RegisteredAt = s.RegisteredAt,
+                AssignedTo = s.Subscriptions?
+                    .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
+                    .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
+                    .FirstOrDefault() ?? "Unassigned"
+            });
+
+            var usbsList = provider.Usbs.Select(u => new DeviceDirectoryViewModel
+            {
+                Id = u.Id,
+                SerialNumber = u.SerialNumber,
+                Identifier = u.Model ?? "N/A",
+                DeviceType = "USB Modem",
+                ServiceProvider = provider.Name,
+                IsActive = u.IsActive,
+                Status = u.Status,
+                RegisteredAt = u.RegisteredAt,
+                AssignedTo = u.Subscriptions?
+                    .Where(sub => sub.EndDate == null || sub.EndDate > DateTime.Now)
+                    .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
+                    .FirstOrDefault() ?? "Unassigned"
+            });
+
+            var deviceList = simsList.Concat(usbsList).ToList();
+
+            static string NormalizeDeviceType(string? deviceType)
+            {
+                if (deviceType != null && deviceType.Contains("SIM", StringComparison.OrdinalIgnoreCase)) return "sim";
+                if (deviceType != null && deviceType.Contains("USB", StringComparison.OrdinalIgnoreCase)) return "usb";
+                return "";
+            }
+
+            var filtered = deviceList.Where(d =>
+            {
+                var normalizedType = NormalizeDeviceType(d.DeviceType);
+
+                bool matchesStatus = status == "all" || (d.IsActive ? "active" : "inactive") == status;
+                bool matchesType = type == "all" || normalizedType == type;
+                bool matchesStatusType = statusType == "all" || (d.Status?.ToLower() ?? "unassigned") == statusType;
+
+                return matchesStatus && matchesType && matchesStatusType;
+            }).ToList();
+
+            ExcelPackage.License.SetNonCommercialPersonal("MyName");
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Devices");
+
+            worksheet.Cells[1, 1].Value = "Serial Number";
+            worksheet.Cells[1, 2].Value = "Type";
+            worksheet.Cells[1, 3].Value = "Provider";
+            worksheet.Cells[1, 4].Value = "Identifier";
+            worksheet.Cells[1, 5].Value = "Availability";
+            worksheet.Cells[1, 6].Value = "Status";
+            worksheet.Cells[1, 7].Value = "Assigned To";
+
+            using (var headerRange = worksheet.Cells[1, 1, 1, 7])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            }
+
+            int row = 2;
+            foreach (var d in filtered)
+            {
+                worksheet.Cells[row, 1].Value = d.SerialNumber;
+                worksheet.Cells[row, 2].Value = d.DeviceType;
+                worksheet.Cells[row, 3].Value = d.ServiceProvider;
+                worksheet.Cells[row, 4].Value = string.IsNullOrEmpty(d.Identifier) ? "-" : d.Identifier;
+                worksheet.Cells[row, 5].Value = d.IsActive ? "Active" : "Inactive";
+                worksheet.Cells[row, 6].Value = d.Status;
+                worksheet.Cells[row, 7].Value = string.IsNullOrEmpty(d.AssignedTo) ? "Unassigned" : d.AssignedTo;
+                row++;
+            }
+
+            if (worksheet.Dimension != null)
+            {
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            }
+
+            var fileContents = package.GetAsByteArray();
+
+            var suffixParts = new List<string>();
+            if (status != "all") suffixParts.Add(status);
+            if (type != "all") suffixParts.Add(type);
+            if (statusType != "all") suffixParts.Add(statusType);
+            var suffix = suffixParts.Any() ? "_" + string.Join("_", suffixParts) : "";
+
+            return File(
+                fileContents,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"ServiceProvider_{provider.Name}_Devices{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+            );
+        }
     }
 }

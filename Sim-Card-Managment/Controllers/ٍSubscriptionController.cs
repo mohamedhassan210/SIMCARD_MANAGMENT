@@ -54,7 +54,8 @@ namespace Sim_Card_Managment.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var subscriptions = _subscriptionRepo.GetAll();
+            var subscriptions = _subscriptionRepo.GetAll()
+                .OrderByDescending(s => s.CreatedDate);
             var now = DateTime.Now;
 
             var model = subscriptions.Select(s => new SubscriptionIndexVM

@@ -25,6 +25,9 @@ namespace Sim_Card_Managment.ViewModels
         public string PhoneNumber { get; set; }
         public string SerialNumber { get; set; }
         public string Status { get; set; }
+        public bool IsActive { get; set; }
+        public string? ProviderName { get; set; }
+        public string? AssignedTo { get; set; }
     }
 
     public class UsbDetailViewModel
@@ -33,5 +36,8 @@ namespace Sim_Card_Managment.ViewModels
         public string SerialNumber { get; set; }
         public string Model { get; set; }
         public string Status { get; set; }
+        public bool IsActive { get; set; }
+        public string? ProviderName { get; set; }
+        public string? AssignedTo { get; set; }
     }
 }

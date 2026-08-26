@@ -341,13 +341,25 @@
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input id="subSearchInput" type="text" placeholder="Search by subscriber or serial..." autocomplete="off">
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="text-muted small fw-bold">Status:</span>
-                    <select id="statusFilter" class="filter-select">
-                        <option value="ALL">All Statuses</option>
-                        <option value="Active">Active</option>
-                        <option value="Expired">Expired</option>
-                    </select>
+
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted small fw-bold">Type:</span>
+                        <select id="typeFilter" class="filter-select">
+                            <option value="ALL">All Types</option>
+                            <option value="Employee">Employee</option>
+                            <option value="Non-Employee">Non-Employee</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted small fw-bold">Status:</span>
+                        <select id="statusFilter" class="filter-select">
+                            <option value="ALL">All Statuses</option>
+                            <option value="Active">Active</option>
+                            <option value="Expired">Expired</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -370,7 +382,7 @@
                         {
                             foreach (var sub in Model)
                             {
-                                <tr class="sub-row" data-status="@sub.Status">
+                                <tr class="sub-row" data-status="@sub.Status" data-type="@sub.SubscriberType">
                                     <td>
                                         <strong>@sub.SubscriberName</strong>
                                         <div class="text-muted small">
@@ -446,9 +458,10 @@
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+                document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('subSearchInput');
             const statusFilter = document.getElementById('statusFilter');
+            const typeFilter = document.getElementById('typeFilter');
             const rows = document.querySelectorAll('.sub-row');
             const noResultsRow = document.getElementById('noResultsRow');
             const exportExcelBtn = document.getElementById('exportExcelBtn');
@@ -456,16 +469,19 @@
             function filterTable() {
                 const searchTerm = searchInput.value.toLowerCase();
                 const statusValue = statusFilter.value;
+                const typeValue = typeFilter.value;
                 let visibleCount = 0;
 
                 rows.forEach(row => {
                     const text = row.innerText.toLowerCase();
                     const rowStatus = row.getAttribute('data-status');
+                    const rowType = row.getAttribute('data-type');
 
                     const matchesSearch = text.includes(searchTerm);
                     const matchesStatus = statusValue === 'ALL' || rowStatus === statusValue;
+                    const matchesType = typeValue === 'ALL' || rowType === typeValue;
 
-                    if (matchesSearch && matchesStatus) {
+                    if (matchesSearch && matchesStatus && matchesType) {
                         row.style.display = '';
                         visibleCount++;
                     } else {
@@ -480,6 +496,7 @@
 
             if (searchInput) searchInput.addEventListener('input', filterTable);
             if (statusFilter) statusFilter.addEventListener('change', filterTable);
+            if (typeFilter) typeFilter.addEventListener('change', filterTable);
 
             // Excel export: read the Status filter's current value only at click
             // time, then build the export URL. Free-text search is intentionally
@@ -493,6 +510,11 @@
                     const statusVal = statusFilter.value; // "ALL", "Active", "Expired"
                     if (statusVal && statusVal !== 'ALL') {
                         url.searchParams.set('status', statusVal);
+                    }
+
+                    const typeVal = typeFilter.value; // "ALL", "Employee", "Non-Employee"
+                    if (typeVal && typeVal !== 'ALL') {
+                        url.searchParams.set('type', typeVal);
                     }
 
                     window.location.href = url.toString();

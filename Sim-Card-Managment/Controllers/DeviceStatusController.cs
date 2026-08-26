@@ -50,11 +50,12 @@ namespace Sim_Card_Managment.Controllers
         /// <summary>
         /// GET: /DeviceStatus/ExportDeviceStatusExcel
         /// Exports the device status log to Excel, filtered by the same
-        /// dropdown filters the Index view offers (Availability, Device Type).
+        /// dropdown filters the Index view offers (Availability, Device Type),
+        /// plus an optional StatusDate range.
         /// Free-text search is intentionally excluded — it's client-side only.
         /// </summary>
         [HttpGet]
-        public IActionResult ExportDeviceStatusExcel(bool? isActive, string? deviceType)
+        public IActionResult ExportDeviceStatusExcel(bool? isActive, string? deviceType, DateTime? from, DateTime? to)
         {
             ExcelPackage.License.SetNonCommercialPersonal("MyName");
 
@@ -75,6 +76,18 @@ namespace Sim_Card_Managment.Controllers
             if (!string.IsNullOrWhiteSpace(deviceType))
             {
                 records = records.Where(r => string.Equals(r.DeviceType, deviceType, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (from.HasValue)
+            {
+                records = records.Where(r => r.StatusDate.Date >= from.Value.Date).ToList();
+            }
+
+            if (to.HasValue)
+            {
+                // Inclusive of the whole "to" day, same as a person would expect
+                // from a date picker labeled "To: 2026-08-26".
+                records = records.Where(r => r.StatusDate.Date <= to.Value.Date).ToList();
             }
 
             using (var package = new ExcelPackage())
@@ -121,6 +134,12 @@ namespace Sim_Card_Managment.Controllers
                 var fileNameParts = new List<string>();
                 if (isActive.HasValue) fileNameParts.Add(isActive.Value ? "Active" : "NotActive");
                 if (!string.IsNullOrWhiteSpace(deviceType)) fileNameParts.Add(deviceType.Replace(" ", ""));
+                if (from.HasValue || to.HasValue)
+                {
+                    var fromPart = from.HasValue ? from.Value.ToString("yyyyMMdd") : "Start";
+                    var toPart = to.HasValue ? to.Value.ToString("yyyyMMdd") : "Now";
+                    fileNameParts.Add($"{fromPart}-{toPart}");
+                }
 
                 var suffix = fileNameParts.Any() ? "_" + string.Join("_", fileNameParts) : "";
                 var fileName = $"DeviceStatus{suffix}_{DateTime.Now:yyyyMMdd}.xlsx";
