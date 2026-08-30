@@ -166,9 +166,8 @@
 
     /* SIM Cards */
     .sim-card {
-        width: 320px;
-        min-width: 320px;
-        height: 210px;
+        width: 100%;
+        min-height: 210px;
         border-radius: 18px;
         padding: 1.25rem;
         position: relative;
@@ -176,7 +175,9 @@
         flex-direction: column;
         justify-content: space-between;
         transition: transform 0.25s ease, box-shadow 0.25s ease;
+        cursor: pointer;
     }
+
 
         .sim-card:hover {
             transform: translateY(-4px);
@@ -193,6 +194,22 @@
         border: 2px solid var(--card-border);
         color: var(--text-dark);
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.03);
+    }
+
+    .sim-card-link {
+        text-decoration: none;
+        display: block;
+        height: 100%;
+    }
+
+    .usb-icon-wrap {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--brand-orange);
+        font-size: 1.1rem;
     }
 
     /* Provider Logo Styling */
@@ -334,54 +351,91 @@
                     <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-normal">Total Cards: @(Model.Subscriptions?.Count ?? 0)</span>
                 </div>
 
-                <div class="d-flex gap-4 overflow-auto pb-3 pt-1">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 pb-3 pt-1">
                     @if (Model.Subscriptions != null && Model.Subscriptions.Any())
                     {
+                        var orderedSubs = Model.Subscriptions
+                        .OrderByDescending(s => s.EndDate == null || s.EndDate > DateTime.Now)
+                        .ToList();
+
                         int index = 1;
-                        foreach (var sub in Model.Subscriptions)
+                        foreach (var sub in orderedSubs)
                         {
                             bool isActive = sub.EndDate == null || sub.EndDate > DateTime.Now;
 
-
-                            string rawProvider = sub.Sim?.ServiceProvider?.Name?.ToLower().Trim() ?? "";
-                        
-                            string logoFileName = rawProvider switch
+                            if (sub.SimId.HasValue)
                             {
-                                var p when p.Contains("vodafone") => "fodafone.png",
-                                var p when p.Contains("orange")   => "orange.png",
-                                var p when p.Contains("etisalat") || p.Contains("e&") => "etisalat.png",
-                                _ => "we.png" // default fallback
-                            };
+                                string rawProvider = sub.Sim?.ServiceProvider?.Name?.ToLower().Trim() ?? "";
+                                string logoFileName = rawProvider switch
+                                {
+                                    var p when p.Contains("vodafone") => "fodafone.png",
+                                    var p when p.Contains("orange") => "orange.png",
+                                    var p when p.Contains("etisalat") || p.Contains("e&") => "etisalat.png",
+                                    _ => "we.png"
+                                };
 
-                            <div class="sim-card @(isActive ? "sim-card-active" : "sim-card-outline")">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="@(isActive ? "badge-status-active" : "badge bg-secondary opacity-50 text-white rounded-pill px-2 py-1 small")">
-                                        @(isActive ? "Active" : "Inactive")
-                                    </span>
-
-                                    <img src="~/img/@logoFileName"
-                                         asp-append-version="true"
-                                         alt="@rawProvider logo"
-                                         class="provider-logo"
-                                         onerror="this.onerror=null; this.src='/img/we.png';" />
+                                <div class="col">
+                                    <a asp-controller="SIM" asp-action="Details" asp-route-id="@sub.SimId" class="sim-card-link">
+                                        <div class="sim-card @(isActive ? "sim-card-active" : "sim-card-outline")">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="@(isActive ? "badge-status-active" : "badge bg-secondary opacity-50 text-white rounded-pill px-2 py-1 small")">
+                                                    @(isActive ? "Active" : "Inactive")
+                                                </span>
+                                                <img src="~/img/@logoFileName"
+                                                     asp-append-version="true"
+                                                     alt="@rawProvider logo"
+                                                     class="provider-logo"
+                                                     onerror="this.onerror=null; this.src='/img/we.png';" />
+                                            </div>
+                                            <div class="my-2">
+                                                <div class="sim-metric-label">DIAL NUMBER</div>
+                                                <div class="sim-metric-value mb-2">@(sub.Sim?.PhoneNumber ?? "N/A")</div>
+                                                <div class="sim-metric-label">SERIAL NUMBER</div>
+                                                <div class="sim-metric-value">@(sub.Sim?.SerialNumber ?? "N/A")</div>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-end pt-2 border-top border-white border-opacity-25">
+                                                <span class="sim-footer-title">SIM @index</span>
+                                                <small class="fw-bold opacity-75">Quota: @(sub.Quota?.BaseAmount + sub.Quota?.ExtraAmount ?? 0)</small>
+                                            </div>
+                                        </div>
+                                    </a>
                                 </div>
-                                <div class="my-2">
-                                    <div class="sim-metric-label">DIAL NUMBER</div>
-                                    <div class="sim-metric-value mb-2">@(sub.Sim?.PhoneNumber ?? "N/A")</div>
-                                    <div class="sim-metric-label">SERIAL NUMBER</div>
-                                    <div class="sim-metric-value">@(sub.Sim?.SerialNumber ?? "N/A")</div>
+                            }
+                            else if (sub.UsbId.HasValue)
+                            {
+                                <div class="col">
+                                    <a asp-controller="USB" asp-action="Details" asp-route-id="@sub.UsbId" class="sim-card-link">
+                                        <div class="sim-card @(isActive ? "sim-card-active" : "sim-card-outline")">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="@(isActive ? "badge-status-active" : "badge bg-secondary opacity-50 text-white rounded-pill px-2 py-1 small")">
+                                                    @(isActive ? "Active" : "Inactive")
+                                                </span>
+                                                <div class="usb-icon-wrap">
+                                                    <i class="fa-solid fa-usb"></i>
+                                                </div>
+                                            </div>
+                                            <div class="my-2">
+                                                <div class="sim-metric-label">MODEL</div>
+                                                <div class="sim-metric-value mb-2">@(sub.Usb?.Model ?? "N/A")</div>
+                                                <div class="sim-metric-label">SERIAL NUMBER</div>
+                                                <div class="sim-metric-value">@(sub.Usb?.SerialNumber ?? "N/A")</div>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-end pt-2 border-top border-white border-opacity-25">
+                                                <span class="sim-footer-title">USB @index</span>
+                                                <small class="fw-bold opacity-75">Quota: @(sub.Quota?.BaseAmount + sub.Quota?.ExtraAmount ?? 0)</small>
+                                            </div>
+                                        </div>
+                                    </a>
                                 </div>
-                                <div class="d-flex justify-content-between align-items-end pt-2 border-top border-white border-opacity-25">
-                                    <span class="sim-footer-title">SIM @index</span>
-                                    <small class="fw-bold opacity-75">Quota: @(sub.Quota?.BaseAmount+sub.Quota?.ExtraAmount ?? 0)</small>
-                                </div>
-                            </div>
+                            }
                             index++;
                         }
                     }
                     else
                     {
-                        <p class="text-muted italic">No SIM cards or assets currently assigned.</p>
+                        <div class="col-12">
+                            <p class="text-muted fst-italic">No SIM cards or assets currently assigned.</p>
+                        </div>
                     }
                 </div>
             </div>
