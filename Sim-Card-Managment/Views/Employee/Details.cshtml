@@ -366,13 +366,24 @@
                             if (sub.SimId.HasValue)
                             {
                                 string rawProvider = sub.Sim?.ServiceProvider?.Name?.ToLower().Trim() ?? "";
-                                string logoFileName = rawProvider switch
+                                string? uploadedLogo = sub.Sim?.ServiceProvider?.LogoPath;
+
+                                string logoSrc;
+                                if (!string.IsNullOrEmpty(uploadedLogo))
                                 {
-                                    var p when p.Contains("vodafone") => "fodafone.png",
-                                    var p when p.Contains("orange") => "orange.png",
-                                    var p when p.Contains("etisalat") || p.Contains("e&") => "etisalat.png",
-                                    _ => "we.png"
-                                };
+                                    logoSrc = uploadedLogo; // use the real uploaded logo
+                                }
+                                else
+                                {
+                                    // fallback for providers without an uploaded logo yet
+                                    logoSrc = rawProvider switch
+                                    {
+                                        var p when p.Contains("vodafone") => "/img/fodafone.png",
+                                        var p when p.Contains("orange") => "/img/orange.png",
+                                        var p when p.Contains("etisalat") || p.Contains("e&") => "/img/etisalat.png",
+                                        _ => "/img/we.png"
+                                    };
+                                }
 
                                 <div class="col">
                                     <a asp-controller="SIM" asp-action="Details" asp-route-id="@sub.SimId" class="sim-card-link">
@@ -381,7 +392,7 @@
                                                 <span class="@(isActive ? "badge-status-active" : "badge bg-secondary opacity-50 text-white rounded-pill px-2 py-1 small")">
                                                     @(isActive ? "Active" : "Inactive")
                                                 </span>
-                                                <img src="~/img/@logoFileName"
+                                                <img src="~/@logoSrc"
                                                      asp-append-version="true"
                                                      alt="@rawProvider logo"
                                                      class="provider-logo"

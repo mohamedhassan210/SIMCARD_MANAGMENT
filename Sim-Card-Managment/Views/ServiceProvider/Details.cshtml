@@ -305,8 +305,15 @@
 
         <div class="details-card">
             <div class="card-header-styled d-flex align-items-center gap-3">
-                <div class="section-icon-wrapper">
-                    <i class="fa-solid fa-tower-cell"></i>
+                <div class="section-icon-wrapper" style="@(string.IsNullOrEmpty(Model.LogoPath) ? "" : "background:#fff;padding:4px;")">
+                    @if (!string.IsNullOrEmpty(Model.LogoPath))
+                    {
+                        <img src="@Model.LogoPath" alt="@Model.Name logo" style="width:100%;height:100%;object-fit:contain;" />
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-tower-cell"></i>
+                    }
                 </div>
                 <div>
                     <h3 class="m-0 fs-5 fw-bold text-dark">Service Provider Details</h3>

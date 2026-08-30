@@ -17,6 +17,18 @@
     var daysOfWeek = new[] { DayOfWeek.Saturday, DayOfWeek.Sunday, DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday };
     var chartCounts = daysOfWeek.Select(d => chartData.ContainsKey(d) ? chartData[d] : 0).ToArray();
 }
+@functions {
+    string GetSimLogo(Sim sim)
+    {
+        if (!string.IsNullOrEmpty(sim.ServiceProvider?.LogoPath))
+            return sim.ServiceProvider.LogoPath;
+
+        if (sim.PhoneNumber.StartsWith("010")) return "/img/fodafone.png";
+        if (sim.PhoneNumber.StartsWith("012")) return "/img/orange.png";
+        if (sim.PhoneNumber.StartsWith("011")) return "/img/etisalat.png";
+        return "/img/we.png";
+    }
+}
 
 
 
@@ -220,22 +232,7 @@
                                             <td class="py-3 px-3 text-center">@indexCounter</td>
                                             <td class="py-3 px-4">
                                                 <div class="rounded-circle d-flex">
-                                                    @if (sim.PhoneNumber.StartsWith("010"))
-                                                    {
-                                                        <img src="~/img/fodafone.png" alt="Vodafone" />
-                                                    }
-                                                    else if (sim.PhoneNumber.StartsWith("012"))
-                                                    {
-                                                        <img src="~/img/orange.png" alt="Orange" />
-                                                    }
-                                                    else if (sim.PhoneNumber.StartsWith("011"))
-                                                    {
-                                                        <img src="~/img/etisalat.png" alt="Etisalat" />
-                                                    }
-                                                    else
-                                                    {
-                                                        <img src="~/img/we.png" alt="WE" />
-                                                    }
+                                                    <img src="@GetSimLogo(sim)" alt="@(sim.ServiceProvider?.Name ?? "Provider")" />
                                                 </div>
                                             </td>
                                             <td class="py-3 px-4">@sim.SerialNumber</td>

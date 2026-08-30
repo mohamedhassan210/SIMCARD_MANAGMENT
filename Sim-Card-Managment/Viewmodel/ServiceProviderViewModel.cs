@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace Sim_Card_Managment.Viewmodel
 {
@@ -16,5 +17,11 @@ namespace Sim_Card_Managment.Viewmodel
 
         [Display(Name = "نشط")]
         public bool IsActive { get; set; } = true;
+
+       
+        public string? LogoPath { get; set; }
+
+        [Display(Name = "شعار الشركة")]
+        public IFormFile? LogoFile { get; set; }
     }
 }

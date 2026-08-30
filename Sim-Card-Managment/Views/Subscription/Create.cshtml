@@ -426,7 +426,9 @@
         let isNonEmployeeMode = false;
         let selectedQuotaDisplay = '';
 
-        function getProviderLogo(providerName) {
+                function getProviderLogo(providerName, providerLogoPath) {
+            if (providerLogoPath) return providerLogoPath;
+
             const name = (providerName || '').toLowerCase();
             if (name.includes('orange')) return '/img/orange.png';
             if (name.includes('vodafone') || name.includes('fodafone')) return '/img/fodafone.png';
@@ -581,7 +583,7 @@
                     html = '<div class="col-12 text-muted small">No available SIM cards found.</div>';
                 } else {
                     data.forEach(sim => {
-                        const logoSrc = getProviderLogo(sim.providerName);
+                        const logoSrc = getProviderLogo(sim.providerName, sim.providerLogoPath);
                         const logoHtml = logoSrc
                             ? `<img src="${logoSrc}" alt="${sim.providerName}" class="sp-logo-img" />`
                             : `<span class="fw-bold text-dark" style="font-size:0.85rem">${sim.providerName}</span>`;

@@ -14,12 +14,18 @@ namespace Sim_Card_Managment.Controllers
     {
         private readonly IServiceProviderRepository _repo;
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public ServiceProviderController(IServiceProviderRepository repo, AppDbContext context)
+        public ServiceProviderController(IServiceProviderRepository repo, AppDbContext context, IWebHostEnvironment env)
         {
             _repo = repo;
             _context = context;
+            _env = env;
         }
+
+        private static readonly string[] AllowedLogoExtensions = { ".png", ".jpg", ".jpeg", ".webp", ".svg" };
+        private const long MaxLogoSizeBytes = 2 * 1024 * 1024; // 2 MB
+
 
         public async Task<IActionResult> Index()
         {
@@ -29,7 +35,8 @@ namespace Sim_Card_Managment.Controllers
                 Id = p.Id,
                 Name = p.Name,
                 DisplayName = p.DisplayName,
-                IsActive = p.IsActive
+                IsActive = p.IsActive,
+                LogoPath = p.LogoPath
             });
             return View(model);
         }
@@ -118,6 +125,20 @@ namespace Sim_Card_Managment.Controllers
                     DisplayName = model.DisplayName,
                     IsActive = model.IsActive
                 };
+
+                if (model.LogoFile != null && model.LogoFile.Length > 0)
+                {
+                    try
+                    {
+                        provider.LogoPath = await SaveLogoAsync(model.LogoFile);
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        ModelState.AddModelError(nameof(model.LogoFile), ex.Message);
+                        return View(model);
+                    }
+                }
+
                 await _repo.AddAsync(provider);
                 await _repo.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -183,6 +204,7 @@ namespace Sim_Card_Managment.Controllers
                 Name = provider.Name,
                 DisplayName = provider.DisplayName,
                 IsActive = provider.IsActive,
+                LogoPath = provider.LogoPath,
                 Quotas = provider.Quotas
                     .Select(q => new QuotaDisplayViewModel
                     {
@@ -213,7 +235,8 @@ namespace Sim_Card_Managment.Controllers
             {
                 Id = provider.Id,
                 Name = provider.Name,
-                DisplayName = provider.DisplayName
+                DisplayName = provider.DisplayName,
+                LogoPath = provider.LogoPath
             };
 
             return View(model);
@@ -235,6 +258,22 @@ namespace Sim_Card_Managment.Controllers
 
             existing.Name = model.Name;
             existing.DisplayName = model.DisplayName;
+
+            if (model.LogoFile != null && model.LogoFile.Length > 0)
+            {
+                try
+                {
+                    var newLogoPath = await SaveLogoAsync(model.LogoFile);
+                    DeleteLogoIfExists(existing.LogoPath); // clean up the old file
+                    existing.LogoPath = newLogoPath;
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError(nameof(model.LogoFile), ex.Message);
+                    model.LogoPath = existing.LogoPath;
+                    return View(model);
+                }
+            }
 
             await _repo.UpdateAsync(existing);
             await _repo.SaveChangesAsync();
@@ -387,6 +426,37 @@ namespace Sim_Card_Managment.Controllers
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ServiceProvider_{provider.Name}_Devices{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
             );
+        }
+
+        private async Task<string?> SaveLogoAsync(IFormFile file)
+        {
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!AllowedLogoExtensions.Contains(ext))
+                throw new InvalidOperationException("Unsupported file type. Use PNG, JPG, WEBP, or SVG.");
+
+            if (file.Length > MaxLogoSizeBytes)
+                throw new InvalidOperationException("Logo file is too large (max 2 MB).");
+
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "logos");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = $"{Guid.NewGuid()}{ext}";
+            var fullPath = Path.Combine(uploadsFolder, fileName);
+
+            using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return $"/uploads/logos/{fileName}";
+        }
+
+        private void DeleteLogoIfExists(string? logoPath)
+        {
+            if (string.IsNullOrEmpty(logoPath)) return;
+            var fullPath = Path.Combine(_env.WebRootPath, logoPath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+            if (System.IO.File.Exists(fullPath))
+                System.IO.File.Delete(fullPath);
         }
     }
 }

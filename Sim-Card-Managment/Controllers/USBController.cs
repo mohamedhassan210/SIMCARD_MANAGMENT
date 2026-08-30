@@ -132,5 +132,21 @@ namespace Sim_Card_Managment.Controllers
                 .ToList();
             ViewBag.ServiceProviders = new SelectList(providersQuery, "Id", "Name", selectedProvider);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Activate(int id)
+        {
+            var usb = _usbRepo.GetById(id);
+            if (usb == null)
+            {
+                return NotFound();
+            }
+
+            usb.IsActive = true;
+            _usbRepo.Update(usb);
+
+            TempData["Success"] = "USB modem activated successfully.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
     }
 }

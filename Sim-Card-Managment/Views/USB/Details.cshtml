@@ -120,9 +120,18 @@
                     </a>
                 }
 
-                <button type="button" class="action-btn-danger" onclick="confirmDelete()">
-                    <i class="fa-solid fa-trash me-2"></i>Delete
-                </button>
+                @if (Model.IsActive)
+                {
+                    <button type="button" class="action-btn-danger" onclick="confirmDelete()">
+                        <i class="fa-solid fa-trash me-2"></i>Delete
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="action-btn-outline" onclick="confirmActivate()">
+                        <i class="fa-solid fa-circle-check me-2"></i>Activate
+                    </button>
+                }
 
                 <form id="deleteForm" asp-controller="USB" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-none">
                     @Html.AntiForgeryToken()
@@ -224,6 +233,35 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 document.getElementById('deleteForm').submit();
+            }
+        });
+    }
+
+        function confirmActivate() {
+        Swal.fire({
+            title: 'Activate USB Modem?',
+            text: 'This will reactivate this USB modem.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#1D4ED8',
+            cancelButtonColor: '#64748B',
+            confirmButtonText: 'Yes, Activate',
+            customClass: { popup: 'rounded-4' }
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+                const res = await fetch(`/USB/Activate/@Model.Id`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (res.ok || res.redirected) {
+                    window.location.reload();
+                } else {
+                    Swal.fire('Error', 'Failed to activate USB modem.', 'error');
+                }
             }
         });
     }

@@ -6,6 +6,7 @@
         public string Name { get; set; } = string.Empty;
         public string? DisplayName { get; set; }
         public bool IsActive { get; set; }
+        public string? LogoPath { get; set; }   // NEW
         public List<QuotaDisplayViewModel> Quotas { get; set; } = new();
         public List<DeviceDirectoryViewModel> Devices { get; set; } = new();
         public int ActiveDeviceCount { get; set; }

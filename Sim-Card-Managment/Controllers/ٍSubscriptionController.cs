@@ -237,6 +237,7 @@ namespace Sim_Card_Managment.Controllers
                 CurrentSimSerial = sub.Sim?.SerialNumber,
                 CurrentSimProviderId = sub.Sim?.ServiceProviderId,
                 CurrentSimProviderName = sub.Sim?.ServiceProvider?.Name,
+                CurrentSimProviderLogoPath = sub.Sim?.ServiceProvider?.LogoPath,
                 CurrentSimNetworkType = sub.Sim?.NetworkType,
                 CurrentSimPhoneNumber = sub.Sim?.PhoneNumber,
 
@@ -244,6 +245,7 @@ namespace Sim_Card_Managment.Controllers
                 CurrentUsbSerial = sub.Usb?.SerialNumber,
                 CurrentUsbModel = sub.Usb?.Model,
                 CurrentUsbProviderName = sub.Usb?.ServiceProvider?.Name,
+                CurrentUsbProviderLogoPath = sub.Usb?.ServiceProvider?.LogoPath,
 
                 SelectedQuotaId = sub.QuotaId,
                 CurrentQuotaDisplay = sub.Quota != null ? $"{sub.Quota.BaseAmount} GB" : null,
@@ -416,7 +418,8 @@ namespace Sim_Card_Managment.Controllers
                 serialNumber = s.SerialNumber,
                 networkType = s.NetworkType,
                 providerName = s.ServiceProvider?.Name ?? "Unknown",
-                providerId = s.ServiceProviderId
+                providerId = s.ServiceProviderId,
+                providerLogoPath = s.ServiceProvider?.LogoPath
             });
 
             return Json(result);
@@ -431,7 +434,8 @@ namespace Sim_Card_Managment.Controllers
                 id = u.Id,
                 model = u.Model,
                 serialNumber = u.SerialNumber,
-                providerName = u.ServiceProvider?.Name ?? "Unknown"
+                providerName = u.ServiceProvider?.Name ?? "Unknown",
+                providerLogoPath = u.ServiceProvider?.LogoPath
             });
 
             return Json(result);

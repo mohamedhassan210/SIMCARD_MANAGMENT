@@ -18,6 +18,7 @@
     <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body>
+    @Html.AntiForgeryToken()
     <section class="sd-body">
 
         <header class="sd-page-header">
@@ -46,9 +47,18 @@
                             <i class="fa-solid fa-pen-to-square me-2"></i>Edit Details
                         </a>
 
-                        <button type="button" class="sd-btn-danger" onclick="sdConfirmDelete()">
-                            <i class="fa-solid fa-trash me-2"></i>Delete
-                        </button>
+                        @if (Model.IsActive)
+                        {
+                            <button type="button" class="sd-btn-danger" onclick="sdConfirmDelete()">
+                                <i class="fa-solid fa-trash me-2"></i>Delete
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="sd-btn-outline" onclick="sdConfirmActivate()">
+                                <i class="fa-solid fa-circle-check me-2"></i>Activate
+                            </button>
+                        }
 
                         <form id="sd-delete-form" asp-controller="SIM" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-none">
                             @Html.AntiForgeryToken()
@@ -162,6 +172,34 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.getElementById('sd-delete-form').submit();
+                }
+            });
+        }
+                function sdConfirmActivate() {
+            Swal.fire({
+                title: 'Activate SIM Card?',
+                text: 'This will reactivate this SIM card.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#1D4ED8',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Yes, Activate',
+                customClass: { popup: 'rounded-4' }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+                    const res = await fetch(`/SIM/Activate/@Model.Id`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (res.ok || res.redirected) {
+                        window.location.reload();
+                    } else {
+                        Swal.fire('Error', 'Failed to activate SIM card.', 'error');
+                    }
                 }
             });
         }

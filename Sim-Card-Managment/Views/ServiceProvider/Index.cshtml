@@ -311,9 +311,16 @@
                                 data-status="@(item.IsActive ? "active" : "inactive")">
                                 <td class="fw-bold text-dark">
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="rounded-circle bg-orange bg-opacity-10 text-danger p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background-color: #fffaf8;">
-                                            <i class="fas fa-wifi fa-sm" style="color: var(--primary-orange);"></i>
-                                        </div>
+                                        @if (!string.IsNullOrEmpty(item.LogoPath))
+                                        {
+                                            <img src="@item.LogoPath" alt="@item.Name" style="width:32px;height:32px;object-fit:contain;border-radius:50%;background:#fff;border:1px solid #eee;padding:2px;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded-circle bg-orange bg-opacity-10 text-danger p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background-color: #fffaf8;">
+                                                <i class="fas fa-wifi fa-sm" style="color: var(--primary-orange);"></i>
+                                            </div>
+                                        }
                                         <span>@item.Name</span>
                                     </div>
                                 </td>

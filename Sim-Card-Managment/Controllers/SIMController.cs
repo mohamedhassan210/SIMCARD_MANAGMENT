@@ -330,5 +330,21 @@ namespace Sim_Card_Managment.Controllers
 
             return new SelectList(activeProviders.OrderBy(p => p.DisplayName ?? p.Name), "Id", "DisplayName", selectedId);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Activate(int id)
+        {
+            var sim = _simRepo.GetById(id);
+            if (sim == null)
+            {
+                return NotFound();
+            }
+
+            sim.IsActive = true;
+            _simRepo.Update(sim);
+
+            TempData["Success"] = "SIM card activated successfully.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
     }
 }
