@@ -5,8 +5,10 @@
 }
 
 @functions {
-    string GetProviderLogo(string? providerName)
+    string GetProviderLogo(string? providerName, string? uploadedLogoPath)
     {
+        if (!string.IsNullOrEmpty(uploadedLogoPath)) return uploadedLogoPath;
+
         var name = (providerName ?? string.Empty).ToLower();
         if (name.Contains("orange")) return "/img/orange.png";
         if (name.Contains("vodafone") || name.Contains("fodafone")) return "/img/fodafone.png";
@@ -218,7 +220,7 @@
 
             @if (!string.IsNullOrEmpty(Model.CurrentSimSerial))
             {
-                var currentSimLogo = GetProviderLogo(Model.CurrentSimProviderName);
+                var currentSimLogo = GetProviderLogo(Model.CurrentSimProviderName, Model.CurrentSimProviderLogoPath);
 
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
@@ -324,14 +326,16 @@
             const originalQuotaId = @Html.Raw(Model.SelectedQuotaId.HasValue ? Model.SelectedQuotaId.Value.ToString() : "null");
             const originalFees = @Model.OriginalFees;
 
-            function getProviderLogo(providerName) {
-                const name = (providerName || '').toLowerCase();
-                if (name.includes('orange')) return '/img/orange.png';
-                if (name.includes('vodafone') || name.includes('fodafone')) return '/img/fodafone.png';
-                if (name.includes('we')) return '/img/we.png';
-                if (name.includes('etisalat')) return '/img/etisalat-logo.png';
-                return '';
-            }
+                   function getProviderLogo(providerName, providerLogoPath) {
+            if (providerLogoPath) return providerLogoPath;
+
+            const name = (providerName || '').toLowerCase();
+            if (name.includes('orange')) return '/img/orange.png';
+            if (name.includes('vodafone') || name.includes('fodafone')) return '/img/fodafone.png';
+            if (name.includes('we')) return '/img/we.png';
+            if (name.includes('etisalat')) return '/img/etisalat-logo.png';
+            return '';
+        }
 
             $('#simSearchInput').on('input', function () { loadSims($(this).val()); });
             $('#usbSearchInput').on('input', function () { loadUsbs($(this).val()); });
@@ -351,7 +355,7 @@
                         html = '<div class="col-12 text-muted small">No SIM cards found.</div>';
                     } else {
                         data.forEach(sim => {
-                            const logoSrc = getProviderLogo(sim.providerName);
+                            const logoSrc = getProviderLogo(sim.providerName, sim.providerLogoPath);
                             const logoHtml = logoSrc
                                 ? `<img src="${logoSrc}" alt="${sim.providerName}" class="sp-logo-img" />`
                                 : `<span class="fw-bold text-dark" style="font-size:0.85rem">${sim.providerName}</span>`;

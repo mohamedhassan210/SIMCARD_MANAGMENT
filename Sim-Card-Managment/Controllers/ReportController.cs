@@ -9,19 +9,16 @@ using System.Threading.Tasks;
 
 // Adjust these to match the exact namespace of your interfaces:
 using Sim_Card_Managment.Repos;
-using Sim_Card_Managment.Repos.EmployeeRepos;
 
 namespace Sim_Card_Management.Controllers
 {
     [RequirePermission]
     public class ReportController : Controller
     {
-        private readonly IEmployeeRepo _employeeRepo;
         private readonly ISubscriptionRepo _subscriptionRepo;
 
-        public ReportController(IEmployeeRepo employeeRepo, ISubscriptionRepo subscriptionRepo)
+        public ReportController(ISubscriptionRepo subscriptionRepo)
         {
-            _employeeRepo = employeeRepo;
             _subscriptionRepo = subscriptionRepo;
 
             ExcelPackage.License.SetNonCommercialPersonal("Joo");
@@ -40,25 +37,67 @@ namespace Sim_Card_Management.Controllers
 
         #region --- Subscriptions Excel Report ---
 
-        // Download Excel Report
-        public async Task<IActionResult> ExportSubscriptionsExcel()
+        // Download Excel Report — status: "Active" | "Expired" | null/"ALL" for everything,
+        // plus an optional date range on StartDate.
+        // Mirrors Subscription/Index.cshtml's Status filter dropdown.
+        public async Task<IActionResult> ExportSubscriptionsExcel(string? status, DateTime? from, DateTime? to)
         {
-            byte[] fileContents = await GenerateSubscriptionsExcelBytes();
-            string fileName = $"Subscriptions_Report_{DateTime.Now:yyyyMMdd}.xlsx";
+            byte[] fileContents = await GenerateSubscriptionsExcelBytes(status, from, to);
+
+            var fileNameParts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(status) && !string.Equals(status, "ALL", StringComparison.OrdinalIgnoreCase))
+                fileNameParts.Add(status);
+            if (from.HasValue || to.HasValue)
+            {
+                var fromPart = from.HasValue ? from.Value.ToString("yyyyMMdd") : "Start";
+                var toPart = to.HasValue ? to.Value.ToString("yyyyMMdd") : "Now";
+                fileNameParts.Add($"{fromPart}-{toPart}");
+            }
+
+            var suffix = fileNameParts.Any() ? "_" + string.Join("_", fileNameParts) : "";
+
+            string fileName = $"Subscriptions_Report{suffix}_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
 
         // View Online (Inline Content-Disposition)
-        public async Task<IActionResult> ViewSubscriptionsOnline()
+        public async Task<IActionResult> ViewSubscriptionsOnline(string? status, DateTime? from, DateTime? to)
         {
-            byte[] fileContents = await GenerateSubscriptionsExcelBytes();
+            byte[] fileContents = await GenerateSubscriptionsExcelBytes(status, from, to);
             Response.Headers.Add("Content-Disposition", "inline; filename=Subscriptions_Report.xlsx");
             return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 
-        private async Task<byte[]> GenerateSubscriptionsExcelBytes()
+        private async Task<byte[]> GenerateSubscriptionsExcelBytes(string? status, DateTime? from, DateTime? to)
         {
             var subscriptions = await _subscriptionRepo.GetAllSubscriptionsWithDetailsAsync(); // Ensure your repo loads Sim, Usb, Employee, Quota
+
+            var query = subscriptions.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(status) && !string.Equals(status, "ALL", StringComparison.OrdinalIgnoreCase))
+            {
+                bool wantActive = string.Equals(status, "Active", StringComparison.OrdinalIgnoreCase);
+                query = query.Where(sub =>
+                {
+                    bool isActive = sub.EndDate == null || sub.EndDate > DateTime.Now;
+                    return isActive == wantActive;
+                });
+            }
+
+            if (from.HasValue)
+            {
+                query = query.Where(sub => sub.StartDate.Date >= from.Value.Date);
+            }
+
+            if (to.HasValue)
+            {
+                // Inclusive of the whole "to" day.
+                query = query.Where(sub => sub.StartDate.Date <= to.Value.Date);
+            }
+
+            var filteredSubscriptions = query
+                .OrderByDescending(sub => sub.StartDate)
+                .ToList();
 
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add("Subscriptions");
@@ -78,16 +117,12 @@ namespace Sim_Card_Management.Controllers
 
             // Fill Data
             int row = 2;
-            foreach (var sub in subscriptions)
+            foreach (var sub in filteredSubscriptions)
             {
                 string subscriberName = sub.Employee?.Name ?? sub.NonEmployee?.Name ?? "Unassigned";
                 string simNumber = sub.Sim?.PhoneNumber ?? "N/A";
                 string usbSerial = sub.Usb?.SerialNumber ?? "N/A";
 
-                // Was: sub.Quota?.BaseAmount + sub.Quota.ExtraAmount ?? 0
-                // That threw a NullReferenceException on every subscription with no
-                // Quota, because the second access (sub.Quota.ExtraAmount) wasn't
-                // null-conditional even though the first one was.
                 decimal? quotaGb = sub.Quota != null
                     ? sub.Quota.BaseAmount + sub.Quota.ExtraAmount
                     : (decimal?)null;
@@ -100,64 +135,8 @@ namespace Sim_Card_Management.Controllers
                 worksheet.Cells[row, 3].Value = usbSerial;
                 worksheet.Cells[row, 4].Value = quotaGb.HasValue ? (object)quotaGb.Value : "N/A";
                 worksheet.Cells[row, 5].Value = fees;
-                worksheet.Cells[row, 6].Value = isActive ? "Active" : "Inactive";
+                worksheet.Cells[row, 6].Value = isActive ? "Active" : "Expired";
                 worksheet.Cells[row, 7].Value = sub.StartDate.ToString("yyyy-MM-dd");
-                row++;
-            }
-
-            worksheet.Cells.AutoFitColumns();
-            return package.GetAsByteArray();
-        }
-
-        #endregion
-
-        #region --- Employees Excel Report ---
-
-        // Download Excel Report
-        public async Task<IActionResult> ExportEmployeesExcel()
-        {
-            byte[] fileContents = await GenerateEmployeesExcelBytes();
-            string fileName = $"Employees_Report_{DateTime.Now:yyyyMMdd}.xlsx";
-            return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-        }
-
-        // View Online
-        public async Task<IActionResult> ViewEmployeesOnline()
-        {
-            byte[] fileContents = await GenerateEmployeesExcelBytes();
-            Response.Headers.Add("Content-Disposition", "inline; filename=Employees_Report.xlsx");
-            return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        }
-
-        private async Task<byte[]> GenerateEmployeesExcelBytes()
-        {
-            var employees = await _employeeRepo.GetPeopleListAsync("all"); // Ensure Subscriptions, Sims, and Usbs are loaded
-
-            using var package = new ExcelPackage();
-            var worksheet = package.Workbook.Worksheets.Add("Employees");
-
-            // Headers
-            string[] headers = { "Employee Name", "National ID / Identifier", "Status", "Total Subscriptions", "Active SIMs", "Active USBs" };
-            for (int i = 0; i < headers.Length; i++)
-            {
-                var cell = worksheet.Cells[1, i + 1];
-                cell.Value = headers[i];
-                cell.Style.Font.Bold = true;
-                cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                cell.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(229, 80, 38));
-                cell.Style.Font.Color.SetColor(Color.White);
-            }
-
-            // Fill Data
-            int row = 2;
-            foreach (var emp in employees)
-            {
-                worksheet.Cells[row, 1].Value = emp.Name;
-                worksheet.Cells[row, 2].Value = emp.Identifier;
-                worksheet.Cells[row, 3].Value = emp.IsActive ? "Active" : "Inactive";
-                worksheet.Cells[row, 4].Value = emp.ActiveSimOnlyCount + emp.ActiveUsbCount;
-                worksheet.Cells[row, 5].Value = emp.ActiveSimOnlyCount;
-                worksheet.Cells[row, 6].Value = emp.ActiveUsbCount;
                 row++;
             }
 

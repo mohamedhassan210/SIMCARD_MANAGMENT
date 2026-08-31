@@ -12,5 +12,6 @@ namespace Sim_Card_Managment.Repos
         void CompleteTransaction();
         Subscription? GetActiveSubscriptionBySimId(int simId);
         Subscription? GetActiveSubscriptionByUsbId(int usbId);
+        Task<List<DeviceTransfer>> GetAllWithDetailsAsync();
     }
 }

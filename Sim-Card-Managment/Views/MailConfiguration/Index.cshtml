@@ -127,6 +127,7 @@
                         <th>SMTP Host</th>
                         <th>Port</th>
                         <th>Sender Email</th>
+                        <th>Password</th>
                         <th>Display Name</th>
                         <th>SSL</th>
                         <th>Status</th>
@@ -143,6 +144,12 @@
                                 <td><span class="text-muted small">@item.SmtpHost</span></td>
                                 <td><span class="text-muted small">@item.SmtpPort</span></td>
                                 <td><code class="text-dark">@item.SenderEmail</code></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <code class="text-dark password-cell" data-password="@item.SenderPassword" data-visible="false">••••••••</code>
+                                        <i class="fa-solid fa-eye toggle-password-row" style="cursor:pointer; color:#8c8c8c;" title="Show password"></i>
+                                    </div>
+                                </td>
                                 <td><span class="text-muted small">@item.SenderDisplayName</span></td>
                                 <td>
                                     @if (item.EnableSsl)
@@ -203,4 +210,18 @@
             </table>
         </div>
     </div>
+
+    <script>
+        document.querySelectorAll('.toggle-password-row').forEach(function (icon) {
+            icon.addEventListener('click', function () {
+                const cell = this.previousElementSibling;
+                const isVisible = cell.dataset.visible === 'true';
+                cell.textContent = isVisible ? '••••••••' : cell.dataset.password;
+                cell.dataset.visible = (!isVisible).toString();
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        });
+    </script>
+
 </div>

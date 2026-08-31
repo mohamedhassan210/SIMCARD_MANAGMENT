@@ -88,23 +88,25 @@ namespace Sim_Card_Managment.ViewModels.Subscription
         public int? SelectedSimId { get; set; }
         public string? CurrentSimSerial { get; set; }
         public int? CurrentSimProviderId { get; set; }
-        public string? CurrentSimProviderName { get; set; }   // NEW — for the current-SIM card's header/logo
-        public string? CurrentSimNetworkType { get; set; }    // NEW — for the current-SIM card's title line
-        public string? CurrentSimPhoneNumber { get; set; }    // NEW — for the current-SIM card's title line
+        public string? CurrentSimProviderName { get; set; }
+        public string? CurrentSimProviderLogoPath { get; set; }
+        public string? CurrentSimNetworkType { get; set; }
+        public string? CurrentSimPhoneNumber { get; set; }
 
         public int? SelectedUsbId { get; set; }
         public string? CurrentUsbSerial { get; set; }
-        public string? CurrentUsbModel { get; set; }           // NEW — for the current-USB card's title line
-        public string? CurrentUsbProviderName { get; set; }    // NEW — for the current-USB card's subtitle line
+        public string? CurrentUsbModel { get; set; }
+        public string? CurrentUsbProviderName { get; set; }
+        public string? CurrentUsbProviderLogoPath { get; set; }   
 
         public int? SelectedQuotaId { get; set; }
         public string? CurrentQuotaDisplay { get; set; }
-        public decimal? CurrentQuotaBaseAmount { get; set; }   // NEW — for the current-quota card's title line
-        public decimal? CurrentQuotaExtraAmount { get; set; }  // NEW — for the current-quota card's subtitle line
-        public decimal? CurrentQuotaFee { get; set; }          // NEW — for the current-quota card's subtitle line
+        public decimal? CurrentQuotaBaseAmount { get; set; }
+        public decimal? CurrentQuotaExtraAmount { get; set; }
+        public decimal? CurrentQuotaFee { get; set; }
 
         public decimal Fees { get; set; }
-        public decimal OriginalFees { get; set; }   // NEW — lets "reselect current" restore the original fee
+        public decimal OriginalFees { get; set; }
     }
 
     // ─────────────────────────────────────────────

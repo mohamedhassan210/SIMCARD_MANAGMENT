@@ -97,6 +97,27 @@
             color: #b02a37;
         }
 
+    .btn-outline-custom {
+        background-color: #f1f3f5;
+        border: 1px solid #e0e0e0;
+        color: #333333;
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+        .btn-outline-custom:hover {
+            background-color: #e9ecef;
+            color: #1a1a1a;
+        }
+
     /* Seamless Unified Search Bar */
     .search-bar-wrapper {
         display: flex;
@@ -192,6 +213,25 @@
 <div class="container-fluid px-4 p-100">
     @Html.AntiForgeryToken()
 
+
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+
+
     <!-- Header Section -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
@@ -202,6 +242,10 @@
             <a asp-action="Create" class="btn-orange-primary shadow-sm">
                 <i class="fas fa-plus"></i>
                 <span>New Branch</span>
+            </a>
+            <a href="#" id="exportBranchExcelBtn" class="btn-outline-custom shadow-sm">
+                <i class="fas fa-file-excel"></i>
+                <span>Excel</span>
             </a>
         </div>
     </div>
@@ -403,6 +447,17 @@
     function biGetToken() {
         const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
         return tokenInput ? tokenInput.value : '';
+    }
+
+         const exportBranchExcelBtn = document.getElementById('exportBranchExcelBtn');
+    if (exportBranchExcelBtn) {
+        exportBranchExcelBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const url = new URL('@Url.Action("ExportBranchesExcel", "Branch")', window.location.origin);
+            const statusVal = document.getElementById('statusFilter').value; // read directly, no closure dependency
+            if (statusVal) url.searchParams.set('status', statusVal);
+            window.location.href = url.toString();
+        });
     }
 
     document.addEventListener("DOMContentLoaded", function () {

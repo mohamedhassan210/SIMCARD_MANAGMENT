@@ -219,537 +219,138 @@ namespace Sim_Card_Managment.Controllers
             return View(model);
         }
         [HttpGet]
-        public async Task<IActionResult> ExportToExcel(string? searchTerm)
+        public async Task<IActionResult> ExportToExcel(string? searchTerm, string status = "all")
         {
             ExcelPackage.License.SetNonCommercialPersonal("MyName");
 
-            // =========================================================
-            // GET DATA
-            // =========================================================
-
             var data = await _vpnRepo.GetForExcelAsync();
-
-            // Get ALL VPN connection types dynamically
-            var connectionTypes = (await _lookupRepo.GetVpnConnectionTypesAsync())
-                .OrderBy(x => x.Id)
-                .ToList();
-
-            // Branch name -> comma-separated firewall type names, for
-            // branches with VPN over internet configured.
             var fireWallTypesByBranch = await _branchRepo.GetFireWallTypeNamesByBranchNameAsync();
 
-            // =========================================================
-            // SEARCH
-            // =========================================================
+            status = (status ?? "all").ToLower();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 data = data
                     .Where(b =>
-                        b.BranchName.Contains(
-                            searchTerm,
-                            StringComparison.OrdinalIgnoreCase)
-
-                        ||
-
+                        b.BranchName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                         b.Connections.Any(v =>
-                            v.ServiceProviderName.Contains(
-                                searchTerm,
-                                StringComparison.OrdinalIgnoreCase)
-
-                            ||
-
-                            v.NID?.Contains(
-                                searchTerm,
-                                StringComparison.OrdinalIgnoreCase) == true
-
-                            ||
-
-                            v.ConnectionTypeName.Contains(
-                                searchTerm,
-                                StringComparison.OrdinalIgnoreCase)
+                            v.ServiceProviderName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                            v.NID?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true ||
+                            v.ConnectionTypeName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                         )
                     )
                     .ToList();
             }
 
-            // =========================================================
-            // CREATE EXCEL
-            // =========================================================
-
             using var package = new ExcelPackage();
-
             var worksheet = package.Workbook.Worksheets.Add("Vpn");
 
-            // =========================================================
-            // CALCULATE COLUMNS
-            // =========================================================
+            string[] headers = {
+        "Branch", "Connection Type", "ISP", "NID", "Line Speed",
+        "Status", "VPN Over Internet", "Firewall Types"
+    };
+            int lastColumn = headers.Length;
 
-            // Branch
-            // 4 columns per VPN type:
-            // ISP / Line Speed / NID / Status
-            // VPN Over Internet
-            // Firewall Types
-            // Notes
-
-            int totalColumns =
-                1 +
-                (connectionTypes.Count * 4) +
-                1 +
-                1 +
-                1;
-
-            int lastColumn = totalColumns;
-
-            // =========================================================
-            // TITLE
-            // =========================================================
-
-            worksheet.Cells[1, 1].Value = "VPN - leased line";
-
+            // Title
             worksheet.Cells[1, 1, 1, lastColumn].Merge = true;
-
-            var titleRange =
-                worksheet.Cells[1, 1, 1, lastColumn];
-
+            worksheet.Cells[1, 1].Value = "VPN - Leased Line";
+            var titleRange = worksheet.Cells[1, 1, 1, lastColumn];
             titleRange.Style.Font.Bold = true;
             titleRange.Style.Font.Size = 16;
+            titleRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            titleRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            titleRange.Style.HorizontalAlignment =
-                ExcelHorizontalAlignment.Center;
-
-            titleRange.Style.VerticalAlignment =
-                ExcelVerticalAlignment.Center;
-
-            titleRange.Style.Fill.PatternType =
-                ExcelFillStyle.Solid;
-
-            titleRange.Style.Fill.BackgroundColor
-                .SetColor(Color.White);
-
-            // =========================================================
-            // HEADERS
-            // =========================================================
-
+            // Header
             int headerRow = 2;
-            int column = 1;
+            for (int i = 0; i < headers.Length; i++)
+                worksheet.Cells[headerRow, i + 1].Value = headers[i];
 
-            worksheet.Cells[headerRow, column].Value = "Branch";
-            column++;
-
-            foreach (var type in connectionTypes)
-            {
-                worksheet.Cells[headerRow, column].Value =
-                    $"{type.Name} ISP";
-                column++;
-
-                worksheet.Cells[headerRow, column].Value =
-                    $"{type.Name} Line Speed";
-                column++;
-
-                worksheet.Cells[headerRow, column].Value =
-                    $"{type.Name} NID";
-                column++;
-
-                worksheet.Cells[headerRow, column].Value =
-                    $"{type.Name} Status";
-                column++;
-            }
-
-            worksheet.Cells[headerRow, column].Value =
-                "VPN Over Internet";
-
-            column++;
-
-            worksheet.Cells[headerRow, column].Value =
-                "Firewall Types";
-
-            column++;
-
-            worksheet.Cells[headerRow, column].Value =
-                "Notes";
-
-            // =========================================================
-            // HEADER STYLE
-            // =========================================================
-
-            using (var headerRange =
-                worksheet.Cells[headerRow, 1, headerRow, lastColumn])
+            using (var headerRange = worksheet.Cells[headerRow, 1, headerRow, lastColumn])
             {
                 headerRange.Style.Font.Bold = true;
-
-                headerRange.Style.HorizontalAlignment =
-                    ExcelHorizontalAlignment.Center;
-
-                headerRange.Style.VerticalAlignment =
-                    ExcelVerticalAlignment.Center;
-
-                headerRange.Style.Fill.PatternType =
-                    ExcelFillStyle.Solid;
-
-                headerRange.Style.Fill.BackgroundColor
-                    .SetColor(Color.LightGray);
-
-                headerRange.Style.Border.Top.Style =
-                    ExcelBorderStyle.Thin;
-
-                headerRange.Style.Border.Bottom.Style =
-                    ExcelBorderStyle.Thin;
-
-                headerRange.Style.Border.Left.Style =
-                    ExcelBorderStyle.Thin;
-
-                headerRange.Style.Border.Right.Style =
-                    ExcelBorderStyle.Thin;
-
-                headerRange.Style.WrapText = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                headerRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                headerRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                headerRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
             }
 
-            // =========================================================
-            // DATA
-            // =========================================================
-
+            // Data — one row per connection
             int row = 3;
-
-            // Track each branch's row range + wrapped text so we can
-            // set row heights AFTER column widths are finalized below.
-            // Merged cells don't auto-expand row height for wrapped
-            // text in Excel/EPPlus, so this has to be done manually.
-            var branchRowRanges = new List<(int StartRow, int EndRow, string FirewallText, string NotesText)>();
-
             foreach (var branch in data.OrderBy(x => x.BranchName))
             {
-                // -----------------------------------------------------
-                // Group this branch's connections by connection type
-                // -----------------------------------------------------
+                var connections = branch.Connections.AsEnumerable();
+                if (status == "up") connections = connections.Where(c => c.Status == true);
+                else if (status == "down") connections = connections.Where(c => c.Status == false);
+                var filteredConnections = connections.ToList();
 
-                var connectionsByType = connectionTypes
-                    .ToDictionary(
-                        type => type.Name,
-                        type => branch.Connections
-                            .Where(x =>
-                                x.ConnectionTypeName.Equals(
-                                    type.Name,
-                                    StringComparison.OrdinalIgnoreCase))
-                            .ToList(),
-                        StringComparer.OrdinalIgnoreCase);
+                if (!filteredConnections.Any())
+                    continue; // branch has no matching connections under this filter — skip it
 
-                // -----------------------------------------------------
-                // Find how many rows this branch needs
-                //
-                // Example:
-                // Main   = 5
-                // Backup = 2
-                // Mobile = 1
-                //
-                // Branch needs 5 rows.
-                // -----------------------------------------------------
+                var firewallText = fireWallTypesByBranch.TryGetValue(branch.BranchName, out var fw) && !string.IsNullOrWhiteSpace(fw)
+                    ? fw : "N/A";
+                var vpnOverInternetText = branch.VpnOverInternetStatus == true ? "OK"
+                    : branch.VpnOverInternetStatus == false ? "NOT OK" : "Unknown";
 
-                int branchRowCount = connectionsByType.Values
-                    .Select(list => list.Count)
-                    .DefaultIfEmpty(1)
-                    .Max();
-
-                // Make sure a branch with no VPN connections still
-                // gets one row.
-                if (branchRowCount < 1)
-                    branchRowCount = 1;
-
-                int branchStartRow = row;
-                int branchEndRow = row + branchRowCount - 1;
-
-                // -----------------------------------------------------
-                // BRANCH
-                // -----------------------------------------------------
-
-                worksheet.Cells[
-                    branchStartRow,
-                    1,
-                    branchEndRow,
-                    1
-                ].Merge = true;
-
-                var branchCell =
-                    worksheet.Cells[branchStartRow, 1];
-
-                branchCell.Value = branch.BranchName;
-
-                branchCell.Style.HorizontalAlignment =
-                    ExcelHorizontalAlignment.Center;
-
-                branchCell.Style.VerticalAlignment =
-                    ExcelVerticalAlignment.Center;
-
-                branchCell.Style.WrapText = true;
-
-                // -----------------------------------------------------
-                // VPN TYPES
-                // -----------------------------------------------------
-
-                foreach (var type in connectionTypes)
+                foreach (var c in filteredConnections)
                 {
-                    var connections =
-                        connectionsByType[type.Name];
+                    worksheet.Cells[row, 1].Value = branch.BranchName;
+                    worksheet.Cells[row, 2].Value = c.ConnectionTypeName;
+                    worksheet.Cells[row, 3].Value = c.ServiceProviderName;
+                    worksheet.Cells[row, 4].Value = string.IsNullOrWhiteSpace(c.NID) ? "N/A" : c.NID;
+                    worksheet.Cells[row, 5].Value = string.IsNullOrWhiteSpace(c.LineSpeed) ? "N/A" : c.LineSpeed;
 
-                    // Starting column for this VPN type
-                    int typeStartColumn =
-                        2 + (connectionTypes.IndexOf(type) * 4);
-
-                    // -------------------------------------------------
-                    // Put EACH connection on its OWN ROW
-                    // -------------------------------------------------
-
-                    for (int i = 0; i < connections.Count; i++)
+                    var statusCell = worksheet.Cells[row, 6];
+                    statusCell.Value = c.Status == true ? "Online" : c.Status == false ? "Offline" : "Unknown";
+                    statusCell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    if (c.Status == true)
                     {
-                        var connection = connections[i];
-
-                        int currentRow =
-                            branchStartRow + i;
-
-                        // ISP
-                        worksheet.Cells[
-                            currentRow,
-                            typeStartColumn
-                        ].Value =
-                            connection.ServiceProviderName;
-
-                        // Line Speed
-                        worksheet.Cells[
-                            currentRow,
-                            typeStartColumn + 1
-                        ].Value =
-                            connection.LineSpeed;
-
-                        // NID
-                        worksheet.Cells[
-                            currentRow,
-                            typeStartColumn + 2
-                        ].Value =
-                            connection.NID;
-
-                        // Status
-                        var statusCell =
-                            worksheet.Cells[
-                                currentRow,
-                                typeStartColumn + 3
-                            ];
-
-                        statusCell.Value =
-                            connection.Status == true
-                                ? "Online"
-                                : connection.Status == false
-                                    ? "Offline"
-                                    : "Unknown";
-
-                        statusCell.Style.HorizontalAlignment =
-                            ExcelHorizontalAlignment.Center;
-
-                        // Status color
-                        if (connection.Status == true)
-                        {
-                            statusCell.Style.Fill.PatternType =
-                                ExcelFillStyle.Solid;
-
-                            statusCell.Style.Fill.BackgroundColor
-                                .SetColor(Color.LimeGreen);
-                        }
-                        else if (connection.Status == false)
-                        {
-                            statusCell.Style.Fill.PatternType =
-                                ExcelFillStyle.Solid;
-
-                            statusCell.Style.Fill.BackgroundColor
-                                .SetColor(Color.LightCoral);
-                        }
+                        statusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        statusCell.Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
                     }
+                    else if (c.Status == false)
+                    {
+                        statusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        statusCell.Style.Fill.BackgroundColor.SetColor(Color.LightCoral);
+                    }
+
+                    worksheet.Cells[row, 7].Value = vpnOverInternetText;
+                    worksheet.Cells[row, 8].Value = firewallText;
+                    row++;
                 }
-
-                // =====================================================
-                // VPN OVER INTERNET
-                // =====================================================
-
-                int vpnOverInternetColumn =
-                    lastColumn - 2;
-
-                worksheet.Cells[
-                    branchStartRow,
-                    vpnOverInternetColumn,
-                    branchEndRow,
-                    vpnOverInternetColumn
-                ].Merge = true;
-
-                var vpnStatusCell =
-                    worksheet.Cells[
-                        branchStartRow,
-                        vpnOverInternetColumn
-                    ];
-
-                vpnStatusCell.Value =
-                    branch.VpnOverInternetStatus == true
-                        ? "OK"
-                        : branch.VpnOverInternetStatus == false
-                            ? "NOT OK"
-                            : "Unknown";
-
-                vpnStatusCell.Style.HorizontalAlignment =
-                    ExcelHorizontalAlignment.Center;
-
-                vpnStatusCell.Style.VerticalAlignment =
-                    ExcelVerticalAlignment.Center;
-
-                vpnStatusCell.Style.WrapText = true;
-
-                if (branch.VpnOverInternetStatus == true)
-                {
-                    vpnStatusCell.Style.Fill.PatternType =
-                        ExcelFillStyle.Solid;
-
-                    vpnStatusCell.Style.Fill.BackgroundColor
-                        .SetColor(Color.LimeGreen);
-                }
-                else if (branch.VpnOverInternetStatus == false)
-                {
-                    vpnStatusCell.Style.Fill.PatternType =
-                        ExcelFillStyle.Solid;
-
-                    vpnStatusCell.Style.Fill.BackgroundColor
-                        .SetColor(Color.LightCoral);
-                }
-
-                // =====================================================
-                // FIREWALL TYPES (comma-separated)
-                // =====================================================
-
-                int firewallTypesColumn =
-                    lastColumn - 1;
-
-                worksheet.Cells[
-                    branchStartRow,
-                    firewallTypesColumn,
-                    branchEndRow,
-                    firewallTypesColumn
-                ].Merge = true;
-
-                var firewallTypesCell =
-                    worksheet.Cells[
-                        branchStartRow,
-                        firewallTypesColumn
-                    ];
-
-                firewallTypesCell.Value =
-                    fireWallTypesByBranch.TryGetValue(branch.BranchName, out var fireWallNames)
-                    && !string.IsNullOrWhiteSpace(fireWallNames)
-                        ? fireWallNames
-                        : "N/A";
-
-                firewallTypesCell.Style.HorizontalAlignment =
-                    ExcelHorizontalAlignment.Left;
-
-                firewallTypesCell.Style.VerticalAlignment =
-                    ExcelVerticalAlignment.Center;
-
-                firewallTypesCell.Style.WrapText = true;
-
-                // =====================================================
-                // NOTES
-                // =====================================================
-
-                int notesColumn =
-                    lastColumn;
-
-                worksheet.Cells[
-                    branchStartRow,
-                    notesColumn,
-                    branchEndRow,
-                    notesColumn
-                ].Merge = true;
-
-                var notesCell =
-                    worksheet.Cells[
-                        branchStartRow,
-                        notesColumn
-                    ];
-
-                notesCell.Value = branch.Notes;
-
-                notesCell.Style.HorizontalAlignment =
-                    ExcelHorizontalAlignment.Left;
-
-                notesCell.Style.VerticalAlignment =
-                    ExcelVerticalAlignment.Center;
-
-                notesCell.Style.WrapText = true;
-
-                // =====================================================
-                // MOVE TO NEXT BRANCH
-                // =====================================================
-
-                row = branchEndRow + 1;
             }
-
-            // =========================================================
-            // GENERAL STYLE
-            // =========================================================
 
             if (row > 3)
             {
-                using var dataRange =
-                    worksheet.Cells[
-                        3,
-                        1,
-                        row - 1,
-                        lastColumn
-                    ];
-
-                dataRange.Style.Border.Top.Style =
-                    ExcelBorderStyle.Thin;
-
-                dataRange.Style.Border.Bottom.Style =
-                    ExcelBorderStyle.Thin;
-
-                dataRange.Style.Border.Left.Style =
-                    ExcelBorderStyle.Thin;
-
-                dataRange.Style.Border.Right.Style =
-                    ExcelBorderStyle.Thin;
-
-                dataRange.Style.VerticalAlignment =
-                    ExcelVerticalAlignment.Center;
-
+                using var dataRange = worksheet.Cells[3, 1, row - 1, lastColumn];
+                dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                dataRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 dataRange.Style.WrapText = true;
             }
 
-            // =========================================================
-            // COLUMN SIZING
-            // =========================================================
-
-            worksheet.Cells[
-                worksheet.Dimension.Address
-            ].AutoFitColumns();
-
+            worksheet.Column(1).Width = 18;
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
             for (int c = 1; c <= lastColumn; c++)
             {
                 if (worksheet.Column(c).Width > 30)
                     worksheet.Column(c).Width = 30;
             }
-
-            worksheet.Column(1).Width = 18;
-
             worksheet.Row(1).Height = 30;
+            worksheet.View.FreezePanes(3, 1);
 
-            worksheet.View.FreezePanes(3, 2);
-
-            // =========================================================
-            // RETURN FILE
-            // =========================================================
-
-            var fileContents =
-                package.GetAsByteArray();
+            var fileContents = package.GetAsByteArray();
+            var suffix = status != "all" ? "_" + (status == "up" ? "Online" : "Offline") : "";
 
             return File(
                 fileContents,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"VPN_Connections_{DateTime.Now:yyyyMMdd}.xlsx"
+                $"VPN_Connections{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
             );
         }
 

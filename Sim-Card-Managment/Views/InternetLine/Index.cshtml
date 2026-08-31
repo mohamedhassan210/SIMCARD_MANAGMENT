@@ -282,7 +282,7 @@
             <p class="page-header-subtitle mb-0">Manage internet connections, bandwidth, and operational status across all branches.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <a asp-controller="InternetLine" asp-action="ExportToExcel" class="btn-secondary-soft">
+            <a href="#" id="exportLineExcelBtn" class="btn-secondary-soft">
                 <i class="fas fa-file-excel text-success"></i>
                 <span>Excel</span>
             </a>
@@ -492,6 +492,18 @@
 
 <!-- Dynamic Search, Filter & Pagination Script -->
 <script>
+        const exportLineExcelBtn = document.getElementById('exportLineExcelBtn');
+    if (exportLineExcelBtn) {
+        exportLineExcelBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const url = new URL('@Url.Action("ExportToExcel", "InternetLine")', window.location.origin);
+            const statusVal = document.getElementById('statusFilter').value; // "ALL", "UP", or "DOWN" — read at click time
+            if (statusVal && statusVal !== 'ALL') {
+                url.searchParams.set('status', statusVal.toLowerCase());
+            }
+            window.location.href = url.toString();
+        });
+    }
     document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("lineSearchInput");
         const statusFilter = document.getElementById("statusFilter");

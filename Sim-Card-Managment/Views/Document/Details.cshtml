@@ -13,6 +13,45 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
     <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
+
+    <style>
+        .bd-filter-select {
+            border: 1px solid #dcdcdc;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: #1a1a1a;
+            background-color: #fff;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+            .bd-filter-select:hover {
+                border-color: #e8552b;
+            }
+
+        .bd-export-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1.5px solid #198754;
+            color: #198754;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+            .bd-export-btn:hover {
+                background: #198754;
+                color: #fff;
+            }
+    </style>
 </head>
 <body>
     <section class="bd-body">
@@ -77,11 +116,32 @@
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                     <h4 class="fw-bold fs-5 m-0 text-dark">Attached SIM Cards</h4>
 
-                    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 col-12 col-md-7 justify-content-end">
-                        <div class="bd-search-box col-12 col-sm-7">
+                    <div class="d-flex flex-wrap align-items-center gap-2 col-12 col-md-9 justify-content-md-end">
+                        <select id="simAvailabilityFilter" class="bd-filter-select">
+                            <option value="all">All Availability</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+
+                        <select id="simStatusTypeFilter" class="bd-filter-select">
+                            <option value="all">All Status Types</option>
+                            @if (ViewBag.StatusTypes != null)
+                            {
+                                foreach (var st in ViewBag.StatusTypes as List<string>)
+                                {
+                                    <option value="@st.ToLower()">@st</option>
+                                }
+                            }
+                        </select>
+
+                        <div class="bd-search-box col-12 col-sm-4" style="min-width: 220px;">
                             <i class="fa-solid fa-magnifying-glass"></i>
                             <input id="simSearchInput" type="text" placeholder="Search SIM cards..." autocomplete="off">
                         </div>
+
+                        <a href="#" id="exportSimsBtn" class="bd-export-btn">
+                            <i class="fa-solid fa-file-excel"></i> Excel
+                        </a>
                     </div>
                 </div>
 
@@ -91,6 +151,7 @@
                             <tr>
                                 <th>Phone Number</th>
                                 <th>Serial Number (ICCID)</th>
+                                <th>Availability</th>
                                 <th>Status</th>
                                 <th style="text-align: right;">View Details</th>
                             </tr>
@@ -100,9 +161,21 @@
                             {
                                 foreach (var sim in Model.Sims)
                                 {
-                                    <tr class="bd-sim-row">
+                                    <tr class="bd-sim-row"
+                                        data-availability="@(sim.IsActive ? "active" : "inactive")"
+                                        data-status="@(sim.Status?.ToLower() ?? "unassigned")">
                                         <td><code class="bd-code">@sim.PhoneNumber</code></td>
                                         <td><code class="bd-code">@sim.SerialNumber</code></td>
+                                        <td>
+                                            @if (sim.IsActive)
+                                            {
+                                                <span style="color:#137333; font-weight:700;">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="color:#c5221f; font-weight:700;">Inactive</span>
+                                            }
+                                        </td>
                                         <td><span class="badge bg-secondary">@sim.Status</span></td>
                                         <td style="text-align: right;">
                                             <a asp-controller="Sim" asp-action="Details" asp-route-id="@sim.Id" class="bd-link-view">
@@ -113,7 +186,7 @@
                                 }
                             }
                             <tr id="noSimsRow" style="display: @(Model.Sims != null && Model.Sims.Any() ? "none" : "");">
-                                <td colspan="4" class="bd-no-results text-center py-4 text-muted">No SIM cards attached to this document.</td>
+                                <td colspan="5" class="bd-no-results text-center py-4 text-muted">No SIM cards attached to this document.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -125,11 +198,32 @@
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                     <h4 class="fw-bold fs-5 m-0 text-dark">Attached USB Modems</h4>
 
-                    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3 col-12 col-md-7 justify-content-end">
-                        <div class="bd-search-box col-12 col-sm-7">
+                    <div class="d-flex flex-wrap align-items-center gap-2 col-12 col-md-9 justify-content-md-end">
+                        <select id="usbAvailabilityFilter" class="bd-filter-select">
+                            <option value="all">All Availability</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+
+                        <select id="usbStatusTypeFilter" class="bd-filter-select">
+                            <option value="all">All Status Types</option>
+                            @if (ViewBag.StatusTypes != null)
+                            {
+                                foreach (var st in ViewBag.StatusTypes as List<string>)
+                                {
+                                    <option value="@st.ToLower()">@st</option>
+                                }
+                            }
+                        </select>
+
+                        <div class="bd-search-box col-12 col-sm-4" style="min-width: 220px;">
                             <i class="fa-solid fa-magnifying-glass"></i>
                             <input id="usbSearchInput" type="text" placeholder="Search USB modems..." autocomplete="off">
                         </div>
+
+                        <a href="#" id="exportUsbsBtn" class="bd-export-btn">
+                            <i class="fa-solid fa-file-excel"></i> Excel
+                        </a>
                     </div>
                 </div>
 
@@ -139,6 +233,7 @@
                             <tr>
                                 <th>Serial Number</th>
                                 <th>Model / Type</th>
+                                <th>Availability</th>
                                 <th>Status</th>
                                 <th style="text-align: right;">View Details</th>
                             </tr>
@@ -148,9 +243,21 @@
                             {
                                 foreach (var usb in Model.Usbs)
                                 {
-                                    <tr class="bd-usb-row">
+                                    <tr class="bd-usb-row"
+                                        data-availability="@(usb.IsActive ? "active" : "inactive")"
+                                        data-status="@(usb.Status?.ToLower() ?? "unassigned")">
                                         <td><code class="bd-code">@usb.SerialNumber</code></td>
                                         <td>@usb.Model</td>
+                                        <td>
+                                            @if (usb.IsActive)
+                                            {
+                                                <span style="color:#137333; font-weight:700;">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="color:#c5221f; font-weight:700;">Inactive</span>
+                                            }
+                                        </td>
                                         <td><span class="badge bg-secondary">@usb.Status</span></td>
                                         <td style="text-align: right;">
                                             <a asp-controller="Usb" asp-action="Details" asp-route-id="@usb.Id" class="bd-link-view">
@@ -161,7 +268,7 @@
                                 }
                             }
                             <tr id="noUsbRow" style="display: @(Model.Usbs != null && Model.Usbs.Any() ? "none" : "");">
-                                <td colspan="4" class="bd-no-results text-center py-4 text-muted">No USB modems attached to this document.</td>
+                                <td colspan="5" class="bd-no-results text-center py-4 text-muted">No USB modems attached to this document.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -172,24 +279,50 @@
     </section>
 
     <script>
-        // SIM Table Search
         document.addEventListener('DOMContentLoaded', () => {
-            setupSearch('simSearchInput', '#simTableBody tr.bd-sim-row', 'noSimsRow');
-            setupSearch('usbSearchInput', '#usbTableBody tr.bd-usb-row', 'noUsbRow');
+            setupTableFilters({
+                searchInputId: 'simSearchInput',
+                availabilityId: 'simAvailabilityFilter',
+                statusId: 'simStatusTypeFilter',
+                rowSelector: '#simTableBody tr.bd-sim-row',
+                noResultId: 'noSimsRow'
+            });
+
+            setupTableFilters({
+                searchInputId: 'usbSearchInput',
+                availabilityId: 'usbAvailabilityFilter',
+                statusId: 'usbStatusTypeFilter',
+                rowSelector: '#usbTableBody tr.bd-usb-row',
+                noResultId: 'noUsbRow'
+            });
+
+            setupExportButton('exportSimsBtn', '@Url.Action("ExportDocumentSimsExcel", "Document")', 'simAvailabilityFilter', 'simStatusTypeFilter');
+            setupExportButton('exportUsbsBtn', '@Url.Action("ExportDocumentUsbsExcel", "Document")', 'usbAvailabilityFilter', 'usbStatusTypeFilter');
         });
 
-        function setupSearch(inputId, rowSelector, noResultId) {
-            const input = document.getElementById(inputId);
-            if (!input) return;
+        function setupTableFilters({ searchInputId, availabilityId, statusId, rowSelector, noResultId }) {
+            const searchInput = document.getElementById(searchInputId);
+            const availabilityFilter = document.getElementById(availabilityId);
+            const statusFilter = document.getElementById(statusId);
+            if (!searchInput || !availabilityFilter || !statusFilter) return;
 
-            input.addEventListener('input', () => {
-                const query = input.value.toLowerCase().trim();
+            function applyFilters() {
+                const query = searchInput.value.toLowerCase().trim();
+                const availVal = availabilityFilter.value;
+                const statusVal = statusFilter.value;
                 const rows = document.querySelectorAll(rowSelector);
                 let visible = 0;
 
                 rows.forEach(row => {
                     const text = row.innerText.toLowerCase();
-                    if (text.includes(query)) {
+                    const rowAvail = row.getAttribute('data-availability') || 'active';
+                    const rowStatus = row.getAttribute('data-status') || 'unassigned';
+
+                    const matchesSearch = !query || text.includes(query);
+                    const matchesAvail = availVal === 'all' || rowAvail === availVal;
+                    const matchesStatus = statusVal === 'all' || rowStatus === statusVal;
+
+                    if (matchesSearch && matchesAvail && matchesStatus) {
                         row.style.display = '';
                         visible++;
                     } else {
@@ -201,6 +334,31 @@
                 if (noRes) {
                     noRes.style.display = visible === 0 ? '' : 'none';
                 }
+            }
+
+            searchInput.addEventListener('input', applyFilters);
+            availabilityFilter.addEventListener('change', applyFilters);
+            statusFilter.addEventListener('change', applyFilters);
+        }
+
+        // Export: read the dropdown filters only at click time, then build the export URL.
+        // Free-text search is intentionally excluded — it's client-side only.
+        function setupExportButton(btnId, actionUrl, availabilityId, statusId) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const availVal = document.getElementById(availabilityId).value;
+                const statusVal = document.getElementById(statusId).value;
+
+                const url = new URL(actionUrl, window.location.origin);
+                url.searchParams.set('documentId', '@Model.DocumentId');
+                url.searchParams.set('availability', availVal);
+                url.searchParams.set('statusType', statusVal);
+
+                window.location.href = url.toString();
             });
         }
     </script>

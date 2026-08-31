@@ -14,11 +14,17 @@ namespace Sim_Card_Managment.Repos.BranchRepos
             _context = context;
         }
 
-        public async Task<IEnumerable<BranchListItemViewModel>> GetAllAsync()
+        public async Task<IEnumerable<BranchListItemViewModel>> GetAllAsync(bool? isActive = null)
         {
-            return await _context.Branches
+            var query = _context.Branches
                 .Include(b => b.InternetLines)
                 .Include(b => b.VpnConnections)
+                .AsQueryable();
+
+            if (isActive.HasValue)
+                query = query.Where(b => b.IsActive == isActive.Value);
+
+            return await query
                 .OrderBy(b => b.Name)
                 .Select(b => new BranchListItemViewModel
                 {
@@ -47,6 +53,10 @@ namespace Sim_Card_Managment.Repos.BranchRepos
                     .ThenInclude(il => il.ServiceType)
                 .Include(b => b.InternetLines)
                     .ThenInclude(il => il.PaymentType)
+                .Include(b => b.InternetLines)
+                    .ThenInclude(il => il.RenewalType)
+                .Include(b => b.InternetLines)
+                    .ThenInclude(il => il.Sim)
                 .Include(b => b.VpnConnections)
                     .ThenInclude(v => v.ConnectionType)
                 .Include(b => b.VpnConnections)
@@ -79,7 +89,12 @@ namespace Sim_Card_Managment.Repos.BranchRepos
                     PaymentTypeName = il.PaymentType?.Name ?? "N/A",
                     Bandwidth = il.Bandwidth,
                     PhoneNumber = il.PhoneNumber,
-                    Status = il.Status
+                    Status = il.Status,
+                    SimSerialNumber = il.Sim?.SerialNumber,
+                    RenewalTypeName = il.RenewalType?.Name ?? "N/A",
+                    NextRenewalDate = il.NextRenewalDate,
+                    QuotaGB = il.QuotaGB,
+                    Notes = il.Notes
                 }).ToList(),
                 VpnConnections = branch.VpnConnections.Select(v => new VpnConnectionListItemViewModel
                 {
@@ -93,7 +108,6 @@ namespace Sim_Card_Managment.Repos.BranchRepos
                 }).ToList()
             };
         }
-
         public async Task<BranchEditViewModel?> GetForEditAsync(int id)
         {
             // FindAsync can't Include() navigation properties, so we

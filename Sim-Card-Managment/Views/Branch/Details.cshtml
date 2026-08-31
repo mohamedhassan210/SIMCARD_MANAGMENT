@@ -10,6 +10,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Branch Details</title>
+
+    <style>
+        .bd-export-btn {
+            background-color: #f1f3f5;
+            border: 1px solid #e0e0e0;
+            color: #333333;
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+            .bd-export-btn:hover {
+                background-color: #e9ecef;
+                color: #1a1a1a;
+            }
+    </style>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/main.css" asp-append-version="true" />
     <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
@@ -115,8 +139,12 @@
                                 <option value="DOWN">Down</option>
                             </select>
                         </div>
+                        <a href="#" id="bd-isp-export-btn" class="bd-export-btn">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </a>
                     </div>
                 </div>
+               
 
                 <div class="table-responsive">
                     <table class="bd-table" id="bd-isp-table">
@@ -184,6 +212,9 @@
                                 <option value="DOWN">Down</option>
                             </select>
                         </div>
+                        <a href="#" id="bd-vpn-export-btn" class="bd-export-btn">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </a>
                     </div>
                 </div>
 
@@ -307,6 +338,31 @@
         if (vpnSearchInput && vpnStatusFilter) {
             vpnSearchInput.addEventListener('input', filterVpnTable);
             vpnStatusFilter.addEventListener('change', filterVpnTable);
+        }
+                // ISP Excel Export
+        const ispExportBtn = document.getElementById('bd-isp-export-btn');
+        if (ispExportBtn) {
+            ispExportBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const url = new URL('@Url.Action("ExportBranchIspExcel", "Branch")', window.location.origin);
+                url.searchParams.set('id', '@Model.Id');
+                const statusVal = ispStatusFilter.value; // read once, at click time
+                if (statusVal && statusVal !== 'ALL') url.searchParams.set('status', statusVal);
+                window.location.href = url.toString();
+            });
+        }
+
+        // VPN Excel Export
+        const vpnExportBtn = document.getElementById('bd-vpn-export-btn');
+        if (vpnExportBtn) {
+            vpnExportBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const url = new URL('@Url.Action("ExportBranchVpnExcel", "Branch")', window.location.origin);
+                url.searchParams.set('id', '@Model.Id');
+                const statusVal = vpnStatusFilter.value; // read once, at click time
+                if (statusVal && statusVal !== 'ALL') url.searchParams.set('status', statusVal);
+                window.location.href = url.toString();
+            });
         }
     </script>
 </body>

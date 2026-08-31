@@ -29,17 +29,21 @@ namespace Sim_Card_Managment.Controllers
         private readonly IUSBRepo _usbRepo;
         private readonly ISerialRepo _serialRepo;
         private readonly ISubscriptionRepo _subscriptionRepo;
+        private readonly AppDbContext _context;
+        private readonly IDeviceTransferRepo _deviceTransferRepo;
 
         public DocumentController(
-            IDocumentRepo documentRepo,
-            IDocumentTypeRepo documentTypeRepo,
-            IServiceProviderRepository serviceProviderRepo,
-            IItemTypeRepo itemTypeRepo,
-            IDocumentDetailsRepo documentDetailsRepo,
-            ISIMRepo simRepo,
-            IUSBRepo usbRepo,
-            ISerialRepo serialRepo,
-            ISubscriptionRepo subscriptionRepo)
+     IDocumentRepo documentRepo,
+     IDocumentTypeRepo documentTypeRepo,
+     IServiceProviderRepository serviceProviderRepo,
+     IItemTypeRepo itemTypeRepo,
+     IDocumentDetailsRepo documentDetailsRepo,
+     ISIMRepo simRepo,
+     IUSBRepo usbRepo,
+     ISerialRepo serialRepo,
+     ISubscriptionRepo subscriptionRepo,
+     IDeviceTransferRepo deviceTransferRepo,
+     AppDbContext context)
         {
             _documentRepo = documentRepo;
             _documentTypeRepo = documentTypeRepo;
@@ -50,43 +54,125 @@ namespace Sim_Card_Managment.Controllers
             _usbRepo = usbRepo;
             _serialRepo = serialRepo;
             _subscriptionRepo = subscriptionRepo;
+            _deviceTransferRepo = deviceTransferRepo;
+            _context = context;
         }
 
         public async Task<IActionResult> Index(string? searchTerm, int? documentTypeId)
         {
             var documents = await _documentRepo.GetAllAsync(searchTerm, documentTypeId);
-            ViewBag.DocumentTypes = new SelectList(await _documentTypeRepo.GetAllAsync(), "Id", "DisplayName");
+            ViewBag.DocumentTypes = new SelectList(await _documentTypeRepo.GetAllAsync(), "Id", "DisplayName", documentTypeId);
             return View(documents);
         }
-        public async Task<IActionResult> InventoryReport(string? searchTerm)
+
+        public async Task<IActionResult> InventoryReport(string? searchTerm, string deviceType = "all")
         {
-            var subscriptions = await _subscriptionRepo.GetAllWithHardwareDetailsAsync();
+            deviceType = (deviceType ?? "all").ToLower();
 
-            // Filter only active subscriptions (where EndDate is null)
-            var activeSubscriptions = subscriptions.Where(s => s.EndDate == null).AsQueryable();
+            var transfers = await _deviceTransferRepo.GetAllWithDetailsAsync(); // already ordered desc by TransferDate
+            var items = transfers.Select(BuildHardwareLifecycleItem).ToList();
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                activeSubscriptions = activeSubscriptions.Where(s =>
-                    (s.Employee != null && s.Employee.Name.Contains(searchTerm)) ||
-                    (s.NonEmployee != null && s.NonEmployee.Name.Contains(searchTerm)) ||
-                    (s.Sim != null && (s.Sim.PhoneNumber.Contains(searchTerm) || s.Sim.SerialNumber.Contains(searchTerm))) ||
-                    (s.Usb != null && s.Usb.SerialNumber.Contains(searchTerm))
-                );
+                items = items.Where(i =>
+                    (i.CurrentHolderName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.PreviousHolderName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.PhoneNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.SimSerialNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.UsbSerialNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true)
+                ).ToList();
             }
 
-            ViewBag.AllSubscriptions = subscriptions; // Passed to trace historical users
-            return View(activeSubscriptions.ToList());
+            if (deviceType == "sim") items = items.Where(i => i.DeviceType == "sim").ToList();
+            else if (deviceType == "usb") items = items.Where(i => i.DeviceType == "usb").ToList();
+
+            ViewBag.DeviceTypeFilter = deviceType;
+            return View(items);
         }
-        public async Task<IActionResult> Details(int id)
+
+        private static HardwareLifecycleItemViewModel BuildHardwareLifecycleItem(DeviceTransfer dt)
+        {
+            var fromSub = dt.FromSubscription;
+            var previousHolder = fromSub?.Employee?.Name ?? fromSub?.NonEmployee?.Name ?? "None (First Owner)";
+            var currentHolder = dt.ToEmployee?.Name ?? "Unassigned";
+            var deviceType = dt.SimId.HasValue ? "sim" : (dt.UsbId.HasValue ? "usb" : "");
+
+            return new HardwareLifecycleItemViewModel
+            {
+                Id = dt.Id,
+                CurrentHolderName = currentHolder,
+                AccountType = "Internal Employee", // transfers currently only support Employee recipients (ToEmpId)
+                PhoneNumber = dt.Sim?.PhoneNumber,
+                SimSerialNumber = dt.Sim?.SerialNumber,
+                UsbSerialNumber = dt.Usb?.SerialNumber,
+                PreviousHolderName = previousHolder,
+                Notes = dt.Reason,
+                TransferDate = dt.TransferDate,
+                DeviceType = deviceType
+            };
+        }
+
+        private async Task<(Document? document, List<SimDetailViewModel> sims, List<UsbDetailViewModel> usbs)> BuildDocumentDeviceListsAsync(int id)
         {
             var document = await _documentRepo.GetByIdAsync(id);
+            if (document == null)
+            {
+                return (null, new List<SimDetailViewModel>(), new List<UsbDetailViewModel>());
+            }
+
+            var serials = await _serialRepo.GetAllAsync(null, id);
+            var now = DateTime.Now;
+
+            var sims = serials
+                .Where(s => s.Sim != null)
+                .Select(s => new SimDetailViewModel
+                {
+                    Id = s.Sim.Id,
+                    PhoneNumber = s.Sim.PhoneNumber,
+                    SerialNumber = s.Sim.SerialNumber,
+                    Status = s.Sim.Status,
+                    IsActive = s.Sim.IsActive,
+                    ProviderName = s.Sim.ServiceProvider?.Name,
+                    AssignedTo = s.Sim.Subscriptions?
+                        .Where(sub => sub.EndDate == null || sub.EndDate > now)
+                        .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
+                        .FirstOrDefault()
+                })
+                .ToList();
+
+            var usbs = serials
+                .Where(s => s.Usb != null)
+                .Select(s => new UsbDetailViewModel
+                {
+                    Id = s.Usb.Id,
+                    SerialNumber = s.Usb.SerialNumber,
+                    Model = s.Usb.Model,
+                    Status = s.Usb.Status,
+                    IsActive = s.Usb.IsActive,
+                    ProviderName = s.Usb.ServiceProvider?.Name,
+                    AssignedTo = s.Usb.Subscriptions?
+                        .Where(sub => sub.EndDate == null || sub.EndDate > now)
+                        .Select(sub => sub.Employee?.Name ?? sub.NonEmployee?.Name)
+                        .FirstOrDefault()
+                })
+                .ToList();
+
+            return (document, sims, usbs);
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var (document, sims, usbs) = await BuildDocumentDeviceListsAsync(id);
             if (document == null)
             {
                 return NotFound();
             }
 
-            var serials = await _serialRepo.GetAllAsync(null, id);
+            // Same lookup source SIM/Index uses, for the Status Type filter dropdowns
+            ViewBag.StatusTypes = _context.DeviceStatusesType
+                .OrderBy(t => t.Name)
+                .Select(t => t.Name)
+                .ToList();
 
             var viewModel = new DocumentDetailsViewModel
             {
@@ -96,51 +182,173 @@ namespace Sim_Card_Managment.Controllers
                 ActionDate = document.ActionDate,
                 CreatedAt = document.CreatedAt,
                 Notes = document.Notes,
-                Sims = serials
-               .Where(s => s.Sim != null)
-               .Select(s => new SimDetailViewModel
-               {
-                  Id = s.Sim.Id,
-                  PhoneNumber = s.Sim.PhoneNumber,
-                  SerialNumber = s.Sim.SerialNumber,
-                  Status = s.Sim.Status
-               })
-               .ToList(),
-                Usbs = serials
-               .Where(s => s.Usb != null)
-               .Select(s => new UsbDetailViewModel
-               {
-                  Id = s.Usb.Id,
-                  SerialNumber = s.Usb.SerialNumber,
-                  Model = s.Usb.Model,
-                  Status = s.Usb.Status
-               })
-               .ToList()
+                Sims = sims,
+                Usbs = usbs
             };
-            
 
             return View(viewModel);
         }
+
+        // GET: /Document/ExportDocumentSimsExcel — mirrors the SIM table's two filters
+        // (Availability, Status Type), any combination of them.
+        [HttpGet]
+        public async Task<IActionResult> ExportDocumentSimsExcel(int documentId, string availability = "all", string statusType = "all")
+        {
+            availability = (availability ?? "all").ToLower();
+            statusType = (statusType ?? "all").ToLower();
+
+            var (document, sims, _) = await BuildDocumentDeviceListsAsync(documentId);
+            if (document == null) return NotFound();
+
+            var filtered = sims.Where(s =>
+            {
+                bool matchesAvailability = availability == "all" || (s.IsActive ? "active" : "inactive") == availability;
+                bool matchesStatusType = statusType == "all" || (s.Status?.ToLower() ?? "unassigned") == statusType;
+                return matchesAvailability && matchesStatusType;
+            }).ToList();
+
+            ExcelPackage.License.SetNonCommercialPersonal("MyName");
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Devices");
+
+            worksheet.Cells[1, 1].Value = "Serial Number";
+            worksheet.Cells[1, 2].Value = "Type";
+            worksheet.Cells[1, 3].Value = "Provider";
+            worksheet.Cells[1, 4].Value = "Identifier";
+            worksheet.Cells[1, 5].Value = "Availability";
+            worksheet.Cells[1, 6].Value = "Status";
+            worksheet.Cells[1, 7].Value = "Assigned To";
+
+            using (var headerRange = worksheet.Cells[1, 1, 1, 7])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            }
+
+            int row = 2;
+            foreach (var s in filtered)
+            {
+                worksheet.Cells[row, 1].Value = s.SerialNumber;
+                worksheet.Cells[row, 2].Value = "SIM Card";
+                worksheet.Cells[row, 3].Value = s.ProviderName;
+                worksheet.Cells[row, 4].Value = string.IsNullOrEmpty(s.PhoneNumber) ? "-" : s.PhoneNumber;
+                worksheet.Cells[row, 5].Value = s.IsActive ? "Active" : "Inactive";
+                worksheet.Cells[row, 6].Value = s.Status;
+                worksheet.Cells[row, 7].Value = string.IsNullOrEmpty(s.AssignedTo) ? "Unassigned" : s.AssignedTo;
+                row++;
+            }
+
+            if (worksheet.Dimension != null)
+            {
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            }
+
+            var fileContents = package.GetAsByteArray();
+
+            var suffixParts = new List<string>();
+            if (availability != "all") suffixParts.Add(availability);
+            if (statusType != "all") suffixParts.Add(statusType);
+            var suffix = suffixParts.Any() ? "_" + string.Join("_", suffixParts) : "";
+
+            return File(
+                fileContents,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"Document_{document.DocumentNumber}_Sims{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+            );
+        }
+
+        // GET: /Document/ExportDocumentUsbsExcel — mirrors the USB table's two filters
+        // (Availability, Status Type), any combination of them.
+        [HttpGet]
+        public async Task<IActionResult> ExportDocumentUsbsExcel(int documentId, string availability = "all", string statusType = "all")
+        {
+            availability = (availability ?? "all").ToLower();
+            statusType = (statusType ?? "all").ToLower();
+
+            var (document, _, usbs) = await BuildDocumentDeviceListsAsync(documentId);
+            if (document == null) return NotFound();
+
+            var filtered = usbs.Where(u =>
+            {
+                bool matchesAvailability = availability == "all" || (u.IsActive ? "active" : "inactive") == availability;
+                bool matchesStatusType = statusType == "all" || (u.Status?.ToLower() ?? "unassigned") == statusType;
+                return matchesAvailability && matchesStatusType;
+            }).ToList();
+
+            ExcelPackage.License.SetNonCommercialPersonal("MyName");
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Devices");
+
+            worksheet.Cells[1, 1].Value = "Serial Number";
+            worksheet.Cells[1, 2].Value = "Type";
+            worksheet.Cells[1, 3].Value = "Provider";
+            worksheet.Cells[1, 4].Value = "Identifier";
+            worksheet.Cells[1, 5].Value = "Availability";
+            worksheet.Cells[1, 6].Value = "Status";
+            worksheet.Cells[1, 7].Value = "Assigned To";
+
+            using (var headerRange = worksheet.Cells[1, 1, 1, 7])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            }
+
+            int row = 2;
+            foreach (var u in filtered)
+            {
+                worksheet.Cells[row, 1].Value = u.SerialNumber;
+                worksheet.Cells[row, 2].Value = "USB Modem";
+                worksheet.Cells[row, 3].Value = u.ProviderName;
+                worksheet.Cells[row, 4].Value = string.IsNullOrEmpty(u.Model) ? "-" : u.Model;
+                worksheet.Cells[row, 5].Value = u.IsActive ? "Active" : "Inactive";
+                worksheet.Cells[row, 6].Value = u.Status;
+                worksheet.Cells[row, 7].Value = string.IsNullOrEmpty(u.AssignedTo) ? "Unassigned" : u.AssignedTo;
+                row++;
+            }
+
+            if (worksheet.Dimension != null)
+            {
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            }
+
+            var fileContents = package.GetAsByteArray();
+
+            var suffixParts = new List<string>();
+            if (availability != "all") suffixParts.Add(availability);
+            if (statusType != "all") suffixParts.Add(statusType);
+            var suffix = suffixParts.Any() ? "_" + string.Join("_", suffixParts) : "";
+
+            return File(
+                fileContents,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"Document_{document.DocumentNumber}_Usbs{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+            );
+        }
+
         #region First Report
         [HttpGet]
-        public async Task<IActionResult> ExportToExcel(string? searchTerm, int? documentTypeId)
+        public async Task<IActionResult> ExportToExcel(string? searchTerm, int? documentTypeId, DateTime? from, DateTime? to)
         {
             ExcelPackage.License.SetNonCommercialPersonal("MyName");
 
-            // Fetch documents and document types
-            var allDocuments = await _documentRepo.GetAllAsync(null,null);
+            var allDocuments = await _documentRepo.GetAllAsync(null, null);
             var allDocTypes = await _documentTypeRepo.GetAllAsync();
 
-            // Get ItemTypes for SIM and USB
             var simItemType = await _itemTypeRepo.GetByNameAsync("SIM") ?? await _itemTypeRepo.GetByNameAsync("Sim");
             var usbItemType = await _itemTypeRepo.GetByNameAsync("USB") ?? await _itemTypeRepo.GetByNameAsync("Usb");
 
-            // Lookup dictionary for document types fallback
             var docTypeDict = allDocTypes.ToDictionary(dt => dt.Id, dt => dt.DisplayName ?? dt.Name);
 
             var query = allDocuments.AsQueryable();
 
-            // Apply filters
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 query = query.Where(d => d.DocumentNumber.Contains(searchTerm) || (d.Notes != null && d.Notes.Contains(searchTerm)));
@@ -151,13 +359,23 @@ namespace Sim_Card_Managment.Controllers
                 query = query.Where(d => d.DocumenttypeId == documentTypeId.Value);
             }
 
+            if (from.HasValue)
+            {
+                query = query.Where(d => d.ActionDate.Date >= from.Value.Date);
+            }
+
+            if (to.HasValue)
+            {
+                // Inclusive of the whole "to" day.
+                query = query.Where(d => d.ActionDate.Date <= to.Value.Date);
+            }
+
             var documents = query.OrderByDescending(d => d.CreatedAt).ToList();
 
             using (var package = new ExcelPackage())
             {
                 var worksheet = package.Workbook.Worksheets.Add("Documents Summary");
 
-                // Set Header Titles
                 worksheet.Cells[1, 1].Value = "Document Serial";
                 worksheet.Cells[1, 2].Value = "Transaction Type";
                 worksheet.Cells[1, 3].Value = "Action Date";
@@ -165,7 +383,6 @@ namespace Sim_Card_Managment.Controllers
                 worksheet.Cells[1, 5].Value = "USBs Count";
                 worksheet.Cells[1, 6].Value = "Notes";
 
-                // Format Header Row
                 using (var range = worksheet.Cells[1, 1, 1, 6])
                 {
                     range.Style.Font.Bold = true;
@@ -177,12 +394,10 @@ namespace Sim_Card_Managment.Controllers
                 int row = 2;
                 foreach (var doc in documents)
                 {
-                    // 1. Transaction Type Resolution
                     string transactionType = doc.DocumentType?.DisplayName
                         ?? doc.DocumentType?.Name
                         ?? (doc.DocumenttypeId.HasValue && docTypeDict.TryGetValue(doc.DocumenttypeId.Value, out var typeName) ? typeName : "N/A");
 
-                    // 2. SIM Count Resolution (using stored Quantity & ItemTypeId matching)
                     int simCount = 0;
                     if (doc.DocumentDetails != null && doc.DocumentDetails.Any())
                     {
@@ -193,7 +408,6 @@ namespace Sim_Card_Managment.Controllers
                             .Sum(d => d.Quantity > 0 ? d.Quantity : (d.Serials?.Count ?? 0));
                     }
 
-                    // 3. USB Count Resolution (using stored Quantity & ItemTypeId matching)
                     int usbCount = 0;
                     if (doc.DocumentDetails != null && doc.DocumentDetails.Any())
                     {
@@ -216,35 +430,72 @@ namespace Sim_Card_Managment.Controllers
 
                 worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
+                var fileNameParts = new List<string>();
+                if (from.HasValue || to.HasValue)
+                {
+                    var fromPart = from.HasValue ? from.Value.ToString("yyyyMMdd") : "Start";
+                    var toPart = to.HasValue ? to.Value.ToString("yyyyMMdd") : "Now";
+                    fileNameParts.Add($"{fromPart}-{toPart}");
+                }
+                var suffix = fileNameParts.Any() ? "_" + string.Join("_", fileNameParts) : "";
+
                 var fileContents = package.GetAsByteArray();
-                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Documents_Summary_{DateTime.Now:yyyyMMdd}.xlsx");
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Documents_Summary{suffix}_{DateTime.Now:yyyyMMdd}.xlsx");
             }
         }
         #endregion
         #region Second Report
         [HttpGet]
-        public async Task<IActionResult> ExportInventoryToExcel()
+        public async Task<IActionResult> ExportInventoryToExcel(string? searchTerm, string deviceType = "all", DateTime? from = null, DateTime? to = null)
         {
             ExcelPackage.License.SetNonCommercialPersonal("MyName");
+            deviceType = (deviceType ?? "all").ToLower();
 
-            // Fetch all subscription records using your specific repository
-            var subscriptions = await _subscriptionRepo.GetAllWithHardwareDetailsAsync(); // Assumes it fetches linked Employee, NonEmployee, Sim, and Usb profiles
+            var transfers = await _deviceTransferRepo.GetAllWithDetailsAsync(); // already ordered desc by TransferDate
+            var items = transfers.Select(BuildHardwareLifecycleItem).ToList();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                items = items.Where(i =>
+                    (i.CurrentHolderName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.PreviousHolderName?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.PhoneNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.SimSerialNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (i.UsbSerialNumber?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) == true)
+                ).ToList();
+            }
+
+            if (deviceType == "sim") items = items.Where(i => i.DeviceType == "sim").ToList();
+            else if (deviceType == "usb") items = items.Where(i => i.DeviceType == "usb").ToList();
+
+            if (from.HasValue)
+            {
+                items = items.Where(i => i.TransferDate.Date >= from.Value.Date).ToList();
+            }
+
+            if (to.HasValue)
+            {
+                // Inclusive of the whole "to" day.
+                items = items.Where(i => i.TransferDate.Date <= to.Value.Date).ToList();
+            }
+
+            // Keep newest-to-oldest even after filtering.
+            items = items.OrderByDescending(i => i.TransferDate).ToList();
 
             using (var package = new ExcelPackage())
             {
                 var worksheet = package.Workbook.Worksheets.Add("Hardware Lifecycle");
 
-                // Set English Header Titles
                 worksheet.Cells[1, 1].Value = "Current Holder Name";
                 worksheet.Cells[1, 2].Value = "Account Type";
                 worksheet.Cells[1, 3].Value = "Phone Number";
                 worksheet.Cells[1, 4].Value = "SIM Serial Number";
                 worksheet.Cells[1, 5].Value = "USB Serial Number";
                 worksheet.Cells[1, 6].Value = "Previous User";
-                worksheet.Cells[1, 7].Value = "Notes";
+                worksheet.Cells[1, 7].Value = "Transfer Date";
+                worksheet.Cells[1, 8].Value = "Notes";
 
-                // Format Header Row
-                using (var range = worksheet.Cells[1, 1, 1, 7])
+                using (var range = worksheet.Cells[1, 1, 1, 8])
                 {
                     range.Style.Font.Bold = true;
                     range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -253,51 +504,43 @@ namespace Sim_Card_Managment.Controllers
                 }
 
                 int row = 2;
-                // Focus purely on active deployments
-                var activeSubscriptions = subscriptions.Where(s => s.EndDate == null).ToList();
-
-                foreach (var sub in activeSubscriptions)
+                foreach (var item in items)
                 {
-                    // 1. Current Holder Name (Stays Arabic as requested)
-                    string currentHolder = sub.Employee != null ? sub.Employee.Name : (sub.NonEmployee != null ? sub.NonEmployee.Name : "Unassigned");
-                    worksheet.Cells[row, 1].Value = currentHolder;
-
-                    // 2. Account Type (English)
-                    string accountType = sub.Employee != null ? "Internal Employee" : $"External ({sub.NonEmployee?.Type ?? "Contractor"})";
-                    worksheet.Cells[row, 2].Value = accountType;
-
-                    // 3. Hardware Info
-                    worksheet.Cells[row, 3].Value = sub.Sim?.PhoneNumber ?? "N/A";
-                    worksheet.Cells[row, 4].Value = sub.Sim?.SerialNumber ?? "N/A";
-                    worksheet.Cells[row, 5].Value = sub.Usb?.SerialNumber ?? "N/A";
-
-                    // 4. Trace Previous User (Lookback)
-                    var historicalRecord = subscriptions.FirstOrDefault(h => h.SimId == sub.SimId && h.Id != sub.Id && h.EndDate != null);
-                    string previousHolder = "";
-                    if (historicalRecord != null)
-                    {
-                        previousHolder = historicalRecord.Employee != null ? historicalRecord.Employee.Name : (historicalRecord.NonEmployee?.Name ?? "");
-                    }
-                    worksheet.Cells[row, 6].Value = string.IsNullOrEmpty(previousHolder) ? "None (First Owner)" : previousHolder;
-
-                    // 5. Notes (Stored in English from our updated SQL script)
-                    worksheet.Cells[row, 7].Value = sub.Notes ?? "";
-
+                    worksheet.Cells[row, 1].Value = item.CurrentHolderName;
+                    worksheet.Cells[row, 2].Value = item.AccountType;
+                    worksheet.Cells[row, 3].Value = item.PhoneNumber ?? "N/A";
+                    worksheet.Cells[row, 4].Value = item.SimSerialNumber ?? "N/A";
+                    worksheet.Cells[row, 5].Value = item.UsbSerialNumber ?? "N/A";
+                    worksheet.Cells[row, 6].Value = item.PreviousHolderName;
+                    worksheet.Cells[row, 7].Value = item.TransferDate.ToString("yyyy-MM-dd HH:mm");
+                    worksheet.Cells[row, 8].Value = string.IsNullOrEmpty(item.Notes) ? "" : item.Notes;
                     row++;
                 }
 
-                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+                if (worksheet.Dimension != null)
+                    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                var suffixParts = new List<string>();
+                if (deviceType != "all") suffixParts.Add(deviceType == "sim" ? "SIM" : "USB");
+                if (from.HasValue || to.HasValue)
+                {
+                    var fromPart = from.HasValue ? from.Value.ToString("yyyyMMdd") : "Start";
+                    var toPart = to.HasValue ? to.Value.ToString("yyyyMMdd") : "Now";
+                    suffixParts.Add($"{fromPart}-{toPart}");
+                }
+                var suffix = suffixParts.Any() ? "_" + string.Join("_", suffixParts) : "";
 
                 var fileContents = package.GetAsByteArray();
-                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Hardware_Lifecycle_{DateTime.Now:yyyyMMdd}.xlsx");
+
+                return File(
+                    fileContents,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"Device_Transfer_Log{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+                );
             }
         }
         #endregion
         #region Create Document
-        /// <summary>
-        /// GET: Document/Create
-        /// Initializes the wizard view with empty ViewModel and populated dropdowns.
-        /// </summary>
         public async Task<IActionResult> Create()
         {
             var viewModel = new DocumentCreateViewModel();
@@ -305,25 +548,14 @@ namespace Sim_Card_Managment.Controllers
             return View(viewModel);
         }
 
-        /// <summary>
-        /// POST: Document/Create
-        /// Processes the multi-step form submission and persists Document, DocumentDetails, and Serial records.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(DocumentCreateViewModel viewModel)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    await PopulateDropdownsAsync(viewModel);
-            //    return View(viewModel);
-            //}
-
             try
             {
                 var userId = GetCurrentUserId();
 
-                // Background generation of Document Number (yyyyMMddHHmmss)
                 var documentNumber = DateTime.Now.ToString("yyyyMMddHHmmss");
                 var actionDate = DateTime.Now;
 
@@ -342,14 +574,12 @@ namespace Sim_Card_Managment.Controllers
 
                 await _documentRepo.AddAsync(document);
 
-                // Ensure ItemType records exist
                 var simItemType = await _itemTypeRepo.GetByNameAsync("SIM") ?? new ItemType { Name = "SIM" };
                 if (simItemType.Id == 0) await _itemTypeRepo.AddAsync(simItemType);
 
                 var usbItemType = await _itemTypeRepo.GetByNameAsync("USB") ?? new ItemType { Name = "USB" };
                 if (usbItemType.Id == 0) await _itemTypeRepo.AddAsync(usbItemType);
 
-                // Process SIM items
                 if (viewModel.Sims != null && viewModel.Sims.Any())
                 {
                     var simDocumentDetails = new DocumentDetails
@@ -362,7 +592,6 @@ namespace Sim_Card_Managment.Controllers
 
                     foreach (var simDto in viewModel.Sims)
                     {
-                        // Validate phone number
                         if (string.IsNullOrWhiteSpace(simDto.PhoneNumber) ||
                             simDto.PhoneNumber.Length != 11 ||
                             !simDto.PhoneNumber.StartsWith("01") ||
@@ -373,7 +602,6 @@ namespace Sim_Card_Managment.Controllers
                             return View(viewModel);
                         }
 
-                        // Generate serial if empty (no serial number device)
                         var serialNumber = string.IsNullOrWhiteSpace(simDto.SerialNumber)
                             ? $"SYS-SIM-{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString("N")[..6].ToUpper()}"
                             : simDto.SerialNumber.Trim();
@@ -402,7 +630,6 @@ namespace Sim_Card_Managment.Controllers
                     }
                 }
 
-                // Process USB items
                 if (viewModel.Usbs != null && viewModel.Usbs.Any())
                 {
                     var usbDocumentDetails = new DocumentDetails
@@ -415,7 +642,6 @@ namespace Sim_Card_Managment.Controllers
 
                     foreach (var usbDto in viewModel.Usbs)
                     {
-                        // Generate serial if empty (no serial number device)
                         var serialNumber = string.IsNullOrWhiteSpace(usbDto.SerialNumber)
                             ? $"SYS-USB-{DateTime.Now:yyyyMMddHHmmss}-{Guid.NewGuid().ToString("N")[..6].ToUpper()}"
                             : usbDto.SerialNumber.Trim();
@@ -453,11 +679,6 @@ namespace Sim_Card_Managment.Controllers
             }
         }
 
-        /// <summary>
-        /// GET: Document/CheckSerialNumber
-        /// AJAX endpoint for real-time serial number uniqueness validation.
-        /// Returns JSON { exists: bool, type: "SIM|USB|UNKNOWN" }
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> CheckSerialNumber(string serialNumber)
         {
@@ -483,9 +704,6 @@ namespace Sim_Card_Managment.Controllers
         #endregion
         #region Helper Methods
 
-        /// <summary>
-        /// Populates DocumentTypes and ServiceProviders dropdown lists via Repositories.
-        /// </summary>
         private async Task PopulateDropdownsAsync(DocumentCreateViewModel viewModel)
         {
             var documentTypes = await _documentTypeRepo.GetAllAsync();
@@ -508,12 +726,9 @@ namespace Sim_Card_Managment.Controllers
                 .ToList();
         }
 
-        /// <summary>
-        /// Extracts the logged-in user ID from Claims.
-        /// </summary>
         private int GetCurrentUserId()
         {
-            var claimValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var claimValue = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;  
             return int.TryParse(claimValue, out var userId) ? userId : 1;
         }
 

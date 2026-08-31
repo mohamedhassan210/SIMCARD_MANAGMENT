@@ -45,6 +45,8 @@
     var canViewInternetLines = Has("InternetLine", "Index");
     var canCreateInternetLine = Has("InternetLine", "Create");
     var canViewInternetLineDashboard = Has("InternetLine", "Dashboard");
+    var canViewServiceTypes = Has("ServiceType", "Index");
+    var canViewPaymentTypes = Has("PaymentType", "Index");
 
     // Device Status
     var canViewDeviceStatuses = Has("DeviceStatus", "Index");
@@ -65,7 +67,7 @@
     var showSubscriptionSection = canViewSubscription || canCreateSubscription;
     var showBranchSection = canViewBranches || canCreateBranch;
     var showVpnConnectionSection = canViewVpnConnections || canCreateVpnConnection;
-    var showInternetLineSection = canViewInternetLines || canCreateInternetLine;
+    var showInternetLineSection = canViewInternetLines || canCreateInternetLine || canViewServiceTypes || canViewPaymentTypes;
 }
 
 <!DOCTYPE html>
@@ -558,6 +560,34 @@
                                     </div>
 
                                     <span class="sub-item-text">Create new Internet Line</span>
+                                </a>
+                            }
+
+                            @if (canViewServiceTypes)
+                            {
+                                <a asp-controller="ServiceType"
+                                   asp-action="Index"
+                                   class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-diagram-project"></i>
+                                    </div>
+
+                                    <span class="sub-item-text">Service Types</span>
+                                </a>
+                            }
+
+                            @if (canViewPaymentTypes)
+                            {
+                                <a asp-controller="PaymentType"
+                                   asp-action="Index"
+                                   class="d-flex align-items-center gap-3 mb-3 text-decoration-none">
+
+                                    <div class="icon-box-sub rounded-3 d-flex justify-content-center align-items-center text-white">
+                                        <i class="fa-solid fa-credit-card"></i>
+                                    </div>
+
+                                    <span class="sub-item-text">Payment Types</span>
                                 </a>
                             }
 

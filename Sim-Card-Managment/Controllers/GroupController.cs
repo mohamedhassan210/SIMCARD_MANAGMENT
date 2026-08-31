@@ -8,6 +8,7 @@ using Sim_Card_Managment.Repos.Account;
 using Sim_Card_Managment.Repos.GroupRepos;
 using Sim_Card_Managment.Viewmodel;
 using System.Drawing;
+using System.IO;
 using System.Security.Claims;
 
 namespace Sim_Card_Managment.Controllers
@@ -113,6 +114,67 @@ namespace Sim_Card_Managment.Controllers
                 fileContents,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"Groups{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
+            );
+        }
+
+        // GET: Group/ExportGroupUsersExcel — the Assigned Users table on Group/Details,
+        // filtered by the same Active/Inactive dropdown shown on that page.
+        [HttpGet]
+        [RequirePermission]
+        public async Task<IActionResult> ExportGroupUsersExcel(int groupId, bool? isActive)
+        {
+            var group = await _groups.GetByIdWithDetailsAsync(groupId);
+            if (group == null) return NotFound();
+
+            var users = group.Users.AsEnumerable();
+            if (isActive.HasValue)
+            {
+                users = users.Where(u => u.IsActive == isActive.Value);
+            }
+
+            var rows = users.ToList();
+
+            ExcelPackage.License.SetNonCommercialPersonal("MyName");
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Group Users");
+
+            worksheet.Cells[1, 1].Value = "Name";
+            worksheet.Cells[1, 2].Value = "Email";
+            worksheet.Cells[1, 3].Value = "Status";
+
+            using (var headerRange = worksheet.Cells[1, 1, 1, 3])
+            {
+                headerRange.Style.Font.Bold = true;
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            }
+
+            int row = 2;
+            foreach (var user in rows)
+            {
+                worksheet.Cells[row, 1].Value = user.Username;
+                worksheet.Cells[row, 2].Value = user.Email;
+                worksheet.Cells[row, 3].Value = user.IsActive ? "Active" : "Inactive";
+                row++;
+            }
+
+            if (worksheet.Dimension != null)
+            {
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+            }
+
+            var fileContents = package.GetAsByteArray();
+
+            var suffix = isActive == true ? "_Active" : isActive == false ? "_Inactive" : "";
+            var safeGroupName = string.Concat(group.Name.Split(Path.GetInvalidFileNameChars()));
+
+            return File(
+                fileContents,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"{safeGroupName}_Users{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
             );
         }
 

@@ -32,6 +32,26 @@
     }
 
     /* Primary & Secondary Action Buttons */
+    .btn-soft-gray {
+        background-color: #f1f3f5;
+        border: 1px solid #e0e0e0;
+        color: #495057;
+        border-radius: 12px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+        .btn-soft-gray:hover {
+            background-color: #e9ecef;
+            border-color: #d0d0d0;
+            color: #333333;
+        }
     .btn-orange-primary {
         background-color: var(--primary-orange);
         border: 1px solid var(--primary-orange);
@@ -245,6 +265,23 @@
 
 <div class="container-fluid px-4 p-100">
 
+
+@if (TempData["Success"] != null)
+{
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+}
+@if (TempData["Error"] != null)
+{
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+}
+
+
     <!-- Header Section -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
@@ -259,6 +296,10 @@
             <a asp-controller="NonEmployee" asp-action="Create" class="btn-orange-outline shadow-sm">
                 <i class="fas fa-plus"></i>
                 <span>New Non-Employee</span>
+            </a>
+            <a href="#" id="exportExcelBtn" class="btn-soft-gray shadow-sm">
+                <i class="fas fa-file-excel"></i>
+                <span>Export to Excel</span>
             </a>
         </div>
     </div>
@@ -439,6 +480,25 @@
         const itemsPerPage = 7;
         let visibleRows = [...allRows];
         let currentPage = 1;
+
+                const exportBtn = document.getElementById("exportExcelBtn");
+
+        if (exportBtn) {
+            exportBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                // Read only the dropdown/select filters, at click time — not the free-text search box
+                const currentStatus = statusFilter ? statusFilter.value : "all";
+                const currentType = typeFilter ? typeFilter.value : "all";
+
+                const params = new URLSearchParams();
+                if (currentStatus && currentStatus !== "all") params.set("status", currentStatus);
+                if (currentType && currentType !== "all") params.set("type", currentType);
+
+                const baseUrl = "@Url.Action("ExportEmployeeExcel", "Employee")";
+                window.location.href = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+            });
+        }
 
         function renderTable() {
             const totalVisible = visibleRows.length;

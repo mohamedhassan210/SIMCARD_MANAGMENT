@@ -218,6 +218,27 @@
                 box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
             }
 
+        .btn-action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            color: #6c757d;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+            .btn-action-icon:hover {
+                border-color: var(--brand-orange);
+                color: var(--brand-orange);
+                background-color: #fffaf8;
+            }
+
+
         /* ---------- Filters (from SIM Index) ---------- */
         .filters { margin-top: 8px; }
         .filters label { display: block; font-size: 12px; color: #6b6b6b; margin-bottom: 8px; }
@@ -284,8 +305,15 @@
 
         <div class="details-card">
             <div class="card-header-styled d-flex align-items-center gap-3">
-                <div class="section-icon-wrapper">
-                    <i class="fa-solid fa-tower-cell"></i>
+                <div class="section-icon-wrapper" style="@(string.IsNullOrEmpty(Model.LogoPath) ? "" : "background:#fff;padding:4px;")">
+                    @if (!string.IsNullOrEmpty(Model.LogoPath))
+                    {
+                        <img src="@Model.LogoPath" alt="@Model.Name logo" style="width:100%;height:100%;object-fit:contain;" />
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-tower-cell"></i>
+                    }
                 </div>
                 <div>
                     <h3 class="m-0 fs-5 fw-bold text-dark">Service Provider Details</h3>
@@ -369,52 +397,59 @@
             </div>
             <!-- existing filters, table, footer, actions bar stay here unchanged -->
 
-           <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
-    <div class="filters-row">
-        <div class="filter-group">
-            <label for="status-filter">Availability</label>
-            <select id="status-filter" class="status-select">
-                <option value="all">All</option>
-                <option value="active">Active</option>
-                <option value="inactive">Not Active</option>
-            </select>
-        </div>
+            <form id="filterForm" class="filters" onsubmit="event.preventDefault();">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="status-filter">Availability</label>
+                        <select id="status-filter" class="status-select">
+                            <option value="all">All</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Not Active</option>
+                        </select>
+                    </div>
 
-        <div class="filter-group">
-            <label for="device-type-filter">Device Type</label>
-            <select id="device-type-filter" class="status-select">
-                <option value="all">All Types</option>
-                <option value="sim">SIM Card</option>
-                <option value="usb">USB Modem</option>
-            </select>
-        </div>
+                    <div class="filter-group">
+                        <label for="device-type-filter">Device Type</label>
+                        <select id="device-type-filter" class="status-select">
+                            <option value="all">All Types</option>
+                            <option value="sim">SIM Card</option>
+                            <option value="usb">USB Modem</option>
+                        </select>
+                    </div>
 
-        <div class="filter-group">
-            <label for="status-type-filter">Status Type</label>
-            <select id="status-type-filter" class="status-select">
-                <option value="all">All Status Types</option>
-                @if (ViewBag.StatusTypes != null)
-                {
-                    foreach (var st in ViewBag.StatusTypes as List<string>)
-                    {
-                        <option value="@st.ToLower()">@st</option>
-                    }
-                }
-            </select>
-        </div>
+                    <div class="filter-group">
+                        <label for="status-type-filter">Status Type</label>
+                        <select id="status-type-filter" class="status-select">
+                            <option value="all">All Status Types</option>
+                            @if (ViewBag.StatusTypes != null)
+                            {
+                                foreach (var st in ViewBag.StatusTypes as List<string>)
+                                {
+                                    <option value="@st.ToLower()">@st</option>
+                                }
+                            }
+                        </select>
+                    </div>
 
-        <div class="filter-group" style="flex: 1;">
-            <label for="search-input">Search</label>
-            <div class="search-box">
-                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
-                    <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                </svg>
-                <input id="search-input" type="text" placeholder="Search by Serial, Phone, or Assignee..." autocomplete="off">
-            </div>
-        </div>
-    </div>
-</form>
+                    <div class="filter-group" style="flex: 1;">
+                        <label for="search-input">Search</label>
+                        <div class="search-box">
+                            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                            </svg>
+                            <input id="search-input" type="text" placeholder="Search by Serial, Phone, or Assignee..." autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>&nbsp;</label>
+                        <a href="#" id="exportDevicesBtn" class="view-btn" style="display: block; text-align: center; white-space: nowrap;">
+                            <i class="fa-solid fa-file-excel"></i> Excel
+                        </a>
+                    </div>
+                </div>
+            </form>
 
             <div class="table-wrap">
     <table id="deviceTable">
@@ -491,16 +526,24 @@
                                 <span style="color: #a8a8a8;">Unassigned</span>
                             }
                         </td>
-                        <td style="text-align: right;">
-                            @if (normalizedType == "sim")
-                            {
-                                <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
-                            }
-                            else
-                            {
-                                <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
-                            }
-                        </td>
+                                    <td style="text-align: right;">
+                                        <div class="d-inline-flex align-items-center gap-2">
+                                            @if (normalizedType == "sim")
+                                            {
+                                                <a asp-controller="SIM" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                                                <a asp-controller="SIM" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit SIM">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="USB" asp-action="Details" asp-route-id="@item.Id" class="view-btn">VIEW</a>
+                                                <a asp-controller="USB" asp-action="Edit" asp-route-id="@item.Id" class="btn-action-icon" title="Edit USB">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
                     </tr>
                 }
             }
@@ -622,6 +665,26 @@
             statusFilter.addEventListener("change", applyFilters);
             typeFilter.addEventListener("change", applyFilters);
             statusTypeFilter.addEventListener("change", applyFilters);
+
+
+                    // Excel export: read all three dropdown filters only at the moment of the
+        // click, then build the export URL. Free-text search is intentionally
+        // excluded since it only filters already-rendered rows client-side.
+        const exportDevicesBtn = document.getElementById('exportDevicesBtn');
+        if (exportDevicesBtn) {
+            exportDevicesBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const url = new URL('@Url.Action("ExportProviderDevicesExcel", "ServiceProvider")', window.location.origin);
+                url.searchParams.set('providerId', '@Model.Id');
+                url.searchParams.set('status', statusFilter.value);
+                url.searchParams.set('type', typeFilter.value);
+                url.searchParams.set('statusType', statusTypeFilter.value);
+
+                window.location.href = url.toString();
+            });
+        }
+
 
             paginationContainer.addEventListener("click", function (e) {
                 const btn = e.target.closest("button");

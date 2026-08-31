@@ -1,4 +1,4 @@
-﻿@model Sim_Card_Managment.Models.Group
+@model Sim_Card_Managment.Models.Group
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -127,6 +127,46 @@
                 font-size: 0.95rem;
                 width: 100%;
                 color: var(--text-dark);
+            }
+
+        /* Status filter dropdown — same look as ServiceProvider/Details' status-select */
+        .status-select {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border: 1px solid #dcdcdc;
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-size: 13px;
+            color: #1a1a1a;
+            width: 150px;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+            .status-select:hover {
+                border-color: var(--brand-orange);
+            }
+
+        /* View button — copied from ServiceProvider/Details' .view-btn */
+        .view-btn {
+            display: inline-block;
+            border: 1.5px solid var(--brand-orange);
+            color: var(--brand-orange);
+            background: transparent;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+            .view-btn:hover {
+                background: var(--brand-orange);
+                color: #fff;
             }
 
         /* Fixed Table Container with Hidden Scrollbar */
@@ -268,6 +308,28 @@
                 box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
             }
 
+        .btn-secondary-soft {
+            background-color: #F1F5F9;
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+            border-radius: 50px;
+            height: 40px;
+            padding: 0 18px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+            .btn-secondary-soft:hover {
+                background-color: #E2E8F0;
+                color: var(--text-dark);
+            }
+
     </style>
 </head>
 <body>
@@ -329,12 +391,25 @@
         </div>
 
         <div class="users-card">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
                 <h4 class="fw-bold fs-5 m-0 text-dark">Assigned Users</h4>
 
-                <div class="search-box col-12 col-md-4">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input id="userSearchInput" type="text" placeholder="Search users by name..." autocomplete="off">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+                    <select id="userStatusFilter" class="status-select">
+                        <option value="all">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+
+                    <div class="search-box" style="min-width: 220px;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input id="userSearchInput" type="text" placeholder="Search users by name..." autocomplete="off">
+                    </div>
+
+                    <a href="#" id="exportGroupUsersBtn" class="btn-secondary-soft">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Excel</span>
+                    </a>
                 </div>
             </div>
 
@@ -343,6 +418,7 @@
                     <thead>
                         <tr>
                             <th>User Name</th>
+                            <th>Status</th>
                             <th style="text-align: right;">Actions</th>
                         </tr>
                     </thead>
@@ -351,20 +427,33 @@
                         {
                             @foreach (var user in Model.Users)
                             {
-                                <tr class="user-row">
+                                <tr class="user-row" data-status="@(user.IsActive ? "active" : "inactive")">
                                     <td>
                                         <strong>@user.Username</strong>
                                     </td>
+                                    <td>
+                                        @if (user.IsActive)
+                                        {
+                                            <span class="badge-status-active">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-status-active" style="background-color: rgba(220,38,38,0.1); color:#DC2626; border-color: rgba(220,38,38,0.2);">Inactive</span>
+                                        }
+                                    </td>
                                     <td style="text-align: right;">
-                                        <button type="button" class="btn-change-group" onclick="changeGroup(@user.Id, '@user.Username')">
-                                            <i class="fa-solid fa-arrows-rotate me-1"></i> Change Group
-                                        </button>
+                                        <div class="d-inline-flex align-items-center gap-2">
+                                            <a asp-controller="Account" asp-action="Details" asp-route-id="@user.Id" class="view-btn">VIEW</a>
+                                            <button type="button" class="btn-change-group" onclick="changeGroup(@user.Id, '@user.Username')">
+                                                <i class="fa-solid fa-arrows-rotate me-1"></i> Change Group
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             }
                         }
                         <tr id="noResultsRow" style="display: @(Model.Users.Any() ? "none" : "");">
-                            <td colspan="2" class="text-center text-muted py-4">
+                            <td colspan="3" class="text-center text-muted py-4">
                                 No matching users found.
                             </td>
                         </tr>
@@ -405,15 +494,25 @@
             return document.querySelector('input[name="__RequestVerificationToken"]').value;
         }
 
-        // Client-side search for the scrollable table
-        document.getElementById('userSearchInput').addEventListener('input', function () {
-            const query = this.value.toLowerCase().trim();
+        // Client-side search + status filter for the scrollable table
+        const userSearchInput = document.getElementById('userSearchInput');
+        const userStatusFilter = document.getElementById('userStatusFilter');
+        const exportGroupUsersBtn = document.getElementById('exportGroupUsersBtn');
+
+        function applyUserFilters() {
+            const query = userSearchInput.value.toLowerCase().trim();
+            const statusVal = userStatusFilter.value;
             const rows = document.querySelectorAll('#usersTableBody tr.user-row');
             let hasVisibleRow = false;
 
             rows.forEach(row => {
                 const name = row.querySelector('td').innerText.toLowerCase();
-                if (name.includes(query)) {
+                const rowStatus = row.getAttribute('data-status') || 'active';
+
+                const matchesSearch = name.includes(query);
+                const matchesStatus = (statusVal === 'all') || (rowStatus === statusVal);
+
+                if (matchesSearch && matchesStatus) {
                     row.style.display = '';
                     hasVisibleRow = true;
                 } else {
@@ -422,7 +521,31 @@
             });
 
             document.getElementById('noResultsRow').style.display = hasVisibleRow ? 'none' : '';
-        });
+        }
+
+        userSearchInput.addEventListener('input', applyUserFilters);
+        userStatusFilter.addEventListener('change', applyUserFilters);
+
+        // Excel export: read the Status filter only at the moment of the click,
+        // not on every change, then build the export URL with it.
+        if (exportGroupUsersBtn) {
+            exportGroupUsersBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const status = userStatusFilter.value;
+                const url = new URL('@Url.Action("ExportGroupUsersExcel", "Group")', window.location.origin);
+                url.searchParams.set('groupId', '@Model.Id');
+
+                if (status === 'active') {
+                    url.searchParams.set('isActive', 'true');
+                } else if (status === 'inactive') {
+                    url.searchParams.set('isActive', 'false');
+                }
+                // "all" -> no isActive param, export everyone in this group
+
+                window.location.href = url.toString();
+            });
+        }
 
         // Change Group Action — pulls real groups, posts real change
             async function changeGroup(userId, userName) {

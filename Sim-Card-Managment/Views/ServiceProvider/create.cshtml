@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create New Non-Employee</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
         section {
@@ -113,6 +114,44 @@
                 color: #fff;
             }
 
+
+        .logo-upload-box {
+            width: 130px;
+            height: 130px;
+            border-radius: 16px;
+            border: 2px dashed #c9c9c9;
+            background-color: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+            .logo-upload-box:hover {
+                border-color: #E24D17;
+                background-color: #fff8f6;
+            }
+
+        .logo-upload-placeholder i {
+            font-size: 28px;
+            color: #b0b0b0;
+            transition: color 0.2s ease;
+        }
+
+        .logo-upload-box:hover .logo-upload-placeholder i {
+            color: #E24D17;
+        }
+
+        .logo-preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #fff;
+        }
+
         
     </style>
 </head>
@@ -122,7 +161,7 @@
     <div class="create-card shadow">
         <h2 class="title-header">Create new ServiceProvider</h2>
 
-        <form id="nonEmployeeForm" asp-controller="ServiceProvider" asp-action="Create" method="post">
+        <form id="nonEmployeeForm" asp-controller="ServiceProvider" asp-action="Create" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
 
             <div class="row g-4 mb-5">
@@ -138,18 +177,51 @@
                     <span asp-validation-for="DisplayName" class="field-error"></span>
                 </div>
 
-              
+                <div class="col-md-6">
+                    <label class="custom-label">Company Logo</label>
+                    <div class="logo-upload-box" id="logoUploadBox">
+                        <div class="logo-upload-placeholder" id="logoUploadPlaceholder">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <img id="logoPreviewImg" class="logo-preview-img d-none" alt="Logo preview" />
+                    </div>
+                    <input type="file" asp-for="LogoFile" id="logoFileInput" class="d-none" accept=".png,.jpg,.jpeg,.webp,.svg" />
+                    <span asp-validation-for="LogoFile" class="field-error"></span>
+                </div>
             </div>
 
             <div class="d-flex justify-content-end gap-3 mt-4">
                 <a class="btn btn-cancel" asp-controller="ServiceProvider" asp-action="Index">Cancel</a>
                 <button type="submit" class="btn btn-create">Create</button>
             </div>
-
         </form>
     </div>
 
  
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var box = document.getElementById('logoUploadBox');
+            var input = document.getElementById('logoFileInput');
+            var placeholder = document.getElementById('logoUploadPlaceholder');
+            var preview = document.getElementById('logoPreviewImg');
 
+            box.addEventListener('click', function () {
+                input.click();
+            });
+
+            input.addEventListener('change', function () {
+                var file = input.files && input.files[0];
+                if (!file) return;
+
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    placeholder.classList.add('d-none');
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
 </section>

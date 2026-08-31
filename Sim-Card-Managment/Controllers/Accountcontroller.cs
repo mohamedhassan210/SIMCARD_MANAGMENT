@@ -134,8 +134,10 @@ namespace Sim_Card_Managment.Controllers
            <p>Your active One-Time Password (OTP) code is: <strong>{validOtpRecord.OtpCode}</strong></p>
            <p>This code is temporary. Please use it before it expires.</p>");
             }
-            catch
+            catch (Exception ex)
             {
+                // TODO: inject ILogger<AccountController> and use it instead of Console
+                Console.WriteLine(ex.ToString()); // temporary — replace with proper logging
                 ModelState.AddModelError("", "Failed to send the email. Please contact your system administrator.");
                 return View(model);
             }

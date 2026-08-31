@@ -271,20 +271,15 @@ namespace Sim_Card_Managment.Controllers
             return View(model);
         }
 
+        
         [HttpGet]
-        public async Task<IActionResult> ExportToExcel(string? searchTerm)
+        public async Task<IActionResult> ExportToExcel(string? searchTerm, string status = "all")
         {
             ExcelPackage.License.SetNonCommercialPersonal("MyName");
 
-            // Get all Internet Line data
             var data = await _internetLineRepo.GetForExcelAsync();
+            status = (status ?? "all").ToLower();
 
-            // Get ALL service types dynamically from DB
-            var serviceTypes = (await _lookupRepo.GetServiceTypesAsync())
-                .OrderBy(x => x.Id)
-                .ToList();
-
-            // Apply search if needed
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 data = data
@@ -300,94 +295,42 @@ namespace Sim_Card_Managment.Controllers
             }
 
             using var package = new ExcelPackage();
-
             var worksheet = package.Workbook.Worksheets.Add("Internet");
 
             // =========================================================
             // TITLE
             // =========================================================
+            const int totalColumns = 10; // Branch, ISP, Payment, Service Type, SIM SN, Phone, Renewal Date, Quota, Bandwidth, Status, Notes
+                                         // (11 actually — see header list below; keep this const in sync if columns change)
 
+            string[] headers = {
+        "Branch", "ISP", "Payment", "Service Type", "SIM SN",
+        "Phone Number", "Renewal Date", "Quota", "Bandwidth", "Status", "Notes"
+    };
+            int lastColumn = headers.Length;
+
+            worksheet.Cells[1, 1, 1, lastColumn].Merge = true;
             worksheet.Cells[1, 1].Value = "Internet Service";
-
-            // Number of columns:
-            // Branch + (8 columns per Service Type) + Notes
-            int totalColumns = 1 + (serviceTypes.Count * 8) + 1;
-
-            worksheet.Cells[1, 1, 1, totalColumns].Merge = true;
-
-            var titleRange = worksheet.Cells[1, 1, 1, totalColumns];
-
+            var titleRange = worksheet.Cells[1, 1, 1, lastColumn];
             titleRange.Style.Font.Bold = true;
             titleRange.Style.Font.Size = 16;
-            titleRange.Style.HorizontalAlignment =
-                OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-            titleRange.Style.VerticalAlignment =
-                OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-
-            titleRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-            titleRange.Style.Fill.BackgroundColor.SetColor(Color.White);
+            titleRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            titleRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
             // =========================================================
-            // HEADER
+            // HEADER — fixed columns, no per-service-type expansion
             // =========================================================
-
             int headerRow = 2;
-            int column = 1;
-
-            // Branch
-            worksheet.Cells[headerRow, column].Value = "Branch";
-            column++;
-
-            // Dynamic ServiceType columns
-            foreach (var serviceType in serviceTypes)
-            {
-                string typeName = serviceType.Name;
-
-                worksheet.Cells[headerRow, column].Value = $"{typeName} ISP";
-                column++;
-
-                worksheet.Cells[headerRow, column].Value = $"{typeName} Payment";
-                column++;
-
-                worksheet.Cells[headerRow, column].Value = $"{typeName} Phone Number";
-                column++;
-
-                worksheet.Cells[headerRow, column].Value = $"{typeName} SIM SN";
-                column++;
-
-                worksheet.Cells[headerRow, column].Value = $"{typeName} Renewal Date";
-                column++;
-
-                worksheet.Cells[headerRow, column].Value = $"{typeName} Quota";
-                column++;
-
-                worksheet.Cells[headerRow, column].Value = $"{typeName} Bandwidth";
-                column++;
-
-                worksheet.Cells[headerRow, column].Value = $"{typeName} Status";
-                column++;
-            }
-
-            // Notes
-            worksheet.Cells[headerRow, column].Value = "Notes";
-
-            int lastColumn = column;
-
-            // =========================================================
-            // HEADER STYLE
-            // =========================================================
+            for (int i = 0; i < headers.Length; i++)
+                worksheet.Cells[headerRow, i + 1].Value = headers[i];
 
             using (var headerRange = worksheet.Cells[headerRow, 1, headerRow, lastColumn])
             {
                 headerRange.Style.Font.Bold = true;
-                headerRange.Style.HorizontalAlignment =
-                    OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-                headerRange.Style.VerticalAlignment =
-                    OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-
+                headerRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                headerRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 headerRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
                 headerRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
-
                 headerRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                 headerRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                 headerRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
@@ -395,241 +338,90 @@ namespace Sim_Card_Managment.Controllers
             }
 
             // =========================================================
-            // DATA
+            // DATA — one row per internet line, branch repeated per row
             // =========================================================
-
             int row = 3;
-
             foreach (var branch in data.OrderBy(x => x.BranchName))
             {
-                worksheet.Cells[row, 1].Value = branch.BranchName;
+                var lines = branch.InternetLines.AsEnumerable();
+                if (status == "up") lines = lines.Where(l => l.Status);
+                else if (status == "down") lines = lines.Where(l => !l.Status);
+                var filteredLines = lines.ToList();
 
-                column = 2;
+                if (!filteredLines.Any())
+                    continue;
 
-                foreach (var serviceType in serviceTypes)
+                foreach (var line in filteredLines)
                 {
-                    string typeName = serviceType.Name;
+                    worksheet.Cells[row, 1].Value = branch.BranchName;
+                    worksheet.Cells[row, 2].Value = line.ServiceProviderName;
+                    worksheet.Cells[row, 3].Value = line.PaymentTypeName;
+                    worksheet.Cells[row, 4].Value = line.ServiceTypeName;
+                    worksheet.Cells[row, 5].Value = line.SimSerialNumber ?? "N/A";
+                    worksheet.Cells[row, 6].Value = line.PhoneNumber ?? "N/A";
+                    worksheet.Cells[row, 7].Value = line.NextRenewalDate.HasValue
+                        ? line.NextRenewalDate.Value.ToString("dd MMM yyyy")
+                        : "N/A";
+                    worksheet.Cells[row, 8].Value = line.QuotaGB.HasValue ? $"{line.QuotaGB} GB" : "N/A";
+                    worksheet.Cells[row, 9].Value = line.Bandwidth ?? "N/A";
+                    worksheet.Cells[row, 10].Value = line.Status ? "UP" : "DOWN";
+                    worksheet.Cells[row, 11].Value = line.Notes ?? "";
 
-                    // All lines belonging to this Service Type
-                    var lines = branch.InternetLines
-                        .Where(x => x.ServiceTypeName.Equals(
-                            typeName,
-                            StringComparison.OrdinalIgnoreCase))
-                        .ToList();
-
-                    // -------------------------------------------------
-                    // Multiple records go into SAME CELL using newline
-                    // -------------------------------------------------
-
-                    worksheet.Cells[row, column].Value =
-                        string.Join(
-                            Environment.NewLine,
-                            lines
-                                .Select(x => x.ServiceProviderName)
-                                .Where(x => !string.IsNullOrWhiteSpace(x))
-                                .Distinct()
-                        );
-
-                    column++;
-
-                    worksheet.Cells[row, column].Value =
-                        string.Join(
-                            Environment.NewLine,
-                            lines
-                                .Select(x => x.PaymentTypeName)
-                                .Where(x => !string.IsNullOrWhiteSpace(x))
-                                .Distinct()
-                        );
-
-                    column++;
-
-                    worksheet.Cells[row, column].Value =
-                        string.Join(
-                            Environment.NewLine,
-                            lines
-                                .Select(x => x.PhoneNumber)
-                                .Where(x => !string.IsNullOrWhiteSpace(x))
-                                .Distinct()
-                        );
-
-                    column++;
-
-                    worksheet.Cells[row, column].Value =
-                        string.Join(
-                            Environment.NewLine,
-                            lines
-                                .Select(x => x.SimSerialNumber)
-                                .Where(x => !string.IsNullOrWhiteSpace(x))
-                                .Distinct()
-                        );
-
-                    column++;
-
-                    worksheet.Cells[row, column].Value =
-                        string.Join(
-                            Environment.NewLine,
-                            lines
-                                .Select(x => x.NextRenewalDate.HasValue
-                                    ? x.NextRenewalDate.Value.ToString("dd MMM yyyy")
-                                    : null)
-                                .Where(x => !string.IsNullOrWhiteSpace(x))
-                                .Distinct()
-                        );
-
-                    column++;
-
-                    worksheet.Cells[row, column].Value =
-                        string.Join(
-                            Environment.NewLine,
-                            lines
-                                .Select(x => x.QuotaGB.HasValue
-                                    ? $"{x.QuotaGB} GB"
-                                    : null)
-                                .Where(x => !string.IsNullOrWhiteSpace(x))
-                                .Distinct()
-                        );
-
-                    column++;
-
-                    worksheet.Cells[row, column].Value =
-                        string.Join(
-                            Environment.NewLine,
-                            lines
-                                .Select(x => x.Bandwidth)
-                                .Where(x => !string.IsNullOrWhiteSpace(x))
-                                .Distinct()
-                        );
-
-                    column++;
-
-                    worksheet.Cells[row, column].Value =
-                        string.Join(
-                            Environment.NewLine,
-                            lines
-                                .Select(x => x.Status ? "UP" : "DOWN")
-                                .Distinct()
-                        );
-
-                    column++;
+                    row++;
                 }
-
-                // Notes
-                worksheet.Cells[row, column].Value =
-                    string.Join(
-                        Environment.NewLine,
-                        branch.InternetLines
-                            .Select(x => x.Notes)
-                            .Where(x => !string.IsNullOrWhiteSpace(x))
-                            .Distinct()
-                    );
-
-                row++;
             }
 
             // =========================================================
             // GENERAL STYLING
             // =========================================================
-
             if (row > 3)
             {
-                using var dataRange =
-                    worksheet.Cells[3, 1, row - 1, lastColumn];
-
+                using var dataRange = worksheet.Cells[3, 1, row - 1, lastColumn];
                 dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                 dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-
-                dataRange.Style.VerticalAlignment =
-                    ExcelVerticalAlignment.Center;
-
+                dataRange.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 dataRange.Style.WrapText = true;
-            }
 
-            // Green status cells
-            for (int r = 3; r < row; r++)
-            {
-                column = 2;
-
-                foreach (var serviceType in serviceTypes)
+                // Status column color coding
+                var statusColumn = 10;
+                for (int r = 3; r < row; r++)
                 {
-                    // Skip:
-                    // ISP
-                    // Payment
-                    // Phone
-                    // SIM
-                    // Renewal
-                    // Quota
-                    // Bandwidth
+                    var statusCell = worksheet.Cells[r, statusColumn];
+                    statusCell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-                    column += 7;
-
-                    var statusCell = worksheet.Cells[r, column];
-
-                    statusCell.Style.HorizontalAlignment =
-                        ExcelHorizontalAlignment.Center;
-
-                    if (statusCell.Value != null)
+                    var cellStatus = statusCell.Value?.ToString() ?? "";   // <-- new local, not `status`
+                    if (cellStatus == "UP")
                     {
-                        string status = statusCell.Value.ToString() ?? "";
-
-                        if (status.Contains("UP"))
-                        {
-                            statusCell.Style.Fill.PatternType =
-                                ExcelFillStyle.Solid;
-
-                            statusCell.Style.Fill.BackgroundColor
-                                .SetColor(Color.LimeGreen);
-                        }
-                        else if (status.Contains("DOWN"))
-                        {
-                            statusCell.Style.Fill.PatternType =
-                                ExcelFillStyle.Solid;
-
-                            statusCell.Style.Fill.BackgroundColor
-                                .SetColor(Color.LightCoral);
-                        }
+                        statusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        statusCell.Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
                     }
-
-                    column++;
+                    else if (cellStatus == "DOWN")
+                    {
+                        statusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        statusCell.Style.Fill.BackgroundColor.SetColor(Color.LightCoral);
+                    }
                 }
             }
 
-            // =========================================================
-            // BRANCH COLUMN
-            // =========================================================
-
             worksheet.Column(1).Width = 18;
-
-            // =========================================================
-            // AUTO SIZE
-            // =========================================================
-
-            worksheet.Cells[worksheet.Dimension.Address]
-                .AutoFitColumns();
-
-            // Keep columns from becoming ridiculously wide
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
             for (int c = 2; c <= lastColumn; c++)
             {
                 if (worksheet.Column(c).Width > 30)
                     worksheet.Column(c).Width = 30;
             }
-
             worksheet.Row(1).Height = 30;
-
-            // Freeze headers
             worksheet.View.FreezePanes(3, 2);
 
-            // =========================================================
-            // RETURN FILE
-            // =========================================================
-
             var fileContents = package.GetAsByteArray();
+            var suffix = status != "all" ? "_" + (status == "up" ? "Up" : "Down") : "";
 
             return File(
                 fileContents,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"Internet_Lines_{DateTime.Now:yyyyMMdd}.xlsx"
+                $"Internet_Lines{suffix}_{DateTime.Now:yyyyMMdd}.xlsx"
             );
         }
 
