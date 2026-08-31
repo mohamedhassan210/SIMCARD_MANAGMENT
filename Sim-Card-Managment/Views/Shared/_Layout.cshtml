@@ -81,6 +81,7 @@
     <link rel="stylesheet" href="~/css/all.min.css" />
     <link href="~/favicon.ico" rel="icon" />
     <link href="~/css/all.min.css" rel="stylesheet" asp-append-version="true" />
+       
 </head>
 <body>
     <div id="sidebarToggleHandle" class="rotate position-fixed top-50 start-0 bg-transparent z-3 d-flex justify-content-center align-items-center shadow "
@@ -615,44 +616,50 @@
         </div>
 
     </aside>
-    <nav class="position-fixed top-0 navbar navbar-expand-lg w-100 border-bottom border-2 border-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand text-white fw-bold" asp-controller="home" asp-action="home">
-                <img src="~/images/Logo.svg" alt="LOGO" class="logo" />
+    <nav class="navbar navbar-expand-lg bg-brand-nav fixed-top shadow-sm py-2">
+        <div class="container-fluid px-4">
+            <!-- Logo / Brand Link -->
+            <a class="navbar-brand text-white fw-bold d-flex align-items-center" asp-controller="Home" asp-action="home">
+                <img src="~/images/Logo.svg" alt="LOGO" class="logo" style="height: 56px;" />
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse justify-content-end align-items-center" id="navbarNav">
-                <ul class="navbar  p-2 text-white m-0 ">
+            <div class="collapse navbar-collapse justify-content-end navbar-brand-custom" id="navbarNav">
+                <ul class="navbar-nav align-items-lg-center gap-1 mt-3 mt-lg-0">
 
                     <li class="nav-item">
-                        <a class="nav-link fw-bold px-4 text-white @(currentController == "Home" && currentAction == "home" ? "active" : "")"
-                           asp-controller="/Home" asp-action="home">HOME</a>
-
+                        <a class="nav-link text-black fw-bold px-3 py-2 rounded-pill @(currentController == "Home" && currentAction == "home" ? "active" : "")"
+                           asp-controller="Home" asp-action="home">
+                            HOME
+                        </a>
                     </li>
 
                     @if (canViewSims)
                     {
                         <li class="nav-item">
-                            <a class="nav-link fw-bold px-4 text-white @(currentController == "SIM" && currentAction == "Index" ? "active" : "")"
-                               asp-controller="SIM" asp-action="Index">DEVICES</a>
+                            <a class="nav-link text-black fw-bold px-3 py-2 rounded-pill @(currentController == "SIM" && currentAction == "Index" ? "active" : "")"
+                               asp-controller="SIM" asp-action="Index">
+                                DEVICES
+                            </a>
                         </li>
                     }
 
                     @if (Has("Employee", "Index"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link fw-bold px-4 text-white @(currentController == "Employee" && currentAction == "Index" ? "active" : "")"
-                               asp-controller="Employee" asp-action="Index">USERS</a>
+                            <a class="nav-link text-black fw-bold px-3 py-2 rounded-pill @(currentController == "Employee" && currentAction == "Index" ? "active" : "")"
+                               asp-controller="Employee" asp-action="Index">
+                                USERS
+                            </a>
                         </li>
                     }
 
                     @if (canViewInternetLineDashboard)
                     {
-                        <li class="nav-item">
+                        <li class="nav-item ms-lg-2 px-2">
                             @await Component.InvokeAsync("NotificationBell")
                         </li>
                     }
