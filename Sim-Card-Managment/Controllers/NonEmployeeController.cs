@@ -44,7 +44,7 @@ namespace Sim_Card_Managment.Controllers
                 nonEmployee.CreatedAt = DateTime.Now;
                 nonEmployee.IsActive = true;
                 _nonEmployeeRepo.Add(nonEmployee);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Employee");
             }
 
             return View(nonEmployee);
