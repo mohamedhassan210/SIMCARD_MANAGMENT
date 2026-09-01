@@ -252,7 +252,7 @@
                 const formData = new FormData();
                 formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
 
-                const res = await fetch(`/USB/Activate/@Model.Id`, {
+                                const res = await fetch(`@Url.Action("Activate", "USB")/@Model.Id`, {
                     method: 'POST',
                     body: formData
                 });

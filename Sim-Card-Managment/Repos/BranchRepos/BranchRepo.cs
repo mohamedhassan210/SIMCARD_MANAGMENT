@@ -146,10 +146,14 @@ namespace Sim_Card_Managment.Repos.BranchRepos
 
             if (model.SelectedFireWallTypeIds.Any())
             {
-                var selectedFireWallTypes = await _context.FireWallTypes
-                    .Where(f => model.SelectedFireWallTypeIds.Contains(f.Id))
-                    .ToListAsync();
-
+                
+                List<FireWallType> selectedFireWallTypes = new List<FireWallType>();
+                foreach (var id in model.SelectedFireWallTypeIds)
+                {
+                    var selectedFireWallType =  _context.FireWallTypes
+                    .Where(f => f.Id == id).FirstOrDefault();
+                    selectedFireWallTypes.Add(selectedFireWallType);
+                }
                 branch.FireWallTypes = selectedFireWallTypes;
             }
 
@@ -173,17 +177,29 @@ namespace Sim_Card_Managment.Repos.BranchRepos
             branch.BranchCode = model.BranchCode;
             branch.Note = model.Note;
 
-            var selectedFireWallTypes = model.SelectedFireWallTypeIds.Any()
-                ? await _context.FireWallTypes
-                    .Where(f => model.SelectedFireWallTypeIds.Contains(f.Id))
-                    .ToListAsync()
-                : new List<FireWallType>();
+            //var selectedFireWallTypes = model.SelectedFireWallTypeIds.Any()
+            //    ? await _context.FireWallTypes
+            //        .Where(f => model.SelectedFireWallTypeIds.Contains(f.Id))
+            //        .ToListAsync()
+            //    : new List<FireWallType>();
+            List<FireWallType> selectedFireWallTypes = new List<FireWallType>();
 
-            branch.FireWallTypes.Clear();
-            foreach (var fireWallType in selectedFireWallTypes)
+            if (model.SelectedFireWallTypeIds.Any())
             {
-                branch.FireWallTypes.Add(fireWallType);
+
+                foreach (var id in model.SelectedFireWallTypeIds)
+                {
+                    var selectedFireWallType = _context.FireWallTypes
+                    .Where(f => f.Id == id).FirstOrDefault();
+                    selectedFireWallTypes.Add(selectedFireWallType);
+                }
+                branch.FireWallTypes = selectedFireWallTypes;
             }
+            //branch.FireWallTypes.Clear();
+            //foreach (var fireWallType in selectedFireWallTypes)
+            //{
+            //    branch.FireWallTypes.Add(fireWallType);
+            //}
 
             _context.Branches.Update(branch);
             await _context.SaveChangesAsync();

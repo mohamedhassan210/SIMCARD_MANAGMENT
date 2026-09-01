@@ -3,7 +3,7 @@
     if (!chartContainer) return;
 
     // Fetch the live database array metrics from our controller endpoint
-    fetch('/Home/GetWeeklyActivityData')
+    fetch(window.appRoot + 'Home/GetWeeklyActivityData')
         .then(response => response.json())
         .then(liveData => {
 

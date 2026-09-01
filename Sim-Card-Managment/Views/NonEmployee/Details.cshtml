@@ -364,7 +364,7 @@
                             if (sub.SimId.HasValue)
                             {
                                 string rawProvider = sub.Sim?.ServiceProvider?.Name?.ToLower().Trim() ?? "";
-                                string? uploadedLogo = sub.Sim?.ServiceProvider?.LogoPath;
+                                string? uploadedLogo = string.IsNullOrEmpty(sub.Sim?.ServiceProvider?.LogoPath) ? null : Url.Content("~" + sub.Sim.ServiceProvider.LogoPath);
 
                                 string logoSrc;
                                 if (!string.IsNullOrEmpty(uploadedLogo))
@@ -376,10 +376,10 @@
                                     // fallback for providers without an uploaded logo yet
                                     logoSrc = rawProvider switch
                                     {
-                                        var p when p.Contains("vodafone") => "/img/fodafone.png",
-                                        var p when p.Contains("orange") => "/img/orange.png",
-                                        var p when p.Contains("etisalat") || p.Contains("e&") => "/img/etisalat.png",
-                                        _ => "/img/we.png"
+                                        var p when p.Contains("vodafone") => Url.Content("~/img/fodafone.png"),
+                                        var p when p.Contains("orange") => Url.Content("~/img/orange.png"),
+                                        var p when p.Contains("etisalat") || p.Contains("e&") => Url.Content("~/img/etisalat.png"),
+                                        _ => Url.Content("~/img/we.png")
                                     };
                                 }
 
@@ -394,7 +394,7 @@
                                                      asp-append-version="true"
                                                      alt="@rawProvider logo"
                                                      class="provider-logo"
-                                                     onerror="this.onerror=null; this.src='/img/we.png';" />
+                                                     onerror="this.onerror=null; this.src='@Url.Content("~/img/we.png")';" />
                                             </div>
                                             <div class="my-2">
                                                 <div class="sim-metric-label">DIAL NUMBER</div>
@@ -486,7 +486,7 @@
                         const formData = new FormData();
                         formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
 
-                        const res = await fetch(`/NonEmployee/Activate/@Model.Id`, {
+                                               const res = await fetch(`@Url.Action("Activate", "NonEmployee")/@Model.Id`, {
                             method: 'POST',
                             body: formData
                         });

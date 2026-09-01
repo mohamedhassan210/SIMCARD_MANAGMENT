@@ -313,7 +313,7 @@
                                     <div class="d-flex align-items-center gap-2">
                                         @if (!string.IsNullOrEmpty(item.LogoPath))
                                         {
-                                            <img src="@item.LogoPath" alt="@item.Name" style="width:32px;height:32px;object-fit:contain;border-radius:50%;background:#fff;border:1px solid #eee;padding:2px;" />
+                                            <img src="@Url.Content("~" + item.LogoPath)" alt="@item.Name" style="width:32px;height:32px;object-fit:contain;border-radius:50%;background:#fff;border:1px solid #eee;padding:2px;" />
                                         }
                                         else
                                         {

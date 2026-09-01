@@ -540,7 +540,8 @@
 
     <!-- SIM Card Picker -->
     <script>
-        var currentLineId = @Model.Id;
+               var currentLineId = @Model.Id;
+        var searchSimsUrl = '@Url.Action("SearchSims", "InternetLine")';
 
         var selectedSim = {
             id: @Html.Raw(Model.SimId.HasValue ? Model.SimId.Value.ToString() : "null"),
@@ -553,10 +554,10 @@
 
         function getProviderLogo(providerName) {
             var name = (providerName || '').toLowerCase();
-            if (name.includes('orange')) return '/img/orange.png';
-            if (name.includes('vodafone') || name.includes('fodafone')) return '/img/fodafone.png';
-            if (name.includes('we')) return '/img/we.png';
-            if (name.includes('etisalat')) return '/img/etisalat-logo.png';
+                       if (name.includes('orange')) return '@Url.Content("~/img/orange.png")';
+            if (name.includes('vodafone') || name.includes('fodafone')) return '@Url.Content("~/img/fodafone.png")';
+            if (name.includes('we')) return '@Url.Content("~/img/we.png")';
+            if (name.includes('etisalat')) return '@Url.Content("~/img/etisalat-logo.png")';
             return '';
         }
 
@@ -624,7 +625,7 @@
                 $('#simCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to change the assigned SIM card.</div>');
                 return;
             }
-            $.get('/InternetLine/SearchSims', { query: query, currentLineId: currentLineId })
+                        $.get(searchSimsUrl, { query: query, currentLineId: currentLineId })
                 .done(function (data) {
                     var html = '';
                     var results = (data || []).filter(function (sim) {

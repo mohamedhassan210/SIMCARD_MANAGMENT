@@ -520,7 +520,7 @@
                 formData.append('__RequestVerificationToken', biGetToken());
 
                 try {
-                    const res = await fetch(`/Branch/Delete/${branchId}`, {
+                                        const res = await fetch(`@Url.Action("Delete", "Branch")/${branchId}`, {
                         method: 'POST',
                         body: formData
                     });

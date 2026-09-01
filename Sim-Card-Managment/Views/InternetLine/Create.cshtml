@@ -522,12 +522,14 @@
     <script>
         function getProviderLogo(providerName) {
             var name = (providerName || '').toLowerCase();
-            if (name.includes('orange')) return '/img/orange.png';
-            if (name.includes('vodafone') || name.includes('fodafone')) return '/img/fodafone.png';
-            if (name.includes('we')) return '/img/we.png';
-            if (name.includes('etisalat')) return '/img/etisalat-logo.png';
+                       if (name.includes('orange')) return '@Url.Content("~/img/orange.png")';
+            if (name.includes('vodafone') || name.includes('fodafone')) return '@Url.Content("~/img/fodafone.png")';
+            if (name.includes('we')) return '@Url.Content("~/img/we.png")';
+            if (name.includes('etisalat')) return '@Url.Content("~/img/etisalat-logo.png")';
             return '';
         }
+
+                const searchSimsUrl = '@Url.Action("SearchSims", "InternetLine")';
 
         $('#simSearchInput').on('input', function () {
             loadSims($(this).val());
@@ -538,7 +540,7 @@
                 $('#simCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to display available SIM cards.</div>');
                 return;
             }
-            $.get('/InternetLine/SearchSims', { query: query }, function (data) {
+            $.get(searchSimsUrl, { query: query }, function (data) {
                 var html = '';
                 if (!data || data.length === 0) {
                     html = '<div class="col-12 text-muted small">No available SIM cards found.</div>';

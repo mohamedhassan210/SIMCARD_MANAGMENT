@@ -252,7 +252,7 @@
 
                         <div class="mb-4">
                             <label class="custom-form-label">Search Employee</label>
-                            <input type="text" id="toEmpSearchInput" class="form-control custom-form-control" placeholder="Search target employee by name or ID...">
+                            <input type="text" id="toEmpSearchInput" class="form-control custom-form-control" placeholder="Search target employee by name or ID..." data-url="@Url.Action("SearchRecipients", "DeviceTransfer")">
                         </div>
 
                         <div class="row g-4" id="toEmployeeCardsContainer">
@@ -295,7 +295,8 @@
                 return;
             }
 
-            $.get('/DeviceTransfer/SearchRecipients', {
+                       const toEmpSearchUrl = $('#toEmpSearchInput').data('url');
+            $.get(toEmpSearchUrl, {
                 query: query,
                 isNonEmployee: false,
                 excludeEmpId: @(Model.FromSubscription?.EmpId ?? 0)

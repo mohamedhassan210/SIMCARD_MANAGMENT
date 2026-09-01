@@ -196,7 +196,7 @@
                     <div class="logo-edit-box" id="logoEditBox">
                         @if (!string.IsNullOrEmpty(Model.LogoPath))
                         {
-                            <img id="logoPreviewImg" class="logo-preview-img" src="@Model.LogoPath" alt="Current logo" />
+                            <img id="logoPreviewImg" class="logo-preview-img" src="@Url.Content("~" + Model.LogoPath)" alt="Current logo" />
                         }
                         else
                         {

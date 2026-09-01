@@ -313,6 +313,7 @@
                     <input type="hidden" asp-for="SelectedQuotaId" id="SelectedQuotaId" />
                     <input type="hidden" asp-for="Fees" id="Feez" />
                     <input type="hidden" asp-for="IsNonEmployee" id="IsNonEmployee" value="false" />
+                    <input type="hidden" id="quotaUrl" value="@Url.Action("GetQuotasByProvider", "Subscription")" />
 
                     <div class="mb-5" id="recipientSection">
                         <h2 class="section-title">
@@ -330,7 +331,9 @@
 
                         <div class="mb-4">
                             <label class="custom-form-label" id="searchLabel">Employee Search</label>
-                            <input type="text" id="empSearchInput" class="form-control custom-form-control" placeholder="Search by name or ID...">
+                            <input type="text" id="empSearchInput" class="form-control custom-form-control"
+                                   placeholder="Search by name or ID..."
+                                   data-url="@Url.Action("SearchRecipients", "Subscription")">
                         </div>
 
                         <div class="row g-4" id="employeeCardsContainer">
@@ -357,7 +360,9 @@
                             <div class="row g-4 mb-3">
                                 <div class="col-md-6">
                                     <label class="custom-form-label">SIM Search</label>
-                                    <input type="text" id="simSearchInput" class="form-control custom-form-control" placeholder="Search by phone or serial...">
+                                    <input type="text" id="simSearchInput" class="form-control custom-form-control"
+                                           placeholder="Search by phone or serial..."
+                                           data-url="@Url.Action("SearchSims", "Subscription")">
                                 </div>
                             </div>
                             <div class="row g-4" id="simCardsContainer"></div>
@@ -373,7 +378,9 @@
                             <div class="row g-4 mb-3">
                                 <div class="col-md-6">
                                     <label class="custom-form-label">USB Search</label>
-                                    <input type="text" id="usbSearchInput" class="form-control custom-form-control" placeholder="Search by model or serial...">
+                                    <input type="text" id="usbSearchInput" class="form-control custom-form-control"
+                                           placeholder="Search by model or serial..."
+                                           data-url="@Url.Action("SearchUsbs", "Subscription")">
                                 </div>
                             </div>
                             <div class="row g-4" id="usbCardsContainer"></div>
@@ -430,10 +437,10 @@
             if (providerLogoPath) return providerLogoPath;
 
             const name = (providerName || '').toLowerCase();
-            if (name.includes('orange')) return '/img/orange.png';
-            if (name.includes('vodafone') || name.includes('fodafone')) return '/img/fodafone.png';
-            if (name.includes('we')) return '/img/we.png';
-            if (name.includes('etisalat')) return '/img/etisalat-logo.png';
+                       if (name.includes('orange')) return '@Url.Content("~/img/orange.png")';
+            if (name.includes('vodafone') || name.includes('fodafone')) return '@Url.Content("~/img/fodafone.png")';
+            if (name.includes('we')) return '@Url.Content("~/img/we.png")';
+            if (name.includes('etisalat')) return '@Url.Content("~/img/etisalat-logo.png")';
             return '';
         }
 
@@ -526,12 +533,12 @@
         // Live Recipient Search
         $('#empSearchInput').on('input', function () {
             const query = $(this).val();
+            const url = $(this).data('url');
             if (!query.trim()) {
                 $('#employeeCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to display selection cards.</div>');
                 return;
             }
-
-            $.get('/Subscription/SearchRecipients', { query: query, isNonEmployee: isNonEmployeeMode }, function (data) {
+        $.get(url, { query: query, isNonEmployee: isNonEmployeeMode }, function (data) {
                 let html = '';
                 if (!data || data.length === 0) {
                     html = `<div class="col-12 text-muted small">No ${isNonEmployeeMode ? 'non-employees' : 'active employees'} found matching query.</div>`;
@@ -568,7 +575,7 @@
         }
 
         // SIM Search
-        $('#simSearchInput').on('input', function() {
+                $('#simSearchInput').on('input', function() {
             loadSims($(this).val());
         });
 
@@ -577,7 +584,8 @@
                 $('#simCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to display selection cards.</div>');
                 return;
             }
-            $.get('/Subscription/SearchSims', { query: query }, function(data) {
+            const url = $('#simSearchInput').data('url');
+            $.get(url, { query: query }, function(data) {
                 let html = '';
                 if (!data || data.length === 0) {
                     html = '<div class="col-12 text-muted small">No available SIM cards found.</div>';
@@ -636,7 +644,7 @@
         }
 
         // USB Search
-        $('#usbSearchInput').on('input', function() {
+               $('#usbSearchInput').on('input', function() {
             loadUsbs($(this).val());
         });
 
@@ -645,7 +653,8 @@
                 $('#usbCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to display selection cards.</div>');
                 return;
             }
-            $.get('/Subscription/SearchUsbs', { query: query }, function(data) {
+            const url = $('#usbSearchInput').data('url');
+            $.get(url, { query: query }, function(data) {
                 let html = '';
                 if (!data || data.length === 0) {
                     html = '<div class="col-12 text-muted small">No available USB modems found.</div>';
@@ -691,9 +700,10 @@
         }
 
         // Quotas Search
-                function loadQuotasForProvider(providerId) {
-            $('#quotaInstruction').hide();
-            $.get('/Subscription/GetQuotasByProvider', { providerId: providerId }, function (data) {
+                    function loadQuotasForProvider(providerId) {
+        $('#quotaInstruction').hide();
+        const url = $('#quotaUrl').val();
+        $.get(url, { providerId: providerId }, function (data) {
                 let html = '';
                 if (!data || data.length === 0) {
                     html = '<div class="col-12 text-muted small">No quotas configured for this provider.</div>';

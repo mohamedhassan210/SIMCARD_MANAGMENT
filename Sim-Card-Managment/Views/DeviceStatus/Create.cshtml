@@ -316,9 +316,10 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+               document.addEventListener("DOMContentLoaded", function () {
+            const searchSimsUrl = '@Url.Action("SearchSims", "DeviceStatus")';
+            const searchUsbsUrl = '@Url.Action("SearchUsbs", "DeviceStatus")';
             const deviceCategorySelect = document.getElementById("deviceCategory");
-
             const simIdGroup = document.getElementById("simIdGroup");
             const usbIdGroup = document.getElementById("usbIdGroup");
             const statusSection = document.getElementById("statusSection");
@@ -375,11 +376,10 @@
                     $('#simCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to display selection cards.</div>');
                     return;
                 }
-                $.get('/DeviceStatus/SearchSims', { query: query }, function (data) {
+                              $.get(searchSimsUrl, { query: query }, function (data) {
                     let html = '';
                     if (!data || data.length === 0) {
-                        html = '<div class="col-12 text-muted small">No SIM cards found.</div>';
-                    } else {
+                        html = '<div class="col-12 text-muted small">No SIM cards found.</div>';       } else {
                         data.forEach(sim => {
                             const isSelected = simIdInput.value == sim.id;
                             html += `
@@ -421,7 +421,7 @@
                     $('#usbCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to display selection cards.</div>');
                     return;
                 }
-                $.get('/DeviceStatus/SearchUsbs', { query: query }, function (data) {
+                                $.get(searchUsbsUrl, { query: query }, function (data) {
                     let html = '';
                     if (!data || data.length === 0) {
                         html = '<div class="col-12 text-muted small">No USB modems found.</div>';
@@ -467,7 +467,7 @@
                     $('#replacedBySimCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to pick a replacement SIM (optional).</div>');
                     return;
                 }
-                $.get('/DeviceStatus/SearchSims', { query: query }, function (data) {
+                              $.get(searchSimsUrl, { query: query }, function (data) {
                     let html = '';
                     if (!data || data.length === 0) {
                         html = '<div class="col-12 text-muted small">No SIM cards found.</div>';
@@ -520,7 +520,7 @@
                     $('#replacedByUsbCardsContainer').html('<div class="col-12 text-muted small fst-italic">Search above to pick a replacement USB (optional).</div>');
                     return;
                 }
-                $.get('/DeviceStatus/SearchUsbs', { query: query }, function (data) {
+                               $.get(searchUsbsUrl, { query: query }, function (data) {
                     let html = '';
                     if (!data || data.length === 0) {
                         html = '<div class="col-12 text-muted small">No USB modems found.</div>';

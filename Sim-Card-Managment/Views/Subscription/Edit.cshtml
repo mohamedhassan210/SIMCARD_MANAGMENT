@@ -10,10 +10,10 @@
         if (!string.IsNullOrEmpty(uploadedLogoPath)) return uploadedLogoPath;
 
         var name = (providerName ?? string.Empty).ToLower();
-        if (name.Contains("orange")) return "/img/orange.png";
-        if (name.Contains("vodafone") || name.Contains("fodafone")) return "/img/fodafone.png";
-        if (name.Contains("we")) return "/img/we.png";
-        if (name.Contains("etisalat")) return "/img/etisalat-logo.png";
+        if (name.Contains("orange")) return Url.Content("~/img/orange.png");
+        if (name.Contains("vodafone") || name.Contains("fodafone")) return Url.Content("~/img/fodafone.png");
+        if (name.Contains("we")) return Url.Content("~/img/we.png");
+        if (name.Contains("etisalat")) return Url.Content("~/img/etisalat-logo.png");
         return string.Empty;
     }
 }
@@ -324,16 +324,19 @@
             const originalSimProviderId = @Html.Raw(Model.CurrentSimProviderId.HasValue ? Model.CurrentSimProviderId.Value.ToString() : "null");
             const originalUsbId = @Html.Raw(Model.SelectedUsbId.HasValue ? Model.SelectedUsbId.Value.ToString() : "null");
             const originalQuotaId = @Html.Raw(Model.SelectedQuotaId.HasValue ? Model.SelectedQuotaId.Value.ToString() : "null");
-            const originalFees = @Model.OriginalFees;
+                        const originalFees = @Model.OriginalFees;
+            const searchSimsUrl = '@Url.Action("SearchSims", "Subscription")';
+            const searchUsbsUrl = '@Url.Action("SearchUsbs", "Subscription")';
+            const getQuotasUrl = '@Url.Action("GetQuotasByProvider", "Subscription")';
 
                    function getProviderLogo(providerName, providerLogoPath) {
             if (providerLogoPath) return providerLogoPath;
 
             const name = (providerName || '').toLowerCase();
-            if (name.includes('orange')) return '/img/orange.png';
-            if (name.includes('vodafone') || name.includes('fodafone')) return '/img/fodafone.png';
-            if (name.includes('we')) return '/img/we.png';
-            if (name.includes('etisalat')) return '/img/etisalat-logo.png';
+                       if (name.includes('orange')) return '@Url.Content("~/img/orange.png")';
+            if (name.includes('vodafone') || name.includes('fodafone')) return '@Url.Content("~/img/fodafone.png")';
+            if (name.includes('we')) return '@Url.Content("~/img/we.png")';
+            if (name.includes('etisalat')) return '@Url.Content("~/img/etisalat-logo.png")';
             return '';
         }
 
@@ -349,7 +352,7 @@
 
             function loadSims(query) {
                 if (!query || !query.trim()) { $('#simCardsContainer').empty(); return; }
-                $.get('/Subscription/SearchSims', { query: query }, function (data) {
+                                $.get(searchSimsUrl, { query: query }, function (data) {
                     let html = '';
                     if (!data || data.length === 0) {
                         html = '<div class="col-12 text-muted small">No SIM cards found.</div>';
@@ -401,7 +404,7 @@
 
             function loadUsbs(query) {
                 if (!query || !query.trim()) { $('#usbCardsContainer').empty(); return; }
-                $.get('/Subscription/SearchUsbs', { query: query }, function (data) {
+                                $.get(searchUsbsUrl, { query: query }, function (data) {
                     let html = '';
                     if (!data || data.length === 0) {
                         html = '<div class="col-12 text-muted small">No USB modems found.</div>';
@@ -441,7 +444,7 @@
             };
 
             function loadQuotasForProvider(providerId) {
-                $.get('/Subscription/GetQuotasByProvider', { providerId: providerId }, function (data) {
+                                $.get(getQuotasUrl, { providerId: providerId }, function (data) {
                     let html = '';
                     // Skip the currently displayed "Current" quota — it's already shown above,
                     // no need to list it a second time in the search results.

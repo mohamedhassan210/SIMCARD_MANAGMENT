@@ -19,15 +19,15 @@
     string GetSimLogo(Sim sim)
     {
         if (!string.IsNullOrEmpty(sim.ServiceProvider?.LogoPath))
-            return sim.ServiceProvider.LogoPath;
+            return Url.Content("~" + sim.ServiceProvider.LogoPath);
 
         if (sim.PhoneNumber != null)
         {
-            if (sim.PhoneNumber.StartsWith("010")) return "/img/fodafone.png";
-            if (sim.PhoneNumber.StartsWith("012")) return "/img/orange.png";
-            if (sim.PhoneNumber.StartsWith("011")) return "/img/etisalat.png";
+            if (sim.PhoneNumber.StartsWith("010")) return Url.Content("~/img/fodafone.png");
+            if (sim.PhoneNumber.StartsWith("012")) return Url.Content("~/img/orange.png");
+            if (sim.PhoneNumber.StartsWith("011")) return Url.Content("~/img/etisalat.png");
         }
-        return "/img/we.png";
+        return Url.Content("~/img/we.png");
     }
 }
 

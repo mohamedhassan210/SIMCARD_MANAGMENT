@@ -354,10 +354,10 @@
                                         var simProvider = (Model.SimProviderName ?? "").ToLower();
                                         string simLogo = simProvider switch
                                         {
-                                            var p when p.Contains("we") => "/img/we.png",
-                                            var p when p.Contains("vodafone") || p.Contains("fodafone") => "/img/fodafone.png",
-                                            var p when p.Contains("orange") => "/img/orange.png",
-                                            var p when p.Contains("etisalat") => "/img/etisalat-logo.png",
+                                            var p when p.Contains("we") => Url.Content("~/img/we.png"),
+                                            var p when p.Contains("vodafone") || p.Contains("fodafone") => Url.Content("~/img/fodafone.png"),
+                                            var p when p.Contains("orange") => Url.Content("~/img/orange.png"),
+                                            var p when p.Contains("etisalat") => Url.Content("~/img/etisalat-logo.png"),
                                             _ => ""
                                         };
                                     }
