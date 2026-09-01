@@ -178,6 +178,13 @@
                 </div>
 
                 <div class="col-md-6">
+                    <label class="custom-label" asp-for="PhonePrefixes">Phone Number Prefixes</label>
+                    <input type="text" class="custom-input" asp-for="PhonePrefixes" placeholder="e.g. 010,0100,0101" />
+                    <div class="form-text text-muted mt-1">Comma-separated. Used to auto-detect this provider when registering a new SIM.</div>
+                    <span asp-validation-for="PhonePrefixes" class="field-error"></span>
+                </div>
+
+                <div class="col-md-6">
                     <label class="custom-label">Company Logo</label>
                     <div class="logo-upload-box" id="logoUploadBox">
                         <div class="logo-upload-placeholder" id="logoUploadPlaceholder">

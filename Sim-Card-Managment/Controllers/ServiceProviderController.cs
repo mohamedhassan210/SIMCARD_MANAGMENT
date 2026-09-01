@@ -26,6 +26,21 @@ namespace Sim_Card_Managment.Controllers
         private static readonly string[] AllowedLogoExtensions = { ".png", ".jpg", ".jpeg", ".webp", ".svg" };
         private const long MaxLogoSizeBytes = 2 * 1024 * 1024; // 2 MB
 
+        // Keeps only digits and commas, strips spaces, drops empty entries — e.g. " 010, 0100 ,,011" -> "010,0100,011"
+        private static string? NormalizePhonePrefixes(string? raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return null;
+
+            var parts = raw
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(p => new string(p.Where(char.IsDigit).ToArray()))
+                .Where(p => !string.IsNullOrEmpty(p))
+                .Distinct();
+
+            var result = string.Join(",", parts);
+            return string.IsNullOrEmpty(result) ? null : result;
+        }
+
 
         public async Task<IActionResult> Index()
         {
@@ -123,7 +138,8 @@ namespace Sim_Card_Managment.Controllers
                 {
                     Name = model.Name,
                     DisplayName = model.DisplayName,
-                    IsActive = model.IsActive
+                    IsActive = model.IsActive,
+                    PhonePrefixes = NormalizePhonePrefixes(model.PhonePrefixes)
                 };
 
                 if (model.LogoFile != null && model.LogoFile.Length > 0)
@@ -236,7 +252,8 @@ namespace Sim_Card_Managment.Controllers
                 Id = provider.Id,
                 Name = provider.Name,
                 DisplayName = provider.DisplayName,
-                LogoPath = provider.LogoPath
+                LogoPath = provider.LogoPath,
+                PhonePrefixes = provider.PhonePrefixes
             };
 
             return View(model);
@@ -258,6 +275,7 @@ namespace Sim_Card_Managment.Controllers
 
             existing.Name = model.Name;
             existing.DisplayName = model.DisplayName;
+            existing.PhonePrefixes = NormalizePhonePrefixes(model.PhonePrefixes);
 
             if (model.LogoFile != null && model.LogoFile.Length > 0)
             {

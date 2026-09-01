@@ -21,12 +21,12 @@
         if (!string.IsNullOrEmpty(sim.ServiceProvider?.LogoPath))
             return Url.Content("~" + sim.ServiceProvider.LogoPath);
 
-        if (sim.PhoneNumber != null)
-        {
-            if (sim.PhoneNumber.StartsWith("010")) return Url.Content("~/img/fodafone.png");
-            if (sim.PhoneNumber.StartsWith("012")) return Url.Content("~/img/orange.png");
-            if (sim.PhoneNumber.StartsWith("011")) return Url.Content("~/img/etisalat.png");
-        }
+        // No uploaded logo — fall back to a static icon matched by provider name,
+        // since the SIM's ServiceProvider is already known (no need to re-derive from phone prefix).
+        var name = (sim.ServiceProvider?.Name ?? string.Empty).ToLower();
+        if (name.Contains("vodafone") || name.Contains("fodafone")) return Url.Content("~/img/fodafone.png");
+        if (name.Contains("orange")) return Url.Content("~/img/orange.png");
+        if (name.Contains("etisalat")) return Url.Content("~/img/etisalat.png");
         return Url.Content("~/img/we.png");
     }
 }

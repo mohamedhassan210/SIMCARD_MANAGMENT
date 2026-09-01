@@ -18,10 +18,12 @@ namespace Sim_Card_Managment.Viewmodel
         [Display(Name = "نشط")]
         public bool IsActive { get; set; } = true;
 
-       
-        public string? LogoPath { get; set; }
 
+        public string? LogoPath { get; set; }
         [Display(Name = "شعار الشركة")]
         public IFormFile? LogoFile { get; set; }
+
+        [Display(Name = "بادئات رقم الهاتف")]
+        public string? PhonePrefixes { get; set; }
     }
 }

@@ -61,36 +61,39 @@
     </section>
 
     <script>
-        // ============================================
-        // 📱 PHONE NUMBER PROVIDER DETECTION
-        // ============================================
-        document.getElementById('cs-phone-input').addEventListener('input', function () {
-            const val = this.value.trim();
-            const badge = document.getElementById('cs-provider-detected');
+           // ============================================
+    // 📱 PHONE NUMBER PROVIDER DETECTION (dynamic, from DB-configured prefixes)
+    // ============================================
+    var providerPrefixMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.ProviderPrefixMap ?? new Dictionary<string, int>()));
+    var providerNames = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.ProviderNames ?? new Dictionary<int, string>()));
 
-            // Remove all provider classes
-            badge.className = 'cs-provider-badge';
-
-            if (val.startsWith('010')) {
-                badge.style.display = 'inline-block';
-                badge.classList.add('cs-provider-vodafone');
-                badge.innerText = 'Detected Provider: Vodafone';
-            } else if (val.startsWith('012')) {
-                badge.style.display = 'inline-block';
-                badge.classList.add('cs-provider-orange');
-                badge.innerText = 'Detected Provider: Orange';
-            } else if (val.startsWith('015')) {
-                badge.style.display = 'inline-block';
-                badge.classList.add('cs-provider-we');
-                badge.innerText = 'Detected Provider: WE';
-            } else if (val.startsWith('011')) {
-                badge.style.display = 'inline-block';
-                badge.classList.add('cs-provider-etisalat');
-                badge.innerText = 'Detected Provider: Etisalat';
-            } else {
-                badge.style.display = 'none';
+    function detectProviderIdFromPrefixMap(phoneValue) {
+        // Longest matching prefix wins
+        var bestPrefix = null;
+        for (var prefix in providerPrefixMap) {
+            if (phoneValue.startsWith(prefix)) {
+                if (bestPrefix === null || prefix.length > bestPrefix.length) {
+                    bestPrefix = prefix;
+                }
             }
-        });
+        }
+        return bestPrefix !== null ? providerPrefixMap[bestPrefix] : null;
+    }
+
+    document.getElementById('cs-phone-input').addEventListener('input', function () {
+        const val = this.value.trim();
+        const badge = document.getElementById('cs-provider-detected');
+
+        badge.className = 'cs-provider-badge';
+
+        const providerId = detectProviderIdFromPrefixMap(val);
+        if (providerId !== null && providerNames[providerId]) {
+            badge.style.display = 'inline-block';
+            badge.innerText = 'Detected Provider: ' + providerNames[providerId];
+        } else {
+            badge.style.display = 'none';
+        }
+    });
 
         // ============================================
         // 📱 FORM VALIDATION

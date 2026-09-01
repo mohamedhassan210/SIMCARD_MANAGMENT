@@ -20,6 +20,10 @@ namespace Sim_Card_Managment.Models
         [MaxLength(300)]
         public string? LogoPath { get; set; }
 
+        // NEW — comma-separated phone number prefixes this provider owns, e.g. "010,0100,0101"
+        [MaxLength(200)]
+        public string? PhonePrefixes { get; set; }
+
         public virtual ICollection<Quota> Quotas { get; set; } = new List<Quota>();
         public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
         public virtual ICollection<Sim> Sims { get; set; } = new List<Sim>();

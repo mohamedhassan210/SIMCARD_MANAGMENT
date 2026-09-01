@@ -31,21 +31,39 @@ namespace Sim_Card_Managment.Controllers
             _context = context;
         }
 
+        // Matches a phone number against each active provider's comma-separated PhonePrefixes.
+        // Longest matching prefix wins, so a more specific prefix beats a shorter overlapping one.
         private Sim_Card_Managment.Models.ServiceProvider? DetectServiceProvider(string phoneNumber)
         {
             if (string.IsNullOrWhiteSpace(phoneNumber)) return null;
+            var cleaned = phoneNumber.Trim();
 
-            string cleanedPhone = phoneNumber.Trim();
-            string targetProviderName = string.Empty;
+            var activeProviders = _context.ServiceProviders.Where(sp => sp.IsActive).ToList();
 
-            if (cleanedPhone.StartsWith("010")) targetProviderName = "Vodafone";
-            else if (cleanedPhone.StartsWith("012")) targetProviderName = "Orange";
-            else if (cleanedPhone.StartsWith("015")) targetProviderName = "WE";
-            else if (cleanedPhone.StartsWith("011")) targetProviderName = "Etisalat";
-            else return null;
+            return activeProviders
+                .Where(p => !string.IsNullOrWhiteSpace(p.PhonePrefixes))
+                .SelectMany(p => p.PhonePrefixes!
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Select(prefix => new { Provider = p, Prefix = prefix }))
+                .Where(x => cleaned.StartsWith(x.Prefix))
+                .OrderByDescending(x => x.Prefix.Length)
+                .Select(x => x.Provider)
+                .FirstOrDefault();
+        }
 
-            return _context.ServiceProviders
-                .FirstOrDefault(sp => sp.Name.ToLower() == targetProviderName.ToLower());
+        // Builds a prefix -> providerId map for sending to the browser as JSON,
+        // so client-side JS can detect a provider live as the user types, without a round trip per keystroke.
+        private static Dictionary<string, int> BuildPrefixToProviderIdMap(IEnumerable<Sim_Card_Managment.Models.ServiceProvider> providers)
+        {
+            var map = new Dictionary<string, int>();
+            foreach (var p in providers.Where(p => !string.IsNullOrWhiteSpace(p.PhonePrefixes)))
+            {
+                foreach (var prefix in p.PhonePrefixes!.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                {
+                    map[prefix] = p.Id;
+                }
+            }
+            return map;
         }
 
         // Shared by Index and ExportDevicesExcel so both always see the same data.
@@ -209,6 +227,12 @@ namespace Sim_Card_Managment.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            var activeProviders = _context.ServiceProviders.Where(sp => sp.IsActive).ToList();
+            var prefixMap = BuildPrefixToProviderIdMap(activeProviders);
+
+            ViewBag.ProviderPrefixMap = prefixMap;
+            ViewBag.ProviderNames = activeProviders.ToDictionary(p => p.Id, p => p.DisplayName ?? p.Name);
+
             return View();
         }
 

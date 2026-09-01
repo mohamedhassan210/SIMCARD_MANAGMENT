@@ -10,5 +10,6 @@ namespace Sim_Card_Managment.Viewmodel
 
         public string? LogoPath { get; set; }
         public IFormFile? LogoFile { get; set; }
+        public string? PhonePrefixes { get; set; }
     }
 }
